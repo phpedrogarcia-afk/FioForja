@@ -1,0 +1,1535 @@
+{
+  "baselineCommit": "dd43842926ff109dee8df7ddb2731f1eb3afce43",
+  "baselineMeasurementsSHA256": "cbb2183a68ec2abf206f414f0c33d404686e48a039a8a81a0b530031f372c4fc",
+  "url": "http://127.0.0.1:8080/",
+  "dpr": 1,
+  "seed": 101,
+  "capture": {
+    "date": "2026-10-07",
+    "clock": "2026-10-07T12:00:00Z",
+    "swordDesign": "DEFAULT_DESIGN",
+    "phases": [
+      "heat",
+      "forge-rest",
+      "forge-charge",
+      "impact",
+      "quench"
+    ]
+  },
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "baselineFile": "viewport-390x844.webp",
+      "comparisonFile": "comparison-390x844.webp",
+      "baselineFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 0,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.7783974170824772,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1663660280087662,
+              -0.11702695295186898,
+              0.11702695295186898,
+              1.1663660280087662,
+              -579.0207272597877,
+              88.03118933564906
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.09392427355444673,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              1.0893787702901592,
+              -0.4328497589825425,
+              0.4328497589825425,
+              1.0893787702901592,
+              -597.9585587988336,
+              340.31097050047265
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.8890775114469,
+            0.36219234022508845
+          ],
+          "impactAnchor": [
+            44.28870026633092,
+            557.402192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.1722222566604614,
+              0,
+              0,
+              1.1722222566604614,
+              -555.8890991210938,
+              0.3621923327445984
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ],
+      "candidateFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -168.3888888888889,
+            0
+          ],
+          "impactAnchor": [
+            431.7888888888889,
+            557.04
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.3105371294393895,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              70.54214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1663660280087662,
+              -0.11702695295186898,
+              0.11702695295186898,
+              1.1663660280087662,
+              -579.0207272597877,
+              88.03118933564906
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.11153507484590548,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              169.0115573194804,
+              430,
+              430
+            ],
+            "matrix": [
+              1.0893787702901592,
+              -0.4328497589825425,
+              0.4328497589825425,
+              1.0893787702901592,
+              -597.9585587988336,
+              340.31097050047265
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.8890775114469,
+            0.36219234022508845
+          ],
+          "impactAnchor": [
+            44.28870026633092,
+            557.402192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.1722222566604614,
+              0,
+              0,
+              1.1722222566604614,
+              -555.8890991210938,
+              0.3621923327445984
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ]
+    },
+    {
+      "width": 412,
+      "height": 915,
+      "baselineFile": "viewport-412x915.webp",
+      "comparisonFile": "comparison-412x915.webp",
+      "baselineFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 0,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.7749188108918311,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.2644844995787377,
+              -0.12687163762236767,
+              0.12687163762236767,
+              1.2644844995787377,
+              -633.1338176627775,
+              95.43665686529465
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.09392955283537346,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1810208254725503,
+              -0.4692624765608347,
+              0.4692624765608347,
+              1.1810208254725503,
+              -653.6647606615535,
+              368.93902677282927
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -608.0001886225579,
+            0.36219234022508845
+          ],
+          "impactAnchor": [
+            42.66647804410877,
+            604.262192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.2708333730697632,
+              0,
+              0,
+              1.2708333730697632,
+              -608.0001831054688,
+              0.3621923327445984
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ],
+      "candidateFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -187.95833333333331,
+            0
+          ],
+          "impactAnchor": [
+            462.7083333333333,
+            603.9
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.3100174868848364,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              70.54214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.2644844995787377,
+              -0.12687163762236767,
+              0.12687163762236767,
+              1.2644844995787377,
+              -633.1338176627775,
+              95.43665686529465
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.11091681239070697,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              169.0115573194804,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1810208254725503,
+              -0.4692624765608347,
+              0.4692624765608347,
+              1.1810208254725503,
+              -653.6647606615535,
+              368.93902677282927
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -608.0001886225579,
+            0.36219234022508845
+          ],
+          "impactAnchor": [
+            42.66647804410877,
+            604.262192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.2708333730697632,
+              0,
+              0,
+              1.2708333730697632,
+              -608.0001831054688,
+              0.3621923327445984
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ]
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "baselineFile": "viewport-844x390.webp",
+      "comparisonFile": "comparison-844x390.webp",
+      "baselineFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.7834394904458599,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6560808833415722,
+              -0.06582766029160939,
+              0.06582766029160939,
+              0.6560808833415722,
+              -13.386655117671353,
+              7.142543441781157
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.09099181073703366,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6127755513641826,
+              -0.24347798667651074,
+              0.24347798667651074,
+              0.6127755513641826,
+              -24.039185238016785,
+              149.04991874351794
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            -0.666855289224597,
+            -42.01280765977494
+          ],
+          "impactAnchor": [
+            336.9331447107754,
+            271.3221923402251
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              0.659375011920929,
+              0,
+              0,
+              0.659375011920929,
+              -0.6668552756309509,
+              -42.0128059387207
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ],
+      "candidateFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.3075523202911738,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              70.54214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6560808833415722,
+              -0.06582766029160939,
+              0.06582766029160939,
+              0.6560808833415722,
+              -13.386655117671353,
+              7.142543441781157
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.1091901728844404,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              169.0115573194804,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6127755513641826,
+              -0.24347798667651074,
+              0.24347798667651074,
+              0.6127755513641826,
+              -24.039185238016785,
+              149.04991874351794
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            -0.666855289224597,
+            -42.01280765977494
+          ],
+          "impactAnchor": [
+            336.9331447107754,
+            271.3221923402251
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              0.659375011920929,
+              0,
+              0,
+              0.659375011920929,
+              -0.6668552756309509,
+              -42.0128059387207
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ]
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "baselineFile": "viewport-1366x768.webp",
+      "comparisonFile": "comparison-1366x768.webp",
+      "baselineFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.7758558558558558,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.061856055078139,
+              -0.10654097908821519,
+              0.10654097908821519,
+              1.061856055078139,
+              -21.6660798308028,
+              79.95582481148574
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.09297297297297297,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              0.9917670917430808,
+              -0.3940650931846854,
+              0.3940650931846854,
+              0.9917670917430808,
+              -38.907023588497964,
+              309.6305639334678
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            -0.666855289224597,
+            0.17469234022508845
+          ],
+          "impactAnchor": [
+            545.7331447107754,
+            507.302192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.0671875476837158,
+              0,
+              0,
+              1.0671875476837158,
+              -0.6668552756309509,
+              0.17469234764575958
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ],
+      "candidateFrames": [
+        {
+          "phase": "heat",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "quality": 42,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-rest",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.3153153153153153,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              70.54214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.061856055078139,
+              -0.10654097908821519,
+              0.10654097908821519,
+              1.061856055078139,
+              -21.6660798308028,
+              79.95582481148574
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "forge-charge",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0.110990990990991,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              169.0115573194804,
+              430,
+              430
+            ],
+            "matrix": [
+              0.9917670917430808,
+              -0.3940650931846854,
+              0.3940650931846854,
+              0.9917670917430808,
+              -38.907023588497964,
+              309.6305639334678
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true
+          }
+        },
+        {
+          "phase": "impact",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            -0.666855289224597,
+            0.17469234022508845
+          ],
+          "impactAnchor": [
+            545.7331447107754,
+            507.302192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.0671875476837158,
+              0,
+              0,
+              1.0671875476837158,
+              -0.6668552756309509,
+              0.17469234764575958
+            ]
+          },
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false
+          }
+        },
+        {
+          "phase": "quench",
+          "bladeVisibleFraction": 1,
+          "overlapFraction": 0,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false
+          }
+        }
+      ]
+    }
+  ],
+  "browser": "156.0.4314.8",
+  "sourceHashes": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "src/game/ForgeCanvas.tsx": "184eb31bca95f5ed4e02a47e42f971bb71c6477f6d018a46e5a5e3217f3df368",
+    "src/game/swordDraw.ts": "ab871b98358e3ae8e213953c7a277df32f4e8a829ab973ec4d6d1c9dc2a9528d",
+    "src/game/GameApp.tsx": "e371c2c10414455ffd0b2d138a306900f6e58ce3df2a7bb1f0b413aa5abb47fc",
+    "src/game/screens/ForgeHud.tsx": "f9e8130be172c3dc0a2047d6aa776cc312f7df3b4b1fb1e7b3fc11b037c9e41a",
+    "src/game/catalog.ts": "6d202e84ff252b7bd13599e08495819e08002b14892567fc120eef44b14771ef",
+    "experiments/M01-R1/capture.mjs": "200358e12aaf623ccd213f7e203d59ba156f3d323a29aa5362064a57f1b018cf",
+    "experiments/M01-R1/evidence/measurements.json": "cbb2183a68ec2abf206f414f0c33d404686e48a039a8a81a0b530031f372c4fc",
+    "experiments/M01-R2/capture.mjs": "1543b14fd7ae50b1cc4e648919936cb359ac02b2887fb5c4b34fbb92b1243b00"
+  },
+  "evidenceHashes": {
+    "comparison-1366x768.webp": "bf4470ce8071d0f7b25e69d197b70d81c6fb6b92875251c4347a7d53f535ca6a",
+    "comparison-390x844.webp": "60cfd6d135bb223dfb5ad98b0eaf9ef2a74770861a051c5b9f21b8f023f4486e",
+    "comparison-412x915.webp": "9de9630c7369a71ecd5cf46ccc20fd1b681910c9f124c9684436c1f4bbd25a01",
+    "comparison-844x390.webp": "2a6b74626dcf4e19c3f7af4d3f8eb328549f3d3901e6a24ce2fcd2829f94b02f"
+  }
+}

@@ -152,7 +152,9 @@ export function ForgeCanvas({
       const cssW = canvas.width / dpr;
       const cssH = canvas.height / dpr;
       const scale = Math.max(cssW / VW, cssH / VH);
-      const ox = (cssW - VW * scale) / 2;
+      const portraitHeat = cssW / cssH < 1 && sim.phase === "heat";
+      const focusX = portraitHeat ? 310 : VW / 2;
+      const ox = cssW / 2 - focusX * scale;
       const oy = (cssH - VH * scale) / 2;
       const shakeAmt = trauma * trauma;
       const sx = shake && !reducedMotion ? Math.sin(time * 47) * 16 * shakeAmt : 0;
@@ -300,6 +302,7 @@ function drawHand(
 
   const charge = sim.charging ? sim.force : 0;
   const bob = Math.sin(time * 2.2) * 5;
+  const restLift = size * 0.225 * Math.pow(1 - charge, 3);
   ctx.save();
   const pivotX = hx + size * 0.74;
   const pivotY = hy + size * 0.16;
@@ -307,7 +310,7 @@ function drawHand(
   ctx.rotate(-0.1 - charge * 0.42);
   ctx.translate(-pivotX, -pivotY);
   if (images.hand) {
-    ctx.drawImage(images.hand, hx, hy + bob, size, size);
+    ctx.drawImage(images.hand, hx, hy + bob - restLift, size, size);
   }
   ctx.restore();
 }
