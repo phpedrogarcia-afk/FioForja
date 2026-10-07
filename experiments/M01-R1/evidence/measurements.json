@@ -1,0 +1,1245 @@
+{
+  "base": "e588242c30c325ac823579079628e1d0cd2231be",
+  "url": "http://127.0.0.1:8080/",
+  "dpr": 1,
+  "seed": 101,
+  "alphaThreshold": 128,
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "file": "viewport-390x844.webp",
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 390,
+          "height": 844,
+          "scale": 1.1722222222222223,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "cropX": 947.2985781990521,
+          "cropY": 0,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "hud": {
+            "phase": "heat",
+            "heat": 0.6305600000000013,
+            "shape": 0.18,
+            "quality": 42,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.66,
+            "sweetWidth": 0.16,
+            "strikes": 0,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Ponto certo — retire agora.",
+            "warp": 0
+          },
+          "logicalBladeBounds": [
+            258,
+            320,
+            359,
+            383
+          ],
+          "bladeVisibleFraction": 0,
+          "visibleBladePixels": 0,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": null,
+          "bodyText": "AQUECER\n\nPonto certo — retire agora.\n\nMUDO\nSAIR\n\nCALOR\n\n64%\n\nFORMA\n\n18%\n\nQUALIDADE\n\n42\n\nRETIRAR DO FOGO"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 390,
+          "height": 844,
+          "scale": 1.1722222222222223,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "cropX": 947.2985781990521,
+          "cropY": 0,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.5182399999999903,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.6794719731589259,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 3407,
+          "overlapPixels": 2652,
+          "overlapFraction": 0.7783974170824772,
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1663660280087662,
+              -0.11702695295186898,
+              0.11702695295186898,
+              1.1663660280087662,
+              -579.0207272597877,
+              88.03118933564906
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n52%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "forge-charge",
+          "width": 390,
+          "height": 844,
+          "scale": 1.1722222222222223,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "cropX": 947.2985781990521,
+          "cropY": 0,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49878399999998874,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true,
+            "sweetCenter": 0.7129411474064667,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 3407,
+          "overlapPixels": 320,
+          "overlapFraction": 0.09392427355444673,
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              1.0893787702901592,
+              -0.4328497589825425,
+              0.4328497589825425,
+              1.0893787702901592,
+              -597.9585587988336,
+              340.31097050047265
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "impact",
+          "width": 390,
+          "height": 844,
+          "scale": 1.1722222222222223,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "cropX": 947.2985781990521,
+          "cropY": 0,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.8890775114469,
+            0.36219234022508845
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49391999999998876,
+            "shape": 0.5185,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.720060312944276,
+            "sweetWidth": 0.16,
+            "strikes": 4,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Fraco — o ferro estava frio.",
+            "warp": 0.21000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            449,
+            717,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 3649,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            44.28870026633092,
+            557.402192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.1722222566604614,
+              0,
+              0,
+              1.1722222566604614,
+              -555.8890991210938,
+              0.3621923327445984
+            ]
+          },
+          "bodyText": "MARTELAR\n\nFraco — o ferro estava frio.\n\nMUDO\nSAIR\n\nCALOR\n\n49%\n\nFORMA\n\n52%\n\nGOLPES\n\n4/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "quench",
+          "width": 390,
+          "height": 844,
+          "scale": 1.1722222222222223,
+          "visibleW": 332.70142180094786,
+          "visibleH": 720,
+          "cropX": 947.2985781990521,
+          "cropY": 0,
+          "sceneFraction": 0.2599229857819905,
+          "outer": [
+            -555.2222222222223,
+            0
+          ],
+          "hud": {
+            "phase": "quench",
+            "heat": 0.5,
+            "shape": 0.6619999999999999,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.5225744818994436,
+            "sweetWidth": 0.16,
+            "strikes": 8,
+            "maxStrikes": 8,
+            "quenchFill": 0.3072000000000001,
+            "message": "Segure para mergulhar…",
+            "warp": 0.53
+          },
+          "logicalBladeBounds": [
+            522,
+            446,
+            743,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 4496,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            44.95555555555552,
+            557.04
+          ],
+          "hand": null,
+          "bodyText": "TEMPERAR\n\nSegure para mergulhar…\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n66%\n\nQUALIDADE\n\n40\n\nSegure para mergulhar. Solte na faixa."
+        }
+      ]
+    },
+    {
+      "width": 412,
+      "height": 915,
+      "file": "viewport-412x915.webp",
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 412,
+          "height": 915,
+          "scale": 1.2708333333333333,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "cropX": 955.8032786885246,
+          "cropY": 0,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "hud": {
+            "phase": "heat",
+            "heat": 0.6305600000000013,
+            "shape": 0.18,
+            "quality": 42,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.66,
+            "sweetWidth": 0.16,
+            "strikes": 0,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Ponto certo — retire agora.",
+            "warp": 0
+          },
+          "logicalBladeBounds": [
+            258,
+            320,
+            359,
+            383
+          ],
+          "bladeVisibleFraction": 0,
+          "visibleBladePixels": 0,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": null,
+          "bodyText": "AQUECER\n\nPonto certo — retire agora.\n\nMUDO\nSAIR\n\nCALOR\n\n64%\n\nFORMA\n\n18%\n\nQUALIDADE\n\n42\n\nRETIRAR DO FOGO"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 412,
+          "height": 915,
+          "scale": 1.2708333333333333,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "cropX": 955.8032786885246,
+          "cropY": 0,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.5182399999999903,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.6794719731589259,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 4003,
+          "overlapPixels": 3102,
+          "overlapFraction": 0.7749188108918311,
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.2644844995787377,
+              -0.12687163762236767,
+              0.12687163762236767,
+              1.2644844995787377,
+              -633.1338176627775,
+              95.43665686529465
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n52%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "forge-charge",
+          "width": 412,
+          "height": 915,
+          "scale": 1.2708333333333333,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "cropX": 955.8032786885246,
+          "cropY": 0,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49878399999998874,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true,
+            "sweetCenter": 0.7129411474064667,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 4003,
+          "overlapPixels": 376,
+          "overlapFraction": 0.09392955283537346,
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              1.1810208254725503,
+              -0.4692624765608347,
+              0.4692624765608347,
+              1.1810208254725503,
+              -653.6647606615535,
+              368.93902677282927
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "impact",
+          "width": 412,
+          "height": 915,
+          "scale": 1.2708333333333333,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "cropX": 955.8032786885246,
+          "cropY": 0,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -608.0001886225579,
+            0.36219234022508845
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49391999999998876,
+            "shape": 0.5185,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.720060312944276,
+            "sweetWidth": 0.16,
+            "strikes": 4,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Fraco — o ferro estava frio.",
+            "warp": 0.21000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            449,
+            717,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 4304,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            42.66647804410877,
+            604.262192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.2708333730697632,
+              0,
+              0,
+              1.2708333730697632,
+              -608.0001831054688,
+              0.3621923327445984
+            ]
+          },
+          "bodyText": "MARTELAR\n\nFraco — o ferro estava frio.\n\nMUDO\nSAIR\n\nCALOR\n\n49%\n\nFORMA\n\n52%\n\nGOLPES\n\n4/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "quench",
+          "width": 412,
+          "height": 915,
+          "scale": 1.2708333333333333,
+          "visibleW": 324.1967213114754,
+          "visibleH": 720,
+          "cropX": 955.8032786885246,
+          "cropY": 0,
+          "sceneFraction": 0.2532786885245902,
+          "outer": [
+            -607.3333333333333,
+            0
+          ],
+          "hud": {
+            "phase": "quench",
+            "heat": 0.5,
+            "shape": 0.6619999999999999,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.5225744818994436,
+            "sweetWidth": 0.16,
+            "strikes": 8,
+            "maxStrikes": 8,
+            "quenchFill": 0.3072000000000001,
+            "message": "Segure para mergulhar…",
+            "warp": 0.53
+          },
+          "logicalBladeBounds": [
+            522,
+            446,
+            743,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 5251,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            43.33333333333337,
+            603.9
+          ],
+          "hand": null,
+          "bodyText": "TEMPERAR\n\nSegure para mergulhar…\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n66%\n\nQUALIDADE\n\n40\n\nSegure para mergulhar. Solte na faixa."
+        }
+      ]
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "file": "viewport-844x390.webp",
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 844,
+          "height": 390,
+          "scale": 0.659375,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "cropX": 0,
+          "cropY": 128.53080568720384,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "hud": {
+            "phase": "heat",
+            "heat": 0.6305600000000013,
+            "shape": 0.18,
+            "quality": 42,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.66,
+            "sweetWidth": 0.16,
+            "strikes": 0,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Ponto certo — retire agora.",
+            "warp": 0
+          },
+          "logicalBladeBounds": [
+            258,
+            320,
+            359,
+            383
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 1920,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "bodyText": "AQUECER\n\nPonto certo — retire agora.\n\nMUDO\nSAIR\n\nCALOR\n\n64%\n\nFORMA\n\n18%\n\nQUALIDADE\n\n42\n\nRETIRAR DO FOGO"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 844,
+          "height": 390,
+          "scale": 0.659375,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "cropX": 0,
+          "cropY": 128.53080568720384,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.5182399999999903,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.6794719731589259,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 1099,
+          "overlapPixels": 861,
+          "overlapFraction": 0.7834394904458599,
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6560808833415722,
+              -0.06582766029160939,
+              0.06582766029160939,
+              0.6560808833415722,
+              -13.386655117671353,
+              7.142543441781157
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n52%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "forge-charge",
+          "width": 844,
+          "height": 390,
+          "scale": 0.659375,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "cropX": 0,
+          "cropY": 128.53080568720384,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49878399999998874,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true,
+            "sweetCenter": 0.7129411474064667,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 1099,
+          "overlapPixels": 100,
+          "overlapFraction": 0.09099181073703366,
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              0.6127755513641826,
+              -0.24347798667651074,
+              0.24347798667651074,
+              0.6127755513641826,
+              -24.039185238016785,
+              149.04991874351794
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "impact",
+          "width": 844,
+          "height": 390,
+          "scale": 0.659375,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "cropX": 0,
+          "cropY": 128.53080568720384,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            -0.666855289224597,
+            -42.01280765977494
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49391999999998876,
+            "shape": 0.5185,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.720060312944276,
+            "sweetWidth": 0.16,
+            "strikes": 4,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Fraco — o ferro estava frio.",
+            "warp": 0.21000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            449,
+            717,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 1160,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            336.9331447107754,
+            271.3221923402251
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              0.659375011920929,
+              0,
+              0,
+              0.659375011920929,
+              -0.6668552756309509,
+              -42.0128059387207
+            ]
+          },
+          "bodyText": "MARTELAR\n\nFraco — o ferro estava frio.\n\nMUDO\nSAIR\n\nCALOR\n\n49%\n\nFORMA\n\n52%\n\nGOLPES\n\n4/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "quench",
+          "width": 844,
+          "height": 390,
+          "scale": 0.659375,
+          "visibleW": 1280,
+          "visibleH": 591.4691943127962,
+          "cropX": 0,
+          "cropY": 128.53080568720384,
+          "sceneFraction": 0.8214849921011058,
+          "outer": [
+            0,
+            -42.37500000000003
+          ],
+          "hud": {
+            "phase": "quench",
+            "heat": 0.5,
+            "shape": 0.6619999999999999,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.5225744818994436,
+            "sweetWidth": 0.16,
+            "strikes": 8,
+            "maxStrikes": 8,
+            "quenchFill": 0.3072000000000001,
+            "message": "Segure para mergulhar…",
+            "warp": 0.53
+          },
+          "logicalBladeBounds": [
+            522,
+            446,
+            743,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 1433,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            337.6,
+            270.96000000000004
+          ],
+          "hand": null,
+          "bodyText": "TEMPERAR\n\nSegure para mergulhar…\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n66%\n\nQUALIDADE\n\n40\n\nSegure para mergulhar. Solte na faixa."
+        }
+      ]
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "file": "viewport-1366x768.webp",
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 1366,
+          "height": 768,
+          "scale": 1.0671875,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "cropX": 0,
+          "cropY": 0.35139092240115133,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "hud": {
+            "phase": "heat",
+            "heat": 0.6305600000000013,
+            "shape": 0.18,
+            "quality": 42,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.66,
+            "sweetWidth": 0.16,
+            "strikes": 0,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Ponto certo — retire agora.",
+            "warp": 0
+          },
+          "logicalBladeBounds": [
+            258,
+            320,
+            359,
+            383
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 4989,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "bodyText": "AQUECER\n\nPonto certo — retire agora.\n\nMUDO\nSAIR\n\nCALOR\n\n64%\n\nFORMA\n\n18%\n\nQUALIDADE\n\n42\n\nRETIRAR DO FOGO"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 1366,
+          "height": 768,
+          "scale": 1.0671875,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "cropX": 0,
+          "cropY": 0.35139092240115133,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.5182399999999903,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.6794719731589259,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 2775,
+          "overlapPixels": 2153,
+          "overlapFraction": 0.7758558558558558,
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              167.29214601869876,
+              430,
+              430
+            ],
+            "matrix": [
+              1.061856055078139,
+              -0.10654097908821519,
+              0.10654097908821519,
+              1.061856055078139,
+              -21.6660798308028,
+              79.95582481148574
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n52%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "forge-charge",
+          "width": 1366,
+          "height": 768,
+          "scale": 1.0671875,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "cropX": 0,
+          "cropY": 0.35139092240115133,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49878399999998874,
+            "shape": 0.48,
+            "quality": 44.419563636363804,
+            "force": 0.5519999999999996,
+            "charging": true,
+            "sweetCenter": 0.7129411474064667,
+            "sweetWidth": 0.16,
+            "strikes": 3,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Golpe perfeito. A lâmina canta.",
+            "warp": 0.18000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            450,
+            710,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 2775,
+          "overlapPixels": 258,
+          "overlapFraction": 0.09297297297297297,
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": {
+            "source": "hand.png",
+            "args": [
+              422,
+              172.73425944760842,
+              430,
+              430
+            ],
+            "matrix": [
+              0.9917670917430808,
+              -0.3940650931846854,
+              0.3940650931846854,
+              0.9917670917430808,
+              -38.907023588497964,
+              309.6305639334678
+            ]
+          },
+          "bodyText": "MARTELAR\n\nGolpe perfeito. A lâmina canta.\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n48%\n\nGOLPES\n\n3/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "impact",
+          "width": 1366,
+          "height": 768,
+          "scale": 1.0671875,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "cropX": 0,
+          "cropY": 0.35139092240115133,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            -0.666855289224597,
+            0.17469234022508845
+          ],
+          "hud": {
+            "phase": "forge",
+            "heat": 0.49391999999998876,
+            "shape": 0.5185,
+            "quality": 45.0177636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.720060312944276,
+            "sweetWidth": 0.16,
+            "strikes": 4,
+            "maxStrikes": 8,
+            "quenchFill": 0,
+            "message": "Fraco — o ferro estava frio.",
+            "warp": 0.21000000000000002
+          },
+          "logicalBladeBounds": [
+            520,
+            449,
+            717,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 3033,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            545.7331447107754,
+            507.302192340225
+          ],
+          "hand": {
+            "source": "hand-strike.png",
+            "args": [
+              384,
+              0,
+              384,
+              384,
+              412,
+              201.60000000000002,
+              450,
+              297
+            ],
+            "matrix": [
+              1.0671875476837158,
+              0,
+              0,
+              1.0671875476837158,
+              -0.6668552756309509,
+              0.17469234764575958
+            ]
+          },
+          "bodyText": "MARTELAR\n\nFraco — o ferro estava frio.\n\nMUDO\nSAIR\n\nCALOR\n\n49%\n\nFORMA\n\n52%\n\nGOLPES\n\n4/8\n\nSegure na bigorna para carregar. Solte no brilho."
+        },
+        {
+          "phase": "quench",
+          "width": 1366,
+          "height": 768,
+          "scale": 1.0671875,
+          "visibleW": 1280,
+          "visibleH": 719.6486090775988,
+          "cropX": 0,
+          "cropY": 0.35139092240115133,
+          "sceneFraction": 0.9995119570522206,
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "hud": {
+            "phase": "quench",
+            "heat": 0.5,
+            "shape": 0.6619999999999999,
+            "quality": 40.1775636363638,
+            "force": 0,
+            "charging": false,
+            "sweetCenter": 0.5225744818994436,
+            "sweetWidth": 0.16,
+            "strikes": 8,
+            "maxStrikes": 8,
+            "quenchFill": 0.3072000000000001,
+            "message": "Segure para mergulhar…",
+            "warp": 0.53
+          },
+          "logicalBladeBounds": [
+            522,
+            446,
+            743,
+            471
+          ],
+          "bladeVisibleFraction": 1,
+          "visibleBladePixels": 3732,
+          "overlapPixels": 0,
+          "overlapFraction": 0,
+          "impactAnchor": [
+            546.4,
+            506.93999999999994
+          ],
+          "hand": null,
+          "bodyText": "TEMPERAR\n\nSegure para mergulhar…\n\nMUDO\nSAIR\n\nCALOR\n\n50%\n\nFORMA\n\n66%\n\nQUALIDADE\n\n40\n\nSegure para mergulhar. Solte na faixa."
+        }
+      ]
+    }
+  ],
+  "quality": {
+    "design": {
+      "name": "Lâmina sem nome",
+      "profile": "long",
+      "steel": "damascus",
+      "wrap": "leather",
+      "guard": "cross",
+      "pommel": "disc",
+      "inscription": "FORJA",
+      "runes": true,
+      "length": 1
+    },
+    "width": 512,
+    "height": 480,
+    "x": 256,
+    "y": 340,
+    "angle": -1.4612058853906016,
+    "lengthPx": 304,
+    "shape": 1,
+    "heat": 0,
+    "assembled": true,
+    "fontAvailable": true,
+    "results": [
+      {
+        "quality": 20,
+        "changedPixelsVs20": 0,
+        "silhouetteMaskDiffVs20": 0,
+        "geometrySHA256": "1439103ea7b9d0d5ddbf4b2022bc7ef6aefb679f3421b93e7eed392a60746828",
+        "baseLightness": 34.8
+      },
+      {
+        "quality": 50,
+        "changedPixelsVs20": 5811,
+        "silhouetteMaskDiffVs20": 0,
+        "geometrySHA256": "1439103ea7b9d0d5ddbf4b2022bc7ef6aefb679f3421b93e7eed392a60746828",
+        "baseLightness": 37.2
+      },
+      {
+        "quality": 75,
+        "changedPixelsVs20": 5815,
+        "silhouetteMaskDiffVs20": 0,
+        "geometrySHA256": "1439103ea7b9d0d5ddbf4b2022bc7ef6aefb679f3421b93e7eed392a60746828",
+        "baseLightness": 39.2
+      },
+      {
+        "quality": 95,
+        "changedPixelsVs20": 5816,
+        "silhouetteMaskDiffVs20": 0,
+        "geometrySHA256": "1439103ea7b9d0d5ddbf4b2022bc7ef6aefb679f3421b93e7eed392a60746828",
+        "baseLightness": 40.8
+      }
+    ]
+  },
+  "browser": "156.0.4314.8",
+  "sourceHashes": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "src/game/ForgeCanvas.tsx": "9fb25d15fe4f556ce63d3eeaa9c5cd2ae997e8f8b575e6ba3e3e482ac06d5ef7",
+    "src/game/swordDraw.ts": "ab871b98358e3ae8e213953c7a277df32f4e8a829ab973ec4d6d1c9dc2a9528d",
+    "src/game/GameApp.tsx": "e371c2c10414455ffd0b2d138a306900f6e58ce3df2a7bb1f0b413aa5abb47fc",
+    "src/game/screens/ForgeHud.tsx": "f9e8130be172c3dc0a2047d6aa776cc312f7df3b4b1fb1e7b3fc11b037c9e41a",
+    "src/game/screens/RevealScreen.tsx": "5dbf4c4a92fbe1200d9e35a951b905f338878c7176bf667e091f643268e41173",
+    "src/game/screens/GalleryScreen.tsx": "00b915ab1d8629b68f89ec2414962f50fd1487a24c5db10a488e21b333f54601",
+    "src/game/sim.ts": "64892dbda008baeafd0d32f03c3bc2069e2363a400ddae6c6a450f4f39dfc670",
+    "src/game/catalog.ts": "6d202e84ff252b7bd13599e08495819e08002b14892567fc120eef44b14771ef",
+    "src/game/types.ts": "17c518b772d1c2451c9a79ba2709f8e73912c9e63c84ad0498f8b8a13aece42f",
+    "src/game/assets.ts": "b7d446ef69c23576307248b5cb0a1bcd25d4854b7d14d1d3e35a9348c94fcac8"
+  },
+  "forgeDesignSource": "DEFAULT_DESIGN in src/game/catalog.ts",
+  "evidenceHashes": {
+    "quality-20.png": "5f3ff0411b0ec001985daee28469fd77683f30c79c396ac10afd9bcd7c16b664",
+    "quality-50.png": "2b711b90b666d97f0902ac3705308d9e58d2df8c106de290eac5775789d07a3e",
+    "quality-75.png": "c23ef9c180626f4f3d79733f24a50ab3f1a57c7cea57c1c59f9126e908e099f7",
+    "quality-95.png": "036694d02a83ef48814750d6f78f2ce231490d294763c10269db37d00cf3b11e",
+    "quality-comparison.png": "dc3f8060bd854fd8367d65c26a5f80c919266cb06b13367481c1d25e64e8cd79",
+    "reveal-placement-512x320.png": "079afdddb509e9ec1852c7ffbfa8dddeeeca896fab20e5ea0d56e2f1fd19494d",
+    "viewport-1366x768.webp": "1bbf694c51a71f2613fdd011684e864b479656c61ff3e967ad5ea7933f5432ec",
+    "viewport-390x844.webp": "6f039161384ad9bf291a88fd62e0ffd2ffd6c56732f5e194db8bed8fecb6f2a0",
+    "viewport-412x915.webp": "6cc165878f668dfdae4cfd7e33442e702b9c2ccb25f1a46eaa51147b81620e81",
+    "viewport-844x390.webp": "d5bda26e8cf2e7424b09bd294a10fc07b8bd653a98c03ff4053f9978627ebe76"
+  }
+}
