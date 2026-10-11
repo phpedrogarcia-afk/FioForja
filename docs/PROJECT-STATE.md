@@ -1,4 +1,18 @@
-# Estado do projeto — auditoria M00-R1
+# Estado do projeto — branch M03
+
+**Snapshot:** branch local `fiobase/m03-professional-bootstrap`, criada do `main` local `e588242c30c325ac823579079628e1d0cd2231be`. `main` e `origin/main` apontavam para esse mesmo commit local no início da M03; a atualidade do servidor remoto não foi verificada. O checkout experimental `exp/m01-r4b-new-workspace` estava em `f476539f636425973481d6b33062a2fa43367df9` com código e artefatos R4B preexistentes não concluídos. A M03 usa worktree separado e não incorpora esse trabalho.
+
+**Fase:** protótipo jogável com direção visual e de Galeria documentada; bootstrap documental M03 isolado para revisão. **Objetivo atual:** tornar a orientação de agentes fiel a este snapshot, preservando o jogo e o trabalho experimental. **Bloqueio:** nenhum para documentação; a integração com a branch experimental depende de revisão posterior.
+
+**Fatos atuais conferidos neste snapshot:** `src/routes/index.tsx` monta `GameApp.tsx`; `GameApp` conduz título, projeto, forja, revelação e galeria. `ForgeCanvas.tsx` usa `stepSim` de `sim.ts`, `swordDraw.ts` desenha armas e `save.ts` mantém no navegador até 24 espadas. O projeto tem scripts `dev`, `typecheck`, `test`, `lint` e `build` em `package.json`; `build` também aciona migração. Há testes em `scripts/`, auth e app-data, mas nenhum arquivo de teste em `src/game/`. O código de teclado observado na forja trata Space/Enter e não `R`; o botão do HUD envia reaquecimento.
+
+**Hipóteses e desconhecidos:** o efeito visual de mudanças de composição em aparelhos reais, a eficácia dos testes para o core do jogo, a necessidade da infraestrutura de auth/dados para o produto e o estado final do experimento R4B não foram estabelecidos por esta missão. Os experimentos posteriores a `main` pertencem às branches experimentais, não a este snapshot.
+
+**Última prova aceita:** auditoria M00-R1 abaixo para o commit que ela declara; evidência M03 e limites em `.project-intelligence/experiments/M03-bootstrap.md`. Uma auditoria antiga não certifica automaticamente o código atual.
+
+**Próximo passo racional:** revisar a branch documental M03 contra o trabalho experimental ativo antes de decidir sua integração. Nenhum merge ou push é autorizado nesta missão.
+
+## Histórico — auditoria M00-R1 (não representa o estado atual)
 
 Snapshot do código de `main` em 2026-10-06, antes desta fundação documental. **HEAD observado:** `2d06a97a9c55e65800927947d186094124936180` (`FioForja: jogo de forja medieval`). No início da auditoria, o único item local era o documento canônico `docs/canon/galeria.md`, ainda não rastreado. Os documentos desta missão também permanecem sem commit. Nenhum código de runtime foi alterado.
 

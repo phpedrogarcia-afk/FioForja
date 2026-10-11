@@ -1,23 +1,9 @@
-# FioForja — AI Start Here
+# FioForja — entrada para agentes
 
-Leia este mapa antes de propor mudanças. Ele separa direção de produto, comportamento observado e trabalho ainda hipotético.
+FioForja é um jogo de forja medieval no navegador. O protótipo deixa projetar, aquecer, martelar, temperar e guardar espadas; a direção de produto vai além do que está implementado.
 
-## Leitura curta
+Antes de qualquer mudança, confirme a raiz Git, a branch e o estado do worktree. Leia [estado atual](PROJECT-STATE.md) para o snapshot e próximo passo, e [mapa semântico](PROJECT-MAP.md) para localizar o fluxo relevante. Use os arquivos da implementação e seus testes para conferir comportamento. Não altere trabalho experimental de outra branch.
 
-1. [Constituição](CONSTITUTION.md): missão, princípios e sinais de sucesso ou falha.
-2. [Conceito](CONCEPT.md): promessa do jogo e fronteira entre protótipo atual e direção futura.
-3. [Estado do projeto](PROJECT-STATE.md): evidências verificadas no commit auditado e desconhecidos.
-4. [Invariantes](INVARIANTS.md): propriedades que mudanças futuras precisam preservar.
-5. [Glossário](GLOSSARY.md): termos de produto e equivalentes reais no código.
-6. [Decisões](DECISIONS.md): decisões aceitas, hipóteses e escolhas ainda abertas.
-7. Documentos de design canônicos: [Bíblia Estética](canon/estetica.md) e [Estrutura da Galeria](canon/galeria.md).
+Trabalhe com mudanças estreitas e verificáveis. Preserve a separação entre simulação, Canvas e save; consulte os [invariantes](INVARIANTS.md) antes de mudar o loop ou a persistência. Diferencie fato, hipótese, decisão e desconhecido. Alegações visuais exigem baseline e evidência de renderização; testes periféricos não provam gameplay. Registre aprendizados duráveis com evidência em Project Intelligence e não repita um caminho falsificado sem informação nova.
 
-## Evidência e implementação
-
-Para dizer o que existe hoje, confira o código e os testes. Um documento de design descreve intenção; não prova implementação. Use `KNOWN`, `OBSERVATION`, `HYPOTHESIS`, `UNKNOWN` e `NOT_PROVEN` quando a distinção mudar uma decisão. Não converta exemplos, nomes provisórios ou números de mockup em balanceamento aprovado.
-
-O núcleo jogável está em `src/game/`: `sim.ts` calcula a forja, `ForgeCanvas.tsx` apresenta a cena, `swordDraw.ts` desenha a arma e `save.ts` persiste o arsenal local. A aplicação ao redor também contém infraestrutura de autenticação, banco e conectores; isso não significa que esses serviços sejam sistemas de gameplay.
-
-Registre aprendizados duráveis em [Project Intelligence](../.project-intelligence/README.md), com evidência e limites. Não repita verificações sem mudança de estado ou hipótese.
-
-Na auditoria de 2026-10-06 não havia `AGENTS.md` no checkout; `.gitignore` ignora `AGENTS.md` e `AGENTS.project.md`. Verifique instruções locais ignoradas ao iniciar uma tarefa neste ambiente.
+Para intenção de produto, consulte [Constituição](CONSTITUTION.md), [Conceito](CONCEPT.md), [Invariantes](INVARIANTS.md), [Decisões](DECISIONS.md) e os documentos canônicos de [estética](canon/estetica.md) e [Galeria](canon/galeria.md). [Project Intelligence](../.project-intelligence/README.md) guarda evidências e aprendizados duráveis. Leia apenas o que a missão exigir; mockups e especificações futuras não provam implementação.

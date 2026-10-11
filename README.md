@@ -17,7 +17,7 @@ Jogo de forja medieval no navegador. Você desenha a espada, aquece o ferro, mar
 | Ação | Mouse / toque | Teclado |
 |---|---|---|
 | Aquecer / martelar / temperar | Segurar e soltar | Espaço ou clique |
-| Reaquecer no meio da forja | Botão **Reaquecer** | `R` |
+| Reaquecer no meio da forja | Botão **Reaquecer** | — |
 | Silenciar | Ícone de som | — |
 
 No celular, tudo é por toque: segure para carregar o martelo, solte para bater.
@@ -46,6 +46,8 @@ Abre em `http://localhost:8080`.
 ```bash
 npm run build      # produção
 npm run typecheck  # tipos
+npm run test       # testes existentes de scripts, auth e app-data
+npm run lint       # análise estática
 ```
 
 ## Stack
@@ -56,3 +58,7 @@ npm run typecheck  # tipos
 - Canvas 2D para a forja, a mão e a espada
 
 Feito para o navegador — sem conta, sem servidor de jogo. O arsenal vive em `localStorage`.
+
+O comando `build` também executa a migração de banco definida em `package.json`; consulte o ambiente antes de usá-lo como simples checagem local. Os testes existentes ainda não cobrem diretamente `src/game/`.
+
+Para trabalho por agentes, comece em [docs/AI-START-HERE.md](docs/AI-START-HERE.md). O estado documentado é específico ao snapshot indicado em [docs/PROJECT-STATE.md](docs/PROJECT-STATE.md).

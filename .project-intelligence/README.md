@@ -8,4 +8,4 @@ Registre somente aprendizados reutilizáveis, pequenos e ligados a evidência. U
 - `decisions/`: decisões duráveis além do registro curto em `docs/DECISIONS.md`.
 - `experiments/`: hipótese, baseline, procedimento, resultado e interpretação de experiências.
 
-As pastas ainda não contêm aprendizados registrados. A orientação do projeto está em [`docs/AI-START-HERE.md`](../docs/AI-START-HERE.md).
+O registro de bootstrap documental M03, com baseline e limites, está em [`experiments/M03-bootstrap.md`](experiments/M03-bootstrap.md). As demais pastas podem permanecer vazias até existir aprendizado que justifique um item. A orientação do projeto está em [`docs/AI-START-HERE.md`](../docs/AI-START-HERE.md).
