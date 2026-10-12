@@ -30,7 +30,7 @@ O baseline mede encontrabilidade documental neste snapshot, não velocidade nem 
 - **ADAPT/REQUIRED_NOW:** entrada curta com rotas a estado e mapa e regras operacionais no próprio documento existente; cabeçalho de estado atual que torna a auditoria M00 histórica; mapa semântico de código e autoridade; README com comandos de test/lint e correção do atalho `R` não implementado; este registro de baseline e prova.
 - **DEFER:** testes e baseline visual do core, CI, política de dependências, runbook de release/rollback e automação de Project Intelligence. Podem ser valiosos, mas exigem decisão ou necessidade concreta e estão fora de um bootstrap sem mudança funcional.
 - **NOT_APPLICABLE agora:** banco de memória FioBase, roteador de agentes, CLI de bootstrap e novo protocolo de governança. O projeto já possui fontes de produto e registro de aprendizados. A revisão M03-R1 mostrou que a entrada existente precisava de uma ponte para descoberta automática pelo Codex; `AGENTS.md` na raiz agora só encaminha à entrada canônica.
-- **UNKNOWN:** atualidade do remoto além de `origin/main` local; resultado final do experimento R4B; transferência desta documentação ao checkout experimental; ganho de produtividade ou qualidade de agentes.
+- **UNKNOWN no bootstrap original:** atualidade do remoto além de `origin/main` local; resultado então não concluído do experimento R4B; transferência desta documentação ao checkout experimental; ganho de produtividade ou qualidade de agentes. A revisão de entrega abaixo atualiza apenas o estado documental observado de R4B.
 
 ## Verificação e limites
 
@@ -42,3 +42,11 @@ O baseline mede encontrabilidade documental neste snapshot, não velocidade nem 
 - Nenhuma melhoria de qualidade ou produtividade de agentes está provada. Nenhuma SCAR nova foi promovida; a divergência entre estado antigo e branch atual foi resolvida nesta interface por rotular o snapshot histórico.
 
 **Integração recomendada após M03-R1:** integrar a documentação à `main` mediante autorização separada. O estado e o mapa descrevem o snapshot `e588242`; ao levar essa documentação ao R4B, adaptar as seções divergentes ao código e à evidência experimental daquela branch. Não houve merge nem push na M03-R1.
+
+## Revisão de entrega ADOPT — 2026-10-12
+
+`main` local e `origin/main` local ainda apontam para `e588242`; a branch M03 acrescenta somente documentação e regras de entrada. A linha experimental R4A alcança `f476539` e contém especificações M01-R3A/R3B, baselines M01-R1/R2 e o bloqueio de assets M01-R4A que não existem na `main` nem na branch M03. R4B usa essa linha como base, mas suas mudanças de Canvas, registro de assets, imagens, capturas e relatório continuam sem commit no outro checkout. Nada disso foi copiado ou alterado aqui.
+
+O relatório local R4B registra `PARTIAL / ADAPT`: o novo tampo é visível e o ponto geométrico de impacto fica nele, mas a arte da mão/martelo não demonstra contato físico e a peça perde hierarquia visual. É evidência experimental da outra worktree, não comportamento do snapshot M03 nem aprovação humana. O julgamento humano, a atualidade real do remoto e a compatibilidade após uma futura união de código e documentação continuam `UNKNOWN` ou `NOT_PROVEN`.
+
+**KEEP:** entrada curta, mapa semântico, fontes canônicas, README corrigido e histórico M00. **ADAPT:** cabeçalho de estado e linguagem temporal deste registro para distinguir snapshot `main`, conclusão documental R4B e trabalho ainda não versionado. **DEFER:** transferir a documentação ao R4B, executar merge, push ou novos mecanismos FioBase. A comparação não encontrou motivo para modificar runtime, configuração, testes ou arquitetura. A integração definitiva requer decisão humana.

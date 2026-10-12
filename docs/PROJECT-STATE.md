@@ -1,16 +1,16 @@
-# Estado do projeto — branch M03
+# Estado do projeto — snapshot main e revisão M03
 
-**Snapshot:** branch local `fiobase/m03-professional-bootstrap`, criada do `main` local `e588242c30c325ac823579079628e1d0cd2231be`. `main` e `origin/main` apontavam para esse mesmo commit local no início da M03; a atualidade do servidor remoto não foi verificada. O checkout experimental `exp/m01-r4b-new-workspace` estava em `f476539f636425973481d6b33062a2fa43367df9` com código e artefatos R4B preexistentes não concluídos. A M03 usa worktree separado e não incorpora esse trabalho.
+**Snapshot de implementação:** `main` local em `e588242c30c325ac823579079628e1d0cd2231be`; a branch documental `fiobase/m03-professional-bootstrap` deriva desse commit e usa worktree separado. `origin/main` local apontava para o mesmo SHA na revisão de 2026-10-12; não houve fetch para verificar o servidor. O checkout `exp/m01-r4b-new-workspace` permanece em `f476539f636425973481d6b33062a2fa43367df9` com mudanças preexistentes de código e artefatos sem commit. Seu relatório local classifica o candidato como `PARTIAL / ADAPT`; esse conteúdo não integra o snapshot M03.
 
-**Fase:** protótipo jogável com direção visual e de Galeria documentada; bootstrap documental M03 isolado para revisão. **Objetivo atual:** tornar a orientação de agentes fiel a este snapshot, preservando o jogo e o trabalho experimental. **Bloqueio:** nenhum para documentação; a integração com a branch experimental depende de revisão posterior.
+**Fase:** protótipo jogável com direção visual e de Galeria documentada; entrega documental M03 isolada para decisão de integração. **Objetivo atual:** manter a orientação de agentes fiel ao snapshot `main` e identificar o que precisará ser adaptado quando o trabalho experimental for integrado. **Bloqueio:** a integração definitiva depende de autorização humana.
 
 **Fatos atuais conferidos neste snapshot:** `src/routes/index.tsx` monta `GameApp.tsx`; `GameApp` conduz título, projeto, forja, revelação e galeria. `ForgeCanvas.tsx` usa `stepSim` de `sim.ts`, `swordDraw.ts` desenha armas e `save.ts` mantém no navegador até 24 espadas. O projeto tem scripts `dev`, `typecheck`, `test`, `lint` e `build` em `package.json`; `build` também aciona migração. Há testes em `scripts/`, auth e app-data, mas nenhum arquivo de teste em `src/game/`. O código de teclado observado na forja trata Space/Enter e não `R`; o botão do HUD envia reaquecimento.
 
-**Hipóteses e desconhecidos:** o efeito visual de mudanças de composição em aparelhos reais, a eficácia dos testes para o core do jogo, a necessidade da infraestrutura de auth/dados para o produto e o estado final do experimento R4B não foram estabelecidos por esta missão. Os experimentos posteriores a `main` pertencem às branches experimentais, não a este snapshot.
+**Hipóteses e desconhecidos:** o efeito visual de mudanças de composição em aparelhos reais, a eficácia dos testes para o core do jogo, a necessidade da infraestrutura de auth/dados para o produto e o julgamento humano do candidato R4B não foram estabelecidos por esta missão. O resultado documental `PARTIAL` de R4B não equivale à aprovação do jogo. Os experimentos posteriores a `main` pertencem às branches experimentais, não a este snapshot.
 
 **Última prova aceita:** auditoria M00-R1 abaixo para o commit que ela declara; evidência M03 e limites em `.project-intelligence/experiments/M03-bootstrap.md`. Uma auditoria antiga não certifica automaticamente o código atual.
 
-**Próximo passo racional:** revisar a branch documental M03 contra o trabalho experimental ativo antes de decidir sua integração. Nenhum merge ou push é autorizado nesta missão.
+**Próximo passo racional:** obter decisão humana sobre integrar a documentação M03 à `main`. Ao aplicar a mesma orientação à linha R4B, atualizar estado e mapa contra aquela implementação e preservar seu trabalho sem commit. Nenhum merge ou push foi feito nesta revisão.
 
 ## Histórico — auditoria M00-R1 (não representa o estado atual)
 
