@@ -27,7 +27,16 @@ export function drawFinishedSword(
   x: number,
   y: number,
   lengthPx: number,
-  opts: { angle?: number; heat?: number; shape?: number; assembled?: boolean; quality?: number } = {},
+  opts: {
+    angle?: number;
+    heat?: number;
+    shape?: number;
+    assembled?: boolean;
+    quality?: number;
+    broken?: boolean;
+    elven?: boolean;
+    rareRunes?: boolean;
+  } = {},
 ) {
   const angle = opts.angle ?? -Math.PI / 2.15;
   const heat = opts.heat ?? 0;
@@ -37,7 +46,7 @@ export function drawFinishedSword(
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
-  drawSwordBody(ctx, design, lengthPx, heat, shape, assembled, quality);
+  drawSwordBody(ctx, design, lengthPx, heat, shape, assembled, quality, opts);
   ctx.restore();
 }
 
@@ -49,115 +58,253 @@ function drawSwordBody(
   shape: number,
   assembled: boolean,
   quality: number,
+  opts: { broken?: boolean; elven?: boolean; rareRunes?: boolean } = {},
 ) {
   const profile = PROFILES[design.profile];
   const st = STEELS[design.steel];
   const wrap = WRAPS[design.wrap];
   const L = lengthPx * (0.55 + design.length * 0.45) * profile.length;
-  const W = (18 + profile.width * 16) * (0.55 + shape * 0.45);
-  const curve = profile.curve * L * 0.28 * shape;
+  const W = (22 + profile.width * 20) * (0.62 + shape * 0.38);
+  const curve = profile.curve * L * 0.22 * Math.max(shape, 0.35);
   const tint = heatTint(heat);
 
   if (assembled) {
-    drawHilt(ctx, design, wrap.color, W);
+    drawHilt(ctx, design, wrap.color, W, Boolean(opts.elven));
   }
+
+  const trace = () => traceBlade(ctx, design.profile, L, W, shape, curve);
 
   ctx.save();
-  const lump = 1 - shape;
-  const bladeLen = L * (0.35 + shape * 0.65);
-  const tipX = bladeLen;
-
-  ctx.beginPath();
-  if (shape < 0.25) {
-    ctx.ellipse(bladeLen * 0.45, 0, bladeLen * 0.42, W * (0.7 + lump * 0.6), 0, 0, Math.PI * 2);
-  } else {
-    const edge = W * (0.42 + shape * 0.2);
-    ctx.moveTo(8, 0);
-    ctx.quadraticCurveTo(bladeLen * 0.2, -edge * 0.2, bladeLen * 0.45, -edge);
-    ctx.quadraticCurveTo(bladeLen * 0.78, -edge * (0.85 - profile.curve), tipX, curve * 0.15);
-    ctx.quadraticCurveTo(bladeLen * 0.78, edge * (0.55 - profile.curve * 0.4), bladeLen * 0.5, edge * 0.55);
-    ctx.quadraticCurveTo(bladeLen * 0.18, edge * 0.25, 8, 0);
-    ctx.closePath();
-  }
-
-  const fill = ctx.createLinearGradient(0, -W, 0, W);
+  trace();
   const base = steelFill(design, heat, quality);
-  fill.addColorStop(0, shade(base, 1.25));
-  fill.addColorStop(0.45, base);
-  fill.addColorStop(0.55, shade(base, 0.55));
-  fill.addColorStop(1, shade(base, 0.9));
+  const fill = ctx.createLinearGradient(0, -W, 0, W);
+  fill.addColorStop(0, shade(base, 1.45));
+  fill.addColorStop(0.18, shade(base, 1.15));
+  fill.addColorStop(0.48, base);
+  fill.addColorStop(0.62, shade(base, 0.42));
+  fill.addColorStop(1, shade(base, 0.95));
   ctx.fillStyle = fill;
+  if (heat > 0.35) {
+    ctx.shadowColor = heat > 0.75 ? "rgba(255,220,160,0.9)" : "rgba(255,90,20,0.75)";
+    ctx.shadowBlur = 18 + heat * 28;
+  }
   ctx.fill();
+  ctx.shadowBlur = 0;
 
-  if (st.damascus && shape > 0.4) {
-    ctx.save();
-    ctx.clip();
-    ctx.globalAlpha = 0.35;
-    ctx.strokeStyle = shade(base, 1.35);
-    ctx.lineWidth = 1.4;
-    for (let i = 0; i < 9; i++) {
-      ctx.beginPath();
-      const y0 = -W * 0.4 + i * (W * 0.1);
-      ctx.moveTo(16, y0);
-      for (let x = 16; x < bladeLen; x += 8) {
-        ctx.lineTo(x, y0 + Math.sin(x * 0.08 + i) * 3.2);
-      }
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
+  ctx.save();
+  ctx.clip();
+  drawBladeFace(ctx, design, L, W, shape, curve, base, st.damascus, st.stars, quality);
+  ctx.restore();
 
-  if (st.stars && shape > 0.5) {
-    ctx.save();
-    ctx.clip();
-    ctx.fillStyle = "rgba(220,230,255,0.55)";
-    for (let i = 0; i < 18; i++) {
-      const sx = 24 + ((i * 47) % (bladeLen - 40));
-      const sy = Math.sin(i * 1.7) * W * 0.22;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 0.9, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  if (shape > 0.55) {
-    ctx.beginPath();
-    ctx.moveTo(22, -1);
-    ctx.quadraticCurveTo(bladeLen * 0.5, -2 - curve * 0.1, bladeLen * 0.82, curve * 0.05);
-    ctx.strokeStyle = "rgba(20,12,8,0.35)";
-    ctx.lineWidth = Math.max(1, W * 0.08);
-    ctx.stroke();
-  }
-
-  if (heat > 0.2) {
+  if (heat > 0.18) {
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
+    trace();
     ctx.fillStyle = tint.glow;
     ctx.fill();
     ctx.restore();
   }
 
-  ctx.lineWidth = 1.2;
-  ctx.strokeStyle = "rgba(12,8,6,0.7)";
+  trace();
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Math.max(1.6, W * 0.045);
+  ctx.strokeStyle = heat > 0.55 ? "rgba(255,236,200,0.85)" : "rgba(10,7,5,0.85)";
   ctx.stroke();
+
+  if (shape > 0.4) {
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.beginPath();
+    ctx.moveTo(18, -W * 0.42);
+    ctx.quadraticCurveTo(L * 0.45, -W * 0.5 - curve * 0.05, L * 0.86, curve * 0.04);
+    ctx.strokeStyle = `rgba(255,255,255,${0.18 + shape * 0.22})`;
+    ctx.lineWidth = Math.max(1.2, W * 0.06);
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.restore();
 
-  const text = renderInscription(design.inscription, design.runes);
-  if (text && shape > 0.72 && heat < 0.35) {
+  const text = renderInscription(design.inscription, design.runes || Boolean(opts.rareRunes));
+  if ((text || opts.rareRunes) && shape > 0.55 && heat < 0.45) {
     ctx.save();
-    ctx.font = `${Math.max(9, Math.floor(W * 0.42))}px Cinzel, serif`;
-    ctx.fillStyle = quality >= 80 ? "rgba(176,137,58,0.85)" : "rgba(30,22,16,0.7)";
+    ctx.font = `${Math.max(11, Math.floor(W * 0.32))}px Cinzel, serif`;
+    ctx.fillStyle = opts.rareRunes ? "rgba(232,160,90,0.95)" : quality >= 80 ? "rgba(214,176,92,0.95)" : "rgba(28,20,14,0.8)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.translate(L * 0.42, 0);
-    ctx.rotate(0);
-    ctx.fillText(text, 0, 0);
+    ctx.translate(L * 0.38, 0);
+    const line = opts.rareRunes ? `ᚠᛟᚱᚷᚨ${text ? ` ${text}` : ""}` : text;
+    ctx.fillText(line.slice(0, 18), 0, 0);
+    ctx.restore();
+  }
+
+  if (opts.broken) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(12,8,6,0.95)";
+    ctx.lineWidth = Math.max(2, W * 0.08);
+    ctx.beginPath();
+    ctx.moveTo(L * 0.28, -W * 0.55);
+    ctx.lineTo(L * 0.4, -W * 0.05);
+    ctx.lineTo(L * 0.3, W * 0.5);
+    ctx.moveTo(L * 0.55, -W * 0.4);
+    ctx.lineTo(L * 0.62, W * 0.35);
+    ctx.stroke();
     ctx.restore();
   }
 }
 
-function drawHilt(ctx: CanvasRenderingContext2D, design: SwordDesign, wrapColor: string, W: number) {
+function traceBlade(
+  ctx: CanvasRenderingContext2D,
+  kind: SwordDesign["profile"],
+  len: number,
+  half: number,
+  shape: number,
+  curve: number,
+) {
+  const lump = 1 - shape;
+  const wob = (t: number, seed: number) => Math.sin(t * 11.7 + seed * 4.2) * lump * half * 0.42;
+  ctx.beginPath();
+
+  if (shape < 0.22) {
+    const h = half * 0.72;
+    ctx.moveTo(0, -h * 0.3);
+    ctx.lineTo(len * 0.08, -h + wob(0.1, 1));
+    ctx.lineTo(len * 0.35, -h * 0.85 + wob(0.3, 2));
+    ctx.lineTo(len * 0.62, -h * 1.05 + wob(0.55, 1));
+    ctx.lineTo(len * 0.88, -h * 0.35 + wob(0.8, 3));
+    ctx.lineTo(len * 0.97, wob(0.95, 2));
+    ctx.lineTo(len * 0.84, h * 0.7 + wob(0.8, 4));
+    ctx.lineTo(len * 0.5, h * 1.05 + wob(0.5, 2));
+    ctx.lineTo(len * 0.18, h * 0.8 + wob(0.2, 5));
+    ctx.closePath();
+    return;
+  }
+
+  if (kind === "falchion") {
+    ctx.moveTo(4, -half * 0.22);
+    ctx.quadraticCurveTo(len * 0.4, -half * 0.38 + wob(0.3, 1), len * 0.9, curve * 0.25);
+    ctx.quadraticCurveTo(len * 0.72, half * 1.25, len * 0.32, half * 1.05 + wob(0.4, 2));
+    ctx.quadraticCurveTo(len * 0.1, half * 0.55, 4, half * 0.18);
+    ctx.closePath();
+    return;
+  }
+
+  if (kind === "saber") {
+    ctx.moveTo(6, -half * 0.42);
+    ctx.bezierCurveTo(
+      len * 0.25,
+      -half * 0.7 - curve * 0.1,
+      len * 0.62,
+      -half * 0.15 - curve * 0.35,
+      len * 0.96,
+      -curve * 0.05,
+    );
+    ctx.quadraticCurveTo(len * 0.7, half * 0.25 + curve * 0.15, len * 0.28, half * 0.55);
+    ctx.quadraticCurveTo(len * 0.08, half * 0.28, 6, half * 0.22);
+    ctx.closePath();
+    return;
+  }
+
+  const belly = kind === "claymore" ? 0.78 : kind === "short" ? 0.48 : 0.62;
+  const shoulder = kind === "claymore" ? 1.05 : kind === "short" ? 0.92 : 1;
+  ctx.moveTo(2, 0);
+  const steps = 16;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const taper = t < belly ? 1 : Math.max(0.02, 1 - (t - belly) / (1 - belly));
+    ctx.lineTo(len * t, -half * shoulder * taper + wob(t, 1));
+  }
+  ctx.lineTo(len, curve * 0.08);
+  for (let i = steps; i >= 1; i--) {
+    const t = i / steps;
+    const taper = t < belly ? 0.82 : Math.max(0.02, 0.82 * (1 - (t - belly) / (1 - belly)));
+    ctx.lineTo(len * t, half * shoulder * taper + wob(t, 2));
+  }
+  ctx.closePath();
+}
+
+function drawBladeFace(
+  ctx: CanvasRenderingContext2D,
+  design: SwordDesign,
+  len: number,
+  half: number,
+  shape: number,
+  curve: number,
+  base: string,
+  damascus: boolean,
+  stars: boolean,
+  quality: number,
+) {
+  if (shape > 0.35) {
+    ctx.beginPath();
+    ctx.moveTo(len * 0.12, 0);
+    ctx.quadraticCurveTo(len * 0.5, curve * 0.04, len * 0.78, curve * 0.06);
+    ctx.lineWidth = Math.max(3, half * (design.profile === "claymore" ? 0.22 : 0.14));
+    ctx.strokeStyle = shade(base, 0.55);
+    ctx.stroke();
+    ctx.lineWidth = Math.max(1, half * 0.04);
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.stroke();
+  }
+
+  if (shape < 0.82) {
+    ctx.strokeStyle = `rgba(20,12,8,${0.25 + (1 - shape) * 0.35})`;
+    ctx.lineWidth = 1.1;
+    const dents = 6 + Math.floor((1 - shape) * 8);
+    for (let i = 0; i < dents; i++) {
+      const x = len * (0.12 + (i * 0.07) % 0.75);
+      const y = Math.sin(i * 2.1) * half * 0.35;
+      ctx.beginPath();
+      ctx.arc(x, y, 2 + (i % 3), 0.2, Math.PI * 1.3);
+      ctx.stroke();
+    }
+  }
+
+  if (damascus && shape > 0.4) {
+    ctx.globalAlpha = 0.45;
+    ctx.strokeStyle = shade(base, 1.4);
+    ctx.lineWidth = 1.3;
+    for (let i = 0; i < 11; i++) {
+      const y0 = -half * 0.55 + i * (half * 0.11);
+      ctx.beginPath();
+      ctx.moveTo(len * 0.08, y0);
+      for (let x = len * 0.08; x < len * 0.9; x += 10) {
+        ctx.lineTo(x, y0 + Math.sin(x * 0.06 + i * 0.8) * 3.4);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  if (stars && shape > 0.45) {
+    ctx.fillStyle = "rgba(230,236,255,0.7)";
+    for (let i = 0; i < 22; i++) {
+      const sx = len * (0.12 + ((i * 37) % 80) / 100);
+      const sy = Math.sin(i * 1.9) * half * 0.36;
+      ctx.beginPath();
+      ctx.arc(sx, sy, i % 5 === 0 ? 1.6 : 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (quality >= 80 && shape > 0.75) {
+    ctx.strokeStyle = "rgba(214,176,92,0.35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(len * 0.16, -half * 0.15);
+    ctx.lineTo(len * 0.16, half * 0.12);
+    ctx.moveTo(len * 0.2, -half * 0.12);
+    ctx.lineTo(len * 0.2, half * 0.1);
+    ctx.stroke();
+  }
+}
+
+function drawHilt(
+  ctx: CanvasRenderingContext2D,
+  design: SwordDesign,
+  wrapColor: string,
+  W: number,
+  elven: boolean,
+) {
   const grip = 54 + design.length * 10;
   ctx.save();
 
@@ -183,6 +330,22 @@ function drawHilt(ctx: CanvasRenderingContext2D, design: SwordDesign, wrapColor:
   }
 
   drawPommel(ctx, design.pommel, -grip - 6, W);
+
+  if (elven) {
+    ctx.strokeStyle = "rgba(186, 206, 154, 0.95)";
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(-8, 0);
+    ctx.quadraticCurveTo(-grip * 0.45, -W * 0.55, -grip - 4, -W * 0.15);
+    ctx.moveTo(-8, 0);
+    ctx.quadraticCurveTo(-grip * 0.5, W * 0.5, -grip - 2, W * 0.12);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(214, 226, 186, 0.9)";
+    ctx.beginPath();
+    ctx.ellipse(-grip * 0.55, -W * 0.34, 7, 3.2, -0.6, 0, Math.PI * 2);
+    ctx.ellipse(-grip * 0.62, W * 0.28, 6, 2.8, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 }
 

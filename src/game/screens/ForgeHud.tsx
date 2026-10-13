@@ -21,7 +21,10 @@ export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props
       <div className="pointer-events-auto flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="rounded-lg border border-border bg-bg/80 px-3 py-2">
-            <p className="font-display text-[0.65rem] uppercase tracking-[0.2em] text-muted">{phaseLabel}</p>
+            <p className="font-display text-[0.65rem] uppercase tracking-[0.2em] text-muted">
+              {phaseLabel}
+              <span className="mt-1 block tracking-[0.14em] text-subtle">Fogo · Bigorna · Banho</span>
+            </p>
             <p className="mt-1 max-w-[16rem] text-sm leading-snug text-fg sm:max-w-sm">{hud.message}</p>
           </div>
           <div className="flex gap-2">
@@ -35,12 +38,25 @@ export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props
         </div>
         <div className="grid grid-cols-3 gap-2 sm:max-w-md">
           <Stat label="Calor" value={`${Math.round(hud.heat * 100)}%`} color={metalColorCss(hud.heat)} />
-          <Stat label="Forma" value={`${Math.round(hud.shape * 100)}%`} />
+          <Stat label="Integridade" value={`${Math.round(hud.integrity * 100)}%`} />
           <Stat
-            label={hud.phase === "forge" ? "Golpes" : "Qualidade"}
-            value={hud.phase === "forge" ? `${hud.strikes}/${hud.maxStrikes}` : `${Math.round(hud.quality)}`}
+            label={hud.phase === "forge" ? "Golpes" : "Forma"}
+            value={hud.phase === "forge" ? `${hud.strikes}/${hud.maxStrikes}` : `${Math.round(hud.shape * 100)}%`}
           />
         </div>
+        {hud.phase === "forge" ? (
+          <div className="max-w-md">
+            <div className="h-1.5 overflow-hidden rounded-xs bg-elevated">
+              <div
+                className={hud.integrity < 0.35 ? "h-full bg-bad" : "h-full bg-good"}
+                style={{ width: `${hud.integrity * 100}%` }}
+              />
+            </div>
+            {hud.missStreak > 0 ? (
+              <p className="mt-1 text-xs text-heat">Erros seguidos: {hud.missStreak}. Três partem a lâmina.</p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="pointer-events-auto mt-auto flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -59,7 +75,7 @@ export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props
               width={hud.sweetWidth}
             />
             <p className="text-center text-sm text-muted sm:text-left">
-              Segure na bigorna para carregar. Solte no brilho.
+              O martelo sobe com a força e cai no ferro. Cada golpe avança pela lâmina.
             </p>
             {hud.heat < 0.4 ? (
               <Button variant="secondary" size="md" className="w-full sm:w-auto" onClick={onReheat}>
@@ -82,7 +98,7 @@ export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props
               />
             </div>
             <p className="mt-2 text-center text-sm text-muted sm:text-left">
-              Segure para mergulhar. Solte na faixa.
+              Segure para afundar no balde. Solte na faixa e retire.
             </p>
           </div>
         ) : null}

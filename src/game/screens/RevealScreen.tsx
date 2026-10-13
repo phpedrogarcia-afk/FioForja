@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { PROFILES, STEELS } from "../catalog";
+import { boonLabel, rarityLabel } from "../rewards";
 import { drawFinishedSword } from "../swordDraw";
 import type { FinishedSword } from "../types";
 
@@ -30,11 +32,14 @@ export function RevealScreen({ sword, onAgain, onGallery, onTitle }: Props) {
     g.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
-    drawFinishedSword(ctx, sword.design, w / 2, h * 0.56, Math.min(w, h) * 0.95, {
+    drawFinishedSword(ctx, sword.design, w / 2, h * 0.58, Math.min(w, h) * 0.95, {
       assembled: true,
       heat: 0,
-      shape: 1,
+      shape: sword.broken ? 0.72 : 1,
       quality: sword.quality,
+      broken: sword.broken,
+      elven: sword.boon === "elfico" || sword.boon === "runas-elfico",
+      rareRunes: sword.boon === "runas" || sword.boon === "runas-elfico" || sword.design.runes,
     });
   }, [sword]);
 
@@ -42,17 +47,29 @@ export function RevealScreen({ sword, onAgain, onGallery, onTitle }: Props) {
     <div className="flex min-h-dvh flex-col bg-bg px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-fg">
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col">
         <p className="text-center font-display text-xs uppercase tracking-[0.24em] text-ember-hot">
-          {sword.grade}
+          {rarityLabel(sword.rarity)}
         </p>
-        <h1 className="mt-2 text-center font-display text-3xl tracking-wide">
-          {sword.design.name || "Lâmina sem nome"}
-        </h1>
+        <h1 className="mt-2 text-center font-display text-3xl tracking-wide sm:text-4xl">{sword.title}</h1>
+        <p className="mt-2 text-center text-sm text-muted">
+          {sword.design.name !== "Lâmina sem nome" ? `${sword.design.name} · ` : ""}
+          {PROFILES[sword.design.profile].name} · {STEELS[sword.design.steel].name}
+        </p>
+        {boonLabel(sword.boon) ? (
+          <p className="mt-2 text-center font-display text-sm text-ember-hot">{boonLabel(sword.boon)}</p>
+        ) : null}
+        {sword.broken ? (
+          <p className="mt-2 text-center text-sm text-heat">Partiu na forja. O ferro não perdoa o ritmo.</p>
+        ) : null}
         <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
           <canvas ref={canvasRef} className="h-72 w-full sm:h-80" />
         </div>
-        <dl className="mt-5 grid grid-cols-2 gap-2 text-sm">
-          <Row label="Qualidade" value={`${sword.quality}`} />
-          <Row label="Aquecimento" value={`${sword.heatScore}`} />
+        <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
+          <Row label="ATK" value={`${sword.stats.atk}`} />
+          <Row label="DEF" value={`${sword.stats.def}`} />
+          <Row label="AGI" value={`${sword.stats.agi}`} />
+        </dl>
+        <dl className="mt-2 grid grid-cols-3 gap-2 text-sm">
+          <Row label="Fogo" value={`${sword.heatScore}`} />
           <Row label="Martelo" value={`${sword.forgeScore}`} />
           <Row label="Têmpera" value={`${sword.quenchScore}`} />
         </dl>

@@ -1,3 +1,12 @@
+export type Rarity = "quebrada" | "comum" | "incomum" | "rara" | "epica" | "lendaria";
+export type Boon = "nenhum" | "runas" | "elfico" | "runas-elfico";
+
+export interface SwordStats {
+  atk: number;
+  def: number;
+  agi: number;
+}
+
 export type Screen = "title" | "design" | "forge" | "reveal" | "gallery";
 
 export type ForgePhase = "heat" | "forge" | "quench";
@@ -32,6 +41,11 @@ export interface FinishedSword {
   quenchScore: number;
   warp: number;
   createdAt: number;
+  rarity: Rarity;
+  title: string;
+  stats: SwordStats;
+  boon: Boon;
+  broken: boolean;
 }
 
 export interface SimState {
@@ -56,6 +70,11 @@ export interface SimState {
   sparkAnim: number;
   done: boolean;
   lastMessage: string;
+  integrity: number;
+  missStreak: number;
+  perfects: number;
+  broken: boolean;
+  along: number;
 }
 
 export interface HudSnapshot {
@@ -72,4 +91,7 @@ export interface HudSnapshot {
   quenchFill: number;
   message: string;
   warp: number;
+  integrity: number;
+  missStreak: number;
+  broken: boolean;
 }

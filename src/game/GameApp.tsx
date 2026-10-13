@@ -4,6 +4,7 @@ import { loadGameImages, type GameImages } from "./assets";
 import { resumeAudio, setMuted, unlockAudio, isMuted } from "./audio";
 import { DEFAULT_DESIGN } from "./catalog";
 import { finishSword } from "./sim";
+import { rollReward } from "./rewards";
 import { loadSave, writeSave } from "./save";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
@@ -27,6 +28,9 @@ const EMPTY_HUD: HudSnapshot = {
   quenchFill: 0,
   message: "",
   warp: 0,
+  integrity: 1,
+  missStreak: 0,
+  broken: false,
 };
 
 export function GameApp() {
@@ -81,16 +85,32 @@ export function GameApp() {
 
   const onFinished = useCallback((sim: SimState) => {
     const scored = finishSword(sim, designRef.current);
+    const reward = rollReward({
+      design: designRef.current,
+      quality: scored.quality,
+      heatScore: scored.heatScore,
+      forgeScore: scored.forgeScore,
+      quenchScore: scored.quenchScore,
+      warp: scored.warp,
+      perfects: scored.perfects,
+      strikes: scored.strikes,
+      broken: scored.broken,
+    });
     const sword: FinishedSword = {
       id: `${Date.now()}`,
       design: designRef.current,
       quality: scored.quality,
-      grade: scored.grade,
+      grade: reward.grade,
       heatScore: scored.heatScore,
       forgeScore: scored.forgeScore,
       quenchScore: scored.quenchScore,
       warp: scored.warp,
       createdAt: Date.now(),
+      rarity: reward.rarity,
+      title: reward.title,
+      stats: reward.stats,
+      boon: reward.boon,
+      broken: scored.broken,
     };
     setFinished(sword);
     const nextGallery = [sword, ...save.current.gallery].slice(0, 24);

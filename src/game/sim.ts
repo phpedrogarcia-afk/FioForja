@@ -41,6 +41,11 @@ export function createSim(design: SwordDesign): SimState {
     sparkAnim: 0,
     done: false,
     lastMessage: "Espere o ferro ficar amarelo-branco, depois retire.",
+    integrity: 1,
+    missStreak: 0,
+    perfects: 0,
+    broken: false,
+    along: 0.12,
   };
 }
 
@@ -97,7 +102,7 @@ export function stepSim(
       if (s.heat > 0.93) s.heatScore = Math.min(s.heatScore, 38);
       if (s.heat < 0.4) s.heatScore = Math.min(s.heatScore, 36);
       s.phase = "forge";
-      s.lastMessage = "Segure para carregar o golpe. Solte no brilho.";
+      s.lastMessage = "Segure e solte no brilho. O martelo vai percorrer a lâmina inteira.";
       s.sweetCenter = 0.64;
       event.sfx = "pull";
       event.message = s.lastMessage;
@@ -107,15 +112,16 @@ export function stepSim(
   }
 
   if (s.phase === "forge") {
-    s.sweetCenter = 0.62 + Math.sin(time * 0.85) * 0.11;
-    s.sweetWidth = steel.sweetWidth;
+    const progress = s.strikes / s.maxStrikes;
+    s.sweetWidth = Math.max(0.05, steel.sweetWidth * (1 - progress * 0.62));
+    s.sweetCenter = 0.58 + Math.sin(time * (0.9 + progress * 2.2)) * (0.1 + progress * 0.08);
 
     if (s.reheating) {
       s.heat = clamp(s.heat + dt * 0.42, 0, 0.86);
       s.lastMessage = "Reaquecendo no fogo…";
       if (s.heat >= 0.74) s.reheating = false;
     } else {
-      s.heat = clamp(s.heat - dt * 0.038, 0.08, 1);
+      s.heat = clamp(s.heat - dt * (0.034 + progress * 0.028), 0.08, 1);
     }
 
     if (input.reheat && !s.reheating && s.heat < 0.55) {
@@ -130,6 +136,7 @@ export function stepSim(
       const kind = gradeStrike(s.force, s.sweetCenter, s.sweetWidth);
       const usedForce = s.force;
       applyStrike(s, kind, design);
+      const snapped = strainBlade(s, kind, design);
       s.charging = false;
       s.force = 0;
       s.strikeKind = kind;
@@ -138,15 +145,21 @@ export function stepSim(
       event.sfx = "clang";
       event.kind = kind;
       event.force = usedForce;
-      event.trauma = kind === "perfect" ? 0.55 : kind === "hard" ? 0.7 : kind === "good" ? 0.38 : 0.18;
-      event.hitstop = kind === "perfect" || kind === "hard" ? 0.055 : 0.03;
+      event.trauma = snapped ? 0.9 : kind === "perfect" ? 0.55 : kind === "hard" ? 0.7 : kind === "good" ? 0.38 : 0.18;
+      event.hitstop = kind === "perfect" || kind === "hard" || snapped ? 0.055 : 0.03;
       event.message = s.lastMessage;
       recomputeQuality(s, design);
+
+      if (snapped) {
+        s.done = true;
+        event.finished = true;
+        return event;
+      }
 
       if (s.strikes >= s.maxStrikes) {
         s.phase = "quench";
         s.heat = Math.max(s.heat, 0.5);
-        s.lastMessage = "Mergulhe a lâmina. Solte no momento certo.";
+        s.lastMessage = "Leve a lâmina ao balde. Segure para mergulhar e solte na faixa.";
       }
       return event;
     }
@@ -165,7 +178,7 @@ export function stepSim(
       } else if (s.quenchFill >= 0.62) {
         s.lastMessage = "Demais. Vai rachar.";
       } else {
-        s.lastMessage = "Segure para mergulhar…";
+        s.lastMessage = "Segure: a lâmina desce no balde.";
       }
     } else if (s.quenching) {
       const ideal = 0.52;
@@ -176,7 +189,14 @@ export function stepSim(
         s.lastMessage = "Temperou pouco. O aço ficou mole.";
       } else if (s.quenchFill > 0.78) {
         s.warp = clamp(s.warp + 0.18, 0, 1);
-        s.lastMessage = "Ficou tempo demais no banho.";
+        s.integrity = clamp(s.integrity - 0.22, 0, 1);
+        if (s.quenchFill > 0.8 && (s.warp > 0.42 || s.integrity < 0.3)) {
+          s.broken = true;
+          s.integrity = 0;
+          s.lastMessage = "A têmpera rachou o aço. Ficou tempo demais no banho.";
+        } else {
+          s.lastMessage = "Ficou tempo demais no banho.";
+        }
       } else {
         s.lastMessage = "Têmpera limpa.";
       }
@@ -216,23 +236,58 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign) {
     s.warp += s.heat > steel.heatMax ? 0.08 : 0.03;
   }
   if (kind === "hard") s.warp += 0.1;
-  if (kind === "perfect" && inHeat) s.warp = Math.max(0, s.warp - 0.02);
+  if (kind === "perfect" && inHeat) {
+    s.warp = Math.max(0, s.warp - 0.02);
+    s.perfects += 1;
+  }
 
   s.shape = clamp(s.shape + shapeGain, 0, 1);
   s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
+  s.along = clamp((s.strikes - 0.4) / Math.max(1, s.maxStrikes - 1), 0.1, 0.92);
+  const where = s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
 
   if (!inHeat && s.heat < steel.heatMin) {
-    s.lastMessage = "Fraco — o ferro estava frio.";
+    s.lastMessage = `Frio demais, ${where}.`;
   } else if (kind === "perfect") {
-    s.lastMessage = "Golpe perfeito. A lâmina canta.";
+    s.lastMessage = `Golpe limpo ${where}.`;
   } else if (kind === "good") {
-    s.lastMessage = "Bom golpe. Continue no ritmo.";
+    s.lastMessage = `Bom golpe ${where}. Siga em frente.`;
   } else if (kind === "weak") {
-    s.lastMessage = "Muito fraco. O ferro quase não cedeu.";
+    s.lastMessage = `Fraco demais ${where}.`;
   } else {
-    s.lastMessage = "Força demais. O gume empena.";
+    s.lastMessage = `Força demais ${where}. O gume entorta.`;
   }
+}
+
+function strainBlade(s: SimState, kind: StrikeKind, design: SwordDesign): boolean {
+  const steel = STEELS[design.steel];
+  const progress = s.strikes / s.maxStrikes;
+  const cold = s.heat < steel.heatMin - 0.05;
+  const mistimed = kind === "weak" || kind === "hard";
+  if (!mistimed && !cold) {
+    s.missStreak = 0;
+    s.integrity = clamp(s.integrity + (kind === "perfect" ? 0.07 : 0.03), 0, 1);
+    return false;
+  }
+  if (!mistimed && cold) {
+    s.integrity = clamp(s.integrity - 0.06, 0, 1);
+    const where = s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
+    s.lastMessage = `No tempo, mas o ferro estava frio — ${where}.`;
+    return s.integrity <= 0.02 ? markBroken(s) : false;
+  }
+  s.missStreak += 1;
+  s.integrity = clamp(s.integrity - (0.12 + s.missStreak * 0.05 + progress * 0.07), 0, 1);
+  if (s.integrity <= 0.02 || s.missStreak >= 3) return markBroken(s);
+  if (s.missStreak >= 2) s.lastMessage = "Outro erro. A lâmina está a um golpe de partir.";
+  return false;
+}
+
+function markBroken(s: SimState) {
+  s.broken = true;
+  s.integrity = 0;
+  s.lastMessage = "A lâmina partiu. O ritmo dos golpes abriu o ferro.";
+  return true;
 }
 
 export function finishSword(s: SimState, design: SwordDesign) {
@@ -244,5 +299,9 @@ export function finishSword(s: SimState, design: SwordDesign) {
     forgeScore: Math.round(clamp(s.shape * 100 - s.warp * 38, 0, 100)),
     quenchScore: Math.round(s.quenchScore),
     warp: s.warp,
+    broken: s.broken,
+    perfects: s.perfects,
+    strikes: s.strikes,
+    integrity: s.integrity,
   };
 }
