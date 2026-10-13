@@ -278,7 +278,9 @@ function tokenIdentityKey(token: string): string {
             .digest("base64url");
         }
       }
-    } catch {}
+    } catch {
+      // Unparseable JWTs fall back to the hash of the complete token.
+    }
   }
   return createHash("sha256").update(token).digest("base64url");
 }

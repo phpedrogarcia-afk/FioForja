@@ -1,15 +1,104 @@
-import { STEELS } from "./catalog";
-import type { Boon, Rarity, SwordDesign, SwordStats } from "./types";
+import { gradeFor, STEELS } from "./catalog";
+import { rankFor } from "./performance";
+import type { Boon, ForgeRank, Rarity, RewardDrop, SwordDesign, SwordStats } from "./types";
 
-const TITLES: Record<Rarity, string[]> = {
-  quebrada: ["Ferro Partido", "Gume Cego", "Lasca da Bigorna", "Promessa Rachada"],
-  comum: ["Ferro de Estrada", "Lâmina de Quartel", "Aço de Feira", "Ponta Honesta"],
-  incomum: ["Vigília do Portão", "Canto da Bigorna", "Sombra Curta", "Dente de Carvalho"],
-  rara: ["Véu de Cinzas", "Presa do Crepúsculo", "Jura da Brasa", "Olho da Fornalha"],
-  epica: ["Coroa Sem Rei", "Canção do Inverno", "Manto de Faísca", "Herança do Carvalho"],
-  lendaria: ["Aurora do Gume", "Sangue de Estrela", "Juramento de Brasa", "Lamento do Rei", "Sol Partido"],
+export const DROP_CATALOG: Record<string, Omit<RewardDrop, "amount">> = {
+  scrap: {
+    id: "scrap",
+    name: "Sucata de ferro",
+    category: "material",
+    tier: 0,
+    unlocks: [],
+    description: "Metal recuperado da peça. Seu estoque fica no Compêndio.",
+  },
+  refined: {
+    id: "refined",
+    name: "Ferro refinado",
+    category: "material",
+    tier: 1,
+    unlocks: ["iron"],
+    description: "Material de treino com ampla janela térmica.",
+  },
+  leather: {
+    id: "leather",
+    name: "Couro de artesão",
+    category: "grip",
+    tier: 1,
+    unlocks: ["leather", "wood"],
+    description: "Desbloqueia também a empunhadura de nogueira.",
+  },
+  minor: {
+    id: "minor",
+    name: "Runa da Brasa",
+    category: "rune",
+    tier: 1,
+    unlocks: ["ember"],
+    description: "Gravação ígnea que responde aos golpes perfeitos.",
+  },
+  tempered: {
+    id: "tempered",
+    name: "Liga temperada",
+    category: "material",
+    tier: 2,
+    unlocks: ["steel"],
+    description: "Aço de reflexos frios e gume uniforme.",
+  },
+  elemental: {
+    id: "elemental",
+    name: "Runas elementais",
+    category: "rune",
+    tier: 2,
+    unlocks: ["frost", "gold"],
+    description: "Desbloqueia inscrições de gelo e ouro.",
+  },
+  ornate: {
+    id: "ornate",
+    name: "Guarda ornamentada",
+    category: "guard",
+    tier: 2,
+    unlocks: ["wings", "ring", "wolf", "cross-pommel"],
+    description: "Asas, anel e novos pomos para sua oficina.",
+  },
+  ancestral: {
+    id: "ancestral",
+    name: "Runa Ancestral",
+    category: "rune",
+    tier: 4,
+    unlocks: ["ancestral"],
+    description: "Conquistada com desempenho S. Luz contida nos canais gravados.",
+  },
+  damascus: {
+    id: "damascus",
+    name: "Damasco magistral",
+    category: "material",
+    tier: 4,
+    unlocks: ["damascus"],
+    description: "Ondas estruturais no aço, com exigência térmica maior.",
+  },
+  star: {
+    id: "star",
+    name: "Metal estelar",
+    category: "material",
+    tier: 4,
+    unlocks: ["meteor"],
+    description: "Inclusões minerais e reflexos de estrelas.",
+  },
+  legendaryGrip: {
+    id: "legendaryGrip",
+    name: "Empunhadura do legado",
+    category: "grip",
+    tier: 4,
+    unlocks: ["goldwire", "metal"],
+    description: "Fio dourado e metal trabalhado para sua próxima obra.",
+  },
 };
-
+export const RANK_DROPS: Record<ForgeRank, string[]> = {
+  S: ["ancestral", "damascus", "legendaryGrip", "star"],
+  A: ["elemental", "tempered", "ornate"],
+  B: ["refined", "leather", "minor"],
+  C: ["refined", "scrap"],
+  F: ["scrap"],
+};
 const BASE: Record<SwordDesign["profile"], SwordStats> = {
   short: { atk: 8, def: 7, agi: 14 },
   long: { atk: 12, def: 11, agi: 10 },
@@ -17,24 +106,20 @@ const BASE: Record<SwordDesign["profile"], SwordStats> = {
   falchion: { atk: 16, def: 8, agi: 9 },
   saber: { atk: 11, def: 8, agi: 15 },
 };
-
-const MUL: Record<Rarity, number> = {
-  quebrada: 0.42,
-  comum: 0.72,
-  incomum: 0.92,
-  rara: 1.12,
-  epica: 1.38,
-  lendaria: 1.72,
+const RARITY: Record<ForgeRank, Rarity> = {
+  S: "lendaria",
+  A: "epica",
+  B: "rara",
+  C: "comum",
+  F: "quebrada",
 };
-
-function pick<T>(list: T[]): T {
-  return list[Math.floor(Math.random() * list.length)]!;
-}
-
-function jitter() {
-  return 0.84 + Math.random() * 0.32;
-}
-
+const NAMES: Record<ForgeRank, string> = {
+  S: "Juramento de Estrelas",
+  A: "Herança da Brasa",
+  B: "Vigília da Forja",
+  C: "Ferro de Estrada",
+  F: "Promessa Partida",
+};
 export function rollReward(input: {
   design: SwordDesign;
   quality: number;
@@ -45,90 +130,53 @@ export function rollReward(input: {
   perfects: number;
   strikes: number;
   broken: boolean;
-}): { rarity: Rarity; title: string; stats: SwordStats; boon: Boon; grade: string } {
-  const perfectRate = input.strikes > 0 ? input.perfects / input.strikes : 0;
-  const score =
-    input.quality * 0.62 +
-    input.heatScore * 0.12 +
-    input.forgeScore * 0.14 +
-    input.quenchScore * 0.12 +
-    perfectRate * 18 -
-    input.warp * 28;
-
-  let rarity: Rarity;
-  if (input.broken) rarity = "quebrada";
-  else if (score >= 86) rarity = Math.random() < 0.72 ? "lendaria" : "epica";
-  else if (score >= 74) rarity = Math.random() < 0.22 ? "lendaria" : Math.random() < 0.55 ? "epica" : "rara";
-  else if (score >= 60) {
-    const r = Math.random();
-    rarity = r < 0.5 ? "incomum" : r < 0.82 ? "rara" : "comum";
-  } else if (score >= 45) rarity = Math.random() < 0.7 ? "comum" : "incomum";
-  else rarity = "comum";
-
-  let boon: Boon = "nenhum";
-  if (!input.broken && (rarity === "lendaria" || rarity === "epica")) {
-    const r = Math.random();
-    boon = r < 0.34 ? "runas-elfico" : r < 0.67 ? "runas" : "elfico";
-  } else if (!input.broken && rarity === "rara") {
-    boon = Math.random() < 0.5 ? "runas" : Math.random() < 0.45 ? "elfico" : "nenhum";
-  } else if (!input.broken && score >= 48 && score < 68 && Math.random() < 0.55) {
-    boon = "nenhum";
-    rarity = Math.random() < 0.65 ? "comum" : rarity;
-  }
-
-  const stats = statsFor(input.design, rarity, input.quality, boon, input.broken);
-  const title = pick(TITLES[rarity]);
-  const grade =
-    rarity === "quebrada"
-      ? "Quebrada"
-      : rarity === "lendaria"
-        ? "Lendária"
-        : rarity === "epica"
-          ? "Épica"
-          : rarity === "rara"
-            ? "Rara"
-            : rarity === "incomum"
-              ? "Incomum"
-              : "Comum";
-
-  return { rarity, title, stats, boon, grade };
-}
-
-function statsFor(
-  design: SwordDesign,
-  rarity: Rarity,
-  quality: number,
-  boon: Boon,
-  broken: boolean,
-): SwordStats {
-  const base = BASE[design.profile];
-  const steel = STEELS[design.steel].hardness;
-  const q = 0.75 + (quality / 100) * 0.45;
-  const m = MUL[rarity] * q * (broken ? 0.85 : 1);
-  const atk = base.atk + steel * 6;
-  const def = base.def + (1 - steel) * 3;
-  const agi = base.agi;
-  const rune = boon === "runas" || boon === "runas-elfico";
-  const elf = boon === "elfico" || boon === "runas-elfico";
+  performance?: number;
+}) {
+  const performance = input.performance ?? input.quality;
+  const rank = rankFor(performance, input.broken);
+  const rarity = RARITY[rank];
+  const broken = rank === "F";
+  const base = BASE[input.design.profile];
+  const scale = broken ? 0.15 : 0.6 + (input.quality / 100) * 0.8;
+  const stats = {
+    atk: Math.round((base.atk + STEELS[input.design.steel].hardness * 6) * scale),
+    def: Math.round((base.def + (input.design.guard === "ring" ? 3 : 1)) * scale),
+    agi: Math.round((base.agi + (input.design.pommel === "sphere" ? 2 : 0)) * scale),
+  };
+  const boon: Boon = input.design.runes ? "runas" : "nenhum";
   return {
-    atk: Math.round(atk * m * jitter() + (rune ? 4 : 0)),
-    def: Math.round(def * m * jitter() + (rune ? 2 : 0)),
-    agi: Math.round(agi * m * jitter() + (elf ? 5 : 0)),
+    rank,
+    performance,
+    rarity,
+    title:
+      input.design.name.trim() && input.design.name !== "Lâmina sem nome"
+        ? input.design.name
+        : NAMES[rank],
+    stats,
+    boon,
+    grade: broken ? "Falha" : gradeFor(input.quality),
+    drops: RANK_DROPS[rank].map((id) => ({
+      ...DROP_CATALOG[id]!,
+      amount: id === "scrap" ? (broken ? 3 : 1) : 1,
+    })),
   };
 }
-
 export function boonLabel(boon: Boon): string {
-  if (boon === "runas-elfico") return "Runas raras e cabo élfico";
-  if (boon === "runas") return "Runas raras";
-  if (boon === "elfico") return "Cabo élfico";
-  return "";
+  return boon === "runas-elfico"
+    ? "Runas e cabo élfico"
+    : boon === "runas"
+      ? "Inscrição rúnica"
+      : boon === "elfico"
+        ? "Cabo élfico"
+        : "";
 }
-
 export function rarityLabel(rarity: Rarity): string {
-  if (rarity === "quebrada") return "Quebrada";
-  if (rarity === "lendaria") return "Lendária";
-  if (rarity === "epica") return "Épica";
-  if (rarity === "rara") return "Rara";
-  if (rarity === "incomum") return "Incomum";
-  return "Comum";
+  return {
+    quebrada: "Quebrada",
+    comum: "Comum",
+    incomum: "Incomum",
+    rara: "Rara",
+    epica: "Épica",
+    lendaria: "Lendária",
+  }[rarity];
 }

@@ -1,3 +1,11 @@
+# Conceito — atualização de 13/10/2026
+
+A promessa continua: o jogador fabrica seu troféu com habilidade e conserva sua história. A entrega atual acrescenta cena POV 2D, perfis com resposta mecânica, inscrições pulsantes, inspeção e recompensas por desempenho. Arsenal, Compêndio e Legado têm implementação inicial; as seis áreas completas do canon e Relíquias continuam direção futura. Consulte `PROJECT-STATE.md` e `verification/2026-10-13-pov-forge.md`.
+
+---
+
+## Histórico do conceito do protótipo anterior
+
 # Conceito do FioForja
 
 ## Promessa

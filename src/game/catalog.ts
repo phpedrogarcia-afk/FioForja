@@ -1,11 +1,4 @@
-import type {
-  GuardId,
-  PommelId,
-  ProfileId,
-  SteelId,
-  SwordDesign,
-  WrapId,
-} from "./types";
+import type { GuardId, PommelId, ProfileId, SteelId, SwordDesign, WrapId } from "./types";
 
 export const PROFILES: Record<
   ProfileId,
@@ -14,7 +7,13 @@ export const PROFILES: Record<
   short: { name: "Espada curta", blurb: "Ágil e equilibrada", length: 0.78, width: 1.08, curve: 0 },
   long: { name: "Espada longa", blurb: "O clássico europeu", length: 1, width: 1, curve: 0 },
   claymore: { name: "Claymore", blurb: "Larga, de duas mãos", length: 1.18, width: 1.18, curve: 0 },
-  falchion: { name: "Alfange", blurb: "Gume largo de corte", length: 0.92, width: 1.22, curve: 0.12 },
+  falchion: {
+    name: "Alfange",
+    blurb: "Gume largo de corte",
+    length: 0.92,
+    width: 1.22,
+    curve: 0.12,
+  },
   saber: { name: "Sabre", blurb: "Curva e veloz", length: 1.06, width: 0.82, curve: 0.26 },
 };
 
@@ -92,6 +91,8 @@ export const WRAPS: Record<WrapId, { name: string; color: string }> = {
   leather: { name: "Couro", color: "#6b3f2a" },
   linen: { name: "Linho", color: "#cbb99a" },
   goldwire: { name: "Fio dourado", color: "#b0893a" },
+  wood: { name: "Nogueira", color: "#503323" },
+  metal: { name: "Metal trabalhado", color: "#869697" },
   bone: { name: "Osso", color: "#e6dcc8" },
 };
 
@@ -119,14 +120,16 @@ export const DEFAULT_DESIGN: SwordDesign = {
   inscription: "",
   runes: false,
   length: 1,
+  runeSchool: "ember",
 };
 
 export function gradeFor(quality: number): string {
-  if (quality >= 92) return "Obra-prima";
-  if (quality >= 80) return "Excelente";
-  if (quality >= 66) return "Boa";
-  if (quality >= 48) return "Medíocre";
-  return "Falha";
+  if (quality >= 95) return "Obra-prima";
+  if (quality >= 88) return "Magistral";
+  if (quality >= 75) return "Excelente";
+  if (quality >= 60) return "Boa";
+  if (quality >= 40) return "Regular";
+  return "Defeituosa";
 }
 
 const RUNES: Record<string, string> = {

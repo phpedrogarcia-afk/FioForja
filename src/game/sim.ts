@@ -1,3 +1,4 @@
+import { performanceScore, timingAccuracy } from "./performance";
 import { STEELS, gradeFor } from "./catalog";
 import type { SimState, StrikeKind, SwordDesign } from "./types";
 
@@ -5,6 +6,7 @@ export interface SimInput {
   charging: boolean;
   action: boolean;
   reheat: boolean;
+  cancel?: boolean;
 }
 
 export interface SimEvent {
@@ -31,7 +33,7 @@ export function createSim(design: SwordDesign): SimState {
     force: 0,
     charging: false,
     sweetCenter: 0.66,
-    sweetWidth: steel.sweetWidth,
+    sweetWidth: steel.sweetWidth * profileMechanics(design).window,
     quenchFill: 0,
     quenching: false,
     quenchScore: 0,
@@ -46,6 +48,9 @@ export function createSim(design: SwordDesign): SimState {
     perfects: 0,
     broken: false,
     along: 0.12,
+    history: [],
+    reheats: 0,
+    runePulse: 0,
   };
 }
 
@@ -57,11 +62,7 @@ function recomputeQuality(s: SimState, design: SwordDesign) {
   const steel = STEELS[design.steel];
   const forge = clamp(s.shape * 100 - s.warp * 38, 0, 100);
   const q =
-    s.heatScore * 0.26 +
-    forge * 0.42 +
-    s.quenchScore * 0.22 +
-    steel.hardness * 10 -
-    s.warp * 18;
+    s.heatScore * 0.26 + forge * 0.42 + s.quenchScore * 0.22 + steel.hardness * 10 - s.warp * 18;
   s.quality = clamp(q, 4, 100);
 }
 
@@ -73,8 +74,16 @@ export function stepSim(
   time: number,
 ): SimEvent {
   const event: SimEvent = {};
+  if (input.cancel) {
+    s.charging = false;
+    s.force = 0;
+    s.quenching = false;
+    input.cancel = false;
+    return event;
+  }
   if (s.done) return event;
 
+  s.runePulse = Math.max(0, s.runePulse - dt * 1.6);
   s.strikeAnim = Math.max(0, s.strikeAnim - dt);
   s.sparkAnim = Math.max(0, s.sparkAnim - dt);
   if (s.strikeAnim <= 0) s.strikeKind = null;
@@ -113,28 +122,48 @@ export function stepSim(
 
   if (s.phase === "forge") {
     const progress = s.strikes / s.maxStrikes;
-    s.sweetWidth = Math.max(0.05, steel.sweetWidth * (1 - progress * 0.62));
+    s.sweetWidth = Math.max(
+      0.05,
+      steel.sweetWidth * profileMechanics(design).window * (1 - progress * 0.35),
+    );
     s.sweetCenter = 0.58 + Math.sin(time * (0.9 + progress * 2.2)) * (0.1 + progress * 0.08);
 
     if (s.reheating) {
-      s.heat = clamp(s.heat + dt * 0.42, 0, 0.86);
+      s.heat = clamp(s.heat + dt * 0.42, 0, (steel.heatMin + steel.heatMax) / 2);
       s.lastMessage = "Reaquecendo no fogo…";
-      if (s.heat >= 0.74) s.reheating = false;
+      if (s.heat >= (steel.heatMin + steel.heatMax) / 2 - 0.001) {
+        s.reheating = false;
+        s.lastMessage = "O aço está no ponto. Volte ao ritmo.";
+      }
     } else {
       s.heat = clamp(s.heat - dt * (0.034 + progress * 0.028), 0.08, 1);
     }
 
-    if (input.reheat && !s.reheating && s.heat < 0.55) {
+    if (input.reheat && !s.reheating && s.heat < steel.heatMin) {
       s.reheating = true;
+      s.reheats += 1;
     }
 
     if (input.charging && !s.reheating) {
       if (!s.charging && s.force < 0.05) event.sfx = "whoosh";
       s.charging = true;
-      s.force = clamp(s.force + dt * 1.15, 0, 1);
+      s.force = clamp(s.force + dt * profileMechanics(design).speed, 0, 1);
     } else if (s.charging) {
       const kind = gradeStrike(s.force, s.sweetCenter, s.sweetWidth);
       const usedForce = s.force;
+      const mid = (steel.heatMin + steel.heatMax) / 2;
+      const half = (steel.heatMax - steel.heatMin) / 2;
+      const thermal =
+        s.heat >= steel.heatMin && s.heat <= steel.heatMax
+          ? 100
+          : Math.max(0, 100 - (Math.abs(s.heat - mid) - half) * 250);
+      s.history.push({
+        accuracy: timingAccuracy(usedForce, s.sweetCenter, s.sweetWidth),
+        heat: s.heat,
+        thermal,
+        kind,
+      });
+      if (kind === "perfect") s.runePulse = 1;
       applyStrike(s, kind, design);
       const snapped = strainBlade(s, kind, design);
       s.charging = false;
@@ -145,7 +174,15 @@ export function stepSim(
       event.sfx = "clang";
       event.kind = kind;
       event.force = usedForce;
-      event.trauma = snapped ? 0.9 : kind === "perfect" ? 0.55 : kind === "hard" ? 0.7 : kind === "good" ? 0.38 : 0.18;
+      event.trauma = snapped
+        ? 0.9
+        : kind === "perfect"
+          ? 0.55
+          : kind === "hard"
+            ? 0.7
+            : kind === "good"
+              ? 0.38
+              : 0.18;
       event.hitstop = kind === "perfect" || kind === "hard" || snapped ? 0.055 : 0.03;
       event.message = s.lastMessage;
       recomputeQuality(s, design);
@@ -216,7 +253,7 @@ export function stepSim(
 function gradeStrike(force: number, center: number, width: number): StrikeKind {
   const lo = center - width / 2;
   const hi = center + width / 2;
-  if (Math.abs(force - center) < 0.045) return "perfect";
+  if (Math.abs(force - center) <= width * 0.2) return "perfect";
   if (force >= lo && force <= hi) return "good";
   if (force < lo) return "weak";
   return "hard";
@@ -245,7 +282,8 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign) {
   s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
   s.along = clamp((s.strikes - 0.4) / Math.max(1, s.maxStrikes - 1), 0.1, 0.92);
-  const where = s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
+  const where =
+    s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
 
   if (!inHeat && s.heat < steel.heatMin) {
     s.lastMessage = `Frio demais, ${where}.`;
@@ -272,7 +310,8 @@ function strainBlade(s: SimState, kind: StrikeKind, design: SwordDesign): boolea
   }
   if (!mistimed && cold) {
     s.integrity = clamp(s.integrity - 0.06, 0, 1);
-    const where = s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
+    const where =
+      s.along < 0.34 ? "junto à guarda" : s.along < 0.67 ? "no meio da lâmina" : "perto da ponta";
     s.lastMessage = `No tempo, mas o ferro estava frio — ${where}.`;
     return s.integrity <= 0.02 ? markBroken(s) : false;
   }
@@ -292,7 +331,16 @@ function markBroken(s: SimState) {
 
 export function finishSword(s: SimState, design: SwordDesign) {
   recomputeQuality(s, design);
+  const average = (key: "accuracy" | "thermal") =>
+    s.history.length ? s.history.reduce((sum, h) => sum + h[key], 0) / s.history.length : 0;
+  const performance = performanceScore(average("accuracy"), average("thermal"), s.quenchScore);
+  if (performance < 50) s.broken = true;
   return {
+    performance,
+    timingScore: Math.round(average("accuracy")),
+    thermalScore: Math.round(average("thermal")),
+    history: s.history,
+    reheats: s.reheats,
     quality: Math.round(s.quality),
     grade: gradeFor(s.quality),
     heatScore: Math.round(s.heatScore),
@@ -304,4 +352,16 @@ export function finishSword(s: SimState, design: SwordDesign) {
     strikes: s.strikes,
     integrity: s.integrity,
   };
+}
+
+export function profileMechanics(design: SwordDesign) {
+  const profile = {
+    short: { window: 1.12, speed: 1.2 },
+    long: { window: 1, speed: 1.1 },
+    claymore: { window: 1.2, speed: 0.85 },
+    falchion: { window: 0.84, speed: 1.2 },
+    saber: { window: 0.72, speed: 1.3 },
+  }[design.profile];
+  const balance = (design.guard === "ring" ? 0.96 : 1) * (design.pommel === "sphere" ? 0.96 : 1);
+  return { window: profile.window, speed: profile.speed * balance };
 }

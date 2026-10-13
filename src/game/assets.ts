@@ -1,5 +1,6 @@
 export const ASSET_URLS = {
   bg: "/game/bg-forge.jpg",
+  anvilPov: "/game/anvil-pov.png",
   hand: "/game/hand.png",
   strike: "/game/hand-strike.png",
   sparks: "/game/sparks.png",

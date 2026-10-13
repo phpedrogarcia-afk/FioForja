@@ -1,3 +1,17 @@
+# Mapa da entrega POV e desempenho
+
+- `GameApp.tsx`: navegação, input, término, persistência e claim.
+- `sim.ts`: calor, golpes, integridade e têmpera; `performance.ts`: precisão contínua e ranks.
+- `layout.ts`: enquadramento e pose da peça; `forgeScene.ts`: cenário e ferramentas; `ForgeCanvas.tsx`: loop de quadros.
+- `swordDraw.ts`: módulos da arma; `runeDraw.ts`: canais gravados sem dependência de fonte Unicode.
+- `rewards.ts`: catálogo e drops por rank; `collection.ts`: claim idempotente e reciclagem; `save.ts`: migração v3.
+- `screens/SwordPreview.tsx`: inspeção e thumbnails responsivos. `RewardsScreen.tsx`: abertura/claim do baú. `GalleryScreen.tsx`: Arsenal, Compêndio e Legado.
+- `game.test.ts`: testes do core. `scripts/gameplay-smoke.mjs`: verificação end-to-end no navegador.
+
+O mapa histórico abaixo explica o restante da infraestrutura. As referências ao limite anterior e à ausência de testes não descrevem mais a entrega atual.
+
+---
+
 # Mapa semântico do FioForja
 
 Este mapa orienta leitura e mudanças. Código e testes prevalecem sobre descrições históricas do comportamento atual; `docs/CONSTITUTION.md`, `docs/INVARIANTS.md` e `docs/canon/` governam a intenção de produto.
@@ -8,7 +22,7 @@ Este mapa orienta leitura e mudanças. Código e testes prevalecem sobre descri�
 
 Na forja, `ForgeCanvas.tsx` mantém o loop de quadros e o desenho Canvas, envia entrada para `sim.ts` e apresenta o estado via `ForgeHud.tsx`. `sim.ts` calcula calor, golpes, têmpera e resultado; `types.ts` define o estado; `catalog.ts` contém opções e limiares atuais. `swordDraw.ts` desenha arma e componentes; `assets.ts` carrega imagens e `audio.ts` trata áudio. Preserve a fronteira simulação/apresentação de `docs/INVARIANTS.md`.
 
-`GameApp.tsx` chama `save.ts` para carregar/gravar projeto, preferências e até 24 armas no `localStorage` do navegador. Alterações no formato ou limite de save exigem exame de migração e perda de dados antes de implementação.
+`GameApp.tsx` chama `save.ts` para carregar/gravar projeto, preferências e todas as armas no `localStorage` do navegador. Alterações no formato ou limite de save exigem exame de migração e perda de dados antes de implementação.
 
 ## Aplicação e suporte
 

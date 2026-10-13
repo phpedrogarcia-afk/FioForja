@@ -27,3 +27,7 @@ Este registro separa decisões de produto fornecidas pelo usuário de hipóteses
 - Quais efeitos ou propriedades rúnicas existirão.
 
 Exemplos, mockups e nomes marcados como provisórios nas fontes de design não fecham essas decisões.
+
+## Brief de 13/10/2026 — decisões desta entrega
+
+O usuário definiu perspectiva superior inclinada, tenaz à esquerda, martelo à direita, módulos e tiers S/A/B/F. A implementação mantém Canvas 2D e usa score 60/20/20 (ritmo/calor/têmpera), completa a lacuna 50–59 com Rank C e torna drops determinísticos. Todos os componentes conquistados são desbloqueios permanentes; quantidades ficam no Compêndio. Falha só concede sucata; três sucatas refinam um ferro. Isso não cria economia de moedas, loja ou combate. Essas decisões substituem as pendências equivalentes do protótipo antigo, sem fechar o balanceamento de conteúdo futuro.

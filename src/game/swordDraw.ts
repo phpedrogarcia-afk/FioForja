@@ -1,3 +1,4 @@
+import { drawRuneMark } from "./runeDraw";
 import { PROFILES, STEELS, WRAPS, renderInscription } from "./catalog";
 import type { SwordDesign } from "./types";
 
@@ -36,6 +37,9 @@ export function drawFinishedSword(
     broken?: boolean;
     elven?: boolean;
     rareRunes?: boolean;
+    runePulse?: number;
+    widthScale?: number;
+    stableLength?: boolean;
   } = {},
 ) {
   const angle = opts.angle ?? -Math.PI / 2.15;
@@ -58,13 +62,20 @@ function drawSwordBody(
   shape: number,
   assembled: boolean,
   quality: number,
-  opts: { broken?: boolean; elven?: boolean; rareRunes?: boolean } = {},
+  opts: {
+    broken?: boolean;
+    elven?: boolean;
+    rareRunes?: boolean;
+    runePulse?: number;
+    widthScale?: number;
+    stableLength?: boolean;
+  } = {},
 ) {
   const profile = PROFILES[design.profile];
   const st = STEELS[design.steel];
   const wrap = WRAPS[design.wrap];
   const L = lengthPx * (0.55 + design.length * 0.45) * profile.length;
-  const W = (22 + profile.width * 20) * (0.62 + shape * 0.38);
+  const W = (12 + profile.width * 13) * (opts.widthScale ?? 1) * (0.82 + shape * 0.18);
   const curve = profile.curve * L * 0.22 * Math.max(shape, 0.35);
   const tint = heatTint(heat);
 
@@ -72,17 +83,32 @@ function drawSwordBody(
     drawHilt(ctx, design, wrap.color, W, Boolean(opts.elven));
   }
 
-  const trace = () => traceBlade(ctx, design.profile, L, W, shape, curve);
+  if (!assembled) {
+    ctx.fillStyle = "#63574a";
+    ctx.fillRect(-38 * (opts.widthScale ?? 1), -W * 0.18, 42 * (opts.widthScale ?? 1), W * 0.36);
+  }
+  const visualShape = opts.stableLength
+    ? Math.max(0.36, shape)
+    : Math.min(shape, 0.5 + quality / 200);
+  const trace = () => traceBlade(ctx, design.profile, L, W, visualShape, curve);
 
   ctx.save();
   trace();
   const base = steelFill(design, heat, quality);
   const fill = ctx.createLinearGradient(0, -W, 0, W);
-  fill.addColorStop(0, shade(base, 1.45));
-  fill.addColorStop(0.18, shade(base, 1.15));
-  fill.addColorStop(0.48, base);
-  fill.addColorStop(0.62, shade(base, 0.42));
-  fill.addColorStop(1, shade(base, 0.95));
+  if (heat > 0.35) {
+    fill.addColorStop(0, heat > 0.7 ? "#d64f22" : "#792d24");
+    fill.addColorStop(0.22, heat > 0.7 ? "#f5a13b" : "#d7632a");
+    fill.addColorStop(0.5, heat > 0.7 ? "#fff0b5" : "#e78e42");
+    fill.addColorStop(0.78, heat > 0.7 ? "#fbb74f" : "#ba4c29");
+    fill.addColorStop(1, "#712e27");
+  } else {
+    fill.addColorStop(0, shade(base, 1.45));
+    fill.addColorStop(0.18, shade(base, 1.15));
+    fill.addColorStop(0.48, base);
+    fill.addColorStop(0.62, shade(base, 0.42));
+    fill.addColorStop(1, shade(base, 0.95));
+  }
   ctx.fillStyle = fill;
   if (heat > 0.35) {
     ctx.shadowColor = heat > 0.75 ? "rgba(255,220,160,0.9)" : "rgba(255,90,20,0.75)";
@@ -125,15 +151,34 @@ function drawSwordBody(
   ctx.restore();
 
   const text = renderInscription(design.inscription, design.runes || Boolean(opts.rareRunes));
-  if ((text || opts.rareRunes) && shape > 0.55 && heat < 0.45) {
+  if ((text || opts.rareRunes || design.runes) && shape > 0.3) {
     ctx.save();
     ctx.font = `${Math.max(11, Math.floor(W * 0.32))}px Cinzel, serif`;
-    ctx.fillStyle = opts.rareRunes ? "rgba(232,160,90,0.95)" : quality >= 80 ? "rgba(214,176,92,0.95)" : "rgba(28,20,14,0.8)";
+    ctx.fillStyle = opts.rareRunes
+      ? "rgba(232,160,90,0.95)"
+      : quality >= 80
+        ? "rgba(214,176,92,0.95)"
+        : "rgba(28,20,14,0.8)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.translate(L * 0.38, 0);
+    const runeColor = { ember: "#ffac59", frost: "#88e8e4", gold: "#ead58e", ancestral: "#b6dae8" }[
+      design.runeSchool ?? "ember"
+    ];
+    ctx.shadowColor = runeColor;
+    ctx.shadowBlur = (opts.runePulse ?? 0) * 14;
+    ctx.fillStyle = design.runes || opts.rareRunes ? runeColor : "#262a2b";
+    ctx.globalAlpha = heat > 0.45 ? 0.45 + (opts.runePulse ?? 0) * 0.55 : 0.85;
     const line = opts.rareRunes ? `ᚠᛟᚱᚷᚨ${text ? ` ${text}` : ""}` : text;
-    ctx.fillText(line.slice(0, 18), 0, 0);
+    const letters = (line || "ᚠᛟᚱᚷᚨ").slice(0, 12);
+    [...letters].forEach((letter, i) => {
+      ctx.save();
+      ctx.translate(L * (0.2 + (i * 0.55) / Math.max(1, letters.length - 1)), 0);
+      ctx.rotate(Math.PI / 2);
+      if (design.runes || opts.rareRunes)
+        drawRuneMark(ctx, letter, W * 0.45, runeColor, opts.runePulse ?? 0);
+      else ctx.fillText(letter, 0, 0);
+      ctx.restore();
+    });
     ctx.restore();
   }
 
@@ -246,12 +291,12 @@ function drawBladeFace(
     ctx.stroke();
   }
 
-  if (shape < 0.82) {
+  if (shape < 0.82 || quality < 75) {
     ctx.strokeStyle = `rgba(20,12,8,${0.25 + (1 - shape) * 0.35})`;
     ctx.lineWidth = 1.1;
-    const dents = 6 + Math.floor((1 - shape) * 8);
+    const dents = 3 + Math.floor((1 - quality / 100) * 16);
     for (let i = 0; i < dents; i++) {
-      const x = len * (0.12 + (i * 0.07) % 0.75);
+      const x = len * (0.12 + ((i * 0.07) % 0.75));
       const y = Math.sin(i * 2.1) * half * 0.35;
       ctx.beginPath();
       ctx.arc(x, y, 2 + (i % 3), 0.2, Math.PI * 1.3);
@@ -384,7 +429,12 @@ function drawGuard(ctx: CanvasRenderingContext2D, id: SwordDesign["guard"], W: n
   }
 }
 
-function drawPommel(ctx: CanvasRenderingContext2D, id: SwordDesign["pommel"], x: number, W: number) {
+function drawPommel(
+  ctx: CanvasRenderingContext2D,
+  id: SwordDesign["pommel"],
+  x: number,
+  W: number,
+) {
   ctx.fillStyle = "#b8a88c";
   ctx.strokeStyle = "#3a3026";
   ctx.lineWidth = 1.2;

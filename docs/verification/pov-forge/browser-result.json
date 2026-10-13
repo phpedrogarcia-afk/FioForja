@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checks": [
+    "keyboard keyup releases after Tab focus change",
+    "full keyboard loop, rank S at 96%",
+    "claims and unlocks persist across reload",
+    "claimed chest cannot grant twice",
+    "viewport 1440×900 no horizontal overflow",
+    "viewport 844×390 no horizontal overflow",
+    "viewport 360×640 no horizontal overflow",
+    "failure run produces only scrap",
+    "failed blade scrap is recycled",
+    "no application page errors"
+  ],
+  "errors": []
+}

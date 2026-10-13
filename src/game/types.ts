@@ -1,3 +1,26 @@
+export type ForgeRank = "S" | "A" | "B" | "C" | "F";
+export type RuneSchool = "ember" | "frost" | "gold" | "ancestral";
+export interface RewardDrop {
+  id: string;
+  name: string;
+  category: "rune" | "material" | "grip" | "guard";
+  tier: number;
+  amount: number;
+  unlocks: string[];
+  description: string;
+}
+export interface Collection {
+  claimed: string[];
+  items: Record<string, number>;
+  unlocked: string[];
+  scrap: number;
+}
+export interface StrikeRecord {
+  accuracy: number;
+  heat: number;
+  thermal: number;
+  kind: StrikeKind;
+}
 export type Rarity = "quebrada" | "comum" | "incomum" | "rara" | "epica" | "lendaria";
 export type Boon = "nenhum" | "runas" | "elfico" | "runas-elfico";
 
@@ -7,13 +30,13 @@ export interface SwordStats {
   agi: number;
 }
 
-export type Screen = "title" | "design" | "forge" | "reveal" | "gallery";
+export type Screen = "title" | "design" | "forge" | "rewards" | "reveal" | "gallery";
 
 export type ForgePhase = "heat" | "forge" | "quench";
 
 export type ProfileId = "short" | "long" | "claymore" | "falchion" | "saber";
 export type SteelId = "iron" | "steel" | "damascus" | "meteor";
-export type WrapId = "leather" | "linen" | "goldwire" | "bone";
+export type WrapId = "leather" | "linen" | "goldwire" | "bone" | "wood" | "metal";
 export type GuardId = "cross" | "curved" | "wings" | "ring";
 export type PommelId = "disc" | "sphere" | "wolf" | "cross";
 
@@ -28,6 +51,7 @@ export interface SwordDesign {
   pommel: PommelId;
   inscription: string;
   runes: boolean;
+  runeSchool?: RuneSchool;
   length: number;
 }
 
@@ -41,6 +65,11 @@ export interface FinishedSword {
   quenchScore: number;
   warp: number;
   createdAt: number;
+  rank?: ForgeRank;
+  performance?: number;
+  drops?: RewardDrop[];
+  history?: StrikeRecord[];
+  reheats?: number;
   rarity: Rarity;
   title: string;
   stats: SwordStats;
@@ -75,6 +104,9 @@ export interface SimState {
   perfects: number;
   broken: boolean;
   along: number;
+  history: StrikeRecord[];
+  reheats: number;
+  runePulse: number;
 }
 
 export interface HudSnapshot {

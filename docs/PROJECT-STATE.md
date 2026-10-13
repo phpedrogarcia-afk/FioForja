@@ -1,3 +1,30 @@
+# Estado atual — POV e desempenho (13/10/2026)
+
+Base de partida: `main` em `7758749`. Esta entrega implementa o brief de perspectiva, modularidade e recompensas autorizado pelo usuário. Código e evidências desta entrega substituem o snapshot histórico abaixo para decisões operacionais.
+
+## Implementado
+
+- Cena Canvas 2D com layout por viewport, bigorna inclinada com arte própria, lâmina/espigão durante a forja, tenaz à esquerda e martelo que recua pela direita.
+- Sulco, gradiente térmico, marcas de qualidade e inscrições geométricas independentes de fontes rúnicas instaladas. Pulsos em golpes perfeitos.
+- Perfis afetam janela e velocidade de carga; guarda/pomo afetam equilíbrio da carga e atributos. Isso é mecânica de jogo, não simulação metalúrgica/3D.
+- Score 60% ritmo, 20% controle térmico nos golpes, 20% têmpera. Ranks S/A/B/C/F com thresholds 95/80/60/50; quebra implica F. Drops e desbloqueios sem RNG privilegiando execução ruim.
+- Inspeção com zoom/giro, histórico de golpes, baú com claim idempotente, Arsenal/Compêndio/Legado, reciclagem e exportação.
+- Save v3 migra peças antigas e conserva todas as instâncias. Persistência continua local; falha de escrita apresenta aviso.
+
+## Verificação
+
+Evidência detalhada: `docs/verification/2026-10-13-pov-forge.md`. Suíte do jogo cobre limites de rank, migração, claim, perfis, enquadramento e reaquecimento; browser smoke percorre sucesso e falha. Não confundir comandos de build com validação visual. Revisão independente apontou corte na têmpera e foco de teclado; ambos foram corrigidos e cobertos por verificação.
+
+## Limites e próximo passo
+
+Renderização 2D, sem câmera/mesh 3D. A intenção completa das seis áreas da Galeria e das Lendárias assinadas/Relíquias continua futura. Sem servidor de jogo ou combate. Inspeção no aparelho real do usuário e validação do deploy público ainda são etapas distintas da entrega no GitHub.
+
+O próximo passo é jogar esta versão em aparelhos reais e ajustar ritmo, dificuldade e acabamento com exemplos concretos; não reconstruir o core sem evidência.
+
+---
+
+# Registro histórico — estado anterior (não operacional)
+
 # Estado do projeto — snapshot main e revisão M03
 
 **Snapshot de implementação:** `main` local em `e588242c30c325ac823579079628e1d0cd2231be`; a branch documental `fiobase/m03-professional-bootstrap` deriva desse commit e usa worktree separado. `origin/main` local apontava para o mesmo SHA na revisão de 2026-10-12; não houve fetch para verificar o servidor. O checkout `exp/m01-r4b-new-workspace` permanece em `f476539f636425973481d6b33062a2fa43367df9` com mudanças preexistentes de código e artefatos sem commit. Seu relatório local classifica o candidato como `PARTIAL / ADAPT`; esse conteúdo não integra o snapshot M03.

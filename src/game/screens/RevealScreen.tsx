@@ -1,99 +1,133 @@
-import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { PROFILES, STEELS } from "../catalog";
-import { boonLabel, rarityLabel } from "../rewards";
-import { drawFinishedSword } from "../swordDraw";
+import { ArrowLeft, Flame, Hammer, Droplets, ChevronRight } from "lucide-react";
+import { PROFILES, STEELS, WRAPS, GUARDS, POMMELS } from "../catalog";
+import { rarityLabel } from "../rewards";
+import { SwordPreview } from "./SwordPreview";
 import type { FinishedSword } from "../types";
-
 interface Props {
   sword: FinishedSword;
   onAgain: () => void;
   onGallery: () => void;
   onTitle: () => void;
+  onRewards?: () => void;
+  claimed?: boolean;
 }
-
-export function RevealScreen({ sword, onAgain, onGallery, onTitle }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    const g = ctx.createRadialGradient(w / 2, h / 2, 30, w / 2, h / 2, w * 0.45);
-    g.addColorStop(0, "rgba(196,92,38,0.22)");
-    g.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-    drawFinishedSword(ctx, sword.design, w / 2, h * 0.58, Math.min(w, h) * 0.95, {
-      assembled: true,
-      heat: 0,
-      shape: sword.broken ? 0.72 : 1,
-      quality: sword.quality,
-      broken: sword.broken,
-      elven: sword.boon === "elfico" || sword.boon === "runas-elfico",
-      rareRunes: sword.boon === "runas" || sword.boon === "runas-elfico" || sword.design.runes,
-    });
-  }, [sword]);
-
+export function RevealScreen({ sword, onAgain, onGallery, onTitle, onRewards, claimed }: Props) {
+  const perfects = sword.history?.filter((h) => h.kind === "perfect").length ?? 0;
   return (
-    <div className="flex min-h-dvh flex-col bg-bg px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-fg">
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col">
-        <p className="text-center font-display text-xs uppercase tracking-[0.24em] text-ember-hot">
-          {rarityLabel(sword.rarity)}
-        </p>
-        <h1 className="mt-2 text-center font-display text-3xl tracking-wide sm:text-4xl">{sword.title}</h1>
-        <p className="mt-2 text-center text-sm text-muted">
-          {sword.design.name !== "Lâmina sem nome" ? `${sword.design.name} · ` : ""}
-          {PROFILES[sword.design.profile].name} · {STEELS[sword.design.steel].name}
-        </p>
-        {boonLabel(sword.boon) ? (
-          <p className="mt-2 text-center font-display text-sm text-ember-hot">{boonLabel(sword.boon)}</p>
-        ) : null}
-        {sword.broken ? (
-          <p className="mt-2 text-center text-sm text-heat">Partiu na forja. O ferro não perdoa o ritmo.</p>
-        ) : null}
-        <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
-          <canvas ref={canvasRef} className="h-72 w-full sm:h-80" />
+    <div className="forge-page inspection-page">
+      <header className="forge-header">
+        <button className="icon-button" aria-label="Voltar à galeria" onClick={onGallery}>
+          <ArrowLeft size={20} />
+        </button>
+        <span>Inspeção da obra</span>
+        <button className="quiet-button" onClick={onTitle}>
+          Início
+        </button>
+      </header>
+      <main className="inspection-layout">
+        <div className="inspection-hero">
+          <p className={`eyebrow rarity-${sword.rarity}`}>
+            {rarityLabel(sword.rarity)} · {sword.grade}
+          </p>
+          <h1>{sword.title}</h1>
+          <p className="subtitle">
+            {PROFILES[sword.design.profile].name} · {STEELS[sword.design.steel].name}
+          </p>
+          <SwordPreview design={sword.design} sword={sword} inspect />
+          {sword.broken ? (
+            <p className="failure-note">A lâmina falhou. A sucata pode voltar à oficina.</p>
+          ) : null}
         </div>
-        <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
-          <Row label="ATK" value={`${sword.stats.atk}`} />
-          <Row label="DEF" value={`${sword.stats.def}`} />
-          <Row label="AGI" value={`${sword.stats.agi}`} />
-        </dl>
-        <dl className="mt-2 grid grid-cols-3 gap-2 text-sm">
-          <Row label="Fogo" value={`${sword.heatScore}`} />
-          <Row label="Martelo" value={`${sword.forgeScore}`} />
-          <Row label="Têmpera" value={`${sword.quenchScore}`} />
-        </dl>
-        <div className="mt-auto flex flex-col gap-3 pt-8">
-          <Button size="lg" onClick={onAgain}>
-            Forjar outra
-          </Button>
-          <Button variant="secondary" size="lg" onClick={onGallery}>
-            Ver galeria
-          </Button>
-          <Button variant="ghost" size="md" onClick={onTitle}>
-            Título
-          </Button>
+        <div className="inspection-details">
+          <div className="score-banner">
+            <span>Desempenho da forja</span>
+            <strong>
+              {sword.rank ? `Rank ${sword.rank}` : "Peça anterior"}{" "}
+              <small>{sword.performance ?? sword.quality}%</small>
+            </strong>
+            <p>
+              Qualidade {sword.quality} · {sword.grade}
+            </p>
+          </div>
+          <dl className="weapon-stats">
+            <Stat label="Ataque" value={sword.stats.atk} />
+            <Stat label="Defesa" value={sword.stats.def} />
+            <Stat label="Agilidade" value={sword.stats.agi} />
+          </dl>
+          <section className="metal-panel">
+            <h2>Construção modular</h2>
+            <dl className="detail-list">
+              <dt>Lâmina</dt>
+              <dd>{PROFILES[sword.design.profile].name}</dd>
+              <dt>Material</dt>
+              <dd>{STEELS[sword.design.steel].name}</dd>
+              <dt>Empunhadura</dt>
+              <dd>{WRAPS[sword.design.wrap].name}</dd>
+              <dt>Guarda / pomo</dt>
+              <dd>
+                {GUARDS[sword.design.guard].name} / {POMMELS[sword.design.pommel].name}
+              </dd>
+              <dt>Inscrição</dt>
+              <dd>
+                {sword.design.inscription ||
+                  (sword.design.runes ? "Marca da forja" : "Sem inscrição")}
+              </dd>
+            </dl>
+          </section>
+          <section className="metal-panel">
+            <h2>História da forja</h2>
+            <div className="process-scores">
+              <span>
+                <Flame size={16} /> Fogo <b>{sword.heatScore}</b>
+              </span>
+              <span>
+                <Hammer size={16} /> Forma <b>{sword.forgeScore}</b>
+              </span>
+              <span>
+                <Droplets size={16} /> Têmpera <b>{sword.quenchScore}</b>
+              </span>
+            </div>
+            <p className="subtitle">
+              {sword.history?.length
+                ? `${perfects} golpes perfeitos · ${sword.reheats ?? 0} reaquecimentos · empenamento ${Math.round(sword.warp * 100)}%`
+                : "Esta peça foi salva antes do registro de golpes."}
+            </p>
+            {sword.history?.length ? (
+              <ol className="strike-history">
+                {sword.history.map((hit, i) => (
+                  <li key={i}>
+                    <span>{i + 1}</span>
+                    <strong>{Math.round(hit.accuracy)}%</strong>
+                    <small>{Math.round(hit.heat * 100)}°</small>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+          </section>
+          <div className="screen-actions">
+            {onRewards && !claimed ? (
+              <Button size="lg" onClick={onRewards}>
+                Abrir baú de recompensas <ChevronRight size={18} />
+              </Button>
+            ) : null}
+            <Button variant="secondary" size="lg" onClick={onAgain}>
+              Forjar outra
+            </Button>
+            <Button variant="ghost" onClick={onGallery}>
+              Ver arsenal
+            </Button>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
-
-function Row({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md border border-border bg-elevated px-3 py-2">
-      <dt className="font-display text-[0.65rem] uppercase tracking-[0.16em] text-muted">{label}</dt>
-      <dd className="font-display text-lg tabular-nums">{value}</dd>
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
