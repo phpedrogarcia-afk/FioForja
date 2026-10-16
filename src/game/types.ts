@@ -1,4 +1,4 @@
-export type Screen = "title" | "design" | "forge" | "reveal" | "gallery";
+export type Screen = "title" | "design" | "forge" | "reveal" | "rewards" | "gallery";
 
 export type ForgePhase = "heat" | "forge" | "quench";
 
@@ -9,6 +9,8 @@ export type GuardId = "cross" | "curved" | "wings" | "ring";
 export type PommelId = "disc" | "sphere" | "wolf" | "cross";
 
 export type StrikeKind = "weak" | "good" | "perfect" | "hard";
+export type StructuralState = "stable" | "deformed" | "damaged" | "cracked" | "broken";
+export type RarityGrade = "Comum" | "Incomum" | "Rara" | "Épica" | "Lendária" | "Relíquia";
 
 export interface SwordDesign {
   name: string;
@@ -32,6 +34,16 @@ export interface FinishedSword {
   quenchScore: number;
   warp: number;
   createdAt: number;
+  // Metallurgical physical attributes (Pillar 5 / User section 5)
+  damage?: number; // ATK (potencial de corte e dureza)
+  defense?: number; // DEF (integridade, espessura e têmpera)
+  agility?: number; // AGI (equilíbrio de massa e alinhamento)
+  durability?: number; // 0-100
+  rarity?: RarityGrade;
+  flaws?: string[];
+  perks?: string[];
+  structuralState?: StructuralState;
+  cracks?: number;
 }
 
 export interface SimState {
@@ -56,6 +68,14 @@ export interface SimState {
   sparkAnim: number;
   done: boolean;
   lastMessage: string;
+  // Risk and failure mechanics (Pillar 2 / Specification 4)
+  integrity: number; // 0-100
+  cracks: number;
+  structuralState: StructuralState;
+  broken: boolean;
+  brokenReason?: string;
+  runicCharge: number;
+  history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean }>;
 }
 
 export interface HudSnapshot {
@@ -72,4 +92,26 @@ export interface HudSnapshot {
   quenchFill: number;
   message: string;
   warp: number;
+  integrity: number;
+  structuralState: StructuralState;
+  cracks: number;
+  broken: boolean;
+}
+
+export interface ForgeRewardItem {
+  id: string;
+  name: string;
+  type: string;
+  rarity: RarityGrade;
+  icon: string;
+  description: string;
+}
+
+export interface ForgeRewardsData {
+  rank: string;
+  scorePercent: number;
+  gold: number;
+  rubies: number;
+  diamonds: number;
+  items: ForgeRewardItem[];
 }

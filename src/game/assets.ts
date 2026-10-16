@@ -5,6 +5,11 @@ export const ASSET_URLS = {
   sparks: "/game/sparks.png",
   fire: "/game/fire.png",
   anvil: "/game/anvil.png",
+  r4bBg: "/game/experimental/r4b-forge-bg.png",
+  r4bAnvil: "/game/experimental/r4b-anvil.png",
+  forgeAction: "/game/forge-action.jpg",
+  inspectionVelvet: "/game/inspection-velvet.jpg",
+  rewardsChest: "/game/rewards-chest.jpg",
 } as const;
 
 export type GameImages = Record<keyof typeof ASSET_URLS, HTMLImageElement | null>;

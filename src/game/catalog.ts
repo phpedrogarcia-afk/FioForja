@@ -5,7 +5,7 @@ import type {
   SteelId,
   SwordDesign,
   WrapId,
-} from "./types";
+} from "./types.ts";
 
 export const PROFILES: Record<
   ProfileId,
@@ -122,11 +122,68 @@ export const DEFAULT_DESIGN: SwordDesign = {
 };
 
 export function gradeFor(quality: number): string {
-  if (quality >= 92) return "Obra-prima";
-  if (quality >= 80) return "Excelente";
-  if (quality >= 66) return "Boa";
-  if (quality >= 48) return "Medíocre";
-  return "Falha";
+  if (quality >= 95) return "Obra-prima";
+  if (quality >= 88) return "Magistral";
+  if (quality >= 75) return "Excelente";
+  if (quality >= 60) return "Boa";
+  if (quality >= 40) return "Regular";
+  return "Defeituosa";
+}
+
+export function rarityFor(design: SwordDesign, quality: number): import("./types").RarityGrade {
+  if (quality >= 95 && (design.steel === "meteor" || design.steel === "damascus")) return "Lendária";
+  if (quality >= 88 && (design.steel === "meteor" || design.steel === "damascus" || design.runes)) return "Épica";
+  if (quality >= 75 || design.steel === "damascus") return "Rara";
+  if (quality >= 45) return "Incomum";
+  return "Comum";
+}
+
+export function calculateSwordAttributes(
+  design: SwordDesign,
+  quality: number,
+  warp: number,
+  heatScore: number,
+  forgeScore: number,
+  quenchScore: number,
+) {
+  const profile = PROFILES[design.profile];
+  const steel = STEELS[design.steel];
+
+  // ATK: Gume bem formado, dureza do aço, qualidade do martelo e proporção de corte
+  const baseAtk = 100 + steel.hardness * 140 + profile.width * 60;
+  const edgeFactor = (quality / 100) * 0.75 + (forgeScore / 100) * 0.25;
+  const damage = Math.round(baseAtk * edgeFactor);
+
+  // DEF: Integridade, espessura da lâmina, têmpera limpa e capacidade de aparar
+  const baseDef = 60 + profile.width * 75 + (quenchScore / 100) * 55;
+  const warpPenalty = Math.max(0.4, 1 - warp * 0.5);
+  const defense = Math.round(baseDef * (quality / 100) * warpPenalty);
+
+  // AGI: Equilíbrio, distribuição de massa e alinhamento
+  const lightness = 1.35 - profile.length * 0.35 - profile.width * 0.25;
+  const alignmentBonus = Math.max(0.3, (1 - warp * 0.7) * (0.4 + heatScore * 0.006));
+  const agility = Math.max(15, Math.round((75 + lightness * 45) * alignmentBonus * (0.65 + quality * 0.0035)));
+
+  // Durability: do choque térmico e integridade
+  const durability = Math.max(15, Math.min(100, Math.round(quenchScore * 0.55 + quality * 0.45 - warp * 30)));
+
+  // Defeitos visuais e metalúrgicos
+  const flaws: string[] = [];
+  if (warp > 0.2) flaws.push("Empenamento visível ao longo da espinha");
+  if (heatScore < 50) flaws.push("Zona de estresse por forja em temperatura fria");
+  if (forgeScore < 55) flaws.push("Gume irregular com rebarbas e marcas de golpe");
+  if (quenchScore < 45) flaws.push("Têmpera deficiente — aço brando");
+
+  // Feitos e perks por maestria
+  const perks: string[] = [];
+  if (quality >= 95) perks.push("Gume de Obra-prima: Corte sem atrito");
+  if (design.runes && quality >= 85) perks.push("Ressonância Rúnica: Lâmina desperta");
+  if (steel.damascus && quality >= 78) perks.push("Dobra Perfeita: Elasticidade superior");
+  if (steel.stars && quality >= 85) perks.push("Pó Meteórico: Dureza estelar");
+  if (quenchScore >= 90) perks.push("Martensita Pura: Retenção eterna de fio");
+  if (warp < 0.03 && quality >= 88) perks.push("Alinhamento Perfeito: Centro de massa ideal");
+
+  return { damage, defense, agility, durability, flaws, perks };
 }
 
 const RUNES: Record<string, string> = {

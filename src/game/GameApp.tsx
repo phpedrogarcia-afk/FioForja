@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
 import { resumeAudio, setMuted, unlockAudio, isMuted } from "./audio";
-import { DEFAULT_DESIGN } from "./catalog";
-import { finishSword } from "./sim";
+import { finishSword, generateForgeRewards } from "./sim";
 import { loadSave, writeSave } from "./save";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
+import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 import type { FinishedSword, HudSnapshot, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
@@ -27,6 +27,10 @@ const EMPTY_HUD: HudSnapshot = {
   quenchFill: 0,
   message: "",
   warp: 0,
+  integrity: 100,
+  structuralState: "stable",
+  cracks: 0,
+  broken: false,
 };
 
 export function GameApp() {
@@ -80,23 +84,16 @@ export function GameApp() {
   }, []);
 
   const onFinished = useCallback((sim: SimState) => {
-    const scored = finishSword(sim, designRef.current);
-    const sword: FinishedSword = {
-      id: `${Date.now()}`,
-      design: designRef.current,
-      quality: scored.quality,
-      grade: scored.grade,
-      heatScore: scored.heatScore,
-      forgeScore: scored.forgeScore,
-      quenchScore: scored.quenchScore,
-      warp: scored.warp,
-      createdAt: Date.now(),
-    };
+    const sword = finishSword(sim, designRef.current);
     setFinished(sword);
-    const nextGallery = [sword, ...save.current.gallery].slice(0, 24);
-    setGallery(nextGallery);
-    persist({ gallery: nextGallery });
-    window.setTimeout(() => setScreen("reveal"), 700);
+
+    if (!sim.broken) {
+      const nextGallery = [sword, ...save.current.gallery].slice(0, 48);
+      setGallery(nextGallery);
+      persist({ gallery: nextGallery });
+    }
+
+    window.setTimeout(() => setScreen("reveal"), 800);
   }, [persist]);
 
   useEffect(() => {
@@ -115,6 +112,9 @@ export function GameApp() {
         e.preventDefault();
         inputRef.current.charging = true;
       }
+      if (e.code === "KeyR" || e.key === "r" || e.key === "R") {
+        inputRef.current.reheat = true;
+      }
     };
     const keyUp = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "Enter") {
@@ -122,6 +122,7 @@ export function GameApp() {
         inputRef.current.charging = false;
       }
     };
+    const currentInput = inputRef.current;
     window.addEventListener("pointerdown", down);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
@@ -133,7 +134,7 @@ export function GameApp() {
       window.removeEventListener("pointercancel", up);
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
-      inputRef.current.charging = false;
+      currentInput.charging = false;
     };
   }, [screen]);
 
@@ -183,9 +184,23 @@ export function GameApp() {
     return (
       <RevealScreen
         sword={finished}
+        onClaimRewards={() => setScreen("rewards")}
         onAgain={() => setScreen("design")}
         onGallery={() => setScreen("gallery")}
         onTitle={() => setScreen("title")}
+      />
+    );
+  }
+
+  if (screen === "rewards" && finished) {
+    const rewards = generateForgeRewards(finished);
+    return (
+      <RewardsScreen
+        sword={finished}
+        rewards={rewards}
+        onClaim={() => {}}
+        onGallery={() => setScreen("gallery")}
+        onAgain={() => setScreen("design")}
       />
     );
   }
@@ -205,7 +220,7 @@ export function GameApp() {
         />
       ) : (
         <div className="flex h-full items-center justify-center font-display text-muted">
-          Acendendo a forja…
+          Acendendo o fogo da forja…
         </div>
       )}
       <ForgeHud

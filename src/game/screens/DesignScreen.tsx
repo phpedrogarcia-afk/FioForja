@@ -27,17 +27,18 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
     canvas.height = Math.floor(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    const g = ctx.createRadialGradient(w / 2, h * 0.55, 20, w / 2, h * 0.55, w * 0.42);
-    g.addColorStop(0, "rgba(196,92,38,0.18)");
-    g.addColorStop(1, "rgba(0,0,0,0)");
+    const g = ctx.createRadialGradient(w / 2, h * 0.55, 30, w / 2, h * 0.55, Math.max(w, h) * 0.6);
+    g.addColorStop(0, "#161d30");
+    g.addColorStop(0.65, "#0c101a");
+    g.addColorStop(1, "#060810");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
-    drawFinishedSword(ctx, design, w / 2, h * 0.58, Math.min(w, h) * 0.92, {
-      angle: -Math.PI / 2.08,
+    drawFinishedSword(ctx, design, w / 2, h * 0.58, Math.min(w, h) * 0.94, {
+      angle: -Math.PI / 2.05,
       assembled: true,
       heat: 0,
       shape: 1,
-      quality: 80,
+      quality: 90,
     });
   }, [design]);
 

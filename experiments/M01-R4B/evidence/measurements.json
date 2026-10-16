@@ -1,0 +1,665 @@
+{
+  "branch": "exp/m01-r4b-new-workspace",
+  "base": "f476539f636425973481d6b33062a2fa43367df9",
+  "url": "http://127.0.0.1:8080/",
+  "browser": "156.0.4314.8",
+  "dpr": 1,
+  "seed": 101,
+  "clock": "2026-10-07T12:00:00Z",
+  "design": "DEFAULT_DESIGN",
+  "phases": [
+    "heat",
+    "forge-rest",
+    "forge-charge",
+    "impact",
+    "quench"
+  ],
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 235,
+              "y": 140,
+              "size": 740
+            },
+            "blade": {
+              "x": 200,
+              "y": 175,
+              "length": 300,
+              "angle": -0.16
+            },
+            "focusX": 270,
+            "impact": null
+          },
+          "outer": [
+            -121.5,
+            0
+          ],
+          "scale": 1.1722222222222223,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 6033,
+          "bladePixelsFullLogical": 4396,
+          "overlapFraction": 0,
+          "impactAnchor": null,
+          "impactAnchorInsideViewport": false,
+          "anvilContactValid": null,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": null,
+          "file": "390x844-heat.jpeg"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 235,
+              "y": 140,
+              "size": 740
+            },
+            "blade": {
+              "x": 530,
+              "y": 420,
+              "length": 350,
+              "angle": -0.19
+            },
+            "focusX": 680,
+            "impact": [
+              660,
+              395
+            ]
+          },
+          "outer": [
+            -602.1111111111112,
+            0
+          ],
+          "scale": 1.1722222222222223,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 3981,
+          "bladePixelsFullLogical": 2877,
+          "overlapFraction": 0.39361969354433557,
+          "impactAnchor": [
+            171.55555555555554,
+            463.02777777777777
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand.png",
+          "file": "390x844-forge-rest.jpeg"
+        },
+        {
+          "phase": "forge-charge",
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "force": 0.5519999999999996
+          },
+          "layout": {
+            "anvil": {
+              "x": 235,
+              "y": 140,
+              "size": 740
+            },
+            "blade": {
+              "x": 530,
+              "y": 420,
+              "length": 350,
+              "angle": -0.19
+            },
+            "focusX": 680,
+            "impact": [
+              660,
+              395
+            ]
+          },
+          "outer": [
+            -602.1111111111112,
+            0
+          ],
+          "scale": 1.1722222222222223,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 3981,
+          "bladePixelsFullLogical": 2877,
+          "overlapFraction": 0.24215021351419241,
+          "impactAnchor": [
+            171.55555555555554,
+            463.02777777777777
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand.png",
+          "file": "390x844-forge-charge.jpeg"
+        },
+        {
+          "phase": "impact",
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 235,
+              "y": 140,
+              "size": 740
+            },
+            "blade": {
+              "x": 530,
+              "y": 420,
+              "length": 350,
+              "angle": -0.19
+            },
+            "focusX": 680,
+            "impact": [
+              660,
+              395
+            ]
+          },
+          "outer": [
+            -602.7779664003358,
+            0.36219234022508845
+          ],
+          "scale": 1.1722222222222223,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 4272,
+          "bladePixelsFullLogical": 3107,
+          "overlapFraction": 0.19616104868913858,
+          "impactAnchor": [
+            170.88870026633094,
+            463.38997011800285
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand-strike.png",
+          "file": "390x844-impact.jpeg"
+        },
+        {
+          "phase": "quench",
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 235,
+              "y": 140,
+              "size": 740
+            },
+            "blade": {
+              "x": 970,
+              "y": 180,
+              "length": 320,
+              "angle": 0.08
+            },
+            "focusX": 1050,
+            "impact": null
+          },
+          "outer": [
+            -1035.8333333333335,
+            0
+          ],
+          "scale": 1.1722222222222223,
+          "bladeVisibleFraction": 0.9997119815668203,
+          "bladePixelsVisible": 4755,
+          "bladePixelsFullLogical": 3472,
+          "overlapFraction": 0,
+          "impactAnchor": null,
+          "impactAnchorInsideViewport": false,
+          "anvilContactValid": null,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": null,
+          "file": "390x844-quench.jpeg"
+        }
+      ]
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "frames": [
+        {
+          "phase": "heat",
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "phase": "heat",
+            "strikes": 0,
+            "shape": 0.18,
+            "heat": 0.6305600000000013,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 145,
+              "y": 92,
+              "size": 940
+            },
+            "blade": {
+              "x": 200,
+              "y": 175,
+              "length": 300,
+              "angle": -0.16
+            },
+            "focusX": 640,
+            "impact": null
+          },
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "scale": 1.0671875,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 4997,
+          "bladePixelsFullLogical": 4396,
+          "overlapFraction": 0,
+          "impactAnchor": null,
+          "impactAnchorInsideViewport": false,
+          "anvilContactValid": null,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": null,
+          "file": "1366x768-heat.jpeg"
+        },
+        {
+          "phase": "forge-rest",
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.5182399999999903,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 145,
+              "y": 92,
+              "size": 940
+            },
+            "blade": {
+              "x": 525,
+              "y": 430,
+              "length": 520,
+              "angle": -0.19
+            },
+            "focusX": 640,
+            "impact": [
+              690,
+              399
+            ]
+          },
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "scale": 1.0671875,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 4924,
+          "bladePixelsFullLogical": 4317,
+          "overlapFraction": 0.16653127538586515,
+          "impactAnchor": [
+            736.359375,
+            425.62031249999995
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand.png",
+          "file": "1366x768-forge-rest.jpeg"
+        },
+        {
+          "phase": "forge-charge",
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "phase": "forge",
+            "strikes": 3,
+            "shape": 0.48,
+            "heat": 0.49878399999998874,
+            "force": 0.5519999999999996
+          },
+          "layout": {
+            "anvil": {
+              "x": 145,
+              "y": 92,
+              "size": 940
+            },
+            "blade": {
+              "x": 525,
+              "y": 430,
+              "length": 520,
+              "angle": -0.19
+            },
+            "focusX": 640,
+            "impact": [
+              690,
+              399
+            ]
+          },
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "scale": 1.0671875,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 4924,
+          "bladePixelsFullLogical": 4317,
+          "overlapFraction": 0.31376929325751424,
+          "impactAnchor": [
+            736.359375,
+            425.62031249999995
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand.png",
+          "file": "1366x768-forge-charge.jpeg"
+        },
+        {
+          "phase": "impact",
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "phase": "forge",
+            "strikes": 4,
+            "shape": 0.5185,
+            "heat": 0.49391999999998876,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 145,
+              "y": 92,
+              "size": 940
+            },
+            "blade": {
+              "x": 525,
+              "y": 430,
+              "length": 520,
+              "angle": -0.19
+            },
+            "focusX": 640,
+            "impact": [
+              690,
+              399
+            ]
+          },
+          "outer": [
+            -0.666855289224597,
+            0.17469234022508845
+          ],
+          "scale": 1.0671875,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 5283,
+          "bladePixelsFullLogical": 4646,
+          "overlapFraction": 0.14366837024417944,
+          "impactAnchor": [
+            735.6925197107754,
+            425.98250484022503
+          ],
+          "impactAnchorInsideViewport": true,
+          "anvilContactValid": true,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": "hand-strike.png",
+          "file": "1366x768-impact.jpeg"
+        },
+        {
+          "phase": "quench",
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "phase": "quench",
+            "strikes": 8,
+            "shape": 0.6619999999999999,
+            "heat": 0.5,
+            "force": 0
+          },
+          "layout": {
+            "anvil": {
+              "x": 145,
+              "y": 92,
+              "size": 940
+            },
+            "blade": {
+              "x": 970,
+              "y": 180,
+              "length": 320,
+              "angle": 0.08
+            },
+            "focusX": 640,
+            "impact": null
+          },
+          "outer": [
+            0,
+            -0.1875
+          ],
+          "scale": 1.0671875,
+          "bladeVisibleFraction": 1,
+          "bladePixelsVisible": 3940,
+          "bladePixelsFullLogical": 3472,
+          "overlapFraction": 0,
+          "impactAnchor": null,
+          "impactAnchorInsideViewport": false,
+          "anvilContactValid": null,
+          "contactTopPolygonNormalized": [
+            [
+              0.36,
+              0.32
+            ],
+            [
+              0.85,
+              0.18
+            ],
+            [
+              0.95,
+              0.25
+            ],
+            [
+              0.42,
+              0.44
+            ]
+          ],
+          "handSource": null,
+          "file": "1366x768-quench.jpeg"
+        }
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "src/game/ForgeCanvas.tsx": "d50f73ef7b47a76df2d8de5ceeb99a90ff4f4a79d9a9ae640cb398b991cfceae",
+    "src/game/assets.ts": "59387188692de3980780df34738bcbb8ab8ab2fa85b711356b6ee0a893dde3a3",
+    "src/game/swordDraw.ts": "ab871b98358e3ae8e213953c7a277df32f4e8a829ab973ec4d6d1c9dc2a9528d",
+    "public/game/experimental/r4b-forge-bg.png": "14393619117caa29334f9ea759576a17cbaa14b85ae91eed5586542d1e09df13",
+    "public/game/experimental/r4b-anvil.png": "c2bf2d9a3555700efb9790d08d3bb32354951f0032feb41163bc88ec286f906b",
+    "experiments/M01-R4B/capture.mjs": "88525e8808fac7e5b047e70ef0da98dc9f2d84414d2b057a066eea60143953df"
+  }
+}

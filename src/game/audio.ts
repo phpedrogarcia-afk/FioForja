@@ -144,6 +144,92 @@ export function playPull() {
   osc.stop(now() + 0.28);
 }
 
+export function playCrack() {
+  if (!ctx || !sfx) return;
+  const t = now();
+  const osc = ctx.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(380, t);
+  osc.frequency.exponentialRampToValueAtTime(140, t + 0.18);
+  const g = envGain(0.22, 0.65, 0.002);
+  const f = ctx.createBiquadFilter();
+  f.type = "bandpass";
+  f.frequency.value = 1800;
+  f.Q.value = 8;
+  osc.connect(f);
+  if (g) f.connect(g);
+  osc.start(t);
+  osc.stop(t + 0.2);
+
+  const buf = noiseBuffer(0.15);
+  if (buf) {
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const ng = envGain(0.12, 0.45, 0.001);
+    const hp = ctx.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.value = 2200;
+    src.connect(hp);
+    if (ng) hp.connect(ng);
+    src.start(t);
+  }
+}
+
+export function playShatter() {
+  if (!ctx || !sfx) return;
+  const t = now();
+  // Catastrophic metal snap
+  const osc = ctx.createOscillator();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(280, t);
+  osc.frequency.exponentialRampToValueAtTime(45, t + 0.4);
+  const g = envGain(0.5, 0.85, 0.003);
+  if (g) osc.connect(g);
+  osc.start(t);
+  osc.stop(t + 0.5);
+
+  // Hollow dull clunk
+  const osc2 = ctx.createOscillator();
+  osc2.type = "triangle";
+  osc2.frequency.setValueAtTime(110, t);
+  osc2.frequency.exponentialRampToValueAtTime(30, t + 0.6);
+  const g2 = envGain(0.65, 0.9, 0.005);
+  if (g2) osc2.connect(g2);
+  osc2.start(t);
+  osc2.stop(t + 0.65);
+
+  const buf = noiseBuffer(0.4);
+  if (buf) {
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const ng = envGain(0.35, 0.5, 0.002);
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 900;
+    src.connect(lp);
+    if (ng) lp.connect(ng);
+    src.start(t);
+  }
+}
+
+export function playRuneHum() {
+  if (!ctx || !sfx) return;
+  const t = now();
+  const freqs = [528, 792, 1056];
+  for (const f of freqs) {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(f, t);
+    osc.frequency.linearRampToValueAtTime(f * 1.02, t + 0.6);
+    const g = envGain(0.7, 0.2, 0.05);
+    if (g) {
+      osc.connect(g);
+      osc.start(t);
+      osc.stop(t + 0.7);
+    }
+  }
+}
+
 function startFire() {
   if (!ctx || !amb || fireTimer != null) return;
   const tick = () => {

@@ -1,5 +1,5 @@
-import { STEELS, gradeFor } from "./catalog";
-import type { SimState, StrikeKind, SwordDesign } from "./types";
+import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
+import type { FinishedSword, ForgeRewardsData, SimState, StrikeKind, SwordDesign } from "./types.ts";
 
 export interface SimInput {
   charging: boolean;
@@ -8,13 +8,14 @@ export interface SimInput {
 }
 
 export interface SimEvent {
-  sfx?: "clang" | "whoosh" | "hiss" | "pull";
+  sfx?: "clang" | "whoosh" | "hiss" | "pull" | "crack" | "shatter" | "rune";
   kind?: StrikeKind;
   force?: number;
   trauma?: number;
   hitstop?: number;
   message?: string;
   finished?: boolean;
+  broken?: boolean;
 }
 
 export function createSim(design: SwordDesign): SimState {
@@ -23,7 +24,7 @@ export function createSim(design: SwordDesign): SimState {
     phase: "heat",
     heat: 0.1,
     heatScore: 0,
-    shape: 0.18,
+    shape: 0.16,
     quality: 42,
     warp: 0,
     strikes: 0,
@@ -40,7 +41,13 @@ export function createSim(design: SwordDesign): SimState {
     strikeAnim: 0,
     sparkAnim: 0,
     done: false,
-    lastMessage: "Espere o ferro ficar amarelo-branco, depois retire.",
+    lastMessage: "Espere o ferro atingir a cor amarelo-laranja ideal e retire para a bigorna.",
+    integrity: 100,
+    cracks: 0,
+    structuralState: "stable",
+    broken: false,
+    runicCharge: 0,
+    history: [],
   };
 }
 
@@ -52,11 +59,12 @@ function recomputeQuality(s: SimState, design: SwordDesign) {
   const steel = STEELS[design.steel];
   const forge = clamp(s.shape * 100 - s.warp * 38, 0, 100);
   const q =
-    s.heatScore * 0.26 +
-    forge * 0.42 +
+    s.heatScore * 0.24 +
+    forge * 0.44 +
     s.quenchScore * 0.22 +
     steel.hardness * 10 -
-    s.warp * 18;
+    s.warp * 22 -
+    s.cracks * 18;
   s.quality = clamp(q, 4, 100);
 }
 
@@ -80,14 +88,15 @@ export function stepSim(
     s.heat = clamp(s.heat + dt * 0.16, 0, 1);
     const mid = (steel.heatMin + steel.heatMax) / 2;
     if (s.heat >= steel.heatMin && s.heat <= steel.heatMax) {
-      s.lastMessage = "Ponto certo — retire agora.";
+      s.lastMessage = "Calor ideal! O aço está plástico e pronto para a bigorna.";
     } else if (s.heat < steel.heatMin) {
-      s.lastMessage = "Ainda frio. Deixe o fogo trabalhar.";
+      s.lastMessage = "Ainda frio. Deixe o fogo da fornalha penetrar o tarugo.";
     } else if (s.heat < 0.92) {
-      s.lastMessage = "Quase queimando. Retire!";
+      s.lastMessage = "Quente demais! O aço começará a queimar carbono. Retire!";
     } else {
-      s.lastMessage = "O ferro está queimando.";
+      s.lastMessage = "O aço está queimando! Descarbonização acelerada.";
       s.warp = clamp(s.warp + dt * 0.08, 0, 1);
+      s.integrity = clamp(s.integrity - dt * 10, 20, 100);
     }
 
     if (input.action) {
@@ -97,7 +106,7 @@ export function stepSim(
       if (s.heat > 0.93) s.heatScore = Math.min(s.heatScore, 38);
       if (s.heat < 0.4) s.heatScore = Math.min(s.heatScore, 36);
       s.phase = "forge";
-      s.lastMessage = "Segure para carregar o golpe. Solte no brilho.";
+      s.lastMessage = "Segure para erguer o martelo e solte na faixa ideal.";
       s.sweetCenter = 0.64;
       event.sfx = "pull";
       event.message = s.lastMessage;
@@ -112,47 +121,63 @@ export function stepSim(
 
     if (s.reheating) {
       s.heat = clamp(s.heat + dt * 0.42, 0, 0.86);
-      s.lastMessage = "Reaquecendo no fogo…";
-      if (s.heat >= 0.74) s.reheating = false;
+      s.integrity = clamp(s.integrity + dt * 6, 0, 100);
+      s.lastMessage = "Reaquecendo na fornalha… Aliviando tensões internas.";
+      if (s.heat >= 0.76) s.reheating = false;
     } else {
       s.heat = clamp(s.heat - dt * 0.038, 0.08, 1);
     }
 
-    if (input.reheat && !s.reheating && s.heat < 0.55) {
+    if (input.reheat && !s.reheating && s.heat < 0.58) {
       s.reheating = true;
+      event.sfx = "pull";
+      return event;
     }
 
     if (input.charging && !s.reheating) {
       if (!s.charging && s.force < 0.05) event.sfx = "whoosh";
       s.charging = true;
-      s.force = clamp(s.force + dt * 1.15, 0, 1);
+      s.force = clamp(s.force + dt * 1.18, 0, 1);
     } else if (s.charging) {
       const kind = gradeStrike(s.force, s.sweetCenter, s.sweetWidth);
       const usedForce = s.force;
-      applyStrike(s, kind, design);
+      applyStrike(s, kind, design, event);
       s.charging = false;
       s.force = 0;
       s.strikeKind = kind;
       s.strikeAnim = 0.38;
       s.sparkAnim = 0.42;
-      event.sfx = "clang";
+
+      // Event SFX handling
+      if (s.broken) {
+        event.sfx = "shatter";
+        event.trauma = 0.9;
+        event.hitstop = 0.12;
+        event.finished = true;
+        event.broken = true;
+        return event;
+      }
+
+      if (event.sfx !== "crack" && event.sfx !== "rune") {
+        event.sfx = "clang";
+      }
       event.kind = kind;
       event.force = usedForce;
-      event.trauma = kind === "perfect" ? 0.55 : kind === "hard" ? 0.7 : kind === "good" ? 0.38 : 0.18;
-      event.hitstop = kind === "perfect" || kind === "hard" ? 0.055 : 0.03;
+      event.trauma = kind === "perfect" ? 0.55 : kind === "hard" ? 0.72 : kind === "good" ? 0.38 : 0.2;
+      event.hitstop = kind === "perfect" || kind === "hard" ? 0.06 : 0.03;
       event.message = s.lastMessage;
       recomputeQuality(s, design);
 
-      if (s.strikes >= s.maxStrikes) {
+      if (s.strikes >= s.maxStrikes && !s.broken) {
         s.phase = "quench";
-        s.heat = Math.max(s.heat, 0.5);
-        s.lastMessage = "Mergulhe a lâmina. Solte no momento certo.";
+        s.heat = Math.max(s.heat, 0.52);
+        s.lastMessage = "Hora da têmpera! Mergulhe a lâmina na cuba e solte na faixa ideal.";
       }
       return event;
     }
 
-    if (s.heat < 0.32 && !s.reheating) {
-      s.lastMessage = "O ferro esfriou. Reaqueça.";
+    if (s.heat < 0.34 && !s.reheating) {
+      s.lastMessage = "PERIGO: O ferro esfriou! Martelar agora causará trincas. Reaqueça!";
     }
   }
 
@@ -161,25 +186,28 @@ export function stepSim(
       s.quenching = true;
       s.quenchFill = clamp(s.quenchFill + dt * 0.48, 0, 1);
       if (s.quenchFill > 0.42 && s.quenchFill < 0.62) {
-        s.lastMessage = "Agora — solte.";
+        s.lastMessage = "Faixa perfeita de têmpera — solte agora!";
       } else if (s.quenchFill >= 0.62) {
-        s.lastMessage = "Demais. Vai rachar.";
+        s.lastMessage = "Tempo demais no banho! Risco de empenamento térmico.";
       } else {
-        s.lastMessage = "Segure para mergulhar…";
+        s.lastMessage = "Mergulhando no banho de têmpera…";
       }
     } else if (s.quenching) {
       const ideal = 0.52;
       const dist = Math.abs(s.quenchFill - ideal);
       s.quenchScore = clamp(100 * (1 - dist / 0.38), 12, 100);
+
       if (s.quenchFill < 0.22) {
         s.quenchScore = Math.min(s.quenchScore, 40);
-        s.lastMessage = "Temperou pouco. O aço ficou mole.";
+        s.lastMessage = "Têmpera incompleta. O aço permaneceu brando.";
       } else if (s.quenchFill > 0.78) {
         s.warp = clamp(s.warp + 0.18, 0, 1);
-        s.lastMessage = "Ficou tempo demais no banho.";
+        s.integrity = clamp(s.integrity - 15, 0, 100);
+        s.lastMessage = "Choque térmico violento! O gume curvou pelo excesso de tempo.";
       } else {
-        s.lastMessage = "Têmpera limpa.";
+        s.lastMessage = "Têmpera perfeita! Martensita consolidada e fio cristalizado.";
       }
+
       recomputeQuality(s, design);
       s.done = true;
       event.sfx = "hiss";
@@ -202,47 +230,187 @@ function gradeStrike(force: number, center: number, width: number): StrikeKind {
   return "hard";
 }
 
-function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign) {
+function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: SimEvent) {
   const steel = STEELS[design.steel];
-  const inHeat = s.heat >= steel.heatMin - 0.08 && s.heat <= steel.heatMax + 0.1;
+  const isCold = s.heat < steel.heatMin - 0.04;
+  const isOverheated = s.heat > steel.heatMax + 0.08;
+  const inHeat = !isCold && !isOverheated;
+
   let shapeGain = 0;
   if (kind === "perfect") shapeGain = 0.16;
-  else if (kind === "good") shapeGain = 0.11;
+  else if (kind === "good") shapeGain = 0.12;
   else if (kind === "hard") shapeGain = 0.07;
-  else shapeGain = 0.03;
+  else shapeGain = 0.035;
 
-  if (!inHeat) {
-    shapeGain *= s.heat < steel.heatMin ? 0.35 : 0.55;
-    s.warp += s.heat > steel.heatMax ? 0.08 : 0.03;
+  s.history.push({
+    strike: s.strikes + 1,
+    kind,
+    force: s.force,
+    inHeat,
+  });
+
+  // Structural stress and integrity calculations
+  if (isCold) {
+    // Cold hammering creates dangerous brittle stress fractures
+    shapeGain *= 0.25;
+    const stress = kind === "hard" ? 38 : kind === "good" ? 22 : 14;
+    s.integrity -= stress;
+    s.warp += 0.07;
+    s.lastMessage = "Golpe no ferro frio! O aço resiste e sofre estresse estrutural.";
+  } else if (isOverheated) {
+    shapeGain *= 0.55;
+    s.integrity -= 12;
+    s.warp += 0.09;
+    s.lastMessage = "Ferro quase queimando! A espinha deforma com facilidade excessiva.";
+  } else {
+    // Normal / Ideal heat
+    if (kind === "perfect") {
+      s.warp = Math.max(0, s.warp - 0.025);
+      s.runicCharge = clamp(s.runicCharge + 0.25, 0, 1);
+      s.lastMessage = "Golpe magistral! As ondas de choque alinham o gume perfeitamente.";
+      if (design.runes && s.runicCharge > 0.5) event.sfx = "rune";
+    } else if (kind === "good") {
+      s.lastMessage = "Bom golpe. O perfil da lâmina se desenvolve com precisão.";
+    } else if (kind === "hard") {
+      s.integrity -= 10;
+      s.warp += 0.08;
+      s.lastMessage = "Força excessiva! O aço sofreu deformação localizada.";
+    } else {
+      s.lastMessage = "Golpe fraco. A martelada não deslocou massa suficiente.";
+    }
   }
-  if (kind === "hard") s.warp += 0.1;
-  if (kind === "perfect" && inHeat) s.warp = Math.max(0, s.warp - 0.02);
+
+  // Check cracking and failure
+  if (s.integrity <= 0 || (s.cracks >= 2 && (isCold || kind === "hard"))) {
+    s.broken = true;
+    s.structuralState = "broken";
+    s.done = true;
+    s.lastMessage = "FALHA ESTRUTURAL: A espada quebrou sob o impacto do martelo!";
+    s.quality = 8;
+    return;
+  }
+
+  if (s.integrity < 38) {
+    s.cracks = 2;
+    s.structuralState = "cracked";
+    event.sfx = "crack";
+    s.lastMessage = "TRINCA CRÍTICA: Uma fissura surgiu no aço! Reaqueça antes de novo golpe!";
+  } else if (s.integrity < 65) {
+    s.cracks = 1;
+    s.structuralState = "damaged";
+  } else if (s.warp > 0.15) {
+    s.structuralState = "deformed";
+  } else {
+    s.structuralState = "stable";
+  }
 
   s.shape = clamp(s.shape + shapeGain, 0, 1);
   s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
-
-  if (!inHeat && s.heat < steel.heatMin) {
-    s.lastMessage = "Fraco — o ferro estava frio.";
-  } else if (kind === "perfect") {
-    s.lastMessage = "Golpe perfeito. A lâmina canta.";
-  } else if (kind === "good") {
-    s.lastMessage = "Bom golpe. Continue no ritmo.";
-  } else if (kind === "weak") {
-    s.lastMessage = "Muito fraco. O ferro quase não cedeu.";
-  } else {
-    s.lastMessage = "Força demais. O gume empena.";
-  }
 }
 
-export function finishSword(s: SimState, design: SwordDesign) {
+export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   recomputeQuality(s, design);
+  const q = Math.round(s.quality);
+  const grade = gradeFor(q);
+  const rarity = rarityFor(design, q);
+  const heatScore = Math.round(s.heatScore);
+  const forgeScore = Math.round(clamp(s.shape * 100 - s.warp * 38, 0, 100));
+  const quenchScore = Math.round(s.quenchScore);
+  const attrs = calculateSwordAttributes(design, q, s.warp, heatScore, forgeScore, quenchScore);
+
   return {
-    quality: Math.round(s.quality),
-    grade: gradeFor(s.quality),
-    heatScore: Math.round(s.heatScore),
-    forgeScore: Math.round(clamp(s.shape * 100 - s.warp * 38, 0, 100)),
-    quenchScore: Math.round(s.quenchScore),
+    id: `${Date.now()}`,
+    design,
+    quality: q,
+    grade,
+    rarity,
+    heatScore,
+    forgeScore,
+    quenchScore,
     warp: s.warp,
+    createdAt: Date.now(),
+    damage: attrs.damage,
+    defense: attrs.defense,
+    agility: attrs.agility,
+    durability: attrs.durability,
+    flaws: attrs.flaws,
+    perks: attrs.perks,
+    structuralState: s.structuralState,
+    cracks: s.cracks,
+  };
+}
+
+export function generateForgeRewards(sword: FinishedSword): ForgeRewardsData {
+  const q = sword.quality;
+  let rank = "C";
+  let gold = 500;
+  let rubies = 15;
+  let diamonds = 10;
+
+  if (q >= 95) {
+    rank = "S (98%)";
+    gold = 4850;
+    rubies = 165;
+    diamonds = 165;
+  } else if (q >= 88) {
+    rank = "A (90%)";
+    gold = 2950;
+    rubies = 95;
+    diamonds = 80;
+  } else if (q >= 75) {
+    rank = "B (78%)";
+    gold = 1600;
+    rubies = 45;
+    diamonds = 35;
+  } else {
+    rank = "C (55%)";
+    gold = 850;
+    rubies = 20;
+    diamonds = 15;
+  }
+
+  const items = [
+    {
+      id: "rune_fire",
+      name: "Fiery Rune Stone",
+      type: "Pedra Rúnica",
+      rarity: (q >= 90 ? "Lendária" : "Rara") as import("./types").RarityGrade,
+      icon: "🔥",
+      description: "Pedra primordial de calor rúnico que confere chama perene às incisões da lâmina.",
+    },
+    {
+      id: "crossguard_damascus",
+      name: "Damascus Crossguard",
+      type: "Componente de Guarda",
+      rarity: (q >= 95 ? "Lendária" : "Épica") as import("./types").RarityGrade,
+      icon: "⚔️",
+      description: "Guarda em aço de Damasco gravada com volutas nórdicas e equilíbrio supremo.",
+    },
+    {
+      id: "grip_dragon",
+      name: "Dragon Leather Sword Grip",
+      type: "Empunhadura",
+      rarity: (q >= 85 ? "Épica" : "Rara") as import("./types").RarityGrade,
+      icon: "🐉",
+      description: "Couro escamoso de alta densidade que repele umidade e oferece aderência inabalável.",
+    },
+    {
+      id: "ingot_starmetal",
+      name: "Star Metal Ingot",
+      type: "Lingote Raro",
+      rarity: (q >= 90 ? "Relíquia" : "Épica") as import("./types").RarityGrade,
+      icon: "✨",
+      description: "Lingotes celestes reluzentes forjados no coração de meteoritos ancestrais.",
+    },
+  ];
+
+  return {
+    rank,
+    scorePercent: q,
+    gold,
+    rubies,
+    diamonds,
+    items,
   };
 }
