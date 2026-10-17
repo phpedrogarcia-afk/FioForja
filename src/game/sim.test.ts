@@ -134,4 +134,81 @@ describe("FioForja Simulator Core & Physical Metallurgy", () => {
     assert.equal(rewards.items[2].name, "Dragon Leather Sword Grip");
     assert.equal(rewards.items[3].name, "Star Metal Ingot");
   });
+
+  it("handles multi-zone targeting and awards Forge Harmony perk on balanced forging", () => {
+    const sim = createSim(DEFAULT_DESIGN);
+    sim.phase = "forge";
+    sim.heat = 0.7; // ideal heat
+
+    // Strike base twice
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false, switchZone: "base" }, DEFAULT_DESIGN, 1);
+    assert.equal(sim.targetZone, "base");
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1.1);
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1.2);
+
+    // Strike mid twice
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false, switchZone: "mid" }, DEFAULT_DESIGN, 2);
+    assert.equal(sim.targetZone, "mid");
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 2.1);
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 2.2);
+
+    // Strike tip twice
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false, switchZone: "tip" }, DEFAULT_DESIGN, 3);
+    assert.equal(sim.targetZone, "tip");
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 3.1);
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 3.2);
+
+    assert.ok(sim.zoneProgress.base >= 2);
+    assert.ok(sim.zoneProgress.mid >= 2);
+    assert.ok(sim.zoneProgress.tip >= 2);
+
+    const finished = finishSword(sim, DEFAULT_DESIGN);
+    assert.ok(
+      finished.perks?.some((p) => p.includes("Harmonia da Forja")),
+      "Balanced forging across all 3 zones must award Harmonia da Forja",
+    );
+  });
+
+  it("adjusts strike dynamics according to equipped hammer tool", () => {
+    // Sledge hammer: higher shape gain and higher stress
+    const simSledge = createSim(DEFAULT_DESIGN, { hammer: "sledge" });
+    assert.equal(simSledge.activeHammer, "sledge");
+
+    // Precision hammer: faster charge and wider sweet spot
+    const simPrecision = createSim(DEFAULT_DESIGN, { hammer: "precision" });
+    assert.equal(simPrecision.activeHammer, "precision");
+    simPrecision.phase = "forge";
+    stepSim(simPrecision, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1);
+    assert.ok(simPrecision.sweetWidth > simSledge.sweetWidth, "Precision hammer should have wider sweet spot");
+  });
+
+  it("classifies Ancient Alloy masterwork as Relic tier", () => {
+    const relicDesign = {
+      ...DEFAULT_DESIGN,
+      family: "relic" as const,
+      steel: "ancient_alloy" as const,
+      profile: "relic_blade" as const,
+    };
+    const sim = createSim(relicDesign);
+    sim.quality = 96;
+    sim.heatScore = 95;
+    sim.quenchScore = 94;
+    sim.shape = 1;
+
+    const finished = finishSword(sim, relicDesign);
+    assert.equal(finished.rarity, "Relíquia");
+    assert.ok(finished.perks?.some((p) => p.includes("Herança dos Primeiros Homens")));
+  });
 });

@@ -9,15 +9,29 @@ interface Props {
   onMute: () => void;
   onPull: () => void;
   onReheat: () => void;
+  onSelectZone?: (zone: import("../types").ForgeZone) => void;
+  onSelectHammer?: (hammer: import("../types").HammerType) => void;
   onQuit: () => void;
 }
 
-export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props) {
+export function ForgeHud({
+  hud,
+  muted,
+  onMute,
+  onPull,
+  onReheat,
+  onSelectZone,
+  onSelectHammer,
+  onQuit,
+}: Props) {
   const phaseLabel =
     hud.phase === "heat" ? "Aquecer" : hud.phase === "forge" ? "Martelar" : "Temperar";
 
   const integrityColor =
     hud.integrity < 35 ? "#ef4444" : hud.integrity < 65 ? "#f59e0b" : "#10b981";
+
+  const activeZone = hud.targetZone || "mid";
+  const activeHammer = hud.activeHammer || "standard";
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5">
@@ -66,6 +80,60 @@ export function ForgeHud({ hud, muted, onMute, onPull, onReheat, onQuit }: Props
             value={hud.phase === "forge" ? `${hud.strikes}/${hud.maxStrikes}` : `${Math.round(hud.quality)}`}
           />
         </div>
+
+        {/* Multi-Zone Targeting & Tool Selectors (During Forge Phase) */}
+        {hud.phase === "forge" && !hud.broken && (
+          <div className="flex flex-col gap-2 rounded-lg border border-[#23324d] bg-[#0c101c]/90 p-2.5 shadow-md backdrop-blur-xs sm:max-w-md">
+            <div className="flex items-center justify-between text-[0.65rem] font-display uppercase tracking-wider text-slate-400">
+              <span>Zona da Lâmina [1, 2, 3]</span>
+              <span>Ferramenta [H]</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              {/* Blade Zones */}
+              <div className="flex gap-1.5">
+                {[
+                  { id: "base" as const, label: "Base [1]", count: hud.zoneProgress?.base || 0 },
+                  { id: "mid" as const, label: "Centro [2]", count: hud.zoneProgress?.mid || 0 },
+                  { id: "tip" as const, label: "Ponta [3]", count: hud.zoneProgress?.tip || 0 },
+                ].map((z) => (
+                  <button
+                    key={z.id}
+                    onClick={() => onSelectZone?.(z.id)}
+                    className={`rounded px-2 py-1 text-xs font-display transition-colors ${
+                      activeZone === z.id
+                        ? "border border-amber-500 bg-amber-500/20 text-amber-300 font-bold shadow-xs"
+                        : "border border-border bg-surface text-slate-400 hover:text-fg"
+                    }`}
+                  >
+                    {z.label} <span className="opacity-70">({z.count})</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Hammers */}
+              <div className="flex gap-1">
+                {[
+                  { id: "precision" as const, label: "⚒️ Pena" },
+                  { id: "standard" as const, label: "🔨 Padrão" },
+                  { id: "sledge" as const, label: "🪓 Marreta" },
+                ].map((h) => (
+                  <button
+                    key={h.id}
+                    onClick={() => onSelectHammer?.(h.id)}
+                    title={h.label}
+                    className={`rounded px-1.5 py-1 text-[0.7rem] font-display transition-colors ${
+                      activeHammer === h.id
+                        ? "border border-blue-400 bg-blue-500/20 text-blue-200 font-semibold"
+                        : "border border-border bg-surface text-slate-400 hover:text-fg"
+                    }`}
+                  >
+                    {h.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="pointer-events-auto mt-auto flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

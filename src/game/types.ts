@@ -2,11 +2,68 @@ export type Screen = "title" | "design" | "forge" | "reveal" | "rewards" | "gall
 
 export type ForgePhase = "heat" | "forge" | "quench";
 
-export type ProfileId = "short" | "long" | "claymore" | "falchion" | "saber";
-export type SteelId = "iron" | "steel" | "damascus" | "meteor";
-export type WrapId = "leather" | "linen" | "goldwire" | "bone";
-export type GuardId = "cross" | "curved" | "wings" | "ring";
-export type PommelId = "disc" | "sphere" | "wolf" | "cross";
+export type ProfileId =
+  | "short"
+  | "long"
+  | "claymore"
+  | "falchion"
+  | "saber"
+  | "katana"
+  | "elven_blade"
+  | "relic_blade";
+
+export type SteelId =
+  | "iron"
+  | "steel"
+  | "damascus"
+  | "blacksteel"
+  | "elven_silver"
+  | "meteor"
+  | "ancient_alloy";
+
+export type WrapId =
+  | "leather"
+  | "braided"
+  | "linen"
+  | "darkwood"
+  | "bone"
+  | "goldwire"
+  | "tsukamaki"
+  | "elven_wood";
+
+export type GuardId =
+  | "cross"
+  | "curved"
+  | "wings"
+  | "ring"
+  | "tsuba"
+  | "leaf"
+  | "imperial"
+  | "runic";
+
+export type PommelId =
+  | "disc"
+  | "sphere"
+  | "wolf"
+  | "cross"
+  | "crescent"
+  | "elven"
+  | "crown"
+  | "knot";
+
+export type FamilyId =
+  | "iron"
+  | "royal"
+  | "damascus"
+  | "oriental"
+  | "elven"
+  | "runic"
+  | "meteor"
+  | "imperial"
+  | "relic";
+
+export type ForgeZone = "base" | "mid" | "tip";
+export type HammerType = "precision" | "standard" | "sledge";
 
 export type StrikeKind = "weak" | "good" | "perfect" | "hard";
 export type StructuralState = "stable" | "deformed" | "damaged" | "cracked" | "broken";
@@ -14,6 +71,7 @@ export type RarityGrade = "Comum" | "Incomum" | "Rara" | "Épica" | "Lendária" 
 
 export interface SwordDesign {
   name: string;
+  family?: FamilyId;
   profile: ProfileId;
   steel: SteelId;
   wrap: WrapId;
@@ -44,6 +102,7 @@ export interface FinishedSword {
   perks?: string[];
   structuralState?: StructuralState;
   cracks?: number;
+  history?: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
 }
 
 export interface SimState {
@@ -75,7 +134,11 @@ export interface SimState {
   broken: boolean;
   brokenReason?: string;
   runicCharge: number;
-  history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean }>;
+  // Multi-zone hammering & tools
+  targetZone: ForgeZone;
+  zoneProgress: Record<ForgeZone, number>;
+  activeHammer: HammerType;
+  history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
 }
 
 export interface HudSnapshot {
@@ -96,6 +159,9 @@ export interface HudSnapshot {
   structuralState: StructuralState;
   cracks: number;
   broken: boolean;
+  targetZone?: ForgeZone;
+  zoneProgress?: Record<ForgeZone, number>;
+  activeHammer?: HammerType;
 }
 
 export interface ForgeRewardItem {

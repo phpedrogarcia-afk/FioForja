@@ -147,8 +147,63 @@ function drawSwordBody(
     ctx.quadraticCurveTo(bladeLen, bW * 0.2, bladeLen * 0.85, bW * 0.45);
     ctx.lineTo(0, bW * 0.5);
     ctx.closePath();
+  } else if (design.profile === "katana") {
+    // Katana: single edged curved katana with kissaki tip and defined mune
+    const edgeHalf = W * (0.35 + shape * 0.12);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.35;
+    // Base ricasso (habaki zone)
+    ctx.moveTo(8, -edgeHalf * 0.7);
+    // Mune (spine) curving upward smoothly
+    ctx.quadraticCurveTo(bladeLen * 0.5, -edgeHalf * 0.7 + totalCurve * 0.3, bladeLen * 0.9, -edgeHalf * 0.55 + totalCurve * 0.75);
+    // Kissaki slant tip
+    ctx.lineTo(tipX, tipY);
+    // Ha (cutting edge) sweeping back with distal curve
+    ctx.quadraticCurveTo(bladeLen * 0.88, edgeHalf * 0.65 + totalCurve * 0.75, bladeLen * 0.45, edgeHalf * 0.85 + totalCurve * 0.3);
+    ctx.lineTo(8, edgeHalf * 0.65);
+    ctx.closePath();
+  } else if (design.profile === "elven_blade") {
+    // Elven: graceful leaf-blade with gentle waist, distal swelling, and slender point
+    const edgeHalf = W * (0.36 + shape * 0.14);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.12;
+    ctx.moveTo(8, -edgeHalf * 0.45);
+    // Gentle waist at 25%, swelling at 60%
+    ctx.bezierCurveTo(
+      bladeLen * 0.25, -edgeHalf * 0.7 + totalCurve * 0.1,
+      bladeLen * 0.62, -edgeHalf * 1.15 + totalCurve * 0.35,
+      bladeLen * 0.88, -edgeHalf * 0.55 + totalCurve * 0.5,
+    );
+    ctx.lineTo(tipX, tipY);
+    ctx.bezierCurveTo(
+      bladeLen * 0.88, edgeHalf * 0.55 + totalCurve * 0.5,
+      bladeLen * 0.62, edgeHalf * 1.15 + totalCurve * 0.35,
+      bladeLen * 0.25, edgeHalf * 0.7 + totalCurve * 0.1,
+    );
+    ctx.lineTo(8, edgeHalf * 0.45);
+    ctx.closePath();
+  } else if (design.profile === "relic_blade") {
+    // Relic blade: ancient broad stepped blade with angular ricasso steps and broad diamond point
+    const edgeHalf = W * (0.44 + shape * 0.16);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.1;
+    ctx.moveTo(8, -edgeHalf * 0.75);
+    // Stepped notch near ricasso
+    ctx.lineTo(bladeLen * 0.18, -edgeHalf * 0.75);
+    ctx.lineTo(bladeLen * 0.2, -edgeHalf * 0.95);
+    // Main cutting edge
+    ctx.lineTo(bladeLen * 0.82, -edgeHalf * 0.95 + totalCurve * 0.4);
+    // Angular facet to tip
+    ctx.lineTo(bladeLen * 0.94, -edgeHalf * 0.45 + totalCurve * 0.7);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(bladeLen * 0.94, edgeHalf * 0.45 + totalCurve * 0.7);
+    ctx.lineTo(bladeLen * 0.82, edgeHalf * 0.95 + totalCurve * 0.4);
+    ctx.lineTo(bladeLen * 0.2, edgeHalf * 0.95);
+    ctx.lineTo(bladeLen * 0.18, edgeHalf * 0.75);
+    ctx.lineTo(8, edgeHalf * 0.75);
+    ctx.closePath();
   } else {
-    // Shaped blade with realistic bevel geometry & curves
+    // Shaped blade with realistic bevel geometry & curves (European/Long/Claymore/Falchion/Saber)
     const edgeHalf = W * (0.4 + shape * 0.15);
     const tipX = bladeLen;
     const tipY = totalCurve * 0.18;
@@ -589,6 +644,87 @@ function drawGuard(
     ctx.quadraticCurveTo(-12, W * 0.25, 5, 0);
     ctx.fill();
     ctx.stroke();
+  } else if (id === "tsuba") {
+    // Oriental Tsuba: refined oval/octagonal disc with cutouts and dark forged patination
+    ctx.fillStyle = isMasterwork ? "#26201a" : "#1a1612";
+    ctx.strokeStyle = isMasterwork ? "#d4af37" : "#4a3c2e";
+    ctx.lineWidth = 2.2;
+    ctx.ellipse(0, 0, 9, W * 1.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Inner rim gold inlay
+    if (isMasterwork) {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 6, W * 0.95, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.65)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    // Decorative cutout holes (hitsu-ana)
+    ctx.fillStyle = "#0c0a08";
+    ctx.beginPath();
+    ctx.ellipse(0, -W * 0.55, 3.5, 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, W * 0.55, 3.5, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (id === "leaf") {
+    // Elven Leaf Guard: organic flowing leaf tendrils embracing the blade
+    ctx.fillStyle = isMasterwork ? "#e2f0d9" : "#b8cfb0";
+    ctx.strokeStyle = isMasterwork ? "#5b7850" : "#3e5236";
+    ctx.moveTo(2, -W * 1.4);
+    ctx.bezierCurveTo(14, -W * 0.8, -10, -W * 0.3, 4, 0);
+    ctx.bezierCurveTo(-10, W * 0.3, 14, W * 0.8, 2, W * 1.4);
+    ctx.bezierCurveTo(-14, W * 0.9, -6, W * 0.2, -6, 0);
+    ctx.bezierCurveTo(-6, -W * 0.2, -14, -W * 0.9, 2, -W * 1.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (id === "imperial") {
+    // Imperial Eagle Quillons: gilded wings spreading outward with crowned quillon tips
+    ctx.fillStyle = "#d4af37";
+    ctx.strokeStyle = "#4e3b12";
+    ctx.lineWidth = 1.6;
+    ctx.moveTo(0, -W * 1.55);
+    ctx.lineTo(8, -W * 1.25);
+    ctx.lineTo(4, -W * 0.4);
+    ctx.lineTo(10, 0);
+    ctx.lineTo(4, W * 0.4);
+    ctx.lineTo(8, W * 1.25);
+    ctx.lineTo(0, W * 1.55);
+    ctx.lineTo(-8, W * 1.2);
+    ctx.lineTo(-4, W * 0.3);
+    ctx.lineTo(-4, -W * 0.3);
+    ctx.lineTo(-8, -W * 1.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Imperial Ruby Crest
+    ctx.beginPath();
+    ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#c0392b";
+    ctx.fill();
+    ctx.strokeStyle = "#ffd700";
+    ctx.stroke();
+  } else if (id === "runic") {
+    // Runic Monolith: heavy geometric dark iron block with engraved angular runic groove
+    ctx.fillStyle = "#202024";
+    ctx.strokeStyle = "#4a4e58";
+    ctx.lineWidth = 1.8;
+    ctx.rect(-8, -W * 1.3, 16, W * 2.6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Glowing runic channel in guard
+    ctx.beginPath();
+    ctx.moveTo(-4, -W * 0.9);
+    ctx.lineTo(0, -W * 0.4);
+    ctx.lineTo(-4, 0);
+    ctx.lineTo(0, W * 0.4);
+    ctx.lineTo(-4, W * 0.9);
+    ctx.strokeStyle = isMasterwork ? "#00f2fe" : "rgba(80,100,120,0.7)";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
   } else {
     // Ring / Basket
     ctx.arc(2, 0, W * 1.05, 0, Math.PI * 2);
@@ -601,7 +737,7 @@ function drawGuard(
   }
 
   // Gemstone sparkle in Masterwork
-  if (isMasterwork) {
+  if (isMasterwork && id !== "tsuba" && id !== "imperial") {
     ctx.beginPath();
     ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
     ctx.fillStyle = "#00f2fe";
@@ -627,8 +763,12 @@ function drawPommel(
   ctx.beginPath();
   if (id === "disc") {
     ctx.ellipse(x - 9, 0, 12, W * 0.44, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
   } else if (id === "sphere") {
     ctx.arc(x - 10, 0, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
   } else if (id === "wolf") {
     ctx.moveTo(x, -2);
     ctx.lineTo(x - 18, -W * 0.55);
@@ -637,6 +777,54 @@ function drawPommel(
     ctx.lineTo(x - 11, 2);
     ctx.lineTo(x - 18, W * 0.55);
     ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (id === "crescent") {
+    // Oriental Kashira cap
+    ctx.moveTo(x, -W * 0.28);
+    ctx.quadraticCurveTo(x - 18, 0, x, W * 0.28);
+    ctx.lineTo(x - 6, W * 0.26);
+    ctx.quadraticCurveTo(x - 22, 0, x - 6, -W * 0.26);
+    ctx.closePath();
+    ctx.fillStyle = "#221c16";
+    ctx.fill();
+    ctx.stroke();
+  } else if (id === "elven") {
+    // Elven Crystal Gem teardrop
+    ctx.moveTo(x, 0);
+    ctx.quadraticCurveTo(x - 8, -W * 0.42, x - 18, 0);
+    ctx.quadraticCurveTo(x - 8, W * 0.42, x, 0);
+    ctx.closePath();
+    ctx.fillStyle = isMasterwork ? "#a8e6cf" : "#88b0a0";
+    ctx.fill();
+    ctx.stroke();
+    if (isMasterwork) {
+      ctx.shadowColor = "#a8e6cf";
+      ctx.shadowBlur = 8;
+    }
+  } else if (id === "crown") {
+    // Imperial Crown
+    ctx.moveTo(x, -W * 0.45);
+    ctx.lineTo(x - 16, -W * 0.52);
+    ctx.lineTo(x - 10, -W * 0.18);
+    ctx.lineTo(x - 20, 0);
+    ctx.lineTo(x - 10, W * 0.18);
+    ctx.lineTo(x - 16, W * 0.52);
+    ctx.lineTo(x, W * 0.45);
+    ctx.closePath();
+    ctx.fillStyle = "#d4af37";
+    ctx.fill();
+    ctx.stroke();
+  } else if (id === "knot") {
+    // Norse / Celtic Interlocking Knot
+    ctx.arc(x - 10, 0, 11, 0, Math.PI * 2);
+    ctx.fillStyle = "#1e1e24";
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x - 10, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = isMasterwork ? "#00f2fe" : "#3d4250";
+    ctx.fill();
   } else {
     // Diamond / Cross
     ctx.moveTo(x + 2, 0);
@@ -644,12 +832,12 @@ function drawPommel(
     ctx.lineTo(x - 16, 0);
     ctx.lineTo(x - 9, W * 0.58);
     ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
-  ctx.fill();
-  ctx.stroke();
 
   // Embedded sapphire jewel in pommel (as in Reference Image 2!)
-  if (isMasterwork) {
+  if (isMasterwork && id !== "crescent" && id !== "knot") {
     ctx.beginPath();
     ctx.arc(x - 9, 0, 4, 0, Math.PI * 2);
     ctx.fillStyle = "#0077ff";

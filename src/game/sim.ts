@@ -1,10 +1,12 @@
 import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
-import type { FinishedSword, ForgeRewardsData, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import type { FinishedSword, ForgeRewardsData, ForgeZone, HammerType, SimState, StrikeKind, SwordDesign } from "./types.ts";
 
 export interface SimInput {
   charging: boolean;
   action: boolean;
   reheat: boolean;
+  switchZone?: ForgeZone;
+  switchHammer?: HammerType;
 }
 
 export interface SimEvent {
@@ -18,7 +20,7 @@ export interface SimEvent {
   broken?: boolean;
 }
 
-export function createSim(design: SwordDesign): SimState {
+export function createSim(design: SwordDesign, options?: { hammer?: HammerType }): SimState {
   const steel = STEELS[design.steel];
   return {
     phase: "heat",
@@ -47,6 +49,9 @@ export function createSim(design: SwordDesign): SimState {
     structuralState: "stable",
     broken: false,
     runicCharge: 0,
+    targetZone: "mid",
+    zoneProgress: { base: 0, mid: 0, tip: 0 },
+    activeHammer: options?.hammer ?? "standard",
     history: [],
   };
 }
@@ -116,8 +121,21 @@ export function stepSim(
   }
 
   if (s.phase === "forge") {
+    if (input.switchZone && input.switchZone !== s.targetZone) {
+      s.targetZone = input.switchZone;
+      const zoneNames = { base: "Base (Ricasso)", mid: "Centro (Corpo)", tip: "Ponta (Ápice)" };
+      s.lastMessage = `Posicionando martelo na ${zoneNames[s.targetZone]}.`;
+    }
+
+    if (input.switchHammer && input.switchHammer !== s.activeHammer) {
+      s.activeHammer = input.switchHammer;
+      const hammerNames = { precision: "Martelo de Pena (Precisão)", standard: "Martelo Padrão", sledge: "Marreta Pesada" };
+      s.lastMessage = `Equipado: ${hammerNames[s.activeHammer]}.`;
+    }
+
     s.sweetCenter = 0.62 + Math.sin(time * 0.85) * 0.11;
-    s.sweetWidth = steel.sweetWidth;
+    const hammerWidthBonus = s.activeHammer === "precision" ? 0.03 : s.activeHammer === "sledge" ? -0.02 : 0;
+    s.sweetWidth = Math.max(0.06, steel.sweetWidth + hammerWidthBonus);
 
     if (s.reheating) {
       s.heat = clamp(s.heat + dt * 0.42, 0, 0.86);
@@ -137,7 +155,8 @@ export function stepSim(
     if (input.charging && !s.reheating) {
       if (!s.charging && s.force < 0.05) event.sfx = "whoosh";
       s.charging = true;
-      s.force = clamp(s.force + dt * 1.18, 0, 1);
+      const chargeSpeed = s.activeHammer === "precision" ? 1.45 : s.activeHammer === "sledge" ? 0.9 : 1.18;
+      s.force = clamp(s.force + dt * chargeSpeed, 0, 1);
     } else if (s.charging) {
       const kind = gradeStrike(s.force, s.sweetCenter, s.sweetWidth);
       const usedForce = s.force;
@@ -236,27 +255,37 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
   const isOverheated = s.heat > steel.heatMax + 0.08;
   const inHeat = !isCold && !isOverheated;
 
+  // Multi-zone register
+  s.zoneProgress[s.targetZone] = (s.zoneProgress[s.targetZone] || 0) + 1;
+
+  // Base shape gain modified by hammer type
   let shapeGain = 0;
   if (kind === "perfect") shapeGain = 0.16;
   else if (kind === "good") shapeGain = 0.12;
   else if (kind === "hard") shapeGain = 0.07;
   else shapeGain = 0.035;
 
+  const hammerShapeMult = s.activeHammer === "sledge" ? 1.45 : s.activeHammer === "precision" ? 0.85 : 1.0;
+  const hammerStressMult = s.activeHammer === "sledge" ? 1.6 : s.activeHammer === "precision" ? 0.65 : 1.0;
+  shapeGain *= hammerShapeMult;
+
   s.history.push({
     strike: s.strikes + 1,
     kind,
     force: s.force,
     inHeat,
+    zone: s.targetZone,
   });
 
   // Structural stress and integrity calculations
   if (isCold) {
     // Cold hammering creates dangerous brittle stress fractures
     shapeGain *= 0.25;
-    const stress = kind === "hard" ? 38 : kind === "good" ? 22 : 14;
+    const baseStress = kind === "hard" ? 38 : kind === "good" ? 22 : 14;
+    const stress = baseStress * hammerStressMult;
     s.integrity -= stress;
     s.warp += 0.07;
-    s.lastMessage = "Golpe no ferro frio! O aço resiste e sofre estresse estrutural.";
+    s.lastMessage = `Golpe no ferro frio na ${s.targetZone.toUpperCase()}! O aço resiste e sofre estresse.`;
   } else if (isOverheated) {
     shapeGain *= 0.55;
     s.integrity -= 12;
@@ -266,13 +295,25 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
     // Normal / Ideal heat
     if (kind === "perfect") {
       s.warp = Math.max(0, s.warp - 0.025);
-      s.runicCharge = clamp(s.runicCharge + 0.25, 0, 1);
-      s.lastMessage = "Golpe magistral! As ondas de choque alinham o gume perfeitamente.";
-      if (design.runes && s.runicCharge > 0.5) event.sfx = "rune";
+      if (s.targetZone === "base") {
+        s.integrity = Math.min(100, s.integrity + 3);
+        s.lastMessage = "Base consolidada! O ricasso ganha tenacidade excepcional.";
+      } else if (s.targetZone === "mid") {
+        s.runicCharge = clamp(s.runicCharge + 0.28, 0, 1);
+        s.lastMessage = "Golpe magistral no corpo! As ondas de choque alinham o gume perfeitamente.";
+        if (design.runes && s.runicCharge > 0.5) event.sfx = "rune";
+      } else {
+        s.lastMessage = "Ponta estirada com precisão cirúrgica!";
+      }
     } else if (kind === "good") {
-      s.lastMessage = "Bom golpe. O perfil da lâmina se desenvolve com precisão.";
+      const zoneMsgs = {
+        base: "Bom golpe na base. Espessura do ricasso uniforme.",
+        mid: "Bom golpe no centro. O perfil da lâmina se desenvolve com precisão.",
+        tip: "Bom golpe na ponta. Geometria de corte refinada.",
+      };
+      s.lastMessage = zoneMsgs[s.targetZone];
     } else if (kind === "hard") {
-      s.integrity -= 10;
+      s.integrity -= 10 * hammerStressMult;
       s.warp += 0.08;
       s.lastMessage = "Força excessiva! O aço sofreu deformação localizada.";
     } else {
@@ -319,6 +360,21 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   const quenchScore = Math.round(s.quenchScore);
   const attrs = calculateSwordAttributes(design, q, s.warp, heatScore, forgeScore, quenchScore);
 
+  // Additional perks based on multi-zone harmony and tool mastery
+  if (s.zoneProgress.base >= 2 && s.zoneProgress.mid >= 2 && s.zoneProgress.tip >= 2) {
+    attrs.perks.push("Harmonia da Forja: Estiramento uniforme entre base, centro e ponta");
+    attrs.damage += 12;
+    attrs.agility += 8;
+  }
+  if (s.activeHammer === "precision" && q >= 85) {
+    attrs.perks.push("Pena de Mestre: Fio afiado com martelo de precisão");
+    attrs.agility += 10;
+  }
+  if (s.activeHammer === "sledge" && q >= 85) {
+    attrs.perks.push("Massa de Guerra: Forja pesada com marreta de impacto");
+    attrs.damage += 15;
+  }
+
   return {
     id: `${Date.now()}`,
     design,
@@ -338,6 +394,7 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     perks: attrs.perks,
     structuralState: s.structuralState,
     cracks: s.cracks,
+    history: s.history,
   };
 }
 

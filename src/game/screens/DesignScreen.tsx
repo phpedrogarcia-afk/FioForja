@@ -1,9 +1,9 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { GUARDS, POMMELS, PROFILES, STEELS, WRAPS } from "../catalog";
+import { CANONICAL_PRESETS, FAMILIES, GUARDS, POMMELS, PROFILES, STEELS, WRAPS } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
-import type { GuardId, PommelId, ProfileId, SteelId, SwordDesign, WrapId } from "../types";
+import type { FamilyId, GuardId, PommelId, ProfileId, SteelId, SwordDesign, WrapId } from "../types";
 
 interface Props {
   design: SwordDesign;
@@ -38,7 +38,7 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
       assembled: true,
       heat: 0,
       shape: 1,
-      quality: 90,
+      quality: 92,
     });
   }, [design]);
 
@@ -48,13 +48,35 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
         <Button variant="ghost" size="sm" onClick={onBack}>
           Voltar
         </Button>
-        <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto</h1>
+        <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
         <span className="w-16" />
       </header>
 
       <div className="mx-auto w-full max-w-3xl px-4 pb-36">
         <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
           <canvas ref={canvasRef} className="h-56 w-full sm:h-72" />
+        </div>
+
+        {/* Canonical Presets Banner */}
+        <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3">
+          <p className="font-display text-xs uppercase tracking-[0.16em] text-amber-300">
+            ⭐ Obras Mestras Canônicas (Projetos Pré-Definidos)
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {CANONICAL_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => onChange(p.design)}
+                className={`rounded-md border px-2.5 py-1 text-xs font-display transition-all ${
+                  design.name === p.name
+                    ? "border-amber-400 bg-amber-500 text-black font-bold shadow-xs"
+                    : "border-border bg-surface/80 text-slate-300 hover:border-amber-500/60 hover:text-white"
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         <label className="mt-5 block font-display text-xs uppercase tracking-[0.16em] text-muted">
@@ -67,6 +89,29 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
             placeholder="Ex.: Juramento"
           />
         </label>
+
+        <Section title="Família Canônica">
+          <ChipRow
+            options={Object.entries(FAMILIES).map(([id, v]) => ({
+              id,
+              label: v.name,
+              hint: v.fantasy,
+            }))}
+            value={design.family || "royal"}
+            onChange={(id) => {
+              const fam = FAMILIES[id as FamilyId];
+              onChange({
+                ...design,
+                family: id as FamilyId,
+                profile: fam.defaultProfile,
+                steel: fam.defaultSteel,
+                wrap: fam.defaultWrap,
+                guard: fam.defaultGuard,
+                pommel: fam.defaultPommel,
+              });
+            }}
+          />
+        </Section>
 
         <Section title="Perfil da lâmina">
           <ChipRow

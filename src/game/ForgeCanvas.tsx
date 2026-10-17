@@ -170,8 +170,16 @@ export function ForgeCanvas({
 
       if (ev.kind) {
         const force = ev.kind === "weak" ? 0.35 : ev.kind === "hard" ? 1 : 0.7;
-        const impact = getR4BLayout("forge", canvas.width < canvas.height).impact!;
-        emitSparks(ev.kind === "perfect" ? 48 : 26, impact[0], impact[1], force, ev.kind === "perfect");
+        const baseImpact = getR4BLayout("forge", canvas.width < canvas.height).impact!;
+        const zoneOffsetX = sim.targetZone === "base" ? -70 : sim.targetZone === "tip" ? 95 : 0;
+        const zoneOffsetY = sim.targetZone === "base" ? 14 : sim.targetZone === "tip" ? -18 : 0;
+        emitSparks(
+          ev.kind === "perfect" ? 48 : 26,
+          baseImpact[0] + zoneOffsetX,
+          baseImpact[1] + zoneOffsetY,
+          force,
+          ev.kind === "perfect",
+        );
       }
 
       if (ev.finished && !finishedSent) {
@@ -229,6 +237,9 @@ export function ForgeCanvas({
           structuralState: sim.structuralState,
           cracks: sim.cracks,
           broken: sim.broken,
+          targetZone: sim.targetZone,
+          zoneProgress: sim.zoneProgress,
+          activeHammer: sim.activeHammer,
         });
       }
 
@@ -496,8 +507,10 @@ function drawHand(
   bladeY: number,
 ) {
   const size = 430;
-  const hx = bladeX - 90;
-  const hy = bladeY - 300;
+  const zoneOffsetX = sim.targetZone === "base" ? -65 : sim.targetZone === "tip" ? 90 : 0;
+  const zoneOffsetY = sim.targetZone === "base" ? 12 : sim.targetZone === "tip" ? -16 : 0;
+  const hx = bladeX - 90 + zoneOffsetX;
+  const hy = bladeY - 300 + zoneOffsetY;
 
   if (sim.strikeAnim > 0 && images.strike) {
     const t = 1 - sim.strikeAnim / 0.38;

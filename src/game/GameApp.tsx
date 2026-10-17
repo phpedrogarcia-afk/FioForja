@@ -12,6 +12,7 @@ import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 import type { FinishedSword, HudSnapshot, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
+import { DEFAULT_DESIGN } from "./catalog";
 
 const EMPTY_HUD: HudSnapshot = {
   phase: "heat",
@@ -36,12 +37,12 @@ const EMPTY_HUD: HudSnapshot = {
 export function GameApp() {
   const save = useRef(loadSave());
   const [screen, setScreen] = useState<Screen>("title");
-  const [design, setDesign] = useState<SwordDesign>(save.current.lastDesign);
-  const [gallery, setGallery] = useState<FinishedSword[]>(save.current.gallery);
+  const [design, setDesign] = useState<SwordDesign>(DEFAULT_DESIGN);
+  const [gallery, setGallery] = useState<FinishedSword[]>([]);
   const [images, setImages] = useState<GameImages | null>(null);
   const [hud, setHud] = useState<HudSnapshot>(EMPTY_HUD);
   const [finished, setFinished] = useState<FinishedSword | null>(null);
-  const [muted, setMutedUi] = useState(save.current.muted);
+  const [muted, setMutedUi] = useState(false);
   const [forgeKey, setForgeKey] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const inputRef = useRef<SimInput>({ charging: false, action: false, reheat: false });
@@ -49,12 +50,18 @@ export function GameApp() {
   designRef.current = design;
 
   useEffect(() => {
+    const loaded = loadSave();
+    save.current = loaded;
+    setGallery(loaded.gallery);
+    setDesign(loaded.lastDesign);
+    setMutedUi(loaded.muted);
+
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
     const onMq = () => setReducedMotion(mq.matches);
     mq.addEventListener("change", onMq);
     void loadGameImages().then(setImages);
-    setMuted(save.current.muted);
+    setMuted(loaded.muted);
     const onVis = () => {
       if (document.visibilityState === "visible") resumeAudio();
     };
@@ -115,6 +122,21 @@ export function GameApp() {
       if (e.code === "KeyR" || e.key === "r" || e.key === "R") {
         inputRef.current.reheat = true;
       }
+      if (e.code === "Digit1" || e.key === "1") {
+        inputRef.current.switchZone = "base";
+      }
+      if (e.code === "Digit2" || e.key === "2") {
+        inputRef.current.switchZone = "mid";
+      }
+      if (e.code === "Digit3" || e.key === "3") {
+        inputRef.current.switchZone = "tip";
+      }
+      if (e.code === "KeyH" || e.key === "h" || e.key === "H") {
+        const order: Array<import("./types").HammerType> = ["standard", "precision", "sledge"];
+        const current = hud.activeHammer || "standard";
+        const nextIdx = (order.indexOf(current) + 1) % order.length;
+        inputRef.current.switchHammer = order[nextIdx];
+      }
     };
     const keyUp = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "Enter") {
@@ -136,7 +158,7 @@ export function GameApp() {
       window.removeEventListener("keyup", keyUp);
       currentInput.charging = false;
     };
-  }, [screen]);
+  }, [screen, hud.activeHammer]);
 
   const toggleMute = () => {
     const next = !isMuted();
@@ -232,6 +254,12 @@ export function GameApp() {
         }}
         onReheat={() => {
           inputRef.current.reheat = true;
+        }}
+        onSelectZone={(zone) => {
+          inputRef.current.switchZone = zone;
+        }}
+        onSelectHammer={(hammer) => {
+          inputRef.current.switchHammer = hammer;
         }}
         onQuit={() => {
           inputRef.current.charging = false;
