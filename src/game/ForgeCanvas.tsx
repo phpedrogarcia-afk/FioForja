@@ -506,30 +506,33 @@ function drawHand(
   bladeX: number,
   bladeY: number,
 ) {
-  const size = 430;
-  const zoneOffsetX = sim.targetZone === "base" ? -65 : sim.targetZone === "tip" ? 90 : 0;
-  const zoneOffsetY = sim.targetZone === "base" ? 12 : sim.targetZone === "tip" ? -16 : 0;
-  const hx = bladeX - 90 + zoneOffsetX;
-  const hy = bladeY - 300 + zoneOffsetY;
+  const size = 410;
+  const zoneOffsetX = sim.targetZone === "base" ? -70 : sim.targetZone === "tip" ? 95 : 0;
+  const zoneOffsetY = sim.targetZone === "base" ? 14 : sim.targetZone === "tip" ? -18 : 0;
+  const hx = bladeX - 85 + zoneOffsetX;
+  const hy = bladeY - 325 + zoneOffsetY;
 
   if (sim.strikeAnim > 0 && images.strike) {
     const t = 1 - sim.strikeAnim / 0.38;
     const frame = Math.min(5, Math.floor(t * 6));
-    drawSheetFrame(ctx, images.strike, 3, 2, frame, hx - 10, hy + 30, size + 20, (size + 20) * 0.66);
+    // Strike anim swings down with head landing squarely on workpiece
+    drawSheetFrame(ctx, images.strike, 3, 2, frame, hx - 12, hy + 24, size + 20, (size + 20) * 0.66);
     return;
   }
 
   const charge = sim.charging ? sim.force : 0;
-  const bob = Math.sin(time * 2.2) * 5;
-  const restLift = size * 0.225 * Math.pow(1 - charge, 3);
+  const bob = Math.sin(time * 2.2) * 4;
+  // In rest position, arm is pulled back and held high in ready stance so the blade and anvil remain completely visible!
+  const restElevation = 65 * (1 - charge);
   ctx.save();
   const pivotX = hx + size * 0.74;
   const pivotY = hy + size * 0.16;
   ctx.translate(pivotX, pivotY);
-  ctx.rotate(-0.1 - charge * 0.42);
+  // Cock hammer back as charge builds
+  ctx.rotate(-0.16 - charge * 0.45);
   ctx.translate(-pivotX, -pivotY);
   if (images.hand) {
-    ctx.drawImage(images.hand, hx, hy + bob - restLift, size, size);
+    ctx.drawImage(images.hand, hx, hy + bob - restElevation, size, size);
   }
   ctx.restore();
 }

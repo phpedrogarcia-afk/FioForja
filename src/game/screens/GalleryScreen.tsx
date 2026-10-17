@@ -11,20 +11,35 @@ import {
   WRAPS,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
-import type { FinishedSword, RarityGrade } from "../types";
+import type { CareerStats, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
 import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
 import { generateForgeRewards } from "../sim";
+import { defaultInventory, defaultWallet } from "../save";
 
 interface Props {
   swords: FinishedSword[];
   onBack: () => void;
   onForge: () => void;
+  wallet?: PlayerWallet;
+  inventory?: PlayerInventory;
+  career?: CareerStats;
+  onBuyTool?: (toolId: string) => boolean;
+  onSelectPreset?: (design: SwordDesign) => void;
 }
 
 type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "legado";
 
-export function GalleryScreen({ swords, onBack, onForge }: Props) {
+export function GalleryScreen({
+  swords,
+  onBack,
+  onForge,
+  wallet = defaultWallet,
+  inventory = defaultInventory,
+  career,
+  onBuyTool,
+  onSelectPreset,
+}: Props) {
   const [currentTab, setCurrentTab] = useState<GalleryTab>("arsenal");
   const [selectedSword, setSelectedSword] = useState<FinishedSword | null>(null);
   const [inspectRewards, setInspectRewards] = useState(false);
@@ -93,9 +108,16 @@ export function GalleryScreen({ swords, onBack, onForge }: Props) {
             Arsenal · Compêndio · Coleção · Legado
           </p>
         </div>
-        <Button variant="secondary" size="sm" onClick={onForge}>
-          + Forjar Nova
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-3 rounded-lg border border-amber-900/40 bg-black/50 px-3 py-1 font-display text-xs">
+            <span className="text-amber-300 font-bold">🪙 {wallet.gold.toLocaleString()}</span>
+            <span className="text-red-400 font-bold">💎 {wallet.rubies}</span>
+            <span className="text-cyan-400 font-bold">🔷 {wallet.diamonds}</span>
+          </div>
+          <Button variant="secondary" size="sm" onClick={onForge}>
+            + Forjar Nova
+          </Button>
+        </div>
       </header>
 
       {/* 6-Pillar Tab Navigation Bar */}
@@ -322,7 +344,11 @@ export function GalleryScreen({ swords, onBack, onForge }: Props) {
                         ) : (
                           <button
                             onClick={() => {
-                              onForge();
+                              if (onSelectPreset) {
+                                onSelectPreset(preset.design);
+                              } else {
+                                onForge();
+                              }
                             }}
                             className="font-display text-amber-400 hover:underline"
                           >
@@ -461,35 +487,70 @@ export function GalleryScreen({ swords, onBack, onForge }: Props) {
       {currentTab === "oficina" && (
         <div className="mx-auto mt-4 w-full max-w-5xl">
           <div className="rounded-xl border border-[#1e2a3e] bg-[#0d1320] p-4">
-            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">
-              Equipamentos da Ferraria Medieval
-            </h2>
-            <p className="mt-1 text-xs text-slate-400">
-              Ferramentas de forja conquistadas com ouro e gemas que alteram diretamente o peso do martelo, rebote da bigorna e velocidade do fogo.
-            </p>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">
+                  Equipamentos da Ferraria Medieval
+                </h2>
+                <p className="mt-1 text-xs text-slate-400">
+                  Ferramentas de forja adquiridas com ouro e gemas que alteram diretamente a cinética do martelo, rebote da bigorna e velocidade do fogo.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 self-start rounded border border-amber-500/30 bg-black/60 px-3 py-1 text-xs font-display sm:self-auto">
+                <span className="font-bold text-amber-300">🪙 {wallet.gold.toLocaleString()}</span>
+                <span className="font-bold text-red-400">💎 {wallet.rubies}</span>
+              </div>
+            </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3">
-              {WORKSHOP_EQUIPMENT.map((tool) => (
-                <div
-                  key={tool.id}
-                  className="rounded-lg border border-[#1b263b] bg-[#0a0f18] p-3.5 transition-all hover:border-amber-500/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{tool.icon}</span>
-                      <div>
-                        <h3 className="font-display text-xs font-bold text-slate-200">{tool.name}</h3>
-                        <span className="text-[0.65rem] text-slate-400 capitalize">{tool.category}</span>
+              {WORKSHOP_EQUIPMENT.map((tool) => {
+                const isUnlocked = tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id);
+                const canAfford = wallet.gold >= tool.costGold && wallet.rubies >= tool.costRubies;
+
+                return (
+                  <div
+                    key={tool.id}
+                    className="flex flex-col justify-between rounded-lg border border-[#1b263b] bg-[#0a0f18] p-3.5 transition-all hover:border-amber-500/50"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">{tool.icon}</span>
+                          <div>
+                            <h3 className="font-display text-xs font-bold text-slate-200">{tool.name}</h3>
+                            <span className="text-[0.65rem] capitalize text-slate-400">{tool.category}</span>
+                          </div>
+                        </div>
+                        <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
+                          {tool.rarity}
+                        </span>
                       </div>
+                      <p className="mt-2 text-xs font-semibold text-amber-200">{tool.stats}</p>
+                      <p className="mt-1.5 text-[0.72rem] text-slate-400">{tool.description}</p>
                     </div>
-                    <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
-                      {tool.rarity}
-                    </span>
+
+                    <div className="mt-4 flex items-center justify-between border-t border-[#1b263b] pt-2.5 text-xs">
+                      <span className="font-semibold text-amber-300">
+                        {tool.costGold === 0 ? "Padrão da Oficina" : `${tool.costGold.toLocaleString()} 🪙 ${tool.costRubies ? `+ ${tool.costRubies} 💎` : ""}`}
+                      </span>
+                      {isUnlocked ? (
+                        <span className="rounded border border-emerald-500/40 bg-emerald-950/40 px-2 py-0.5 text-[0.7rem] font-bold text-emerald-400">
+                          ✓ Adquirido
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          disabled={!canAfford}
+                          onClick={() => onBuyTool?.(tool.id)}
+                          className="bg-amber-600 text-xs font-bold text-stone-950 hover:bg-amber-500 disabled:opacity-50"
+                        >
+                          Adquirir
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-2 text-xs font-semibold text-amber-200">{tool.stats}</p>
-                  <p className="mt-1.5 text-[0.72rem] text-slate-400">{tool.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

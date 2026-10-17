@@ -98,6 +98,7 @@ export interface FinishedSword {
   agility?: number; // AGI (equilíbrio de massa e alinhamento)
   durability?: number; // 0-100
   rarity?: RarityGrade;
+  value?: number; // gold valuation
   flaws?: string[];
   perks?: string[];
   structuralState?: StructuralState;
@@ -180,4 +181,44 @@ export interface ForgeRewardsData {
   rubies: number;
   diamonds: number;
   items: ForgeRewardItem[];
+}
+
+export interface PlayerWallet {
+  gold: number;
+  rubies: number;
+  diamonds: number;
+}
+
+export interface PlayerInventory {
+  unlockedProfiles: ProfileId[];
+  unlockedSteels: SteelId[];
+  unlockedGuards: GuardId[];
+  unlockedPommels: PommelId[];
+  unlockedWraps: WrapId[];
+  unlockedRunes: string[];
+  unlockedTools: string[];
+  materials: Record<string, number>;
+}
+
+export interface WorkshopTool {
+  id: string;
+  name: string;
+  category: "hammer" | "anvil" | "furnace" | "quench";
+  icon: string;
+  costGold: number;
+  costRubies: number;
+  rarity: RarityGrade;
+  stats: string;
+  description: string;
+  unlockedByDefault?: boolean;
+}
+
+export interface CareerStats {
+  totalForged: number;
+  masterpieces: number;
+  legendaries: number;
+  relics: number;
+  brokenBlades: number;
+  highestQuality: number;
+  totalValueEarned: number;
 }

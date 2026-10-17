@@ -5,7 +5,7 @@ import type { FinishedSword, ForgeRewardsData } from "../types";
 interface Props {
   sword: FinishedSword;
   rewards: ForgeRewardsData;
-  onClaim: () => void;
+  onClaim: (rewards: ForgeRewardsData) => void;
   onGallery: () => void;
   onAgain: () => void;
 }
@@ -14,8 +14,9 @@ export function RewardsScreen({ sword, rewards, onClaim, onGallery, onAgain }: P
   const [claimed, setClaimed] = useState(false);
 
   const handleClaim = () => {
+    if (claimed) return;
     setClaimed(true);
-    onClaim();
+    onClaim(rewards);
   };
 
   return (

@@ -19,10 +19,16 @@ async function run() {
   const url = "http://127.0.0.1:8899/";
   console.log(`Vite listening at ${url}`);
 
-  const browser = await chromium.launch({
-    channel: "msedge",
-    headless: true,
-  }).catch(() => chromium.launch({ headless: true }));
+  const launchArgs = [
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--disable-features=CDPScreenshotNewSurface",
+    "--no-sandbox",
+  ];
+  const browser = await chromium
+    .launch({ channel: "chrome", headless: true, args: launchArgs })
+    .catch(() => chromium.launch({ channel: "msedge", headless: true, args: launchArgs }))
+    .catch(() => chromium.launch({ headless: true, args: launchArgs }));
 
   console.log(`Browser launched: ${browser.version()}`);
 
@@ -65,11 +71,33 @@ async function run() {
       await page.screenshot({ path: forgeFile });
       console.log(`Saved: ${forgeFile}`);
 
-      // Pull to anvil
+      // Pull to anvil (Initial Stage: Tarugo Bruto, shape = 0)
       const pullBtn = page.getByRole("button", { name: /Retirar do fogo/i });
       if (await pullBtn.isVisible()) {
         await pullBtn.click();
         await page.waitForTimeout(800);
+        const tarugoFile = join(outDir, `${vp.name}-04-forge-tarugo-bruto.png`);
+        await page.screenshot({ path: tarugoFile });
+        console.log(`Saved: ${tarugoFile}`);
+
+        // Deliver 2 strikes to elongate into Stage 2: Pré-forma (shape ~0.35)
+        for (let i = 0; i < 2; i++) {
+          await page.keyboard.down("Space");
+          await page.waitForTimeout(450);
+          await page.keyboard.up("Space");
+          await page.waitForTimeout(350);
+        }
+        const preformaFile = join(outDir, `${vp.name}-04b-forge-preforma.png`);
+        await page.screenshot({ path: preformaFile });
+        console.log(`Saved: ${preformaFile}`);
+
+        // Deliver more strikes to form Stage 3: Lâmina Forjada
+        for (let i = 0; i < 3; i++) {
+          await page.keyboard.down("Space");
+          await page.waitForTimeout(450);
+          await page.keyboard.up("Space");
+          await page.waitForTimeout(350);
+        }
         const anvilFile = join(outDir, `${vp.name}-04-forge-anvil.png`);
         await page.screenshot({ path: anvilFile });
         console.log(`Saved: ${anvilFile}`);
@@ -96,6 +124,7 @@ async function run() {
         quality: 98,
         grade: "Obra-prima",
         rarity: "Lendária",
+        value: 4850,
         heatScore: 97,
         forgeScore: 98,
         quenchScore: 96,
@@ -117,23 +146,35 @@ async function run() {
       };
 
       const raw = localStorage.getItem("a-forja-save");
-      const current = raw ? JSON.parse(raw) : { version: 1, gallery: [] };
+      const current = raw ? JSON.parse(raw) : { version: 4, gallery: [] };
       current.gallery = [masterpiece, ...(current.gallery || [])];
+      current.wallet = { gold: 5700, rubies: 190, diamonds: 185 };
+      current.career = {
+        totalForged: 14,
+        masterpieces: 5,
+        legendaries: 4,
+        relics: 1,
+        brokenBlades: 2,
+        highestQuality: 98,
+        totalValueEarned: 24500,
+      };
       localStorage.setItem("a-forja-save", JSON.stringify(current));
     });
 
-    // 5. Open Gallery Screen
+    // 5. Open Gallery Screen and capture all 6 tabs
     await page.goto(url, { waitUntil: "networkidle" });
     await page.waitForTimeout(800);
     const galBtn = page.getByRole("button", { name: /Arsenal do Ferreiro/i });
     if (await galBtn.isVisible()) {
       await galBtn.click();
       await page.waitForTimeout(800);
+
+      // Tab 1: Arsenal
       const galleryFile = join(outDir, `${vp.name}-05-gallery-arsenal.png`);
       await page.screenshot({ path: galleryFile });
       console.log(`Saved: ${galleryFile}`);
 
-      // Click on Compêndio tab
+      // Tab 2: Compêndio
       const compBtn = page.getByRole("button", { name: /Compêndio/i });
       if (await compBtn.isVisible()) {
         await compBtn.click();
@@ -143,7 +184,37 @@ async function run() {
         console.log(`Saved: ${compFile}`);
       }
 
-      // Click on Legado tab
+      // Tab 3: Componentes
+      const compoBtn = page.getByRole("button", { name: /Componentes/i });
+      if (await compoBtn.isVisible()) {
+        await compoBtn.click();
+        await page.waitForTimeout(600);
+        const compoFile = join(outDir, `${vp.name}-06b-gallery-componentes.png`);
+        await page.screenshot({ path: compoFile });
+        console.log(`Saved: ${compoFile}`);
+      }
+
+      // Tab 4: Runas
+      const runasBtn = page.getByRole("button", { name: /Runas/i });
+      if (await runasBtn.isVisible()) {
+        await runasBtn.click();
+        await page.waitForTimeout(600);
+        const runasFile = join(outDir, `${vp.name}-06c-gallery-runas.png`);
+        await page.screenshot({ path: runasFile });
+        console.log(`Saved: ${runasFile}`);
+      }
+
+      // Tab 5: Oficina
+      const oficBtn = page.getByRole("button", { name: /Oficina/i });
+      if (await oficBtn.isVisible()) {
+        await oficBtn.click();
+        await page.waitForTimeout(600);
+        const oficFile = join(outDir, `${vp.name}-07b-gallery-oficina.png`);
+        await page.screenshot({ path: oficFile });
+        console.log(`Saved: ${oficFile}`);
+      }
+
+      // Tab 6: Legado
       const legBtn = page.getByRole("button", { name: /Legado/i });
       if (await legBtn.isVisible()) {
         await legBtn.click();
@@ -192,9 +263,14 @@ async function run() {
       "desktop-01-title.png",
       "desktop-02-design.png",
       "desktop-03-forge-heat.png",
+      "desktop-04-forge-tarugo-bruto.png",
+      "desktop-04b-forge-preforma.png",
       "desktop-04-forge-anvil.png",
       "desktop-05-gallery-arsenal.png",
       "desktop-06-gallery-compendio.png",
+      "desktop-06b-gallery-componentes.png",
+      "desktop-06c-gallery-runas.png",
+      "desktop-07b-gallery-oficina.png",
       "desktop-07-gallery-legado.png",
       "desktop-08-velvet-inspection.png",
       "desktop-09-rewards-chest.png",

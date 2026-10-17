@@ -1,5 +1,5 @@
-import { PROFILES, STEELS, WRAPS, renderInscription } from "./catalog";
-import type { SwordDesign } from "./types";
+import { PROFILES, STEELS, WRAPS, renderInscription } from "./catalog.ts";
+import type { SwordDesign } from "./types.ts";
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
@@ -124,8 +124,10 @@ function drawSwordBody(
     drawHilt(ctx, design, wrap.color, W, quality);
   }
 
-  const isBillet = !assembled && shape < 0.28;
-  const bladeLen = L * (isBillet ? 0.48 : 0.4 + shape * 0.6);
+  // Blade length and width interpolation based on forging progression
+  const isRawBillet = !assembled && shape < 0.22;
+  const isPreform = !assembled && shape >= 0.22 && shape < 0.55;
+  const bladeLen = L * (isRawBillet ? 0.38 : isPreform ? 0.38 + (shape - 0.22) * 0.95 : 0.45 + shape * 0.55);
 
   ctx.save();
 
@@ -138,83 +140,151 @@ function drawSwordBody(
 
   // Workpiece / Blade Main Path
   ctx.beginPath();
-  if (isBillet) {
-    // A thick forged hot steel billet/tarugo with shaped corners
-    const bW = W * 0.75;
-    ctx.moveTo(0, -bW * 0.5);
-    ctx.lineTo(bladeLen * 0.85, -bW * 0.45);
-    ctx.quadraticCurveTo(bladeLen, -bW * 0.2, bladeLen, 0);
-    ctx.quadraticCurveTo(bladeLen, bW * 0.2, bladeLen * 0.85, bW * 0.45);
-    ctx.lineTo(0, bW * 0.5);
+  if (isRawBillet) {
+    // 1. TARUGO BRUTO: Thick forged hot steel rectangular stock ingot (flat blunt end, rounded forged corners)
+    const bW = W * 0.88;
+    ctx.moveTo(4, -bW * 0.5);
+    ctx.lineTo(bladeLen - 6, -bW * 0.5);
+    ctx.quadraticCurveTo(bladeLen, -bW * 0.5, bladeLen, -bW * 0.5 + 6);
+    ctx.lineTo(bladeLen, bW * 0.5 - 6);
+    ctx.quadraticCurveTo(bladeLen, bW * 0.5, bladeLen - 6, bW * 0.5);
+    ctx.lineTo(4, bW * 0.5);
+    ctx.closePath();
+  } else if (isPreform) {
+    // 2. PRÉ-FORMA: Elongating tapered bar with rough hammered wedge point
+    const t = (shape - 0.22) / 0.33; // 0 to 1
+    const baseW = W * (0.82 - t * 0.15);
+    const tipTaperW = baseW * (0.85 - t * 0.5);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.15 * t;
+
+    ctx.moveTo(6, -baseW * 0.5);
+    ctx.lineTo(bladeLen * (0.75 + t * 0.1), -tipTaperW * 0.5 + tipY * 0.7);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(bladeLen * (0.75 + t * 0.1), tipTaperW * 0.5 + tipY * 0.7);
+    ctx.lineTo(6, baseW * 0.5);
     ctx.closePath();
   } else if (design.profile === "katana") {
-    // Katana: single edged curved katana with kissaki tip and defined mune
-    const edgeHalf = W * (0.35 + shape * 0.12);
+    // 3. KATANA (Oriental): Authentic Nihonto geometry with sori curve, mune spine, sweeping ha, and kissaki chisel tip
+    const edgeHalf = W * (0.34 + shape * 0.12);
     const tipX = bladeLen;
-    const tipY = totalCurve * 0.35;
-    // Base ricasso (habaki zone)
-    ctx.moveTo(8, -edgeHalf * 0.7);
-    // Mune (spine) curving upward smoothly
-    ctx.quadraticCurveTo(bladeLen * 0.5, -edgeHalf * 0.7 + totalCurve * 0.3, bladeLen * 0.9, -edgeHalf * 0.55 + totalCurve * 0.75);
-    // Kissaki slant tip
+    const tipY = totalCurve * 0.42;
+    // Habaki collar zone
+    ctx.moveTo(8, -edgeHalf * 0.65);
+    // Mune (curved spine)
+    ctx.quadraticCurveTo(bladeLen * 0.45, -edgeHalf * 0.68 + totalCurve * 0.25, bladeLen * 0.88, -edgeHalf * 0.5 + totalCurve * 0.8);
+    // Slanted kissaki chisel tip
     ctx.lineTo(tipX, tipY);
-    // Ha (cutting edge) sweeping back with distal curve
-    ctx.quadraticCurveTo(bladeLen * 0.88, edgeHalf * 0.65 + totalCurve * 0.75, bladeLen * 0.45, edgeHalf * 0.85 + totalCurve * 0.3);
-    ctx.lineTo(8, edgeHalf * 0.65);
+    // Ha (sweeping cutting edge)
+    ctx.quadraticCurveTo(bladeLen * 0.86, edgeHalf * 0.68 + totalCurve * 0.78, bladeLen * 0.42, edgeHalf * 0.88 + totalCurve * 0.28);
+    ctx.lineTo(8, edgeHalf * 0.62);
     ctx.closePath();
   } else if (design.profile === "elven_blade") {
-    // Elven: graceful leaf-blade with gentle waist, distal swelling, and slender point
-    const edgeHalf = W * (0.36 + shape * 0.14);
+    // 4. ELVEN LEAF (Élfica): Organic leaf-shaped blade with wasp waist at 26%, swelling at 62%, and slender needle point
+    const edgeHalf = W * (0.35 + shape * 0.14);
     const tipX = bladeLen;
     const tipY = totalCurve * 0.12;
-    ctx.moveTo(8, -edgeHalf * 0.45);
-    // Gentle waist at 25%, swelling at 60%
+    ctx.moveTo(8, -edgeHalf * 0.48);
+    // Inward waist at 26% of length
     ctx.bezierCurveTo(
-      bladeLen * 0.25, -edgeHalf * 0.7 + totalCurve * 0.1,
-      bladeLen * 0.62, -edgeHalf * 1.15 + totalCurve * 0.35,
-      bladeLen * 0.88, -edgeHalf * 0.55 + totalCurve * 0.5,
+      bladeLen * 0.26, -edgeHalf * 0.62 + totalCurve * 0.08,
+      bladeLen * 0.62, -edgeHalf * 1.25 + totalCurve * 0.32,
+      bladeLen * 0.88, -edgeHalf * 0.55 + totalCurve * 0.55,
     );
     ctx.lineTo(tipX, tipY);
     ctx.bezierCurveTo(
-      bladeLen * 0.88, edgeHalf * 0.55 + totalCurve * 0.5,
-      bladeLen * 0.62, edgeHalf * 1.15 + totalCurve * 0.35,
-      bladeLen * 0.25, edgeHalf * 0.7 + totalCurve * 0.1,
+      bladeLen * 0.88, edgeHalf * 0.55 + totalCurve * 0.55,
+      bladeLen * 0.62, edgeHalf * 1.25 + totalCurve * 0.32,
+      bladeLen * 0.26, edgeHalf * 0.62 + totalCurve * 0.08,
     );
+    ctx.lineTo(8, edgeHalf * 0.48);
+    ctx.closePath();
+  } else if (design.profile === "claymore") {
+    // 5. CLAYMORE (Aço do Reino / Imperial): Broad heavy greatsword with parrying lugs at ricasso and massive cutting face
+    const edgeHalf = W * (0.48 + shape * 0.16);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.14;
+    ctx.moveTo(8, -edgeHalf * 0.65);
+    // Ricasso section with parrying side lugs
+    ctx.lineTo(bladeLen * 0.14, -edgeHalf * 0.65);
+    ctx.lineTo(bladeLen * 0.16, -edgeHalf * 0.95);
+    ctx.lineTo(bladeLen * 0.18, -edgeHalf * 0.72);
+    // Broad double-edged main body
+    ctx.lineTo(bladeLen * 0.86, -edgeHalf * 0.78 + totalCurve * 0.5);
+    // Spear point
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(bladeLen * 0.86, edgeHalf * 0.78 + totalCurve * 0.5);
+    ctx.lineTo(bladeLen * 0.18, edgeHalf * 0.72);
+    ctx.lineTo(bladeLen * 0.16, edgeHalf * 0.95);
+    ctx.lineTo(bladeLen * 0.14, edgeHalf * 0.65);
+    ctx.lineTo(8, edgeHalf * 0.65);
+    ctx.closePath();
+  } else if (design.profile === "falchion") {
+    // 6. FALCHION (Ferro / Imperial): Single-edged cleaver with straight spine, flared forward cutting belly and clip point
+    const edgeHalf = W * (0.38 + shape * 0.16);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.22;
+    ctx.moveTo(8, -edgeHalf * 0.45);
+    // Straight sturdy spine with false edge / clip point
+    ctx.lineTo(bladeLen * 0.74, -edgeHalf * 0.55 + totalCurve * 0.4);
+    ctx.lineTo(tipX, tipY);
+    // Flared weighted cutting belly
+    ctx.quadraticCurveTo(bladeLen * 0.82, edgeHalf * 1.35 + totalCurve * 0.65, bladeLen * 0.5, edgeHalf * 0.95 + totalCurve * 0.25);
     ctx.lineTo(8, edgeHalf * 0.45);
     ctx.closePath();
+  } else if (design.profile === "saber") {
+    // 7. SABER (Damasco / Imperial): Continuous sweeping cavalry saber with arched spine and curved belly
+    const edgeHalf = W * (0.36 + shape * 0.14);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.38;
+    ctx.moveTo(8, -edgeHalf * 0.45);
+    // Continuous sweeping curved spine
+    ctx.quadraticCurveTo(bladeLen * 0.5, -edgeHalf * 0.65 + totalCurve * 0.28, bladeLen * 0.9, -edgeHalf * 0.35 + totalCurve * 0.75);
+    ctx.lineTo(tipX, tipY);
+    // Swept cutting edge
+    ctx.quadraticCurveTo(bladeLen * 0.82, edgeHalf * 0.82 + totalCurve * 0.7, bladeLen * 0.4, edgeHalf * 0.85 + totalCurve * 0.22);
+    ctx.lineTo(8, edgeHalf * 0.45);
+    ctx.closePath();
+  } else if (design.profile === "short") {
+    // 8. SHORT / GLADIUS (Ferro do Ferreiro): Broad parallel cutting edges with sudden acute triangular spearhead
+    const edgeHalf = W * (0.42 + shape * 0.14);
+    const tipX = bladeLen;
+    const tipY = totalCurve * 0.08;
+    ctx.moveTo(8, -edgeHalf * 0.75);
+    // Parallel edges up to 76% of blade
+    ctx.lineTo(bladeLen * 0.76, -edgeHalf * 0.75 + totalCurve * 0.35);
+    // Acute triangular spearhead
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(bladeLen * 0.76, edgeHalf * 0.75 + totalCurve * 0.35);
+    ctx.lineTo(8, edgeHalf * 0.75);
+    ctx.closePath();
   } else if (design.profile === "relic_blade") {
-    // Relic blade: ancient broad stepped blade with angular ricasso steps and broad diamond point
-    const edgeHalf = W * (0.44 + shape * 0.16);
+    // 9. RELIC BLADE (Antiga / Relíquia): Archaic stepped blade with angular ricasso steps and broad diamond point
+    const edgeHalf = W * (0.45 + shape * 0.16);
     const tipX = bladeLen;
     const tipY = totalCurve * 0.1;
     ctx.moveTo(8, -edgeHalf * 0.75);
-    // Stepped notch near ricasso
     ctx.lineTo(bladeLen * 0.18, -edgeHalf * 0.75);
-    ctx.lineTo(bladeLen * 0.2, -edgeHalf * 0.95);
-    // Main cutting edge
-    ctx.lineTo(bladeLen * 0.82, -edgeHalf * 0.95 + totalCurve * 0.4);
-    // Angular facet to tip
+    ctx.lineTo(bladeLen * 0.2, -edgeHalf * 0.98);
+    ctx.lineTo(bladeLen * 0.82, -edgeHalf * 0.98 + totalCurve * 0.4);
     ctx.lineTo(bladeLen * 0.94, -edgeHalf * 0.45 + totalCurve * 0.7);
     ctx.lineTo(tipX, tipY);
     ctx.lineTo(bladeLen * 0.94, edgeHalf * 0.45 + totalCurve * 0.7);
-    ctx.lineTo(bladeLen * 0.82, edgeHalf * 0.95 + totalCurve * 0.4);
-    ctx.lineTo(bladeLen * 0.2, edgeHalf * 0.95);
+    ctx.lineTo(bladeLen * 0.82, edgeHalf * 0.98 + totalCurve * 0.4);
+    ctx.lineTo(bladeLen * 0.2, edgeHalf * 0.98);
     ctx.lineTo(bladeLen * 0.18, edgeHalf * 0.75);
     ctx.lineTo(8, edgeHalf * 0.75);
     ctx.closePath();
   } else {
-    // Shaped blade with realistic bevel geometry & curves (European/Long/Claymore/Falchion/Saber)
-    const edgeHalf = W * (0.4 + shape * 0.15);
+    // 10. LONG (Aço do Reino): Classic chivalric longsword with elegant distal taper to needle point
+    const edgeHalf = W * (0.38 + shape * 0.14);
     const tipX = bladeLen;
-    const tipY = totalCurve * 0.18;
-
-    ctx.moveTo(8, -edgeHalf * 0.4);
-    // Upper cutting edge / spine
-    ctx.quadraticCurveTo(bladeLen * 0.35, -edgeHalf * 1.05 + totalCurve * 0.25, bladeLen * 0.8, -edgeHalf * 0.7 + totalCurve * 0.6);
+    const tipY = totalCurve * 0.16;
+    ctx.moveTo(8, -edgeHalf * 0.65);
+    ctx.quadraticCurveTo(bladeLen * 0.4, -edgeHalf * 0.62 + totalCurve * 0.22, bladeLen * 0.85, -edgeHalf * 0.42 + totalCurve * 0.58);
     ctx.lineTo(tipX, tipY);
-    // Lower cutting edge
-    ctx.quadraticCurveTo(bladeLen * 0.8, edgeHalf * 0.7 + totalCurve * 0.6, bladeLen * 0.35, edgeHalf * 0.95 + totalCurve * 0.25);
-    ctx.lineTo(8, edgeHalf * 0.4);
+    ctx.quadraticCurveTo(bladeLen * 0.85, edgeHalf * 0.42 + totalCurve * 0.58, bladeLen * 0.4, edgeHalf * 0.62 + totalCurve * 0.22);
+    ctx.lineTo(8, edgeHalf * 0.65);
     ctx.closePath();
   }
 
@@ -293,7 +363,7 @@ function drawSwordBody(
   }
 
   // 4. Central Fuller (Sangradouro)
-  if (!isBillet && shape > 0.5) {
+  if (shape > 0.5) {
     const fullerStart = 16;
     const fullerEnd = bladeLen * 0.74;
     const fullerY = totalCurve * 0.15;

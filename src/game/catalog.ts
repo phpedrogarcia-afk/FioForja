@@ -463,18 +463,21 @@ export interface WorkshopItem {
   icon: string;
   stats: string;
   description: string;
+  costGold: number;
+  costRubies: number;
+  unlockedByDefault?: boolean;
 }
 
 export const WORKSHOP_EQUIPMENT: WorkshopItem[] = [
-  { id: "hammer_standard", category: "hammer", name: "Martelo de Forja Padrão", rarity: "Comum", icon: "🔨", stats: "Impacto: Médio | Controle: Balanceado", description: "O fiel companheiro de qualquer aprendiz de ferreiro." },
-  { id: "hammer_precision", category: "hammer", name: "Martelo de Pena (Precisão)", rarity: "Rara", icon: "⚒️", stats: "Impacto: Leve | Controle: Altíssimo | Carga: Ágil", description: "Pena cruzada de precisão para estiramento fino e gume perfeito." },
-  { id: "hammer_sledge", category: "hammer", name: "Marreta Pesada de Desbaste", rarity: "Épica", icon: "🪓", stats: "Impacto: Devastador | Controle: Difícil | Carga: Pesada", description: "Move grandes massas de aço a cada golpe. Cuidado com metal frio!" },
-  { id: "anvil_cast", category: "anvil", name: "Bigorna de Ferro Fundido", rarity: "Comum", icon: "🧱", stats: "Massa: 120kg | Rebote: Normal", description: "Bigorna tradicional com chifre cônico e mesa plana." },
-  { id: "anvil_master", category: "anvil", name: "Bigorna do Mestre Forjador", rarity: "Lendária", icon: "🏛️", stats: "Massa: 280kg | Rebote: Perfeito | Redução de Vibração", description: "Fundida em aço de alta liga com face endurecida a espelho." },
-  { id: "furnace_coal", category: "furnace", name: "Forja de Carvão de Pedra", rarity: "Comum", icon: "🔥", stats: "Calor: Gradual | Oxigênio: Manual", description: "Fogo vivo alimentado por fole manual e carvão vegetal." },
-  { id: "furnace_bluefire", category: "furnace", name: "Fornalha das Chamas Azuis", rarity: "Épica", icon: "💙", stats: "Calor: Rápido | Controle Térmico Superior", description: "Fornalha cerâmica de tiragem fechada com combustão completa." },
-  { id: "quench_water", category: "quench", name: "Cuba d'Água Fria", rarity: "Comum", icon: "💧", stats: "Resfriamento: Rápido | Risco de Choque", description: "Água pura de nascente da oficina para têmperas simples." },
-  { id: "quench_oil", category: "quench", name: "Banho de Óleo Aquecido", rarity: "Rara", icon: "🏺", stats: "Resfriamento: Progressivo | Reduz Empenamento", description: "Mistura mineral balanceada que minimiza trincas e tensões." },
+  { id: "hammer_standard", category: "hammer", name: "Martelo de Forja Padrão", rarity: "Comum", icon: "🔨", stats: "Impacto: Médio | Controle: Balanceado", description: "O fiel companheiro de qualquer aprendiz de ferreiro.", costGold: 0, costRubies: 0, unlockedByDefault: true },
+  { id: "hammer_precision", category: "hammer", name: "Martelo de Pena (Precisão)", rarity: "Rara", icon: "⚒️", stats: "Impacto: Leve | Controle: Altíssimo | Carga: Ágil", description: "Pena cruzada de precisão para estiramento fino e gume perfeito.", costGold: 1200, costRubies: 25 },
+  { id: "hammer_sledge", category: "hammer", name: "Marreta Pesada de Desbaste", rarity: "Épica", icon: "🪓", stats: "Impacto: Devastador | Controle: Difícil | Carga: Pesada", description: "Move grandes massas de aço a cada golpe. Cuidado com metal frio!", costGold: 2400, costRubies: 50 },
+  { id: "anvil_cast", category: "anvil", name: "Bigorna de Ferro Fundido", rarity: "Comum", icon: "🧱", stats: "Massa: 120kg | Rebote: Normal", description: "Bigorna tradicional com chifre cônico e mesa plana.", costGold: 0, costRubies: 0, unlockedByDefault: true },
+  { id: "anvil_master", category: "anvil", name: "Bigorna do Mestre Forjador", rarity: "Lendária", icon: "🏛️", stats: "Massa: 280kg | Rebote: Perfeito | Redução de Vibração", description: "Fundida em aço de alta liga com face endurecida a espelho.", costGold: 3800, costRubies: 85 },
+  { id: "furnace_coal", category: "furnace", name: "Forja de Carvão de Pedra", rarity: "Comum", icon: "🔥", stats: "Calor: Gradual | Oxigênio: Manual", description: "Fogo vivo alimentado por fole manual e carvão vegetal.", costGold: 0, costRubies: 0, unlockedByDefault: true },
+  { id: "furnace_bluefire", category: "furnace", name: "Fornalha das Chamas Azuis", rarity: "Épica", icon: "💙", stats: "Calor: Rápido | Controle Térmico Superior", description: "Fornalha cerâmica de tiragem fechada com combustão completa.", costGold: 3100, costRubies: 60 },
+  { id: "quench_water", category: "quench", name: "Cuba d'Água Fria", rarity: "Comum", icon: "💧", stats: "Resfriamento: Rápido | Risco de Choque", description: "Água pura de nascente da oficina para têmperas simples.", costGold: 0, costRubies: 0, unlockedByDefault: true },
+  { id: "quench_oil", category: "quench", name: "Banho de Óleo Aquecido", rarity: "Rara", icon: "🏺", stats: "Resfriamento: Progressivo | Reduz Empenamento", description: "Mistura mineral balanceada que minimiza trincas e tensões.", costGold: 1600, costRubies: 30 },
 ];
 
 export const DEFAULT_DESIGN: SwordDesign = {

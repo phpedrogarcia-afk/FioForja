@@ -212,3 +212,68 @@ describe("FioForja Simulator Core & Physical Metallurgy", () => {
     assert.ok(finished.perks?.some((p) => p.includes("Herança dos Primeiros Homens")));
   });
 });
+
+describe("FioForja Economy, Save Migration & Workshop Progression", () => {
+  it("provides backward-compatible defaults when loading legacy saves", async () => {
+    const { loadSave, defaultWallet, defaultInventory, defaultCareer } = await import("./save.ts");
+    const save = loadSave();
+    assert.ok(save.wallet, "Save must have wallet");
+    assert.equal(typeof save.wallet.gold, "number");
+    assert.equal(typeof save.wallet.rubies, "number");
+    assert.equal(typeof save.wallet.diamonds, "number");
+
+    assert.ok(save.inventory, "Save must have inventory");
+    assert.ok(Array.isArray(save.inventory.unlockedTools));
+    assert.ok(
+      save.inventory.unlockedTools.includes("hammer_standard"),
+      "Standard hammer must always be unlocked",
+    );
+
+    assert.ok(save.career, "Save must have career stats");
+    assert.equal(typeof save.career.totalForged, "number");
+  });
+
+  it("verifies workshop equipment prices and unlocks properly", async () => {
+    const { WORKSHOP_EQUIPMENT } = await import("./catalog.ts");
+    const stdHammer = WORKSHOP_EQUIPMENT.find((t) => t.id === "hammer_standard");
+    const precHammer = WORKSHOP_EQUIPMENT.find((t) => t.id === "hammer_precision");
+    const sledgeHammer = WORKSHOP_EQUIPMENT.find((t) => t.id === "hammer_sledge");
+
+    assert.ok(stdHammer, "Standard hammer must exist");
+    assert.equal(stdHammer.costGold, 0, "Standard hammer is free default");
+    assert.equal(stdHammer.unlockedByDefault, true);
+
+    assert.ok(precHammer, "Precision hammer must exist");
+    assert.ok(precHammer.costGold > 0, "Precision hammer requires gold");
+    assert.ok(precHammer.costRubies > 0, "Precision hammer requires rubies");
+
+    assert.ok(sledgeHammer, "Sledge hammer must exist");
+    assert.ok(sledgeHammer.costGold > precHammer.costGold, "Sledge is epic tier");
+  });
+
+  it("enforces career stats tracking and wallet crediting", async () => {
+    const { generateForgeRewards } = await import("./sim.ts");
+    const sim = createSim(DEFAULT_DESIGN);
+    sim.quality = 90;
+    sim.shape = 1;
+    const finished = finishSword(sim, DEFAULT_DESIGN);
+    const rewards = generateForgeRewards(finished);
+
+    assert.ok(rewards.gold > 0, "Completed blade awards gold");
+    assert.ok(rewards.rubies > 0, "Completed blade awards rubies");
+    assert.ok(rewards.items.length > 0, "Completed blade drops crafting materials");
+  });
+
+  it("produces correct thermal radiation color scale across temperatures", async () => {
+    const { metalColorCss } = await import("./swordDraw.ts");
+    const coldColor = metalColorCss(0.05);
+    const cherryColor = metalColorCss(0.5);
+    const incandescenceColor = metalColorCss(0.85);
+
+    assert.ok(coldColor.startsWith("#"), "Must return hex color");
+    assert.ok(cherryColor.startsWith("#"), "Must return hex color");
+    assert.ok(incandescenceColor.startsWith("#"), "Must return hex color");
+    assert.notEqual(coldColor, incandescenceColor, "Cold steel and incandescent steel must differ visually");
+  });
+});
+

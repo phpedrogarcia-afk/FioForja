@@ -11,12 +11,14 @@ interface Props {
   onReheat: () => void;
   onSelectZone?: (zone: import("../types").ForgeZone) => void;
   onSelectHammer?: (hammer: import("../types").HammerType) => void;
+  unlockedHammers?: import("../types").HammerType[];
   onQuit: () => void;
 }
 
 export function ForgeHud({
   hud,
   muted,
+  unlockedHammers,
   onMute,
   onPull,
   onReheat,
@@ -116,20 +118,26 @@ export function ForgeHud({
                   { id: "precision" as const, label: "⚒️ Pena" },
                   { id: "standard" as const, label: "🔨 Padrão" },
                   { id: "sledge" as const, label: "🪓 Marreta" },
-                ].map((h) => (
-                  <button
-                    key={h.id}
-                    onClick={() => onSelectHammer?.(h.id)}
-                    title={h.label}
-                    className={`rounded px-1.5 py-1 text-[0.7rem] font-display transition-colors ${
-                      activeHammer === h.id
-                        ? "border border-blue-400 bg-blue-500/20 text-blue-200 font-semibold"
-                        : "border border-border bg-surface text-slate-400 hover:text-fg"
-                    }`}
-                  >
-                    {h.label}
-                  </button>
-                ))}
+                ].map((h) => {
+                  const isUnlocked = !unlockedHammers || unlockedHammers.includes(h.id);
+                  return (
+                    <button
+                      key={h.id}
+                      disabled={!isUnlocked}
+                      onClick={() => isUnlocked && onSelectHammer?.(h.id)}
+                      title={isUnlocked ? h.label : `${h.label} (Bloqueado na Oficina)`}
+                      className={`rounded px-1.5 py-1 text-[0.7rem] font-display transition-colors ${
+                        activeHammer === h.id
+                          ? "border border-blue-400 bg-blue-500/20 text-blue-200 font-semibold"
+                          : isUnlocked
+                          ? "border border-border bg-surface text-slate-400 hover:text-fg"
+                          : "border border-border/40 bg-surface/30 text-slate-600 cursor-not-allowed opacity-40"
+                      }`}
+                    >
+                      {h.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
