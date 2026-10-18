@@ -55,11 +55,12 @@ function noiseBuffer(seconds: number) {
   return buf;
 }
 
-export function playClang(force: number, kind: "weak" | "good" | "perfect" | "hard") {
+export function playClang(force: number, kind: "weak" | "good" | "perfect" | "hard", zone: "base" | "mid" | "tip" = "mid") {
   if (!ctx || !sfx) return;
   const t = now();
   const peak = kind === "weak" ? 0.28 : kind === "hard" ? 0.95 : kind === "perfect" ? 0.8 : 0.62;
-  const pitch = 140 + force * 90 + (kind === "perfect" ? 40 : 0);
+  const zonePitchMult = zone === "base" ? 0.8 : zone === "tip" ? 1.35 : 1.0;
+  const pitch = (140 + force * 90 + (kind === "perfect" ? 40 : 0)) * zonePitchMult;
 
   const g = envGain(0.45, peak, 0.004);
   if (!g) return;
@@ -70,7 +71,7 @@ export function playClang(force: number, kind: "weak" | "good" | "perfect" | "ha
   osc.frequency.exponentialRampToValueAtTime(pitch * 0.45, t + 0.28);
   const filt = ctx.createBiquadFilter();
   filt.type = "bandpass";
-  filt.frequency.value = 700 + force * 900;
+  filt.frequency.value = (700 + force * 900) * (zone === "tip" ? 1.4 : zone === "base" ? 0.75 : 1.0);
   filt.Q.value = 6;
   osc.connect(filt);
   filt.connect(g);
@@ -94,11 +95,30 @@ export function playClang(force: number, kind: "weak" | "good" | "perfect" | "ha
     const ng = envGain(0.08, peak * 0.45, 0.001);
     const hp = ctx.createBiquadFilter();
     hp.type = "highpass";
-    hp.frequency.value = 1800;
+    hp.frequency.value = zone === "tip" ? 2400 : 1800;
     src.connect(hp);
     if (ng) hp.connect(ng);
     src.start(t);
   }
+}
+
+export function playUpgradeChime() {
+  if (!ctx || !sfx) return;
+  const audioCtx = ctx;
+  const t = now();
+  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+  notes.forEach((freq, idx) => {
+    const delay = idx * 0.07;
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, t + delay);
+    const g = envGain(0.65, 0.28, 0.01);
+    if (g) {
+      osc.connect(g);
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.65);
+    }
+  });
 }
 
 export function playWhoosh() {

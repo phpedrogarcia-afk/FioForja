@@ -75,29 +75,36 @@ async function run() {
       const pullBtn = page.getByRole("button", { name: /Retirar do fogo/i });
       if (await pullBtn.isVisible()) {
         await pullBtn.click();
-        await page.waitForTimeout(800);
+        await page.waitForTimeout(600);
         const tarugoFile = join(outDir, `${vp.name}-04-forge-tarugo-bruto.png`);
         await page.screenshot({ path: tarugoFile });
         console.log(`Saved: ${tarugoFile}`);
 
-        // Deliver 2 strikes to elongate into Stage 2: Pré-forma (shape ~0.35)
+        // Deliver strikes to shape blade into Pré-forma (shape ~0.35)
         for (let i = 0; i < 2; i++) {
           await page.keyboard.down("Space");
-          await page.waitForTimeout(450);
+          await page.waitForTimeout(420);
           await page.keyboard.up("Space");
-          await page.waitForTimeout(350);
+          await page.waitForTimeout(300);
         }
         const preformaFile = join(outDir, `${vp.name}-04b-forge-preforma.png`);
         await page.screenshot({ path: preformaFile });
         console.log(`Saved: ${preformaFile}`);
 
-        // Deliver more strikes to form Stage 3: Lâmina Forjada
-        for (let i = 0; i < 3; i++) {
-          await page.keyboard.down("Space");
-          await page.waitForTimeout(450);
-          await page.keyboard.up("Space");
-          await page.waitForTimeout(350);
+        // Reheat in furnace so the metal is at glorious incandescent orange heat (matching Reference Image 2)
+        const reheatBtn = page.getByRole("button", { name: /Reaquecer na fornalha/i });
+        if (await reheatBtn.isVisible()) {
+          await reheatBtn.click();
+          await page.waitForTimeout(1400); // let heat build back up to yellow-orange
         }
+
+        // Deliver striking blow in Mid zone to ignite radiant cyan runes
+        await page.keyboard.press("Digit2"); // select Mid zone
+        await page.keyboard.down("Space");
+        await page.waitForTimeout(380);
+        await page.keyboard.up("Space");
+        await page.waitForTimeout(200);
+
         const anvilFile = join(outDir, `${vp.name}-04-forge-anvil.png`);
         await page.screenshot({ path: anvilFile });
         console.log(`Saved: ${anvilFile}`);
@@ -275,8 +282,19 @@ async function run() {
       "desktop-08-velvet-inspection.png",
       "desktop-09-rewards-chest.png",
       "mobile-01-title.png",
+      "mobile-02-design.png",
+      "mobile-03-forge-heat.png",
+      "mobile-04-forge-tarugo-bruto.png",
+      "mobile-04b-forge-preforma.png",
       "mobile-04-forge-anvil.png",
+      "mobile-05-gallery-arsenal.png",
+      "mobile-06-gallery-compendio.png",
+      "mobile-06b-gallery-componentes.png",
+      "mobile-06c-gallery-runas.png",
+      "mobile-07b-gallery-oficina.png",
+      "mobile-07-gallery-legado.png",
       "mobile-08-velvet-inspection.png",
+      "mobile-09-rewards-chest.png",
     ];
     for (const f of files) {
       const src = join(outDir, f);

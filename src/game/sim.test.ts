@@ -275,5 +275,76 @@ describe("FioForja Economy, Save Migration & Workshop Progression", () => {
     assert.ok(incandescenceColor.startsWith("#"), "Must return hex color");
     assert.notEqual(coldColor, incandescenceColor, "Cold steel and incandescent steel must differ visually");
   });
+
+  it("updates PhysicalBladeProfile continuously across targeted strikes", () => {
+    const sim = createSim(DEFAULT_DESIGN);
+    sim.phase = "forge";
+    sim.heat = 0.65;
+    const initialBase = sim.physicalProfile.baseWidth;
+    const initialMid = sim.physicalProfile.midWidth;
+    const initialTip = sim.physicalProfile.tipWidth;
+
+    // Strike base
+    sim.targetZone = "base";
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1);
+    assert.ok(sim.physicalProfile.baseWidth > initialBase, "Base width must develop when striking base");
+    assert.equal(sim.physicalProfile.midWidth, initialMid, "Mid width untouched when striking base");
+
+    // Strike tip
+    sim.targetZone = "tip";
+    sim.charging = true;
+    sim.force = sim.sweetCenter;
+    stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 2);
+    assert.ok(sim.physicalProfile.tipWidth > initialTip, "Tip width must develop when striking tip");
+    assert.ok(sim.physicalProfile.distalTaper > 0.08, "Distal taper must develop when striking tip");
+  });
+
+  it("applies equipped workshop gear bonuses accurately", () => {
+    // Bluefire furnace heating acceleration
+    const simStandard = createSim(DEFAULT_DESIGN, {
+      equippedGear: { hammer: "standard", anvil: "anvil_cast", furnace: "furnace_coal", quench: "quench_water" },
+    });
+    const simBluefire = createSim(DEFAULT_DESIGN, {
+      equippedGear: { hammer: "standard", anvil: "anvil_cast", furnace: "furnace_bluefire", quench: "quench_water" },
+    });
+    stepSim(simStandard, 1.0, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1);
+    stepSim(simBluefire, 1.0, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 1);
+    assert.ok(simBluefire.heat > simStandard.heat, "Bluefire furnace heats faster than standard coal furnace");
+
+    // Master anvil sweet spot bonus
+    const simMasterAnvil = createSim(DEFAULT_DESIGN, {
+      equippedGear: { hammer: "standard", anvil: "anvil_master", furnace: "furnace_coal", quench: "quench_water" },
+    });
+    assert.ok(simMasterAnvil.sweetWidth > simStandard.sweetWidth, "Master anvil expands forge sweet width");
+
+    // Oil quench gentler cooling
+    const simOil = createSim(DEFAULT_DESIGN, {
+      equippedGear: { hammer: "standard", anvil: "anvil_cast", furnace: "furnace_coal", quench: "quench_oil" },
+    });
+    simOil.phase = "quench";
+    simOil.quenchFill = 0.85; // Over-soaked quench
+    simOil.charging = false;
+    simOil.quenching = true;
+    stepSim(simOil, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, 2);
+    assert.ok(simOil.warp < 0.15, "Oil quench limits thermal shock warp");
+  });
+
+  it("persists and migrates equipped gear in player inventory", async () => {
+    const { migrateSave } = await import("./save.ts");
+    const migrated = migrateSave({
+      inventory: {
+        unlockedTools: ["hammer_standard", "hammer_precision"],
+        equipped: { hammer: "precision", anvil: "anvil_master", furnace: "furnace_bluefire", quench: "quench_oil" },
+      },
+    });
+
+    assert.equal(migrated.inventory.equipped?.hammer, "precision");
+    assert.equal(migrated.inventory.equipped?.anvil, "anvil_master");
+    assert.equal(migrated.inventory.equipped?.furnace, "furnace_bluefire");
+    assert.equal(migrated.inventory.equipped?.quench, "quench_oil");
+  });
 });
+
 

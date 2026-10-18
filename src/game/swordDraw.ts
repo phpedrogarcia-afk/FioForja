@@ -61,6 +61,7 @@ export interface DrawSwordOptions {
   broken?: boolean;
   lightOffset?: number;
   runicCharge?: number;
+  physicalProfile?: import("./types.ts").PhysicalBladeProfile;
 }
 
 export function drawFinishedSword(
@@ -81,6 +82,7 @@ export function drawFinishedSword(
   const broken = opts.broken ?? false;
   const lightOffset = opts.lightOffset ?? 0.5;
   const runicCharge = opts.runicCharge ?? 0;
+  const physicalProfile = opts.physicalProfile;
 
   ctx.save();
   ctx.translate(x, y);
@@ -96,6 +98,7 @@ export function drawFinishedSword(
     broken,
     lightOffset,
     runicCharge,
+    physicalProfile,
   });
 
   ctx.restore();
@@ -105,9 +108,9 @@ function drawSwordBody(
   ctx: CanvasRenderingContext2D,
   design: SwordDesign,
   lengthPx: number,
-  opts: Required<Omit<DrawSwordOptions, "angle">>,
+  opts: Required<Omit<DrawSwordOptions, "angle" | "physicalProfile">> & { physicalProfile?: import("./types.ts").PhysicalBladeProfile },
 ) {
-  const { heat, shape, assembled, quality, warp, cracks, broken, lightOffset, runicCharge } = opts;
+  const { heat, shape, assembled, quality, warp, cracks, broken, lightOffset, runicCharge, physicalProfile } = opts;
   const profile = PROFILES[design.profile];
   const st = STEELS[design.steel];
   const wrap = WRAPS[design.wrap];
@@ -124,7 +127,7 @@ function drawSwordBody(
     drawHilt(ctx, design, wrap.color, W, quality);
   }
 
-  // Blade length and width interpolation based on forging progression
+  // Blade length and width continuous interpolation based on forging progression and physicalProfile
   const isRawBillet = !assembled && shape < 0.22;
   const isPreform = !assembled && shape >= 0.22 && shape < 0.55;
   const bladeLen = L * (isRawBillet ? 0.38 : isPreform ? 0.38 + (shape - 0.22) * 0.95 : 0.45 + shape * 0.55);
@@ -415,7 +418,7 @@ function drawSwordBody(
 
   // 8. Runes & Inscriptions (Incandescent Cyan/Gold Glow as in Reference Image 1 & 2!)
   const inscription = renderInscription(design.inscription || "AETHELGARD", design.runes);
-  const showRunes = (design.runes || design.inscription) && (shape > 0.65 || assembled);
+  const showRunes = (design.runes || design.inscription) && (shape > 0.3 || runicCharge > 0.08 || assembled);
 
   if (showRunes && inscription) {
     drawLuminousRunes(ctx, inscription, bladeLen, W, totalCurve, {

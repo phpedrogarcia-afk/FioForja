@@ -25,7 +25,9 @@ interface Props {
   inventory?: PlayerInventory;
   career?: CareerStats;
   onBuyTool?: (toolId: string) => boolean;
+  onEquipTool?: (toolId: string) => void;
   onSelectPreset?: (design: SwordDesign) => void;
+  onUpgrade?: (sword: FinishedSword) => boolean;
 }
 
 type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "legado";
@@ -38,7 +40,9 @@ export function GalleryScreen({
   inventory = defaultInventory,
   career,
   onBuyTool,
+  onEquipTool,
   onSelectPreset,
+  onUpgrade,
 }: Props) {
   const [currentTab, setCurrentTab] = useState<GalleryTab>("arsenal");
   const [selectedSword, setSelectedSword] = useState<FinishedSword | null>(null);
@@ -68,6 +72,8 @@ export function GalleryScreen({
         onAgain={onForge}
         onGallery={() => setSelectedSword(null)}
         onTitle={onBack}
+        wallet={wallet}
+        onUpgrade={onUpgrade}
       />
     );
   }
@@ -506,11 +512,26 @@ export function GalleryScreen({
               {WORKSHOP_EQUIPMENT.map((tool) => {
                 const isUnlocked = tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id);
                 const canAfford = wallet.gold >= tool.costGold && wallet.rubies >= tool.costRubies;
+                const eq = inventory.equipped;
+                let isEquipped = false;
+                if (tool.id.startsWith("hammer_")) {
+                  isEquipped = (eq?.hammer || "standard") === tool.id.replace("hammer_", "");
+                } else if (tool.id.startsWith("anvil_")) {
+                  isEquipped = (eq?.anvil || "anvil_cast") === tool.id;
+                } else if (tool.id.startsWith("furnace_")) {
+                  isEquipped = (eq?.furnace || "furnace_coal") === tool.id;
+                } else if (tool.id.startsWith("quench_")) {
+                  isEquipped = (eq?.quench || "quench_water") === tool.id;
+                }
 
                 return (
                   <div
                     key={tool.id}
-                    className="flex flex-col justify-between rounded-lg border border-[#1b263b] bg-[#0a0f18] p-3.5 transition-all hover:border-amber-500/50"
+                    className={`flex flex-col justify-between rounded-lg border p-3.5 transition-all ${
+                      isEquipped
+                        ? "border-amber-500 bg-[#141b2a] shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                        : "border-[#1b263b] bg-[#0a0f18] hover:border-amber-500/50"
+                    }`}
                   >
                     <div>
                       <div className="flex items-start justify-between">
@@ -521,9 +542,16 @@ export function GalleryScreen({
                             <span className="text-[0.65rem] capitalize text-slate-400">{tool.category}</span>
                           </div>
                         </div>
-                        <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
-                          {tool.rarity}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {isEquipped && (
+                            <span className="rounded border border-amber-500/60 bg-amber-500/20 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase text-amber-300">
+                              Equipado
+                            </span>
+                          )}
+                          <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
+                            {tool.rarity}
+                          </span>
+                        </div>
                       </div>
                       <p className="mt-2 text-xs font-semibold text-amber-200">{tool.stats}</p>
                       <p className="mt-1.5 text-[0.72rem] text-slate-400">{tool.description}</p>
@@ -534,9 +562,20 @@ export function GalleryScreen({
                         {tool.costGold === 0 ? "Padrão da Oficina" : `${tool.costGold.toLocaleString()} 🪙 ${tool.costRubies ? `+ ${tool.costRubies} 💎` : ""}`}
                       </span>
                       {isUnlocked ? (
-                        <span className="rounded border border-emerald-500/40 bg-emerald-950/40 px-2 py-0.5 text-[0.7rem] font-bold text-emerald-400">
-                          ✓ Adquirido
-                        </span>
+                        isEquipped ? (
+                          <span className="text-emerald-400 font-bold text-xs flex items-center gap-1">
+                            ✓ Em Uso
+                          </span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => onEquipTool?.(tool.id)}
+                            className="border-amber-500/50 bg-[#121a2c] text-xs font-bold text-amber-200 hover:bg-[#1a253e]"
+                          >
+                            Equipar
+                          </Button>
+                        )
                       ) : (
                         <Button
                           size="sm"

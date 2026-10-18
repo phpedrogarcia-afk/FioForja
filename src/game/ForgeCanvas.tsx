@@ -3,7 +3,7 @@ import type { MutableRefObject } from "react";
 import { drawSheetFrame, type GameImages } from "./assets";
 import { createSim, stepSim, type SimInput } from "./sim";
 import { drawFinishedSword } from "./swordDraw";
-import type { ForgePhase, HudSnapshot, SimState, SwordDesign } from "./types";
+import type { ForgePhase, HudSnapshot, PlayerInventory, SimState, SwordDesign } from "./types";
 import { playClang, playCrack, playHiss, playPull, playRuneHum, playShatter, playWhoosh } from "./audio";
 
 const VW = 1280;
@@ -59,6 +59,7 @@ interface Props {
   onHud: (hud: HudSnapshot) => void;
   onFinished: (sim: SimState) => void;
   inputRef: MutableRefObject<SimInput>;
+  inventory?: PlayerInventory;
 }
 
 export function ForgeCanvas({
@@ -69,6 +70,7 @@ export function ForgeCanvas({
   onHud,
   onFinished,
   inputRef,
+  inventory,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,7 +82,10 @@ export function ForgeCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const sim = createSim(design);
+    const sim = createSim(design, {
+      hammer: inventory?.equipped?.hammer,
+      equippedGear: inventory?.equipped,
+    });
     const sparks: Spark[] = [];
     const steams: SteamParticle[] = [];
     let trauma = 0;
@@ -153,7 +158,7 @@ export function ForgeCanvas({
       inputRef.current.reheat = false;
 
       // Audio dispatch
-      if (ev.sfx === "clang") playClang(ev.force ?? 0.6, ev.kind ?? "good");
+      if (ev.sfx === "clang") playClang(ev.force ?? 0.6, ev.kind ?? "good", sim.targetZone);
       if (ev.sfx === "whoosh") playWhoosh();
       if (ev.sfx === "hiss") {
         playHiss();
@@ -212,7 +217,7 @@ export function ForgeCanvas({
       // Continuous steam during quench
       if (sim.phase === "quench" && sim.quenching && Math.random() < 0.4) {
         const layout = getR4BLayout("quench", canvas.width < canvas.height);
-        emitSteam(3, layout.blade.x, layout.blade.y);
+        emitSteam(4, layout.blade.x, layout.blade.y);
       }
 
       // HUD snapshot emission
@@ -240,6 +245,8 @@ export function ForgeCanvas({
           targetZone: sim.targetZone,
           zoneProgress: sim.zoneProgress,
           activeHammer: sim.activeHammer,
+          physicalProfile: sim.physicalProfile,
+          quenchSteam: sim.quenchSteam,
         });
       }
 
@@ -376,6 +383,7 @@ function paint(
     cracks: sim.cracks,
     broken: sim.broken,
     runicCharge: sim.runicCharge,
+    physicalProfile: sim.physicalProfile,
   });
 
   // 8. Quench Bath Trough & Water
@@ -482,12 +490,12 @@ function drawTongs(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
   ctx.fill();
   ctx.stroke();
 
-  // Heavy forged handles extending off left
+  // Heavy forged handles extending off left down toward blacksmith hand
   ctx.beginPath();
   ctx.moveTo(-28, -3);
-  ctx.lineTo(-180, -20);
+  ctx.lineTo(-270, 42);
   ctx.moveTo(-28, 3);
-  ctx.lineTo(-180, 20);
+  ctx.lineTo(-270, 78);
   ctx.strokeStyle = "#28201a";
   ctx.lineWidth = 4.8;
   ctx.stroke();
@@ -495,6 +503,98 @@ function drawTongs(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
+  // Blacksmith's Left Arm and Hand in heavy leather bracer gripping the tongs (Reference Image 2)
+  ctx.save();
+  const gx = -180;
+  const gy = 54;
+
+  // Forearm sleeve entering from lower-left
+  ctx.beginPath();
+  ctx.moveTo(-450, 250);
+  ctx.lineTo(-240, 100);
+  ctx.lineTo(-210, 142);
+  ctx.lineTo(-390, 310);
+  ctx.closePath();
+  ctx.fillStyle = "#1e1814"; // Rough medieval tunic wool
+  ctx.fill();
+
+  // Hardened leather vambrace / bracer
+  const bracerGrad = ctx.createLinearGradient(-340, 180, -220, 90);
+  bracerGrad.addColorStop(0, "#4a2e1b");
+  bracerGrad.addColorStop(0.5, "#331f12");
+  bracerGrad.addColorStop(1, "#24150b");
+  ctx.fillStyle = bracerGrad;
+  ctx.beginPath();
+  ctx.moveTo(-350, 175);
+  ctx.lineTo(-215, 82);
+  ctx.lineTo(-195, 122);
+  ctx.lineTo(-315, 225);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#180e07";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Bracer strapping & brass rivets
+  ctx.strokeStyle = "#150d06";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-305, 145);
+  ctx.lineTo(-285, 185);
+  ctx.moveTo(-255, 110);
+  ctx.lineTo(-235, 150);
+  ctx.stroke();
+
+  [[-295, 165], [-245, 130]].forEach(([rx, ry]) => {
+    [-14, 0, 14].forEach((offset) => {
+      ctx.beginPath();
+      ctx.arc(rx + offset * 0.6, ry + offset * 0.8, 2.8, 0, Math.PI * 2);
+      ctx.fillStyle = "#c89438"; // Brass rivet
+      ctx.fill();
+      ctx.strokeStyle = "#422808";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    });
+  });
+
+  // Leather glove hand grasping tongs
+  const gloveGrad = ctx.createRadialGradient(gx, gy, 6, gx, gy, 38);
+  gloveGrad.addColorStop(0, "#5a3a22");
+  gloveGrad.addColorStop(1, "#301d10");
+  ctx.fillStyle = gloveGrad;
+
+  // Curled thumb & fingers around tongs reins
+  ctx.beginPath();
+  ctx.ellipse(gx, gy, 26, 20, 0.45, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#140b05";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Knuckles and finger segments
+  for (let f = 0; f < 4; f++) {
+    const fx = gx + 8 - f * 6;
+    const fy = gy - 14 + f * 9;
+    ctx.beginPath();
+    ctx.ellipse(fx, fy, 7, 5, 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = "#4a2d19";
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Fire warmth highlight on top edge of arm
+  const rimG = ctx.createLinearGradient(-450, 250, -170, 45);
+  rimG.addColorStop(0, "rgba(255,140,40,0.45)");
+  rimG.addColorStop(1, "rgba(255,100,20,0.1)");
+  ctx.strokeStyle = rimG;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-450, 250);
+  ctx.lineTo(-215, 82);
+  ctx.lineTo(gx + 10, gy - 14);
+  ctx.stroke();
+
+  ctx.restore();
   ctx.restore();
 }
 

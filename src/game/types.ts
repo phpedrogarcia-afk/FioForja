@@ -99,11 +99,30 @@ export interface FinishedSword {
   durability?: number; // 0-100
   rarity?: RarityGrade;
   value?: number; // gold valuation
+  upgradesApplied?: number;
   flaws?: string[];
   perks?: string[];
   structuralState?: StructuralState;
   cracks?: number;
+  physicalProfile?: PhysicalBladeProfile;
   history?: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
+}
+
+export interface PhysicalBladeProfile {
+  baseWidth: number;   // 0 (raw billet block) -> 1 (formed ricasso)
+  midWidth: number;    // 0 -> 1
+  tipWidth: number;    // 0 -> 1
+  distalTaper: number; // 0 (uniform bar) -> 1 (tapered wedge/needle)
+  fullerDepth: number; // 0 -> 1
+  bevelSharpness: number; // 0 -> 1
+  hammerMarksCount: number;
+}
+
+export interface EquippedWorkshopGear {
+  hammer: HammerType;
+  anvil: "anvil_cast" | "anvil_master";
+  furnace: "furnace_coal" | "furnace_bluefire";
+  quench: "quench_water" | "quench_oil";
 }
 
 export interface SimState {
@@ -111,6 +130,7 @@ export interface SimState {
   heat: number;
   heatScore: number;
   shape: number;
+  physicalProfile: PhysicalBladeProfile;
   quality: number;
   warp: number;
   strikes: number;
@@ -122,6 +142,7 @@ export interface SimState {
   quenchFill: number;
   quenching: boolean;
   quenchScore: number;
+  quenchSteam: number;
   reheating: boolean;
   strikeKind: StrikeKind | null;
   strikeAnim: number;
@@ -139,6 +160,7 @@ export interface SimState {
   targetZone: ForgeZone;
   zoneProgress: Record<ForgeZone, number>;
   activeHammer: HammerType;
+  equippedGear: EquippedWorkshopGear;
   history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
 }
 
@@ -163,6 +185,8 @@ export interface HudSnapshot {
   targetZone?: ForgeZone;
   zoneProgress?: Record<ForgeZone, number>;
   activeHammer?: HammerType;
+  physicalProfile?: PhysicalBladeProfile;
+  quenchSteam?: number;
 }
 
 export interface ForgeRewardItem {
@@ -198,6 +222,7 @@ export interface PlayerInventory {
   unlockedRunes: string[];
   unlockedTools: string[];
   materials: Record<string, number>;
+  equipped?: EquippedWorkshopGear;
 }
 
 export interface WorkshopTool {

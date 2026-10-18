@@ -1,4 +1,4 @@
-import type { CareerStats, FinishedSword, PlayerInventory, PlayerWallet, SwordDesign } from "./types.ts";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SwordDesign } from "./types.ts";
 import { DEFAULT_DESIGN } from "./catalog.ts";
 
 const KEY = "a-forja-save";
@@ -21,6 +21,13 @@ export const defaultWallet: PlayerWallet = {
   diamonds: 20,
 };
 
+export const defaultEquippedGear: EquippedWorkshopGear = {
+  hammer: "standard",
+  anvil: "anvil_cast",
+  furnace: "furnace_coal",
+  quench: "quench_water",
+};
+
 export const defaultInventory: PlayerInventory = {
   unlockedProfiles: ["short", "long", "falchion", "saber"],
   unlockedSteels: ["iron", "steel"],
@@ -28,13 +35,14 @@ export const defaultInventory: PlayerInventory = {
   unlockedPommels: ["disc", "sphere", "cross"],
   unlockedWraps: ["leather", "braided", "linen"],
   unlockedRunes: ["fehu", "uruz"],
-  unlockedTools: ["hammer_standard", "anvil_standard", "furnace_standard", "quench_water"],
+  unlockedTools: ["hammer_standard", "anvil_cast", "furnace_coal", "quench_water"],
   materials: {
     iron_ingot: 8,
     steel_ingot: 4,
     scrap: 0,
     refined_iron: 1,
   },
+  equipped: defaultEquippedGear,
 };
 
 export const defaultCareer: CareerStats = {
@@ -141,6 +149,12 @@ export function migrateSave(raw: any): SaveData {
     materials: {
       ...defaultInventory.materials,
       ...(rawInv.materials || {}),
+    },
+    equipped: {
+      hammer: rawInv.equipped?.hammer || defaultEquippedGear.hammer,
+      anvil: rawInv.equipped?.anvil || defaultEquippedGear.anvil,
+      furnace: rawInv.equipped?.furnace || defaultEquippedGear.furnace,
+      quench: rawInv.equipped?.quench || defaultEquippedGear.quench,
     },
   };
 

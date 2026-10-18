@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
-import { resumeAudio, setMuted, unlockAudio, isMuted } from "./audio";
+import { isMuted, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
 import { finishSword, generateForgeRewards } from "./sim";
-import { defaultCareer, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
+import { defaultCareer, defaultEquippedGear, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
-import type { CareerStats, FinishedSword, ForgeRewardsData, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
@@ -146,6 +146,60 @@ export function GameApp() {
     setScreen("design");
   }, [persist]);
 
+  const handleEquipTool = useCallback((toolId: string) => {
+    const currentInventory = save.current.inventory || defaultInventory;
+    const currentEquipped: EquippedWorkshopGear = currentInventory.equipped || defaultEquippedGear;
+    const nextEquipped: EquippedWorkshopGear = { ...currentEquipped };
+
+    if (toolId.startsWith("hammer_")) {
+      nextEquipped.hammer = toolId.replace("hammer_", "") as any;
+    } else if (toolId.startsWith("anvil_")) {
+      nextEquipped.anvil = toolId as any;
+    } else if (toolId.startsWith("furnace_")) {
+      nextEquipped.furnace = toolId as any;
+    } else if (toolId.startsWith("quench_")) {
+      nextEquipped.quench = toolId as any;
+    }
+
+    const nextInventory: PlayerInventory = {
+      ...currentInventory,
+      equipped: nextEquipped,
+    };
+    setInventory(nextInventory);
+    persist({ inventory: nextInventory });
+  }, [persist]);
+
+  const handleUpgradeSword = useCallback((targetSword: FinishedSword): boolean => {
+    const currentWallet = save.current.wallet || defaultWallet;
+    const upgrades = targetSword.upgradesApplied || 0;
+    const goldCost = 50 * (upgrades + 1);
+    const rubyCost = upgrades >= 1 ? 1 : 0;
+
+    if (currentWallet.gold < goldCost || currentWallet.rubies < rubyCost) return false;
+
+    const nextWallet: PlayerWallet = {
+      ...currentWallet,
+      gold: currentWallet.gold - goldCost,
+      rubies: currentWallet.rubies - rubyCost,
+    };
+
+    const updatedSword: FinishedSword = {
+      ...targetSword,
+      damage: (targetSword.damage ?? 180) + 16,
+      durability: Math.min(100, (targetSword.durability ?? 90) + 4),
+      upgradesApplied: upgrades + 1,
+    };
+
+    playUpgradeChime();
+    setWallet(nextWallet);
+    setFinished(updatedSword);
+
+    const nextGallery = save.current.gallery.map((s) => (s.id === targetSword.id ? updatedSword : s));
+    setGallery(nextGallery);
+    persist({ wallet: nextWallet, gallery: nextGallery });
+    return true;
+  }, [persist]);
+
   const onFinished = useCallback((sim: SimState) => {
     const sword = finishSword(sim, designRef.current);
     const swordValue = sword.value ?? Math.round(sword.quality * 28 + (sword.rarity === "Lendária" ? 1800 : sword.rarity === "Relíquia" ? 3500 : 250));
@@ -279,7 +333,9 @@ export function GameApp() {
         onBack={() => setScreen("title")}
         onForge={() => setScreen("design")}
         onBuyTool={handleBuyTool}
+        onEquipTool={handleEquipTool}
         onSelectPreset={handleSelectPreset}
+        onUpgrade={handleUpgradeSword}
       />
     );
   }
@@ -288,6 +344,8 @@ export function GameApp() {
     return (
       <RevealScreen
         sword={finished}
+        wallet={wallet}
+        onUpgrade={handleUpgradeSword}
         onClaimRewards={() => setScreen("rewards")}
         onAgain={() => setScreen("design")}
         onGallery={() => setScreen("gallery")}
@@ -325,6 +383,7 @@ export function GameApp() {
           onHud={onHud}
           onFinished={onFinished}
           inputRef={inputRef}
+          inventory={inventory}
         />
       ) : (
         <div className="flex h-full items-center justify-center font-display text-muted">

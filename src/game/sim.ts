@@ -1,5 +1,5 @@
 import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
-import type { FinishedSword, ForgeRewardsData, ForgeZone, HammerType, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, HammerType, PhysicalBladeProfile, SimState, StrikeKind, SwordDesign } from "./types.ts";
 
 export interface SimInput {
   charging: boolean;
@@ -20,13 +20,35 @@ export interface SimEvent {
   broken?: boolean;
 }
 
-export function createSim(design: SwordDesign, options?: { hammer?: HammerType }): SimState {
+export function createSim(
+  design: SwordDesign,
+  options?: { hammer?: HammerType; equippedGear?: EquippedWorkshopGear },
+): SimState {
   const steel = STEELS[design.steel];
+  const equippedGear: EquippedWorkshopGear = options?.equippedGear ?? {
+    hammer: options?.hammer ?? "standard",
+    anvil: "anvil_cast",
+    furnace: "furnace_coal",
+    quench: "quench_water",
+  };
+  const activeHammer = options?.hammer ?? equippedGear.hammer ?? "standard";
+
+  const initialProfile: PhysicalBladeProfile = {
+    baseWidth: 0.16,
+    midWidth: 0.16,
+    tipWidth: 0.16,
+    distalTaper: 0.08,
+    fullerDepth: 0,
+    bevelSharpness: 0,
+    hammerMarksCount: 0,
+  };
+
   return {
     phase: "heat",
     heat: 0.1,
     heatScore: 0,
     shape: 0.16,
+    physicalProfile: initialProfile,
     quality: 42,
     warp: 0,
     strikes: 0,
@@ -34,10 +56,11 @@ export function createSim(design: SwordDesign, options?: { hammer?: HammerType }
     force: 0,
     charging: false,
     sweetCenter: 0.66,
-    sweetWidth: steel.sweetWidth,
+    sweetWidth: steel.sweetWidth + (equippedGear.anvil === "anvil_master" ? 0.025 : 0),
     quenchFill: 0,
     quenching: false,
     quenchScore: 0,
+    quenchSteam: 0,
     reheating: false,
     strikeKind: null,
     strikeAnim: 0,
@@ -51,7 +74,8 @@ export function createSim(design: SwordDesign, options?: { hammer?: HammerType }
     runicCharge: 0,
     targetZone: "mid",
     zoneProgress: { base: 0, mid: 0, tip: 0 },
-    activeHammer: options?.hammer ?? "standard",
+    activeHammer,
+    equippedGear,
     history: [],
   };
 }
@@ -90,7 +114,8 @@ export function stepSim(
   const steel = STEELS[design.steel];
 
   if (s.phase === "heat") {
-    s.heat = clamp(s.heat + dt * 0.16, 0, 1);
+    const heatGainRate = s.equippedGear?.furnace === "furnace_bluefire" ? 0.22 : 0.16;
+    s.heat = clamp(s.heat + dt * heatGainRate, 0, 1);
     const mid = (steel.heatMin + steel.heatMax) / 2;
     if (s.heat >= steel.heatMin && s.heat <= steel.heatMax) {
       s.lastMessage = "Calor ideal! O aço está plástico e pronto para a bigorna.";
@@ -135,15 +160,18 @@ export function stepSim(
 
     s.sweetCenter = 0.62 + Math.sin(time * 0.85) * 0.11;
     const hammerWidthBonus = s.activeHammer === "precision" ? 0.03 : s.activeHammer === "sledge" ? -0.02 : 0;
-    s.sweetWidth = Math.max(0.06, steel.sweetWidth + hammerWidthBonus);
+    const anvilBonus = s.equippedGear?.anvil === "anvil_master" ? 0.025 : 0;
+    s.sweetWidth = Math.max(0.06, steel.sweetWidth + hammerWidthBonus + anvilBonus);
 
     if (s.reheating) {
-      s.heat = clamp(s.heat + dt * 0.42, 0, 0.86);
+      const reheatRate = s.equippedGear?.furnace === "furnace_bluefire" ? 0.55 : 0.42;
+      s.heat = clamp(s.heat + dt * reheatRate, 0, 0.88);
       s.integrity = clamp(s.integrity + dt * 6, 0, 100);
       s.lastMessage = "Reaquecendo na fornalha… Aliviando tensões internas.";
       if (s.heat >= 0.76) s.reheating = false;
     } else {
-      s.heat = clamp(s.heat - dt * 0.038, 0.08, 1);
+      const coolingRate = s.equippedGear?.furnace === "furnace_bluefire" ? 0.027 : 0.038;
+      s.heat = clamp(s.heat - dt * coolingRate, 0.08, 1);
     }
 
     if (input.reheat && !s.reheating && s.heat < 0.58) {
@@ -204,6 +232,7 @@ export function stepSim(
     if (input.charging) {
       s.quenching = true;
       s.quenchFill = clamp(s.quenchFill + dt * 0.48, 0, 1);
+      s.quenchSteam = clamp(s.quenchSteam + dt * 1.5, 0, 1);
       if (s.quenchFill > 0.42 && s.quenchFill < 0.62) {
         s.lastMessage = "Faixa perfeita de têmpera — solte agora!";
       } else if (s.quenchFill >= 0.62) {
@@ -215,16 +244,25 @@ export function stepSim(
       const ideal = 0.52;
       const dist = Math.abs(s.quenchFill - ideal);
       s.quenchScore = clamp(100 * (1 - dist / 0.38), 12, 100);
+      const isOilQuench = s.equippedGear?.quench === "quench_oil";
 
       if (s.quenchFill < 0.22) {
         s.quenchScore = Math.min(s.quenchScore, 40);
-        s.lastMessage = "Têmpera incompleta. O aço permaneceu brando.";
+        s.lastMessage = isOilQuench
+          ? "Têmpera branda em óleo. Estrutura parcialmente martensítica."
+          : "Têmpera incompleta. O aço permaneceu brando.";
       } else if (s.quenchFill > 0.78) {
-        s.warp = clamp(s.warp + 0.18, 0, 1);
-        s.integrity = clamp(s.integrity - 15, 0, 100);
-        s.lastMessage = "Choque térmico violento! O gume curvou pelo excesso de tempo.";
+        const warpPenalty = isOilQuench ? 0.07 : 0.18;
+        const integrityPenalty = isOilQuench ? 6 : 15;
+        s.warp = clamp(s.warp + warpPenalty, 0, 1);
+        s.integrity = clamp(s.integrity - integrityPenalty, 0, 100);
+        s.lastMessage = isOilQuench
+          ? "Têmpera longa em óleo — leve empenamento evitado por resfriamento brando."
+          : "Choque térmico violento! O gume curvou pelo excesso de tempo na água.";
       } else {
-        s.lastMessage = "Têmpera perfeita! Martensita consolidada e fio cristalizado.";
+        s.lastMessage = isOilQuench
+          ? "Têmpera magistral em óleo vegetal! Martensita refinada e tenacidade suprema."
+          : "Têmpera perfeita! Martensita consolidada e fio cristalizado.";
       }
 
       recomputeQuality(s, design);
@@ -234,6 +272,8 @@ export function stepSim(
       event.trauma = 0.25;
       event.message = s.lastMessage;
       return event;
+    } else {
+      s.quenchSteam = Math.max(0, s.quenchSteam - dt * 0.35);
     }
   }
 
@@ -269,6 +309,25 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
   const hammerStressMult = s.activeHammer === "sledge" ? 1.6 : s.activeHammer === "precision" ? 0.65 : 1.0;
   shapeGain *= hammerShapeMult;
 
+  // Multi-segment PhysicalBladeProfile dynamic deformation
+  s.physicalProfile.hammerMarksCount += 1;
+  const zone = s.targetZone;
+  let zoneMult = kind === "perfect" ? 1.25 : kind === "good" ? 1.0 : kind === "hard" ? 0.75 : 0.4;
+  if (isCold) zoneMult *= 0.35;
+
+  if (zone === "base") {
+    s.physicalProfile.baseWidth = clamp(s.physicalProfile.baseWidth + 0.16 * zoneMult * hammerShapeMult, 0, 1);
+    s.physicalProfile.bevelSharpness = clamp(s.physicalProfile.bevelSharpness + 0.07 * zoneMult, 0, 1);
+  } else if (zone === "mid") {
+    s.physicalProfile.midWidth = clamp(s.physicalProfile.midWidth + 0.17 * zoneMult * hammerShapeMult, 0, 1);
+    s.physicalProfile.fullerDepth = clamp(s.physicalProfile.fullerDepth + 0.18 * zoneMult, 0, 1);
+    s.physicalProfile.bevelSharpness = clamp(s.physicalProfile.bevelSharpness + 0.12 * zoneMult, 0, 1);
+  } else if (zone === "tip") {
+    s.physicalProfile.tipWidth = clamp(s.physicalProfile.tipWidth + 0.18 * zoneMult * hammerShapeMult, 0, 1);
+    s.physicalProfile.distalTaper = clamp(s.physicalProfile.distalTaper + 0.19 * zoneMult, 0, 1);
+    s.physicalProfile.bevelSharpness = clamp(s.physicalProfile.bevelSharpness + 0.16 * zoneMult, 0, 1);
+  }
+
   s.history.push({
     strike: s.strikes + 1,
     kind,
@@ -295,6 +354,9 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
     // Normal / Ideal heat
     if (kind === "perfect") {
       s.warp = Math.max(0, s.warp - 0.025);
+      if (s.equippedGear?.anvil === "anvil_master") {
+        s.warp = Math.max(0, s.warp - 0.015);
+      }
       if (s.targetZone === "base") {
         s.integrity = Math.min(100, s.integrity + 3);
         s.lastMessage = "Base consolidada! O ricasso ganha tenacidade excepcional.";
@@ -374,6 +436,14 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     attrs.perks.push("Massa de Guerra: Forja pesada com marreta de impacto");
     attrs.damage += 15;
   }
+  if (s.equippedGear?.anvil === "anvil_master") {
+    attrs.perks.push("Bigorna Magistral: Rebote perfeito sem deflexão interna");
+    attrs.defense += 8;
+  }
+  if (s.equippedGear?.quench === "quench_oil") {
+    attrs.perks.push("Banho em Óleo: Matriz cristalina homogênea sem microtrincas");
+    attrs.durability = Math.min(100, attrs.durability + 10);
+  }
 
   return {
     id: `${Date.now()}`,
@@ -390,10 +460,12 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     defense: attrs.defense,
     agility: attrs.agility,
     durability: attrs.durability,
+    upgradesApplied: 0,
     flaws: attrs.flaws,
     perks: attrs.perks,
     structuralState: s.structuralState,
     cracks: s.cracks,
+    physicalProfile: { ...s.physicalProfile },
     history: s.history,
   };
 }

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { drawFinishedSword } from "../swordDraw";
-import type { FinishedSword } from "../types";
+import type { FinishedSword, PlayerWallet } from "../types";
 import { PROFILES, STEELS, WRAPS, GUARDS, POMMELS } from "../catalog";
+import { defaultWallet } from "../save";
 
 interface Props {
   sword: FinishedSword;
@@ -10,11 +11,22 @@ interface Props {
   onAgain: () => void;
   onGallery: () => void;
   onTitle: () => void;
+  wallet?: PlayerWallet;
+  onUpgrade?: (sword: FinishedSword) => boolean;
 }
 
-export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitle }: Props) {
+export function RevealScreen({
+  sword,
+  onClaimRewards,
+  onAgain,
+  onGallery,
+  onTitle,
+  wallet = defaultWallet,
+  onUpgrade,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lightOffset, setLightOffset] = useState(0.5);
+  const [upgradeFeedback, setUpgradeFeedback] = useState<string | null>(null);
 
   const isBroken = sword.structuralState === "broken" || sword.quality <= 15;
   const profile = PROFILES[sword.design.profile];
@@ -22,6 +34,11 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
   const wrap = WRAPS[sword.design.wrap];
   const guard = GUARDS[sword.design.guard];
   const pommel = POMMELS[sword.design.pommel];
+
+  const upgrades = sword.upgradesApplied || 0;
+  const goldCost = 50 * (upgrades + 1);
+  const rubyCost = upgrades >= 1 ? 1 : 0;
+  const canAffordUpgrade = wallet.gold >= goldCost && wallet.rubies >= rubyCost;
 
   const damage = sword.damage ?? Math.round(180 + sword.quality * 1.5);
   const defense = sword.defense ?? Math.round(90 + sword.quality * 0.8);
@@ -42,23 +59,29 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // Deep royal blue-purple velvet backdrop gradient
-    const vg = ctx.createRadialGradient(w / 2, h * 0.5, 40, w / 2, h * 0.5, Math.max(w, h) * 0.65);
-    vg.addColorStop(0, "#161b2e");
-    vg.addColorStop(0.5, "#0d1120");
-    vg.addColorStop(1, "#060810");
+    // Deep royal blue-purple midnight velvet backdrop gradient
+    const vg = ctx.createRadialGradient(w / 2, h * 0.5, 30, w / 2, h * 0.5, Math.max(w, h) * 0.7);
+    vg.addColorStop(0, "#181a30");
+    vg.addColorStop(0.45, "#0e1122");
+    vg.addColorStop(1, "#05060e");
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
 
-    // Warm candle / lantern ambient reflection
-    const cg = ctx.createRadialGradient(w * 0.2, h * 0.15, 10, w * 0.2, h * 0.15, 200);
-    cg.addColorStop(0, "rgba(255, 170, 70, 0.12)");
+    // Subtle velvet fabric weave texture
+    ctx.fillStyle = "rgba(255, 255, 255, 0.015)";
+    for (let x = 0; x < w; x += 4) {
+      ctx.fillRect(x, 0, 1.5, h);
+    }
+
+    // Warm candle / lantern ambient reflection on velvet
+    const cg = ctx.createRadialGradient(w * 0.22, h * 0.16, 15, w * 0.22, h * 0.16, 240);
+    cg.addColorStop(0, "rgba(255, 175, 75, 0.14)");
     cg.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = cg;
     ctx.fillRect(0, 0, w, h);
 
-    // Draw the sword vertically on velvet (as in Reference Image 2!)
-    const swordLen = Math.min(w * 0.85, h * 0.86);
+    // Draw the sword vertically on velvet (as in Reference Image 3)
+    const swordLen = Math.min(w * 0.86, h * 0.86);
     drawFinishedSword(ctx, sword.design, w / 2, h * 0.88, swordLen, {
       angle: -Math.PI / 2, // Vertical presentation
       assembled: !isBroken,
@@ -78,76 +101,110 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
     setLightOffset(Math.max(0.1, Math.min(0.9, relY)));
   };
 
-  return (
-    <div className="flex min-h-dvh flex-col bg-[#080b12] text-fg px-4 pb-12 pt-[max(1rem,env(safe-area-inset-top))]">
-      {/* Top Inspection Header Bar (matching Reference Image 2) */}
-      <header className="mx-auto flex w-full max-w-4xl flex-col items-center border-b border-[#243048] pb-4 text-center">
-        <div className="flex items-center gap-2">
-          <span className="font-display text-xs uppercase tracking-[0.24em] text-cyan-400">
-            {isBroken ? "RELATÓRIO DE FALHA" : `INSPEÇÃO: ${sword.grade.toUpperCase()}`}
-          </span>
-        </div>
-        <h1 className="mt-1 font-display text-2xl font-bold tracking-wider text-amber-100 sm:text-3xl">
-          {sword.design.name ? sword.design.name.toUpperCase() : "LÂMINA SEM NOME"}
-        </h1>
+  const handleUpgradeClick = () => {
+    if (!onUpgrade || !canAffordUpgrade) return;
+    const success = onUpgrade(sword);
+    if (success) {
+      setUpgradeFeedback("Aço aprimorado na têmpera secundária! +16 ATK / +4 Durabilidade");
+      window.setTimeout(() => setUpgradeFeedback(null), 3000);
+    }
+  };
 
-        {/* Stats Subheader: Damage | Durability | Rarity */}
-        {!isBroken ? (
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs font-display tracking-widest sm:gap-8">
-            <div>
-              <span className="text-muted">DAMAGE: </span>
-              <span className="text-amber-300 font-bold text-sm tabular-nums">{damage}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-muted">DURABILITY: </span>
-              <span className="text-cyan-300 font-bold text-sm tabular-nums">{durability}/100</span>
-              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full bg-cyan-400 shadow-[0_0_8px_#00f2fe]"
-                  style={{ width: `${durability}%` }}
-                />
-              </div>
-            </div>
-            <div>
-              <span className="text-muted">RARITY: </span>
-              <span
-                className={
-                  rarity === "Lendária"
-                    ? "text-amber-400 font-bold"
-                    : rarity === "Épica"
-                      ? "text-purple-400 font-bold"
-                      : rarity === "Rara"
-                        ? "text-blue-400 font-bold"
-                        : "text-slate-300 font-bold"
-                }
-              >
-                {rarity.toUpperCase()}
-              </span>
+  return (
+    <div className="flex min-h-dvh flex-col bg-[#070912] text-fg px-4 pb-12 pt-[max(1rem,env(safe-area-inset-top))]">
+      {/* Top Inspection & Resource Header Bar (Reference Image 3) */}
+      <header className="mx-auto flex w-full max-w-4xl flex-col items-center justify-between gap-3 border-b border-[#202c44] pb-4 sm:flex-row">
+        <div className="text-center sm:text-left">
+          <div className="flex items-center justify-center gap-2 sm:justify-start">
+            <span className="font-display text-xs uppercase tracking-[0.24em] text-cyan-400">
+              {isBroken ? "RELATÓRIO DE FALHA ESTRUTURAL" : `INSPEÇÃO: ${sword.grade.toUpperCase()}`}
+            </span>
+            <span className="rounded bg-[#162136] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-amber-300">
+              {rarity}
+            </span>
+          </div>
+          <h1 className="mt-1 font-display text-2xl font-bold tracking-wider text-amber-100 sm:text-3xl">
+            {sword.design.name ? sword.design.name.toUpperCase() : "AETHELGARD'S BANE (MASTERWORK)"}
+          </h1>
+        </div>
+
+        {/* Player Wallet Display in Header (Gold | Rubies | Diamonds) */}
+        <div className="flex items-center gap-4 rounded-xl border border-amber-900/50 bg-[#0c1220] px-4 py-2 font-display text-xs shadow-md">
+          <div className="flex items-center gap-1.5">
+            <span className="text-amber-400 text-sm">🪙</span>
+            <span className="font-bold text-amber-200 tabular-nums">{wallet.gold.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-red-400 text-sm">💎</span>
+            <span className="font-bold text-red-200 tabular-nums">{wallet.rubies}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-cyan-400 text-sm">🔷</span>
+            <span className="font-bold text-cyan-200 tabular-nums">{wallet.diamonds}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Subheader: Damage | Durability Bar | Rarity (Reference Image 3) */}
+      {!isBroken && (
+        <div className="mx-auto mt-3 flex w-full max-w-4xl flex-wrap items-center justify-center gap-4 text-xs font-display tracking-widest sm:justify-start sm:gap-8 border-b border-[#1b253b] pb-3">
+          <div>
+            <span className="text-muted">DAMAGE: </span>
+            <span className="text-amber-300 font-bold text-sm tabular-nums">{damage}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted">DURABILITY: </span>
+            <span className="text-cyan-300 font-bold text-sm tabular-nums">{durability}/100</span>
+            <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-900 border border-slate-700">
+              <div
+                className="h-full bg-cyan-400 shadow-[0_0_10px_#00f2fe]"
+                style={{ width: `${durability}%` }}
+              />
             </div>
           </div>
-        ) : (
-          <p className="mt-2 text-sm text-red-400">
-            A peça sofreu colapso estrutural durante o forjamento.
-          </p>
-        )}
-      </header>
+          <div>
+            <span className="text-muted">REFINE: </span>
+            <span className="text-amber-400 font-bold text-sm tabular-nums">+{upgrades}</span>
+          </div>
+        </div>
+      )}
 
       {/* Main Inspection Stage */}
       <div className="mx-auto mt-4 grid w-full max-w-4xl grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Left Specification Column (matching Reference Image 2) */}
+        {/* Left Column: Round Node Badges for Components (Reference Image 3) */}
         {!isBroken && (
           <aside className="order-2 flex flex-col gap-3 lg:order-1 lg:col-span-3">
-            <h2 className="font-display text-xs uppercase tracking-[0.2em] text-muted">Componentes</h2>
-            <SpecCard icon="⚔️" title="TIPO DE LÂMINA" value={profile.name} desc={profile.blurb} />
-            <SpecCard icon="✨" title="AÇO & MATERIAIS" value={steel.name} desc={steel.blurb} />
-            <SpecCard icon="ᚱ" title="RUNAS & ENTALHES" value={sword.design.runes ? "Runas Ciano/Ouro" : "Sem Runas"} desc={sword.design.inscription || "Liso"} />
-            <SpecCard icon="🛡️" title="GUARDA & POMO" value={`${guard.name} / ${pommel.name}`} desc={`Cabo: ${wrap.name}`} />
+            <h2 className="font-display text-xs uppercase tracking-[0.2em] text-muted">Especificações</h2>
+            <NodeBadge
+              icon="⚔️"
+              title="TIPO DE LÂMINA"
+              value={profile.name}
+              desc={profile.blurb}
+            />
+            <NodeBadge
+              icon="✨"
+              title="AÇO & MATERIAIS"
+              value={steel.name}
+              desc={steel.blurb}
+            />
+            <NodeBadge
+              icon="ᚱ"
+              title="RUNAS & ENTALHES"
+              value={sword.design.runes ? "Runas Ciano Incandescentes" : "Sem Runas"}
+              desc={sword.design.inscription || "Gume Liso"}
+            />
+            <NodeBadge
+              icon="🛡️"
+              title="GUARDA & POMO"
+              value={`${guard.name} / ${pommel.name}`}
+              desc={`Empunhadura: ${wrap.name}`}
+            />
           </aside>
         )}
 
-        {/* Center: Velvet Inspection Canvas with Interactive Lighting */}
+        {/* Center: Velvet Inspection Canvas with Interactive Lighting (Reference Image 3) */}
         <div
-          className={`order-1 overflow-hidden rounded-xl border border-[#23314d] bg-[#0c101c] shadow-[0_16px_50px_rgba(0,0,0,0.85)] ${
+          className={`order-1 overflow-hidden rounded-xl border border-[#23314d] bg-[#0a0d18] shadow-[0_16px_50px_rgba(0,0,0,0.85)] ${
             isBroken ? "lg:col-span-12" : "lg:order-2 lg:col-span-6"
           }`}
         >
@@ -155,31 +212,59 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
             <canvas
               ref={canvasRef}
               onPointerMove={handlePointerMove}
-              className="h-96 w-full cursor-crosshair sm:h-[460px]"
+              className="h-96 w-full cursor-crosshair sm:h-[480px]"
             />
             <div className="pointer-events-none absolute bottom-2 left-3 text-[0.65rem] uppercase tracking-widest text-slate-500">
-              Passe o cursor sobre a lâmina para inspecionar o gume
+              Passe o cursor sobre a lâmina para mover a iluminação sobre o veludo
             </div>
           </div>
         </div>
 
-        {/* Right Attributes and Perks Column (matching Reference Image 2) */}
+        {/* Right Column: Base Stats, Perks, and Interactive UPGRADE System (Reference Image 3) */}
         {!isBroken ? (
           <aside className="order-3 flex flex-col gap-3 lg:col-span-3">
-            <h2 className="font-display text-xs uppercase tracking-[0.2em] text-muted">Propriedades Físicas</h2>
+            <h2 className="font-display text-xs uppercase tracking-[0.2em] text-muted">Atributos de Combate</h2>
             <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#223049] bg-[#0f1523] p-3 text-center">
               <div>
                 <span className="block font-display text-[0.6rem] text-muted">ATK</span>
-                <span className="font-display text-base font-bold text-amber-300">{damage}</span>
+                <span className="font-display text-base font-bold text-amber-300 tabular-nums">{damage}</span>
               </div>
               <div>
                 <span className="block font-display text-[0.6rem] text-muted">DEF</span>
-                <span className="font-display text-base font-bold text-blue-300">{defense}</span>
+                <span className="font-display text-base font-bold text-blue-300 tabular-nums">{defense}</span>
               </div>
               <div>
                 <span className="block font-display text-[0.6rem] text-muted">AGI</span>
-                <span className="font-display text-base font-bold text-emerald-300">{agility}</span>
+                <span className="font-display text-base font-bold text-emerald-300 tabular-nums">{agility}</span>
               </div>
+            </div>
+
+            {/* INTERACTIVE UPGRADE PANEL (Reference Image 3) */}
+            <div className="rounded-lg border border-amber-600/50 bg-[#121626] p-3 shadow-lg">
+              <div className="flex items-center justify-between">
+                <span className="font-display text-xs font-bold uppercase tracking-wider text-amber-300">
+                  Aprimoramento (+{upgrades})
+                </span>
+                <span className="rounded bg-black/40 px-2 py-0.5 text-[0.65rem] font-bold text-amber-200">
+                  {goldCost.toLocaleString()} 🪙 {rubyCost > 0 ? `+ ${rubyCost} 💎` : ""}
+                </span>
+              </div>
+              <p className="mt-1 text-[0.7rem] text-slate-300">
+                Forja de refino: adiciona <span className="text-amber-300 font-semibold">+16 ATK</span> e <span className="text-cyan-300 font-semibold">+4 Durabilidade</span>.
+              </p>
+              {upgradeFeedback && (
+                <p className="mt-1.5 text-[0.68rem] text-emerald-400 font-semibold animate-pulse">
+                  ✓ {upgradeFeedback}
+                </p>
+              )}
+              <Button
+                size="sm"
+                disabled={!canAffordUpgrade}
+                onClick={handleUpgradeClick}
+                className="mt-2.5 w-full bg-linear-to-r from-amber-600 via-amber-500 to-amber-600 font-bold text-xs text-stone-950 shadow-[0_0_15px_rgba(217,119,6,0.4)] hover:brightness-110 disabled:opacity-50"
+              >
+                ⚒️ APRIMORAR LÂMINA
+              </Button>
             </div>
 
             {/* Perks Section */}
@@ -199,7 +284,7 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
               </div>
             )}
 
-            {/* Flaws Section (if any defects occurred) */}
+            {/* Flaws Section */}
             {sword.flaws && sword.flaws.length > 0 && (
               <div className="rounded-lg border border-red-900/60 bg-red-950/40 p-3">
                 <h3 className="font-display text-[0.65rem] uppercase tracking-wider text-red-400">
@@ -271,15 +356,17 @@ export function RevealScreen({ sword, onClaimRewards, onAgain, onGallery, onTitl
   );
 }
 
-function SpecCard({ icon, title, value, desc }: { icon: string; title: string; value: string; desc: string }) {
+function NodeBadge({ icon, title, value, desc }: { icon: string; title: string; value: string; desc: string }) {
   return (
-    <div className="rounded-lg border border-[#202c44] bg-[#0f1422] p-2.5 shadow-xs">
-      <div className="flex items-center gap-2">
-        <span className="text-base">{icon}</span>
-        <span className="font-display text-[0.62rem] uppercase tracking-wider text-muted">{title}</span>
+    <div className="flex items-start gap-3 rounded-xl border border-[#202c44] bg-[#0c1220] p-3 shadow-md transition-all hover:border-cyan-500/50">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-950/50 text-xl shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+        {icon}
       </div>
-      <p className="mt-1 font-display text-xs font-semibold text-fg">{value}</p>
-      <p className="mt-0.5 text-[0.68rem] text-slate-400">{desc}</p>
+      <div className="min-w-0 flex-1">
+        <span className="font-display text-[0.62rem] uppercase tracking-wider text-muted">{title}</span>
+        <p className="truncate font-display text-xs font-bold text-fg">{value}</p>
+        <p className="mt-0.5 line-clamp-2 text-[0.68rem] text-slate-400">{desc}</p>
+      </div>
     </div>
   );
 }
