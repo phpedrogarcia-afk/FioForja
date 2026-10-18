@@ -1,69 +1,70 @@
 # Estado Atual do Projeto — FioForja
 
 **Data da Atualização:** 18 de Outubro de 2026  
-**Branch de Trabalho:** `antigravity/forge-of-prestige-v1`  
-**Base Canônica de Continuidade:** `antigravity/arsenal-vivo-integrity` (`cd59d6bddc6c729d95fae80cd1430bc6d2047295`)  
-**Missão Concluída:** Operação 02: A Forja do Prestígio (Pilar 1 a Pilar 6)  
-**Registro Histórico Antigo:** Arquivado em [`docs/historical/PROJECT-STATE-M00-R1.md`](historical/PROJECT-STATE-M00-R1.md)
+**Branch de Trabalho:** `antigravity/blacksmith-progression-v1`  
+**Base Canônica de Continuidade:** `antigravity/forge-of-prestige-v1` (`6674640aac8ff474db8e21cce357b24936b66713`)  
+**Missão Concluída:** Operação 03: O Ciclo do Ferreiro — Progressão Real, Crafting Integrado, Economia Significativa e Experiência Jogável  
+**Registros Históricos:** Arquivados em [`docs/historical/`](historical/)
 
 ---
 
 ## 1. FATOS COMPROVADOS (KNOWN & VERIFIED)
 
-### A. Consolidação Transacional Fail-Closed (`src/game/transactions.ts`)
-- **Arquitetura Pura de Mutação de Estado:** Todas as operações que alteram o progresso do jogador (fusão de espadas, fusão de componentes, instalação/troca de peças, compra de ferramentas ou insumos no bazar, refino de bancada, reivindicação de drops de forja, conclusão de forja com núcleo ativo e moedas por golpe) foram encapsuladas em executores puros em `src/game/transactions.ts`.
-- **Garantia Fail-Closed:** Se a persistência em disco/localStorage falhar (como em `QuotaExceededError` ou erro de I/O), a mutação em memória é imediatamente abortada, o estado anterior é preservado integralmente, nenhuma espada ou moeda é consumida, e o usuário recebe alerta visual contextual via banner `errorToast`.
-- **Verificação por Testes Unitários de Falha Simulada:** Em `src/game/prestige-transactions.test.ts`, simulações com injeção de erro em `mockStorage.setItem` comprovam que fusão lendária, compra no bazar, montagem de peças e recolha de recompensas falham fechadas sem corromper save nem perder itens.
+### A. Gating Real de Insumos e Consumo Atômico de Metais (`src/game/materials.ts` & `src/game/transactions.ts`)
+- **Unificação Metalúrgica Canônica:** Chaves primárias consolidadas para os 7 aços do jogo (`iron_ingot`, `steel_ingot`, `damascus_billet`, `blacksteel_chunk`, `elven_silver_ingot`, `starmetal_ore`, `ancient_relic_shard`), com resolução transparente de aliases legados (`iron`, `damascus`, `blacksteel`).
+- **Transação de Início de Forja (`executeStartForgeTransaction`):** Toda forja regular verifica o estoque de insumos e debita atomicamente 1x metal correspondente. Se o jogador tiver 0 unidades, a forja é bloqueada (`INSUFFICIENT_MATERIALS`).
+- **Garantia de Estorno no Cancelamento (`executeCancelForgeTransaction`):** Cancelar ou sair antes do primeiro golpe devolve 100% do insumo consumido de volta ao inventário do ferreiro.
 
-### B. 5 Armas de Referência com Identidade Real no Catálogo (`src/game/catalog.ts`)
-- **Guarda da Fronteira (`guarda_medieval`):** Espada medieval de sentinela em ferro comum, perfil reto clássico, guarda em cruz, pomo em disco, empunhadura em couro cru, papel tático `Equilibrada`.
-- **Cimitarra de Damasco (`cimitarra_damasco`):** Lâmina curva de alfange (falchion) em tarugo dobrado de Damasco, padrão moiré ondulado, guarda curva de latão com cabochão de granada carmesim, empunhadura trançada, papel tático `Ofensiva` (P.ATK elevado).
-- **Lua Silenciosa (`lua_silenciosa`):** Katana oriental em bloco de aço negro forjado, curvatura elegante, tsuba cinzelada, empunhadura em tsukamaki carmesim com pele de arraia, kashira em crescente, papel tático `Ágil` (AGI extrema).
-- **Folha de Aereth (`folha_aereth`):** Lâmina foliar em prata élfica sagrada, quilhões em folha entrelaçada, pomo em cristal gota lapidado, empunhadura em madeira élfica com runas entalhadas no sangradouro, papel tático `Excepcional`.
-- **Queda de Asterion (`queda_asterion`):** Sabre lendário em meteorito celestial azul-escuro com poeira estelar, guarda de asas heráldicas, empunhadura em fio dourado espiralado, inscrições Futhark com ressonância estelar restrita, papel tático `Excepcional` (P.ATK > 310).
+### B. Proteção Anti-Softlock, Reciclagem de Sucata e Modo de Treino
+- **Estoque Inicial de Resguardo:** Novos jogadores e saves legados migrados recebem estoque inicial digno (8x lingote de ferro, 4x lingote de aço e 850 moedas de ouro).
+- **Recuperação de Falhas (Sucata):** Se uma lâmina quebrar por abuso térmico ou estresse físico, o ferreiro recolhe +2x sucata (`scrap`).
+- **Refundição de Sucata (`executeRecycleScrapTransaction`):** Ferramenta na bancada da Oficina permite transformar 2x sucata em 1x lingote de ferro utilizável.
+- **Treino Básico de Oficina (`isTraining: true`):** A qualquer momento — e especialmente se estiver sem metais e sem ouro — o artesão pode executar forja livre de treino. O modo é visualmente sinalizado com marca d'água na bigorna e isolado economicamente (valor de venda = 0, ouro de golpes = 0, drops de forja = 0), impedindo exploração.
 
-### C. Especialização e Funções de Combate (`CombatRole`)
-- Modelagem formal de arquétipos de combate:
-  - `Ofensiva`: Multiplicador de ATK (1.22x), durabilidade reforçada (+4), agilidade contida (0.85x) — talhadores e montantes pesados.
-  - `Defensiva`: Multiplicador de DEF (1.22x), durabilidade máxima (+8), ATK contido (0.98x) — espadas de guarda e parada.
-  - `Ágil`: Multiplicador de AGI (1.28x), ATK equilibrado (1.00x), DEF leve (0.88x) — katanas, espadas curtas e sabres.
-  - `Equilibrada`: 1.00x em todas as métricas — clássico europeu.
-  - `Excepcional`: Multiplicadores balanceados superiores (1.16x ATK, 1.12x DEF, 1.14x AGI, +6 DUR) para ligas celestiais e ancestrais.
+### C. Estados Explícitos de Blueprints no Compêndio (`src/game/blueprints.ts`)
+- Os projetos canônicos são classificados dinamicamente em 6 estados estritos:
+  - `locked`: Requisitos de carreira não atingidos (exibe texto claro de como desbloquear).
+  - `known`: Conhecido na literatura da forja, mas requer descoberta ativa.
+  - `discovered`: Projeto desbloqueado por conquista ou compra de receita, aguardando metal no estoque.
+  - `ready`: Desbloqueado e com estoque de metal disponível para forja imediata.
+  - `crafted`: Já forjado com sucesso ao menos uma vez e presente no Arsenal.
+  - `mastered`: Dominado com perfeição (Rank S, qualidade ≥ 95%).
+- **Proteção de Armas Lendárias:** A simples posse de metal meteórico **NÃO** autoriza forjar a Queda de Asterion ou Cinzas Ancestrais. É obrigatório atingir marcos de carreira (ex.: 2 Obras-primas Rank S) ou portar um Núcleo de Fusão compatível.
 
-### D. Comparador Tático de Lâminas (`WeaponComparisonModal` em `src/game/screens/GalleryScreen.tsx`)
-- Modo de seleção comparativa na Galeria com dock inferior interativo e tags de slot A / slot B.
-- Modal dedicado em tela cheia com visualização lado a lado das duas lâminas em alta definição.
-- Tabela comparativa analítica com cálculo automático de vantagens (deltas coloridos `+X (A)` em esmeralda e `+Y (B)` em ciano) para P.ATK, DEF, AGI, DUR e Qualidade metalúrgica.
-- Resumo visual de componentes acoplados (guarda, pomo, empunhadura e runas instaladas).
+### D. Encomendas da Guilda dos Ferreiros (`src/game/commissions.ts`)
+- Oitavo pilar integrado na Galeria (`currentTab === "commissions"`):
+  - **Capitão Valerius (Sentinela da Muralha Norte):** Exige lâmina de ferro com papel Defensivo e qualidade ≥ 60%. Paga 350 ouro, 5 rubis e 2x lingotes de aço nobre.
+  - **Comandante Kael (Falcões Cinzentos):** Exige lâmina ágil (AGI ≥ 22) com qualidade ≥ 75%. Paga 600 ouro, 10 rubis e 1x tarugo de Damasco.
+  - **Lord Alistair (Alta Nobreza):** Exige lâmina de duelo ofensiva (ATK ≥ 32) com qualidade ≥ 88%. Paga 1.200 ouro, 20 rubis e 1x minério de meteorito.
+- A entrega (`executeDeliverCommissionTransaction`) valida os requisitos matematicamente, impede entregas duplicadas e grava indelévelmente a encomenda na arma (`commissionDelivered`).
 
-### E. Mercado & Bazar Medieval Expandido (`BAZAAR_ARTICLES`)
-- Sub-navegação temática na Oficina com 5 categorias ativas:
-  - `Ferramentas da Forja`: Martelos, bigornas, fornalhas e bacias de têmpera equipáveis.
-  - `Lingotes & Metais`: Lingotes de ferro, barras de aço nobre, tarugos de Damasco, blocos de aço negro, prata élfica, meteorito e ligas ancestrais.
-  - `Guarnições & Peças`: Guardas clássicas, curvas, tsubas cinzeladas, asas celestes, pomos de disco, crescentes, gemas élficas e empunhaduras trançadas.
-  - `Runas Futhark`: Pedras rúnicas autênticas (Fehu, Uruz, Thurisaz, Sowilo, Tiwaz) com insumos para incrustação física na bancada.
-  - `Crisol & Catalisadores`: Catalisadores astrais para estabilização de saltos míticos de fusão.
+### E. Resiliência de Persistência Fail-Closed (`retryPersistSave` em `GameApp.tsx`)
+- Caso a persistência em disco falhe durante o término da forja (`QuotaExceededError`), a arma forjada não é descartada nem empurrada para a tela de revelação em estado desincronizado.
+- O payload é preservado em `uncommittedSave`, e um modal contextual surge oferecendo a ação `[🔄 Tentar Gravar Novamente]`. A gravação reexecuta sem sortear novos atributos nem regenerar sementes de RNG.
 
-### F. Áudio & Satisfação Sensorial (`src/game/audio.ts`)
-- Jingle de moedas enriquecido com micro-jitter harmônico (+/- 2.5% de pitch aleatório) e pares acústicos alternados, eliminando repetição mecânica.
-- Assinaturas de fanfare distintas para conclusão de forja e comemoração de drops Épicos/Lendários.
+### F. Simulação Econômica Multi-Perfil (`scripts/simulate-economy-progression.mjs`)
+- Simulação Monte Carlo validada em 60 partidas por perfil:
+  - **Iniciante:** 49 armas concluídas, 11 quebras (22% de taxa de falha), 52 treinos livres, 2 encomendas da muralha entregues, ouro final de 2.650 🪙. Zero softlocks.
+  - **Intermediário:** 56 armas concluídas, 4 quebras, 3 Obras-primas Rank S, compra ativa de 10x lingotes de Damasco no Bazar, 1ª arma Épica na rodada #4 e 1ª Lendária na #7.
+  - **Experiente:** 60 armas concluídas, 0 quebras, 26 Obras-primas Rank S (43% de taxa de maestria), compra de 6x lingotes de aço negro, 1ª Lendária na rodada #6.
 
 ### G. Métricas Técnicas e Verificação
 - **TypeScript:** 0 erros (`npm run typecheck` código 0).
-- **Testes Automatizados:** 100% aprovados (102/102 testes em 25 suites, 0 falhas).
-- **Build de Produção:** Concluído com sucesso em 386ms (`npm run build`).
-- **Evidências Visuais Capturadas:**
-  - [`prestige-01-canonical-5-weapons-gallery.png`](../public/game/evidence/prestige-01-canonical-5-weapons-gallery.png): Galeria exibindo as 5 armas de referência com suas geometrias únicas, distintivos de raridade e botões de inspeção/comparação.
-  - [`prestige-02-velvet-inspection-damascus.png`](../public/game/evidence/prestige-02-velvet-inspection-damascus.png): Mesa de inspeção em veludo da Cimitarra de Damasco, destacando as ondas moiré naturais, cabochão de granada e empunhadura trançada sem neon.
-  - [`prestige-03-velvet-inspection-asterion.png`](../public/game/evidence/prestige-03-velvet-inspection-asterion.png): Mesa de inspeção em veludo da Queda de Asterion, com aço meteórico pontilhado de estrelas, asas douradas e runas Futhark com ressonância estelar contida.
-  - [`prestige-04-weapon-comparison-modal.png`](../public/game/evidence/prestige-04-weapon-comparison-modal.png): Comparador Tático de Lâminas comparando Cimitarra de Damasco (Ofensiva) vs Lua Silenciosa (Ágil), com deltas matemáticos de ATK (+56 A), DEF (+34 A), AGI (+86 B) e DUR (+4 A).
-  - [`prestige-05-medieval-bazaar-expanded.png`](../public/game/evidence/prestige-05-medieval-bazaar-expanded.png): Bazar medieval expandido exibindo categoria de guarnições, guardas e pomos para compra com ouro e rubis.
-  - [`prestige-06-bazaar-runes-futhark.png`](../public/game/evidence/prestige-06-bazaar-runes-futhark.png): Aba de Runas Futhark no bazar exibindo pedras rúnicas desde Fehu até Tiwaz.
+- **Testes Automatizados:** 117 testes em 26 suites, 0 falhas (`npm test`), incluindo 15 testes adversariais específicos da Operação 03 (`src/game/progression.test.ts`).
+- **Linter:** 0 erros (`npm run lint` código 0).
+- **Build de Produção:** Concluído com sucesso em 410ms (`npm run build`).
+- **Evidências Visuais Capturadas via Playwright:**
+  - `progression-01-design-screen-gating.png`: Tela de Design com selos de estado do Compêndio, indicadores de estoque de metal e botão de treino.
+  - `progression-02-gallery-commissions-tab.png`: 8º Pilar da Galeria com a lista de patronos da guilda e requisitos.
+  - `progression-03-commission-delivered.png`: Encomenda do Capitão Valerius entregue com sucesso, payout de ouro/rubis/aço creditado e arma etiquetada.
+  - `progression-04-workshop-scrap-recycle.png`: Ferramenta de reciclagem de sucata em ferro comum e garantias anti-softlock.
+  - `progression-05-practice-forge-live.png`: Sessão de forja ativa em modo de treino de oficina.
 
 ---
 
 ## 2. INVARIANTES ATIVOS
 1. **The Weapon is the Hero. The Player Forges the Trophy.**
 2. **Fail-Closed Persistence:** Nenhuma alteração de estado avança na UI sem confirmação de persistência em disco.
-3. **Bíblia Estética Respeitada:** Entalhe físico chanfrado, materiais táteis, zero neon cyan em peças sem runas ativas.
-4. **Isolamento de Branches:** Todo o trabalho desta missão foi realizado na branch `antigravity/forge-of-prestige-v1`. A branch `main` nunca é modificada diretamente.
+3. **Materials Matter:** Metais são necessários para forjas regulares; o estoque é debitado atomicamente.
+4. **Anti-Softlock:** O jogador iniciante ou falido nunca fica impossibilitado de forjar.
+5. **Isolamento de Branches:** Todo o trabalho foi realizado na branch `antigravity/blacksmith-progression-v1`. A branch `main` nunca é modificada diretamente.

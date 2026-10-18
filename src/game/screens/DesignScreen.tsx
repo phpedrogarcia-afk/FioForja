@@ -3,16 +3,47 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CANONICAL_PRESETS, FAMILIES, GUARDS, POMMELS, PROFILES, STEELS, WRAPS } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
-import type { FamilyId, GuardId, PommelId, ProfileId, SteelId, SwordDesign, WrapId } from "../types";
+import type {
+  CareerStats,
+  FamilyId,
+  FinishedSword,
+  FusionCore,
+  GuardId,
+  PlayerInventory,
+  PlayerWallet,
+  PommelId,
+  ProfileId,
+  SteelId,
+  SwordDesign,
+  WrapId,
+} from "../types";
+import { getMaterialStock, getRequiredMaterialForSteel } from "../materials";
+import { evaluateBlueprintStatus } from "../blueprints";
+import { defaultCareer, defaultInventory, defaultWallet } from "../save";
 
 interface Props {
   design: SwordDesign;
   onChange: (next: SwordDesign) => void;
   onBack: () => void;
-  onForge: () => void;
+  onForge: (isTraining?: boolean) => void;
+  inventory?: PlayerInventory;
+  wallet?: PlayerWallet;
+  career?: CareerStats;
+  gallery?: FinishedSword[];
+  activeCore?: FusionCore | null;
 }
 
-export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
+export function DesignScreen({
+  design,
+  onChange,
+  onBack,
+  onForge,
+  inventory = defaultInventory,
+  wallet = defaultWallet,
+  career = defaultCareer,
+  gallery = [],
+  activeCore = null,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,43 +73,174 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
     });
   }, [design]);
 
+  // Current material requirement and stock
+  const reqMat = getRequiredMaterialForSteel(design.steel);
+  const currentStock = getMaterialStock(inventory?.materials, reqMat.key);
+  const hasMaterial = currentStock >= 1;
+
+  // Check if current design corresponds to a preset and whether it is locked
+  const matchedPreset = CANONICAL_PRESETS.find((p) => p.name === design.name);
+  const presetStatus = matchedPreset
+    ? evaluateBlueprintStatus(matchedPreset, inventory, career, gallery, activeCore)
+    : null;
+
+  const isLocked = presetStatus ? presetStatus.state === "locked" : false;
+  const canForgeReal = !isLocked && hasMaterial;
+
   return (
     <div className="flex min-h-dvh flex-col bg-bg text-fg">
-      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
+      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 border-b border-border/40">
         <Button variant="ghost" size="sm" onClick={onBack}>
-          Voltar
+          ← Voltar
         </Button>
-        <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
-        <span className="w-16" />
+        <div className="text-center">
+          <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
+          <span className="text-[0.65rem] uppercase tracking-wider text-amber-400/80">
+            Almoxarifado & Metais Reais
+          </span>
+        </div>
+        <div className="flex items-center gap-2 rounded-md border border-border/60 bg-surface px-2.5 py-1 text-xs font-display">
+          <span className="text-amber-300 font-bold">🪙 {wallet.gold}</span>
+        </div>
       </header>
 
-      <div className="mx-auto w-full max-w-3xl px-4 pb-36">
-        <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-44">
+        {/* Sword Preview Canvas */}
+        <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
           <canvas ref={canvasRef} className="h-56 w-full sm:h-72" />
         </div>
 
-        {/* Canonical Presets Banner */}
-        <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3">
-          <p className="font-display text-xs uppercase tracking-[0.16em] text-amber-300">
-            ⭐ Obras Mestras Canônicas (Projetos Pré-Definidos)
-          </p>
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            {CANONICAL_PRESETS.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => onChange(p.design)}
-                className={`rounded-md border px-2.5 py-1 text-xs font-display transition-all ${
-                  design.name === p.name
-                    ? "border-amber-400 bg-amber-500 text-black font-bold shadow-xs"
-                    : "border-border bg-surface/80 text-slate-300 hover:border-amber-500/60 hover:text-white"
-                }`}
-              >
-                {p.name}
-              </button>
-            ))}
+        {/* Fusion Core Notification Banner */}
+        {activeCore ? (
+          <div className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/30 p-3.5 flex items-center justify-between">
+            <div>
+              <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-300">
+                🔮 Núcleo de Fusão Ativo: {activeCore.name}
+              </span>
+              <p className="text-xs text-purple-200/80 mt-0.5">
+                Herança: +{activeCore.bonusQuality}% Qualidade · Aço: {activeCore.steel} · Família: {activeCore.family}
+              </p>
+            </div>
+            <span className="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              Autorizado
+            </span>
+          </div>
+        ) : null}
+
+        {/* Canonical Presets Section with explicit progression states */}
+        <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3.5">
+          <div className="flex items-center justify-between">
+            <p className="font-display text-xs uppercase tracking-[0.16em] text-amber-300 font-bold">
+              📜 Compêndio de Obras Mestras (Projetos & Blueprints)
+            </p>
+            <span className="text-[0.7rem] text-muted">Desbloqueio Progressivo</span>
+          </div>
+
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {CANONICAL_PRESETS.map((p) => {
+              const st = evaluateBlueprintStatus(p, inventory, career, gallery, activeCore);
+              const isSelected = design.name === p.name || design.name === p.design.name;
+
+              let badgeText = "Pronto";
+              let badgeClass = "bg-emerald-950/60 border-emerald-500/40 text-emerald-300";
+
+              if (st.state === "mastered") {
+                badgeText = "🏆 Dominada";
+                badgeClass = "bg-amber-950/70 border-amber-400 text-amber-300 font-bold";
+              } else if (st.state === "crafted") {
+                badgeText = "⚔️ Fabricada";
+                badgeClass = "bg-sky-950/60 border-sky-400 text-sky-300";
+              } else if (st.state === "ready") {
+                badgeText = "✅ Pronta";
+                badgeClass = "bg-emerald-950/60 border-emerald-500/40 text-emerald-300";
+              } else if (st.state === "discovered") {
+                badgeText = "⚠️ Falta Insumo";
+                badgeClass = "bg-amber-950/40 border-amber-500/30 text-amber-400";
+              } else {
+                badgeText = "🔒 Bloqueada";
+                badgeClass = "bg-red-950/40 border-red-500/30 text-red-300";
+              }
+
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => onChange(p.design)}
+                  className={cn(
+                    "rounded-lg border p-2.5 text-left transition-all flex flex-col justify-between",
+                    isSelected
+                      ? "border-amber-400 bg-amber-500/15 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                      : "border-border/80 bg-surface/70 hover:border-amber-500/50 hover:bg-surface",
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-display text-xs font-bold text-fg truncate">{p.name}</span>
+                    <span className={cn("text-[0.65rem] px-1.5 py-0.5 rounded border uppercase tracking-wider", badgeClass)}>
+                      {badgeText}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[0.7rem] text-muted">
+                    <span>{STEELS[p.design.steel]?.name || p.design.steel}</span>
+                    <span className="font-mono text-xs">
+                      {st.hasMaterial ? `Estoque: ${st.materialStock}` : "Sem Insumo"}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
+        {/* Requirement & Stock Card for Currently Selected Weapon */}
+        <div className="mt-5 rounded-lg border border-border bg-surface p-4">
+          <div className="flex items-center justify-between">
+            <span className="font-display text-xs uppercase tracking-wider text-muted font-bold">
+              Insumos Necessários para a Lâmina
+            </span>
+            <span className="text-xs font-mono text-slate-400">Consumo: 1x Insumo Base</span>
+          </div>
+
+          <div className="mt-3 flex items-center gap-3.5 rounded-lg border border-border/80 bg-elevated p-3">
+            <span className="text-2xl">{reqMat.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-display text-sm font-bold text-fg">{reqMat.name}</span>
+                <span className="text-[0.65rem] px-1.5 py-0.5 rounded bg-surface border border-border uppercase tracking-wider text-amber-300">
+                  {reqMat.rarity}
+                </span>
+              </div>
+              <p className="text-xs text-subtle truncate mt-0.5">{reqMat.description}</p>
+            </div>
+            <div className="text-right">
+              <div className="font-mono text-sm font-bold">
+                {currentStock >= 1 ? (
+                  <span className="text-emerald-400">Disponível: {currentStock}</span>
+                ) : (
+                  <span className="text-red-400">Faltando (0 em estoque)</span>
+                )}
+              </div>
+              <span className="text-[0.65rem] text-slate-500">Exige 1 unidade</span>
+            </div>
+          </div>
+
+          {/* Locked Status Banner if blueprint is locked */}
+          {presetStatus && presetStatus.state === "locked" ? (
+            <div className="mt-3 rounded-md border border-red-500/30 bg-red-950/20 p-2.5 text-xs text-red-300">
+              <span className="font-bold">🔒 Projeto Bloqueado: </span>
+              {presetStatus.requirementText}
+            </div>
+          ) : null}
+
+          {/* Missing Material Advice */}
+          {!hasMaterial && (!presetStatus || presetStatus.state !== "locked") ? (
+            <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-950/20 p-2.5 text-xs text-amber-300">
+              <span className="font-bold">⚠️ Matéria-prima em Falta: </span>
+              Adquira {reqMat.name} no Bazar Medieval (Galeria → Oficina/Bazar) ou forje lâminas de ferro para conquistar drops.
+            </div>
+          ) : null}
+        </div>
+
+        {/* Custom Design Controls */}
         <label className="mt-5 block font-display text-xs uppercase tracking-[0.16em] text-muted">
           Nome da lâmina
           <input
@@ -125,13 +287,17 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
           />
         </Section>
 
-        <Section title="Ferro">
+        <Section title="Aço / Metal">
           <ChipRow
-            options={Object.entries(STEELS).map(([id, v]) => ({
-              id,
-              label: v.name,
-              hint: v.blurb,
-            }))}
+            options={Object.entries(STEELS).map(([id, v]) => {
+              const sReq = getRequiredMaterialForSteel(id as SteelId);
+              const sStock = getMaterialStock(inventory?.materials, sReq.key);
+              return {
+                id,
+                label: v.name,
+                hint: `${v.blurb} · Estoque: ${sStock}`,
+              };
+            })}
             value={design.steel}
             onChange={(id) => onChange({ ...design, steel: id as SteelId })}
           />
@@ -194,10 +360,43 @@ export function DesignScreen({ design, onChange, onBack, onForge }: Props) {
         </Section>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-bg/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <Button size="lg" className="mx-auto flex w-full max-w-md" onClick={onForge}>
-          Levar ao fogo
-        </Button>
+      {/* Bottom Sticky Action Bar */}
+      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl">
+        <div className="mx-auto flex w-full max-w-md flex-col gap-2">
+          {canForgeReal ? (
+            <>
+              <Button
+                size="lg"
+                className="w-full bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 font-display uppercase tracking-wider font-bold shadow-lg"
+                onClick={() => onForge(false)}
+              >
+                🔥 Levar ao Fogo (Consumir 1x {reqMat.name})
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="w-full text-slate-400 hover:text-amber-300 font-display text-xs"
+                onClick={() => onForge(true)}
+              >
+                🔨 Treino Básico de Oficina (Sem Custo de Metal)
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button size="lg" className="w-full opacity-50 cursor-not-allowed" disabled>
+                {isLocked ? "🔒 Projeto Bloqueado na Carreira" : `❌ Insumos Insuficientes (Falta 1x ${reqMat.name})`}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="w-full border-dashed border-amber-600/50 text-amber-300 hover:bg-amber-950/30 font-display text-xs"
+                onClick={() => onForge(true)}
+              >
+                🔨 Treino Básico de Oficina (Sem Custo · Ferro Comum)
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

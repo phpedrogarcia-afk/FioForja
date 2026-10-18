@@ -1,5 +1,6 @@
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SaveResult, SwordDesign } from "./types.ts";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SaveResult } from "./types.ts";
 import { DEFAULT_DESIGN } from "./catalog.ts";
+import { DEFAULT_COMMISSIONS } from "./commissions.ts";
 
 export type { SaveData, SaveResult };
 
@@ -37,6 +38,8 @@ export const defaultInventory: PlayerInventory = {
   unlockedWraps: ["leather", "braided", "linen"],
   unlockedRunes: ["fehu", "uruz"],
   unlockedTools: ["hammer_standard", "anvil_cast", "furnace_coal", "quench_water"],
+  unlockedBlueprints: ["guarda_medieval"],
+  masteredBlueprints: [],
   materials: {
     iron_ingot: 8,
     steel_ingot: 4,
@@ -73,6 +76,8 @@ export const defaultSaveData: SaveData = {
   shake: true,
   claimedForgeRewardIds: [],
   claimedStrikeRewardIds: [],
+  activeForgeAttempt: null,
+  commissions: DEFAULT_COMMISSIONS,
 };
 
 const defaults = defaultSaveData;
@@ -184,6 +189,10 @@ export function migrateSave(raw: any): SaveData {
     unlockedTools: Array.isArray(rawInv.unlockedTools) && rawInv.unlockedTools.length > 0
       ? Array.from(new Set([...defaultInventory.unlockedTools, ...rawInv.unlockedTools]))
       : [...defaultInventory.unlockedTools],
+    unlockedBlueprints: Array.isArray(rawInv.unlockedBlueprints) && rawInv.unlockedBlueprints.length > 0
+      ? Array.from(new Set([...(defaultInventory.unlockedBlueprints || ["guarda_medieval"]), ...rawInv.unlockedBlueprints]))
+      : ["guarda_medieval"],
+    masteredBlueprints: Array.isArray(rawInv.masteredBlueprints) ? rawInv.masteredBlueprints : [],
     materials: {
       ...defaultInventory.materials,
       ...rawMaterials,
@@ -217,6 +226,10 @@ export function migrateSave(raw: any): SaveData {
     shake: raw.shake !== undefined ? Boolean(raw.shake) : true,
     claimedForgeRewardIds,
     claimedStrikeRewardIds,
+    activeForgeAttempt: raw.activeForgeAttempt || null,
+    commissions: Array.isArray(raw.commissions) && raw.commissions.length > 0
+      ? raw.commissions
+      : DEFAULT_COMMISSIONS,
   };
 }
 

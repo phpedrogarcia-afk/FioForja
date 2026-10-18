@@ -247,6 +247,16 @@ export const LOOT_CATALOG: LootTableItem[] = [
     value: 110,
   },
   {
+    catalogKey: "elven_silver_ingot",
+    name: "Lingote de Prata Élfica",
+    category: "material",
+    rarity: "Rara",
+    icon: "🪙",
+    description: "Liga sagrada dos elfos com reflexos lunares. Massa levíssima e resistência encantada.",
+    baseQuantity: 1,
+    value: 180,
+  },
+  {
     catalogKey: "catalyst_astral",
     name: "Catalisador Astral",
     category: "fusion",

@@ -18,10 +18,10 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 ## 2. Documentos Canônicos de Design (`docs/canon/`)
 
 - [Bíblia Estética](canon/estetica.md): regras visuais das lâminas, acabamento de metal, incisão rúnica chanfrada e as 9 famílias canônicas.
-- [Estrutura da Galeria](canon/galeria.md): os 6 pilares canônicos (Arsenal, Compêndio, Componentes, Runas, Oficina, Legado).
+- [Estrutura da Galeria](canon/galeria.md): os 8 pilares canônicos (Arsenal, Compêndio, Componentes, Runas, Oficina, Crisol de Fusão, Legado e Encomendas).
 - [Sistema Híbrido de Fusão (Opção C)](canon/fusao-hibrida.md): regras do Crisol de Fusão de componentes e espadas (núcleos que exigem forja).
 - [Motor de Loot e Drops](canon/loot-drops.md): tabelas reais de recompensas, categorias, probabilidades por rank e integridade de sorteio.
-- [Economia e Moedas](canon/economia.md): ganhos em tempo real na bigorna (+3/+8/+12 ouro), prêmios balanceados e custos da oficina.
+- [Economia e Moedas](canon/economia.md): ganhos em tempo real na bigorna (+3/+8/+12 ouro), prêmios balanceados, insumos e encomendas.
 
 ---
 
@@ -38,10 +38,14 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 ## 4. Evidência, Código e Testes
 
 - O núcleo jogável reside em `src/game/`:
+  - `materials.ts`: chaves primárias de insumos metalúrgicos, consumo atômico e refundição de sucata.
+  - `blueprints.ts`: máquina de estados (6 estados explícitos de projetos) e critérios de desbloqueio.
+  - `commissions.ts`: catálogo de encomendas da guilda e validação estrita de critérios de entrega.
+  - `transactions.ts`: executores de transações atômicas fail-closed (fusão, forja, compra, entrega, refino).
   - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas e cálculo de atributos.
   - `ForgeCanvas.tsx`: cena da forja, duas mãos de ferreiro com tenazes e martelo, bigorna, fornalha e bacia de têmpera.
   - `swordDraw.ts`: renderizador paramétrico de lâminas, guardas, cabos, pomos e incisões rúnicas.
-  - `save.ts`: persistência, sanitização e migração de saves locais.
+  - `save.ts`: persistência com backup atômico, retry seguro, sanitização e migração de saves.
   - `loot.ts`: motor dinâmico de drops e tabelas de recompensas ponderadas.
   - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C).
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.

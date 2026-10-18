@@ -1,6 +1,7 @@
 import type {
+  ActiveForgeAttempt,
+  BlacksmithCommission,
   CareerStats,
-  EquippedWorkshopGear,
   FinishedSword,
   ForgeRewardsData,
   FusionCore,
@@ -11,8 +12,8 @@ import type {
   SimState,
   SwordDesign,
 } from "./types.ts";
-import { writeSave, defaultWallet, defaultInventory, defaultCareer } from "./save.ts";
-import { recalculateSwordStats, WORKSHOP_EQUIPMENT } from "./catalog.ts";
+import { writeSave, defaultWallet, defaultInventory, defaultCareer, generateUniqueId } from "./save.ts";
+import { recalculateSwordStats, CANONICAL_PRESETS } from "./catalog.ts";
 import {
   applyComponentFusionTransaction,
   applySwordFusionTransaction,
@@ -22,6 +23,15 @@ import {
   type SwordFusionOutcome,
 } from "./fusion.ts";
 import { finishSword, applyStrikeRewardTransaction } from "./sim.ts";
+import {
+  addMaterialStock,
+  deductMaterialStock,
+  getMaterialStock,
+  getRequiredMaterialForSteel,
+  recycleScrapToIron,
+} from "./materials.ts";
+import { evaluateBlueprintStatus } from "./blueprints.ts";
+import { isSwordEligibleForCommission } from "./commissions.ts";
 
 export interface TransactionExecutionResult<T = unknown> {
   success: boolean;
@@ -29,6 +39,7 @@ export interface TransactionExecutionResult<T = unknown> {
   error?: string;
   code?: string;
   payload?: T;
+  uncommittedSave?: SaveData;
 }
 
 /**
@@ -274,7 +285,7 @@ export function executeUpgradeSwordTransaction(
 export interface ShopPurchaseItem {
   id: string;
   name: string;
-  type: "tool" | "material" | "component" | "rune" | "catalyst";
+  type: "tool" | "material" | "component" | "rune" | "catalyst" | "recipe";
   costGold: number;
   costRubies?: number;
   quantity?: number;
@@ -304,8 +315,9 @@ export function executeShopPurchaseTransaction(
     rubies: currentWallet.rubies - rubyCost,
   };
 
-  const nextMaterials = { ...(currentInventory.materials || {}) };
-  let nextUnlockedTools = [...(currentInventory.unlockedTools || [])];
+  let nextMaterials = { ...(currentInventory.materials || {}) };
+  const nextUnlockedTools = [...(currentInventory.unlockedTools || [])];
+  const nextUnlockedBlueprints = [...(currentInventory.unlockedBlueprints || ["guarda_medieval"])];
   const nextComponents = [...(currentInventory.components || [])];
 
   if (purchase.type === "tool") {
@@ -315,10 +327,15 @@ export function executeShopPurchaseTransaction(
     nextUnlockedTools.push(purchase.id);
   } else if (purchase.type === "material") {
     const qty = purchase.quantity || 1;
-    nextMaterials[purchase.id] = (nextMaterials[purchase.id] || 0) + qty;
+    nextMaterials = addMaterialStock(nextMaterials, purchase.id, qty);
   } else if (purchase.type === "catalyst") {
     const qty = purchase.quantity || 1;
     nextMaterials.catalyst_astral = (nextMaterials.catalyst_astral || 0) + qty;
+  } else if (purchase.type === "recipe") {
+    const blueprintId = purchase.id.replace(/^recipe_/, "");
+    if (!nextUnlockedBlueprints.includes(blueprintId)) {
+      nextUnlockedBlueprints.push(blueprintId);
+    }
   } else if (purchase.type === "component" || purchase.type === "rune") {
     if (purchase.componentData) {
       nextComponents.push({
@@ -339,6 +356,7 @@ export function executeShopPurchaseTransaction(
     ...currentInventory,
     materials: nextMaterials,
     unlockedTools: nextUnlockedTools,
+    unlockedBlueprints: nextUnlockedBlueprints,
     components: nextComponents,
   };
 
@@ -392,13 +410,13 @@ export function executeClaimRewardsTransaction(
     diamonds: currentWallet.diamonds + (rewards.diamonds || 0),
   };
 
-  const nextMaterials = { ...(currentInventory.materials || {}) };
+  let nextMaterials = { ...(currentInventory.materials || {}) };
   const nextComponents = [...(currentInventory.components || [])];
 
   for (const item of (rewards.items || [])) {
     if (item.category === "material" || item.category === "fusion") {
       const key = item.catalogKey || item.id;
-      nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
+      nextMaterials = addMaterialStock(nextMaterials, key, item.quantity || 1);
     } else if (item.category === "guard" || item.category === "pommel" || item.category === "wrap" || item.category === "rune") {
       nextComponents.push({
         id: item.id,
@@ -413,7 +431,7 @@ export function executeClaimRewardsTransaction(
       });
     } else {
       const key = item.catalogKey || item.id;
-      nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
+      nextMaterials = addMaterialStock(nextMaterials, key, item.quantity || 1);
     }
   }
 
@@ -448,7 +466,8 @@ export function executeClaimRewardsTransaction(
 }
 
 /**
- * 7. Finish Sword Transaction: Finishes sword, consumes active FusionCore atomically, updates career and saves to gallery.
+ * 7. Finish Sword Transaction: Finishes sword, consumes active FusionCore atomically, updates career, unlocks/masters blueprints, and saves to gallery.
+ * On persistence failure, it returns fail-closed state preserving temporary uncommittedSave for manual retry without regenerating attributes or drops.
  */
 export function executeFinishSwordTransaction(
   currentSave: SaveData,
@@ -456,17 +475,58 @@ export function executeFinishSwordTransaction(
   design: SwordDesign,
 ): TransactionExecutionResult<FinishedSword> {
   const sword = finishSword(sim, design);
-  const swordValue = sword.value ?? Math.round(sword.quality * 28 + (sword.rarity === "Lendária" ? 1800 : sword.rarity === "Relíquia" ? 3500 : 250));
-  sword.value = swordValue;
+  const attempt = currentSave.activeForgeAttempt;
+  const isTraining = Boolean(attempt?.isTraining);
 
-  let nextInventory = currentSave.inventory || defaultInventory;
-  if (sim.activeCore) {
-    const remainingCores = (currentSave.inventory.fusionCores || []).filter((c) => c.id !== sim.activeCore!.id);
-    nextInventory = {
-      ...currentSave.inventory,
-      fusionCores: remainingCores,
+  if (isTraining) {
+    sword.value = 0;
+    sword.isTraining = true;
+    sword.pendingRewards = {
+      forgeRunId: sword.forgeRunId,
+      rank: "TREINO",
+      scorePercent: Math.round(sword.quality),
+      gold: 0,
+      rubies: 0,
+      diamonds: 0,
+      items: [],
+      claimed: true,
     };
+  } else {
+    const swordValue = sword.value ?? Math.round(sword.quality * 28 + (sword.rarity === "Lendária" ? 1800 : sword.rarity === "Relíquia" ? 3500 : 250));
+    sword.value = swordValue;
   }
+
+  const nextInventory = { ...(currentSave.inventory || defaultInventory) };
+  const nextMaterials = { ...(nextInventory.materials || {}) };
+
+  // Scrap reward on blade break (anti-softlock fallback)
+  if (sim.broken && !isTraining) {
+    nextMaterials.scrap = (nextMaterials.scrap || 0) + 2;
+  }
+
+  if (sim.activeCore) {
+    const remainingCores = (nextInventory.fusionCores || []).filter((c) => c.id !== sim.activeCore!.id);
+    nextInventory.fusionCores = remainingCores;
+  }
+
+  // Blueprint mastery & discovery tracking
+  const matchedPreset = CANONICAL_PRESETS.find(
+    (p) =>
+      p.id === (design as any).id ||
+      p.name === design.name ||
+      p.design.name === design.name ||
+      (p.family === design.family && p.design.profile === design.profile),
+  );
+  const nextBlueprints = [...(nextInventory.unlockedBlueprints || ["guarda_medieval"])];
+  const nextMastered = [...(nextInventory.masteredBlueprints || [])];
+  if (matchedPreset) {
+    if (sword.quality >= 95 && !nextMastered.includes(matchedPreset.id)) {
+      nextMastered.push(matchedPreset.id);
+    }
+  }
+  nextInventory.unlockedBlueprints = nextBlueprints;
+  nextInventory.masteredBlueprints = nextMastered;
+  nextInventory.materials = nextMaterials;
 
   const prevCareer = currentSave.career || defaultCareer;
   const isMasterpiece = sword.quality >= 95;
@@ -477,7 +537,7 @@ export function executeFinishSwordTransaction(
     relics: prevCareer.relics + (sword.rarity === "Relíquia" ? 1 : 0),
     brokenBlades: prevCareer.brokenBlades + (sim.broken ? 1 : 0),
     highestQuality: Math.max(prevCareer.highestQuality, sword.quality),
-    totalValueEarned: prevCareer.totalValueEarned + (sim.broken ? 0 : swordValue),
+    totalValueEarned: prevCareer.totalValueEarned + (sim.broken || isTraining ? 0 : (sword.value || 0)),
   };
 
   const nextGallery = !sim.broken ? [sword, ...currentSave.gallery] : currentSave.gallery;
@@ -487,6 +547,7 @@ export function executeFinishSwordTransaction(
     gallery: nextGallery,
     career: nextCareer,
     inventory: nextInventory,
+    activeForgeAttempt: null, // Clear active attempt on finish
   };
 
   const writeRes = writeSave(nextSave);
@@ -494,6 +555,7 @@ export function executeFinishSwordTransaction(
     return {
       success: false,
       save: currentSave,
+      uncommittedSave: nextSave,
       error: writeRes.error || "Falha ao gravar lâmina finalizada no armazenamento.",
       code: writeRes.code || "PERSISTENCE_FAILED",
       payload: sword,
@@ -543,5 +605,335 @@ export function executeStrikeRewardTransaction(
   return {
     success: true,
     save: nextSave,
+  };
+}
+
+/**
+ * 9. Start Forge Transaction: Transactionally validates blueprint knowledge, checks raw material stock,
+ * reserves/deducts 1x material (unless free training), records activeForgeAttempt with attemptId, and persists fail-closed.
+ */
+export function executeStartForgeTransaction(
+  currentSave: SaveData,
+  design: SwordDesign,
+  options?: { isTraining?: boolean; activeCoreId?: string },
+): TransactionExecutionResult<ActiveForgeAttempt> {
+  const currentInv = currentSave.inventory || defaultInventory;
+  const isTraining = Boolean(options?.isTraining);
+
+  if (isTraining) {
+    const attempt: ActiveForgeAttempt = {
+      attemptId: generateUniqueId("attempt"),
+      forgeRunId: generateUniqueId("run"),
+      design: { ...design, steel: "iron" },
+      isTraining: true,
+      materialConsumed: null,
+      activeCoreId: null,
+      startedAt: Date.now(),
+    };
+
+    const nextSave: SaveData = {
+      ...currentSave,
+      activeForgeAttempt: attempt,
+    };
+
+    const writeRes = writeSave(nextSave);
+    if (!writeRes.ok) {
+      return {
+        success: false,
+        save: currentSave,
+        error: writeRes.error || "Falha ao registrar início do treino no armazenamento.",
+        code: writeRes.code || "PERSISTENCE_FAILED",
+      };
+    }
+
+    return {
+      success: true,
+      save: nextSave,
+      payload: attempt,
+    };
+  }
+
+  let activeCore: FusionCore | null = null;
+  if (options?.activeCoreId) {
+    activeCore = (currentInv.fusionCores || []).find((c) => c.id === options.activeCoreId) || null;
+    if (!activeCore) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Núcleo de Fusão especificado não existe ou já foi consumido.",
+        code: "CORE_NOT_FOUND",
+      };
+    }
+  }
+
+  // Validate blueprint lock
+  const matchedPreset = CANONICAL_PRESETS.find(
+    (p) =>
+      p.id === (design as any).id ||
+      p.name === design.name ||
+      p.design.name === design.name ||
+      (p.family === design.family && p.design.profile === design.profile),
+  );
+  if (matchedPreset) {
+    const status = evaluateBlueprintStatus(
+      matchedPreset,
+      currentInv,
+      currentSave.career || defaultCareer,
+      currentSave.gallery || [],
+      activeCore,
+    );
+    if (!status.unlocked || status.state === "locked") {
+      return {
+        success: false,
+        save: currentSave,
+        error: `Projeto "${matchedPreset.name}" bloqueado. ${status.requirementText}`,
+        code: "BLUEPRINT_LOCKED",
+      };
+    }
+  }
+
+  const reqMat = getRequiredMaterialForSteel(design.steel);
+  const stock = getMaterialStock(currentInv.materials, reqMat.key);
+
+  if (stock < 1) {
+    return {
+      success: false,
+      save: currentSave,
+      error: `Insumos insuficientes: requer 1x ${reqMat.name}. Disponível no inventário: ${stock}.`,
+      code: "INSUFFICIENT_MATERIALS",
+    };
+  }
+
+  const nextMaterials = deductMaterialStock(currentInv.materials, reqMat.key, 1);
+  const attempt: ActiveForgeAttempt = {
+    attemptId: generateUniqueId("attempt"),
+    forgeRunId: generateUniqueId("run"),
+    design,
+    isTraining: false,
+    materialConsumed: { key: reqMat.key, name: reqMat.name, quantity: 1 },
+    activeCoreId: activeCore ? activeCore.id : null,
+    startedAt: Date.now(),
+  };
+
+  const nextInventory: PlayerInventory = {
+    ...currentInv,
+    materials: nextMaterials,
+  };
+
+  const nextSave: SaveData = {
+    ...currentSave,
+    inventory: nextInventory,
+    activeForgeAttempt: attempt,
+  };
+
+  const writeRes = writeSave(nextSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: currentSave,
+      error: writeRes.error || "Falha ao gravar consumo de materiais no armazenamento.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+
+  return {
+    success: true,
+    save: nextSave,
+    payload: attempt,
+  };
+}
+
+/**
+ * 10. Cancel Forge Transaction: Safely refunds consumed material back to player inventory and clears attempt.
+ */
+export function executeCancelForgeTransaction(currentSave: SaveData): TransactionExecutionResult {
+  const attempt = currentSave.activeForgeAttempt;
+  if (!attempt) {
+    return { success: true, save: currentSave };
+  }
+
+  const nextInventory = { ...(currentSave.inventory || defaultInventory) };
+  if (attempt.materialConsumed && attempt.materialConsumed.quantity > 0) {
+    nextInventory.materials = addMaterialStock(
+      nextInventory.materials,
+      attempt.materialConsumed.key,
+      attempt.materialConsumed.quantity,
+    );
+  }
+
+  const nextSave: SaveData = {
+    ...currentSave,
+    inventory: nextInventory,
+    activeForgeAttempt: null,
+  };
+
+  const writeRes = writeSave(nextSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: currentSave,
+      error: writeRes.error || "Falha ao registrar cancelamento da forja.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+
+  return {
+    success: true,
+    save: nextSave,
+  };
+}
+
+/**
+ * 11. Retry Persistence Transaction: Re-attempts persisting an uncommitted save without generating new RNG/attributes/rewards.
+ */
+export function retryPersistSave(uncommittedSave: SaveData): TransactionExecutionResult {
+  const writeRes = writeSave(uncommittedSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: uncommittedSave,
+      uncommittedSave,
+      error: writeRes.error || "Falha repetida ao gravar no armazenamento local.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+  return {
+    success: true,
+    save: uncommittedSave,
+  };
+}
+
+/**
+ * 12. Deliver Commission Transaction: Validates weapon matches commission specifications, credits rewards, and tags sword.
+ */
+export function executeDeliverCommissionTransaction(
+  currentSave: SaveData,
+  commissionId: string,
+  swordId: string,
+): TransactionExecutionResult<{ commission: BlacksmithCommission; sword: FinishedSword }> {
+  const commissions = currentSave.commissions || [];
+  const commIndex = commissions.findIndex((c) => c.id === commissionId);
+  if (commIndex === -1) {
+    return { success: false, save: currentSave, error: "Encomenda não encontrada.", code: "COMMISSION_NOT_FOUND" };
+  }
+  const comm = commissions[commIndex];
+  if (comm.completed) {
+    return { success: false, save: currentSave, error: "Encomenda já entregue e recompensada.", code: "COMMISSION_ALREADY_COMPLETED" };
+  }
+
+  const sword = (currentSave.gallery || []).find((s) => s.id === swordId);
+  if (!sword) {
+    return { success: false, save: currentSave, error: "Espada não encontrada no Arsenal.", code: "SWORD_NOT_FOUND" };
+  }
+
+  const check = isSwordEligibleForCommission(comm, sword);
+  if (!check.eligible) {
+    return {
+      success: false,
+      save: currentSave,
+      error: `A arma não atende a todos os requisitos: ${check.reasons.join(" ")}`,
+      code: "INELIGIBLE_SWORD",
+    };
+  }
+
+  const updatedComm: BlacksmithCommission = {
+    ...comm,
+    completed: true,
+    deliveredSwordId: sword.id,
+  };
+
+  const nextCommissions = [...commissions];
+  nextCommissions[commIndex] = updatedComm;
+
+  const updatedSword: FinishedSword = {
+    ...sword,
+    commissionDelivered: comm.id,
+  };
+
+  const nextGallery = (currentSave.gallery || []).map((s) => (s.id === sword.id ? updatedSword : s));
+
+  const currentWallet = currentSave.wallet || defaultWallet;
+  const nextWallet: PlayerWallet = {
+    ...currentWallet,
+    gold: currentWallet.gold + comm.rewardGold,
+    rubies: currentWallet.rubies + (comm.rewardRubies || 0),
+  };
+
+  let nextMaterials = { ...(currentSave.inventory?.materials || {}) };
+  if (comm.rewardMaterial) {
+    nextMaterials = addMaterialStock(nextMaterials, comm.rewardMaterial.key, comm.rewardMaterial.quantity);
+  }
+
+  const nextInventory: PlayerInventory = {
+    ...(currentSave.inventory || defaultInventory),
+    materials: nextMaterials,
+  };
+
+  const nextSave: SaveData = {
+    ...currentSave,
+    wallet: nextWallet,
+    inventory: nextInventory,
+    gallery: nextGallery,
+    commissions: nextCommissions,
+  };
+
+  const writeRes = writeSave(nextSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: currentSave,
+      error: writeRes.error || "Falha ao gravar entrega de encomenda no armazenamento.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+
+  return {
+    success: true,
+    save: nextSave,
+    payload: { commission: updatedComm, sword: updatedSword },
+  };
+}
+
+/**
+ * 13. Recycle Scrap Transaction: Recycles 2x scrap into 1x iron ingot (anti-softlock).
+ */
+export function executeRecycleScrapTransaction(
+  currentSave: SaveData,
+): TransactionExecutionResult<{ ironCreated: number }> {
+  const currentMaterials = currentSave.inventory?.materials || {};
+  const res = recycleScrapToIron(currentMaterials);
+  if (!res.success) {
+    return {
+      success: false,
+      save: currentSave,
+      error: "Sucata insuficiente para reciclagem (são necessárias pelo menos 2 unidades de sucata).",
+      code: "INSUFFICIENT_SCRAP",
+    };
+  }
+
+  const nextInventory: PlayerInventory = {
+    ...(currentSave.inventory || defaultInventory),
+    materials: res.nextMaterials,
+  };
+
+  const nextSave: SaveData = {
+    ...currentSave,
+    inventory: nextInventory,
+  };
+
+  const writeRes = writeSave(nextSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: currentSave,
+      error: writeRes.error || "Falha ao gravar reciclagem de sucata.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+
+  return {
+    success: true,
+    save: nextSave,
+    payload: { ironCreated: res.ironCreated },
   };
 }

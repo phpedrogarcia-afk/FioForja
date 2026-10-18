@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   CANONICAL_PRESETS,
   FAMILIES,
@@ -12,7 +13,7 @@ import {
   recalculateSwordStats,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
-import type { CareerStats, CombatRole, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
+import type { BlacksmithCommission, CareerStats, CombatRole, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
 import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
 import { generateForgeRewards } from "../sim";
@@ -21,6 +22,7 @@ import { FusionStationScreen } from "./FusionStationScreen";
 import type { ComponentFusionOutcome, SwordFusionOutcome } from "../fusion";
 import type { FusionCore } from "../types";
 import type { ShopPurchaseItem } from "../transactions";
+import { isSwordEligibleForCommission, DEFAULT_COMMISSIONS } from "../commissions";
 
 export interface ShopArticle {
   id: string;
@@ -469,9 +471,12 @@ interface Props {
   onApplySwordFusion?: (outcome: SwordFusionOutcome) => void;
   onForgeCore?: (core: FusionCore) => void;
   onInstallComponent?: (swordId: string, componentId: string) => boolean;
+  commissions?: BlacksmithCommission[];
+  onDeliverCommission?: (commissionId: string, swordId: string) => boolean;
+  onRecycleScrap?: () => boolean;
 }
 
-type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "fusao" | "legado";
+type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "fusao" | "legado" | "encomendas";
 
 export function GalleryScreen({
   swords,
@@ -479,7 +484,8 @@ export function GalleryScreen({
   onForge,
   wallet = defaultWallet,
   inventory = defaultInventory,
-  career,
+  career: _career,
+  commissions = DEFAULT_COMMISSIONS,
   onBuyTool,
   onBuyShopItem,
   onEquipTool,
@@ -489,6 +495,8 @@ export function GalleryScreen({
   onApplySwordFusion,
   onForgeCore,
   onInstallComponent,
+  onDeliverCommission,
+  onRecycleScrap,
 }: Props) {
   const [currentTab, setCurrentTab] = useState<GalleryTab>("arsenal");
   const [selectedSword, setSelectedSword] = useState<FinishedSword | null>(null);
@@ -511,7 +519,7 @@ export function GalleryScreen({
       const match = swords.find((s) => s.id === selectedSword.id);
       if (match) setSelectedSword(match);
     }
-  }, [swords]);
+  }, [swords, selectedSword]);
 
   if (selectedSword) {
     if (inspectRewards) {
@@ -606,11 +614,12 @@ export function GalleryScreen({
         </div>
       </header>
 
-      {/* 7-Pillar Tab Navigation Bar */}
+      {/* 8-Pillar Tab Navigation Bar */}
       <nav className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap justify-center gap-1.5 border-b border-[#1b2434] pb-3 sm:justify-start">
         {[
           { id: "arsenal" as const, label: "Arsenal", count: swords.length, icon: "⚔️" },
           { id: "compendio" as const, label: "Compêndio", count: `${CANONICAL_PRESETS.length} Obras`, icon: "📜" },
+          { id: "encomendas" as const, label: "Encomendas", count: `${commissions.filter((c) => !c.completed).length} Pedidos`, icon: "📋" },
           { id: "componentes" as const, label: "Componentes", count: "32", icon: "🛡️" },
           { id: "runas" as const, label: "Runas", count: RUNES_COMPENDIUM.length, icon: "ᚠ" },
           { id: "oficina" as const, label: "Oficina", count: WORKSHOP_EQUIPMENT.length, icon: "⚒️" },
@@ -1333,6 +1342,178 @@ export function GalleryScreen({
           onApplySwordFusion={onApplySwordFusion || (() => {})}
           onForgeCore={onForgeCore}
         />
+      )}
+
+      {/* PILLAR 8: QUADRO ENXUTO DE ENCOMENDAS & RECICLAGEM */}
+      {currentTab === "encomendas" && (
+        <div className="mx-auto mt-4 w-full max-w-5xl space-y-6">
+          {/* Header & Scrap Recycling Banner */}
+          <div className="rounded-xl border border-[#1e2a3e] bg-[#0d1320] p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-display text-base font-bold uppercase tracking-wider text-amber-300">
+                  📜 Quadro de Encomendas da Forja
+                </h2>
+                <p className="mt-1 text-xs text-slate-400">
+                  Cumpra encomendas de patrulhas, mercenários e nobres entregando armas que atendam aos requisitos. Ganhe ouro, rubis e ligas raras.
+                </p>
+              </div>
+
+              {/* Scrap Recycling Tool */}
+              <div className="rounded-lg border border-amber-900/40 bg-black/40 p-3 min-w-[240px]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-300 font-display">Sucata de Oficina:</span>
+                  <span className="font-bold text-amber-300 font-mono">{inventory.materials?.scrap || 0} unid.</span>
+                </div>
+                <p className="text-[0.65rem] text-slate-400 mt-1">2 sucatas podem ser refundidas em 1 lingote de ferro.</p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!onRecycleScrap || (inventory.materials?.scrap || 0) < 2}
+                  onClick={() => onRecycleScrap && onRecycleScrap()}
+                  className="mt-2 w-full text-xs border-amber-500/40 text-amber-300 hover:bg-amber-950/40"
+                >
+                  ♻️ Refundir Sucata em Ferro
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Active & Completed Commissions List */}
+          <div className="grid grid-cols-1 gap-4">
+            {commissions.map((comm) => {
+              const eligibleSwords = swords.filter((s) => isSwordEligibleForCommission(comm, s).eligible);
+              const deliveredSword = comm.completed && comm.deliveredSwordId
+                ? swords.find((s) => s.id === comm.deliveredSwordId)
+                : null;
+
+              return (
+                <div
+                  key={comm.id}
+                  className={cn(
+                    "rounded-xl border p-5 transition-all",
+                    comm.completed
+                      ? "border-emerald-500/30 bg-[#0a141a]/60"
+                      : "border-[#1e2a3e] bg-[#0d1320] hover:border-amber-500/40",
+                  )}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex items-start gap-3.5">
+                      <span className="text-3xl p-2 rounded-lg bg-surface/80 border border-border/60">
+                        {comm.icon}
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-display text-sm font-bold text-fg">{comm.clientName}</h3>
+                          <span className="text-[0.65rem] px-2 py-0.5 rounded bg-[#131b2c] border border-border text-slate-300 uppercase tracking-wider">
+                            {comm.clientTitle}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-xs text-slate-300 max-w-xl leading-relaxed">
+                          {comm.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-xs uppercase font-display tracking-wider text-slate-400 block">
+                        Recompensa
+                      </span>
+                      <div className="mt-1 flex items-center justify-end gap-2 text-xs font-mono font-bold">
+                        <span className="text-amber-300">🪙 +{comm.rewardGold}</span>
+                        {comm.rewardRubies ? <span className="text-red-400">💎 +{comm.rewardRubies}</span> : null}
+                      </div>
+                      {comm.rewardMaterial ? (
+                        <span className="mt-0.5 block text-[0.7rem] text-cyan-300 font-mono">
+                          +{comm.rewardMaterial.quantity}x {comm.rewardMaterial.name}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Requirements Row */}
+                  <div className="mt-4 pt-3 border-t border-[#182234] grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div className="rounded bg-black/30 p-2 border border-border/40">
+                      <span className="text-[0.65rem] uppercase text-slate-400 block">Qualidade Mínima</span>
+                      <span className="font-mono font-bold text-amber-200">≥ {comm.minQuality}%</span>
+                    </div>
+                    <div className="rounded bg-black/30 p-2 border border-border/40">
+                      <span className="text-[0.65rem] uppercase text-slate-400 block">Material / Aço</span>
+                      <span className="font-bold text-slate-200">
+                        {comm.steel ? (STEELS[comm.steel]?.name || comm.steel) : "Livre"}
+                      </span>
+                    </div>
+                    <div className="rounded bg-black/30 p-2 border border-border/40">
+                      <span className="text-[0.65rem] uppercase text-slate-400 block">Especialização</span>
+                      <span className="font-bold text-slate-200">{comm.requiredRole || "Qualquer"}</span>
+                    </div>
+                    <div className="rounded bg-black/30 p-2 border border-border/40">
+                      <span className="text-[0.65rem] uppercase text-slate-400 block">Atributo Mínimo</span>
+                      <span className="font-bold text-slate-200">
+                        {comm.minStat ? `${comm.minStat.stat.toUpperCase()} ≥ ${comm.minStat.minValue}` : "Sem restrição"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Delivery Action / Status */}
+                  <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    {comm.completed ? (
+                      <div className="flex items-center gap-2 text-emerald-400 text-xs font-display font-bold">
+                        <span>✅ Encomenda Cumprida e Entregue</span>
+                        {deliveredSword ? (
+                          <span className="text-slate-400 font-normal">
+                            (Arma: {deliveredSword.design.name} · {deliveredSword.quality}%)
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-xs text-slate-400">
+                          {eligibleSwords.length > 0 ? (
+                            <span className="text-emerald-300 font-medium">
+                              ⚔️ {eligibleSwords.length} arma(s) no seu Arsenal atendem aos critérios!
+                            </span>
+                          ) : (
+                            <span className="text-amber-400/90">
+                              ⏳ Nenhuma arma elegível no Arsenal. Forje uma lâmina compatível.
+                            </span>
+                          )}
+                        </div>
+
+                        {eligibleSwords.length > 0 && onDeliverCommission ? (
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <select
+                              id={`select-sword-${comm.id}`}
+                              className="h-9 rounded-md border border-border bg-[#0a0f19] px-2 text-xs text-fg font-display"
+                              defaultValue={eligibleSwords[0].id}
+                            >
+                              {eligibleSwords.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                  {s.design.name} ({s.quality}% · {s.combatRole || "Equilibrada"})
+                                </option>
+                              ))}
+                            </select>
+                            <Button
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-500 text-black font-display font-bold text-xs shrink-0"
+                              onClick={() => {
+                                const sel = document.getElementById(`select-sword-${comm.id}`) as HTMLSelectElement;
+                                const sid = sel ? sel.value : eligibleSwords[0].id;
+                                onDeliverCommission(comm.id, sid);
+                              }}
+                            >
+                              📦 Entregar Arma
+                            </Button>
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* PILLAR 5: COMPARADOR REAL DE LÂMINAS */}

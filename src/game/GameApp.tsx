@@ -14,15 +14,21 @@ import {
   executeClaimRewardsTransaction,
   executeFinishSwordTransaction,
   executeStrikeRewardTransaction,
+  executeStartForgeTransaction,
+  executeCancelForgeTransaction,
+  executeDeliverCommissionTransaction,
+  executeRecycleScrapTransaction,
+  retryPersistSave,
   type ShopPurchaseItem,
 } from "./transactions";
+import { Button } from "@/components/ui/button";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
@@ -64,6 +70,7 @@ export function GameApp() {
   const [forgeKey, setForgeKey] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [errorToast, setErrorToast] = useState<string | null>(null);
+  const [pendingFailedSave, setPendingFailedSave] = useState<{ sword: FinishedSword; uncommittedSave: SaveData } | null>(null);
   const showError = useCallback((msg: string) => {
     setErrorToast(msg);
     window.setTimeout(() => setErrorToast(null), 4500);
@@ -109,15 +116,24 @@ export function GameApp() {
     return res;
   }, []);
 
-  const startForge = useCallback(() => {
+  const startForge = useCallback((isTraining = false) => {
     unlockAudio();
-    setActiveCore(null);
-    persist({ lastDesign: designRef.current });
+    const res = executeStartForgeTransaction(save.current, designRef.current, {
+      isTraining,
+      activeCoreId: activeCore?.id,
+    });
+    if (!res.success) {
+      showError(res.error || "Não foi possível iniciar a forja.");
+      return false;
+    }
+    save.current = res.save;
+    setInventory(res.save.inventory);
     setHud(EMPTY_HUD);
     setFinished(null);
     setForgeKey((k) => k + 1);
     setScreen("forge");
-  }, [persist]);
+    return true;
+  }, [activeCore, showError]);
 
   const onHud = useCallback((next: HudSnapshot) => {
     setHud(next);
@@ -276,7 +292,11 @@ export function GameApp() {
   const onFinished = useCallback((sim: SimState) => {
     const res = executeFinishSwordTransaction(save.current, sim, designRef.current);
     if (!res.success) {
-      showError(res.error || "Falha ao registrar lâmina finalizada.");
+      showError(res.error || "Falha ao registrar lâmina finalizada no armazenamento.");
+      if (res.payload && res.uncommittedSave) {
+        setPendingFailedSave({ sword: res.payload, uncommittedSave: res.uncommittedSave });
+      }
+      return;
     }
     save.current = res.save;
     setCareer(res.save.career);
@@ -289,6 +309,54 @@ export function GameApp() {
       setActiveCore(null);
     }
     window.setTimeout(() => setScreen("reveal"), 800);
+  }, [showError]);
+
+  const handleRetryPersist = useCallback(() => {
+    if (!pendingFailedSave) return;
+    const res = retryPersistSave(pendingFailedSave.uncommittedSave);
+    if (!res.success) {
+      showError(res.error || "Falha persistente ao tentar salvar novamente.");
+      return;
+    }
+    save.current = res.save;
+    setCareer(res.save.career);
+    setInventory(res.save.inventory);
+    setGallery(res.save.gallery);
+    setFinished(pendingFailedSave.sword);
+    setActiveCore(null);
+    setPendingFailedSave(null);
+    setScreen("reveal");
+  }, [pendingFailedSave, showError]);
+
+  const handleCancelFailedPersist = useCallback(() => {
+    setPendingFailedSave(null);
+    setScreen("design");
+  }, []);
+
+  const handleDeliverCommission = useCallback((commissionId: string, swordId: string): boolean => {
+    const res = executeDeliverCommissionTransaction(save.current, commissionId, swordId);
+    if (!res.success) {
+      showError(res.error || "Falha na entrega da encomenda.");
+      return false;
+    }
+    save.current = res.save;
+    playUpgradeChime();
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
+    setGallery(res.save.gallery);
+    return true;
+  }, [showError]);
+
+  const handleRecycleScrap = useCallback((): boolean => {
+    const res = executeRecycleScrapTransaction(save.current);
+    if (!res.success) {
+      showError(res.error || "Falha na reciclagem de sucata.");
+      return false;
+    }
+    save.current = res.save;
+    playUpgradeChime();
+    setInventory(res.save.inventory);
+    return true;
   }, [showError]);
 
   const handleInstallComponent = useCallback((swordId: string, componentId: string): boolean => {
@@ -397,6 +465,11 @@ export function GameApp() {
           onChange={setDesign}
           onBack={() => setScreen("title")}
           onForge={startForge}
+          inventory={inventory}
+          wallet={wallet}
+          career={career}
+          gallery={gallery}
+          activeCore={activeCore}
         />
       );
     }
@@ -408,6 +481,7 @@ export function GameApp() {
           wallet={wallet}
           inventory={inventory}
           career={career}
+          commissions={save.current.commissions}
           onBack={() => setScreen("title")}
           onForge={() => setScreen("design")}
           onBuyTool={handleBuyTool}
@@ -419,6 +493,8 @@ export function GameApp() {
           onApplySwordFusion={handleApplySwordFusion}
           onForgeCore={handleForgeCore}
           onInstallComponent={handleInstallComponent}
+          onDeliverCommission={handleDeliverCommission}
+          onRecycleScrap={handleRecycleScrap}
         />
       );
     }
@@ -496,6 +572,11 @@ export function GameApp() {
           }}
           onQuit={() => {
             inputRef.current.charging = false;
+            const cancelRes = executeCancelForgeTransaction(save.current);
+            if (cancelRes.success) {
+              save.current = cancelRes.save;
+              setInventory(cancelRes.save.inventory);
+            }
             setScreen("title");
           }}
         />
@@ -513,6 +594,36 @@ export function GameApp() {
         >
           <span className="text-red-400 font-bold">⚠️</span>
           <span>{errorToast}</span>
+        </div>
+      )}
+      {pendingFailedSave && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in">
+          <div className="max-w-md w-full rounded-xl border border-red-500/60 bg-[#12080a] p-6 shadow-2xl">
+            <h3 className="font-display text-base font-bold text-red-300 flex items-center gap-2">
+              <span>⚠️</span> Falha de Gravação no Armazenamento
+            </h3>
+            <p className="mt-2 text-xs text-slate-300 leading-relaxed">
+              A lâmina forjada foi concluída, mas o navegador não conseguiu gravar o registro no armazenamento local.
+            </p>
+            <p className="mt-2 text-xs text-amber-300/90 font-display">
+              Seu núcleo, seus materiais e os atributos calculados da espada permanecem preservados em memória.
+            </p>
+            <div className="mt-5 flex gap-2.5">
+              <Button
+                className="flex-1 bg-amber-600 hover:bg-amber-500 text-black font-display font-bold text-xs"
+                onClick={handleRetryPersist}
+              >
+                🔄 Tentar Gravar Novamente
+              </Button>
+              <Button
+                variant="secondary"
+                className="flex-1 border-border text-slate-400 hover:text-white text-xs"
+                onClick={handleCancelFailedPersist}
+              >
+                ✕ Manter Estado Anterior
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -131,6 +131,8 @@ export interface FinishedSword {
   cracks?: number;
   physicalProfile?: PhysicalBladeProfile;
   history?: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
+  isTraining?: boolean;
+  commissionDelivered?: string;
 }
 
 export interface PhysicalBladeProfile {
@@ -296,6 +298,34 @@ export interface PlayerWallet {
   diamonds: number;
 }
 
+export interface ActiveForgeAttempt {
+  attemptId: string;
+  forgeRunId: string;
+  design: SwordDesign;
+  isTraining: boolean;
+  materialConsumed?: { key: string; name: string; quantity: number } | null;
+  activeCoreId?: string | null;
+  startedAt: number;
+}
+
+export interface BlacksmithCommission {
+  id: string;
+  clientName: string;
+  clientTitle: string;
+  icon: string;
+  description: string;
+  family?: FamilyId;
+  steel?: SteelId;
+  minQuality: number;
+  requiredRole?: CombatRole;
+  minStat?: { stat: "damage" | "defense" | "agility" | "durability"; minValue: number };
+  rewardGold: number;
+  rewardMaterial?: { key: string; name: string; quantity: number };
+  rewardRubies?: number;
+  completed: boolean;
+  deliveredSwordId?: string;
+}
+
 export interface PlayerInventory {
   unlockedProfiles: ProfileId[];
   unlockedSteels: SteelId[];
@@ -304,6 +334,8 @@ export interface PlayerInventory {
   unlockedWraps: WrapId[];
   unlockedRunes: string[];
   unlockedTools: string[];
+  unlockedBlueprints?: string[];
+  masteredBlueprints?: string[];
   materials: Record<string, number>;
   fusionCores: FusionCore[];
   components: InventoryComponent[];
@@ -344,6 +376,8 @@ export interface SaveData {
   shake: boolean;
   claimedForgeRewardIds: string[];
   claimedStrikeRewardIds: string[];
+  activeForgeAttempt?: ActiveForgeAttempt | null;
+  commissions?: BlacksmithCommission[];
 }
 
 export interface SaveResult {
@@ -351,3 +385,4 @@ export interface SaveResult {
   error?: string;
   code?: "QUOTA_EXCEEDED" | "STORAGE_UNAVAILABLE" | "SERIALIZATION_FAILED" | "UNKNOWN";
 }
+
