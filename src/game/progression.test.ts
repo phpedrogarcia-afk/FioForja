@@ -405,8 +405,16 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
 
       const testSave: SaveData = {
         ...defaultSaveData,
+        career: {
+          ...defaultCareer,
+          totalForged: 10,
+          masterpieces: 2,
+          legendaries: 1,
+        },
         inventory: {
           ...defaultInventory,
+          unlockedSteels: steels,
+          unlockedBlueprints: ["queda_asterion", "cinzas_ancestrais", "cimitarra_damasco", "juramento_ferro", "folha_aereth"],
           materials: { [mat.key]: 2 },
         },
       };

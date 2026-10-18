@@ -1,64 +1,67 @@
 # Estado Atual do Projeto — FioForja
 
 **Data da Atualização:** 18 de Outubro de 2026  
-**Branch de Trabalho:** `antigravity/blacksmith-progression-v1`  
-**Base Canônica de Continuidade:** `antigravity/forge-of-prestige-v1` (`6674640aac8ff474db8e21cce357b24936b66713`)  
-**Missão Concluída:** Operação 03: O Ciclo do Ferreiro — Progressão Real, Crafting Integrado, Economia Significativa e Experiência Jogável  
+**Branch de Trabalho:** `antigravity/forge-lifecycle-proof-v1`  
+**Base Canônica de Continuidade:** `antigravity/blacksmith-progression-v1` (`6e3920d4a8a92bca0b4d6f238d6232d3645a6b6c`)  
+**Missão Concluída:** Operação 04: A Prova da Forja — Recuperação do Ciclo de Vida, Progressão Econômica Real e Handoff para o Codex  
 **Registros Históricos:** Arquivados em [`docs/historical/`](historical/)
 
 ---
 
 ## 1. FATOS COMPROVADOS (KNOWN & VERIFIED)
 
-### A. Gating Real de Insumos e Consumo Atômico de Metais (`src/game/materials.ts` & `src/game/transactions.ts`)
-- **Unificação Metalúrgica Canônica:** Chaves primárias consolidadas para os 7 aços do jogo (`iron_ingot`, `steel_ingot`, `damascus_billet`, `blacksteel_chunk`, `elven_silver_ingot`, `starmetal_ore`, `ancient_relic_shard`), com resolução transparente de aliases legados (`iron`, `damascus`, `blacksteel`).
-- **Transação de Início de Forja (`executeStartForgeTransaction`):** Toda forja regular verifica o estoque de insumos e debita atomicamente 1x metal correspondente. Se o jogador tiver 0 unidades, a forja é bloqueada (`INSUFFICIENT_MATERIALS`).
-- **Garantia de Estorno no Cancelamento (`executeCancelForgeTransaction`):** Cancelar ou sair antes do primeiro golpe devolve 100% do insumo consumido de volta ao inventário do ferreiro.
+### A. Ciclo de Vida da Tentativa de Forja & Política Justa de Cancelamento (`src/game/transactions.ts`, `src/game/types.ts`)
+- **Máquina de Estados de 4 Fases:** `ForgeAttemptStatus = "PREPARED" | "ACTIVE" | "COMPLETED" | "CANCELLED"`.
+- **Prevenção Fail-Closed de Tentativas Simultâneas:** `executeStartForgeTransaction` rejeita categoricamente o início de uma nova forja caso `activeAttempt` já exista e esteja ativa (`ATTEMPT_ALREADY_ACTIVE`).
+- **Identidade Estrita de Execução (`forgeRunId`):** O ID da tentativa é emitido na largada, passado ao simulador, ao canvas e impresso indelevelmente em `FinishedSword.forgeRunId`.
+- **Política Justa de Cancelamento (`executeCancelForgeTransaction`):**
+  - Fase `PREPARED` (0 golpes): Desistência limpa — 100% de devolução do lingote de metal consumido.
+  - Fase `ACTIVE` (≥1 golpe): Metal deformado — 0 devolução do lingote, mas +1x sucata (`scrap`) de salvamento para reciclagem.
+  - Tentativas canceladas ou completadas são imutáveis e rejeitam novo cancelamento (`ATTEMPT_NOT_ACTIVE`).
+- **Modal de Recuperação de Tentativa Ativa:** Ao recarregar com uma tentativa pendente em disco, `GameApp.tsx` apresenta um modal contextual permitindo `[🔨 Continuar Forja]` ou `[❌ Cancelar / Abandonar]`.
 
-### B. Proteção Anti-Softlock, Reciclagem de Sucata e Modo de Treino
-- **Estoque Inicial de Resguardo:** Novos jogadores e saves legados migrados recebem estoque inicial digno (8x lingote de ferro, 4x lingote de aço e 850 moedas de ouro).
-- **Recuperação de Falhas (Sucata):** Se uma lâmina quebrar por abuso térmico ou estresse físico, o ferreiro recolhe +2x sucata (`scrap`).
-- **Refundição de Sucata (`executeRecycleScrapTransaction`):** Ferramenta na bancada da Oficina permite transformar 2x sucata em 1x lingote de ferro utilizável.
-- **Treino Básico de Oficina (`isTraining: true`):** A qualquer momento — e especialmente se estiver sem metais e sem ouro — o artesão pode executar forja livre de treino. O modo é visualmente sinalizado com marca d'água na bigorna e isolado economicamente (valor de venda = 0, ouro de golpes = 0, drops de forja = 0), impedindo exploração.
+### B. Isolamento Estrito do Modo Treino & Galeria Segregada
+- **Economia e Carreira 100% Blindadas:**
+  - Golpes em modo treino rejeitam qualquer crédito de ouro (`TRAINING_MODE_NO_GOLD`).
+  - Término da forja em treino zera o objeto de recompensa (0 cartas, 0 ouro, 0 rubis, 0 diamantes).
+  - Estatísticas de carreira, maestria e contadores de raridade não sofrem qualquer incremento.
+- **Galeria Segregada (`trainingGallery`):** Lâminas de treino são gravadas estritamente em `trainingGallery` do save, mantendo o Arsenal canônico livre de artefatos de teste.
+- **Rejeição Categórica no Crisol e Encomendas:**
+  - `validateSwordFusionTransaction` e `fuseSwords` impedem o consumo de armas de treino (`isTraining`) e armas entregues à guilda (`commissionDelivered`).
+  - `isSwordEligibleForCommission` invalida qualquer espada com `isTraining: true`.
 
-### C. Estados Explícitos de Blueprints no Compêndio (`src/game/blueprints.ts`)
-- Os projetos canônicos são classificados dinamicamente em 6 estados estritos:
-  - `locked`: Requisitos de carreira não atingidos (exibe texto claro de como desbloquear).
-  - `known`: Conhecido na literatura da forja, mas requer descoberta ativa.
-  - `discovered`: Projeto desbloqueado por conquista ou compra de receita, aguardando metal no estoque.
-  - `ready`: Desbloqueado e com estoque de metal disponível para forja imediata.
-  - `crafted`: Já forjado com sucesso ao menos uma vez e presente no Arsenal.
-  - `mastered`: Dominado com perfeição (Rank S, qualidade ≥ 95%).
-- **Proteção de Armas Lendárias:** A simples posse de metal meteórico **NÃO** autoriza forjar a Queda de Asterion ou Cinzas Ancestrais. É obrigatório atingir marcos de carreira (ex.: 2 Obras-primas Rank S) ou portar um Núcleo de Fusão compatível.
+### C. Recuperação de Limalha Anti-Softlock por Mérito Técnico
+- Ao completar uma sessão de treino com qualidade $\ge 50$, o ferreiro recolhe +1x sucata (`scrap`) de limalhas da bigorna.
+- 2 sessões de treino bem-sucedidas = 2x sucata $\rightarrow$ 1x lingote de ferro na bancada da Oficina via `executeRecycleScrapTransaction`.
+- O jogador novato ou falido possui caminho de ascensão econômica puramente baseado em habilidade manual, sem risco de exploração monetária rápida.
 
-### D. Encomendas da Guilda dos Ferreiros (`src/game/commissions.ts`)
-- Oitavo pilar integrado na Galeria (`currentTab === "commissions"`):
-  - **Capitão Valerius (Sentinela da Muralha Norte):** Exige lâmina de ferro com papel Defensivo e qualidade ≥ 60%. Paga 350 ouro, 5 rubis e 2x lingotes de aço nobre.
-  - **Comandante Kael (Falcões Cinzentos):** Exige lâmina ágil (AGI ≥ 22) com qualidade ≥ 75%. Paga 600 ouro, 10 rubis e 1x tarugo de Damasco.
-  - **Lord Alistair (Alta Nobreza):** Exige lâmina de duelo ofensiva (ATK ≥ 32) com qualidade ≥ 88%. Paga 1.200 ouro, 20 rubis e 1x minério de meteorito.
-- A entrega (`executeDeliverCommissionTransaction`) valida os requisitos matematicamente, impede entregas duplicadas e grava indelévelmente a encomenda na arma (`commissionDelivered`).
+### D. Bloqueio Metalúrgico de Projetos Customizados (`src/game/screens/DesignScreen.tsx`)
+- O construtor livre de design impede a forja de aços nobres (`damascus`, `blacksteel`, `elven_silver`, `meteor`, `ancient_alloy`) se o jogador não tiver o tier de maestria correspondente em `career.unlockedTiers`.
+- O botão de forja real é desabilitado com aviso claro `🔒 Metalurgia Bloqueada: requer maestria em X para forjar`. O treino de oficina permanece disponível para aprendizado da temperatura.
 
-### E. Resiliência de Persistência Fail-Closed (`retryPersistSave` em `GameApp.tsx`)
-- Caso a persistência em disco falhe durante o término da forja (`QuotaExceededError`), a arma forjada não é descartada nem empurrada para a tela de revelação em estado desincronizado.
-- O payload é preservado em `uncommittedSave`, e um modal contextual surge oferecendo a ação `[🔄 Tentar Gravar Novamente]`. A gravação reexecuta sem sortear novos atributos nem regenerar sementes de RNG.
+### E. Atribuição Legítima de Papel Defensivo & Encomenda do Capitão Valerius
+- `calculateSwordAttributes` confere organicamente `combatRole: "Defensiva"` a espadas de ferro com cruzeta (`guard: "cross"`) ou perfil curto/longo, atingindo DEF $\ge 50$.
+- A primeira encomenda da guilda (`comm_guard_captain`) pode ser concluída com materiais da largada sem injeção de mocks ou cheats.
 
-### F. Simulação Econômica Multi-Perfil (`scripts/simulate-economy-progression.mjs`)
-- Simulação Monte Carlo validada em 60 partidas por perfil:
-  - **Iniciante:** 49 armas concluídas, 11 quebras (22% de taxa de falha), 52 treinos livres, 2 encomendas da muralha entregues, ouro final de 2.650 🪙. Zero softlocks.
-  - **Intermediário:** 56 armas concluídas, 4 quebras, 3 Obras-primas Rank S, compra ativa de 10x lingotes de Damasco no Bazar, 1ª arma Épica na rodada #4 e 1ª Lendária na #7.
-  - **Experiente:** 60 armas concluídas, 0 quebras, 26 Obras-primas Rank S (43% de taxa de maestria), compra de 6x lingotes de aço negro, 1ª Lendária na rodada #6.
+### F. Gating Real de Insumos e Consumo Atômico de Metais (`src/game/materials.ts`)
+- 7 chaves canônicas de metais (`iron_ingot`, `steel_ingot`, `damascus_billet`, `blacksteel_chunk`, `elven_silver_ingot`, `starmetal_ore`, `ancient_relic_shard`).
+- Forja regular debita 1x metal base correspondente (`executeStartForgeTransaction`); falta de material bloqueia a forja (`INSUFFICIENT_MATERIALS`).
 
-### G. Métricas Técnicas e Verificação
+### G. Compêndio de Projetos & Encomendas da Guilda
+- 6 estados canônicos de blueprints (`locked`, `known`, `discovered`, `ready`, `crafted`, `mastered`).
+- Encomendas de Capitão Valerius, Comandante Kael e Lord Alistair com validação matemática e etiquetagem permanente.
+
+### H. Métricas Técnicas e Verificação
 - **TypeScript:** 0 erros (`npm run typecheck` código 0).
-- **Testes Automatizados:** 117 testes em 26 suites, 0 falhas (`npm test`), incluindo 15 testes adversariais específicos da Operação 03 (`src/game/progression.test.ts`).
+- **Testes Automatizados:** 126 testes em 27 suites, 0 falhas (`npm test`), incluindo os 9 testes de integração e invariantes de ciclo de vida em `src/game/lifecycle-proof.test.ts`.
 - **Linter:** 0 erros (`npm run lint` código 0).
-- **Build de Produção:** Concluído com sucesso em 410ms (`npm run build`).
+- **Build de Produção:** Concluído com sucesso (`npm run build`).
 - **Evidências Visuais Capturadas via Playwright:**
-  - `progression-01-design-screen-gating.png`: Tela de Design com selos de estado do Compêndio, indicadores de estoque de metal e botão de treino.
-  - `progression-02-gallery-commissions-tab.png`: 8º Pilar da Galeria com a lista de patronos da guilda e requisitos.
-  - `progression-03-commission-delivered.png`: Encomenda do Capitão Valerius entregue com sucesso, payout de ouro/rubis/aço creditado e arma etiquetada.
-  - `progression-04-workshop-scrap-recycle.png`: Ferramenta de reciclagem de sucata em ferro comum e garantias anti-softlock.
-  - `progression-05-practice-forge-live.png`: Sessão de forja ativa em modo de treino de oficina.
+  - `proof-01-recovery-modal-active-attempt.png`: Modal de recuperação de tentativa ativa ao recarregar a tela com opções de continuar ou cancelar.
+  - `proof-02-cancel-fair-scrap-salvage.png`: Política justa de cancelamento após golpes desferidos concedendo +1x sucata de salvamento.
+  - `proof-03-metallurgy-gating-custom.png`: Banner de metalurgia bloqueada na tela de Design impedindo forja de aço nobre sem maestria.
+  - `proof-04-valerius-commission-defensive.png`: Encomenda do Capitão Valerius com espada de ferro Defensiva legítima pronta para entrega.
+  - `proof-05-commission-delivered-rewards.png`: Conclusão da entrega da encomenda com payout de 350 ouro, 5 rubis e 2x lingotes de aço.
 
 ---
 

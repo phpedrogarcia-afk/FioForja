@@ -192,6 +192,7 @@ export interface SimState {
   strikeReward?: { amount: number; kind: StrikeKind; strikeIndex: number; id: string } | null;
   forgeRunId?: string;
   activeCore?: FusionCore | null;
+  isTraining?: boolean;
 }
 
 export interface HudSnapshot {
@@ -298,14 +299,19 @@ export interface PlayerWallet {
   diamonds: number;
 }
 
+export type ForgeAttemptStatus = "PREPARED" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "FAILED";
+
 export interface ActiveForgeAttempt {
   attemptId: string;
   forgeRunId: string;
+  status: ForgeAttemptStatus;
   design: SwordDesign;
   isTraining: boolean;
   materialConsumed?: { key: string; name: string; quantity: number } | null;
   activeCoreId?: string | null;
   startedAt: number;
+  strikesCount: number;
+  lastStrikeAt?: number;
 }
 
 export interface BlacksmithCommission {
@@ -368,6 +374,7 @@ export interface CareerStats {
 export interface SaveData {
   version: number;
   gallery: FinishedSword[];
+  trainingGallery?: FinishedSword[];
   lastDesign: SwordDesign;
   wallet: PlayerWallet;
   inventory: PlayerInventory;

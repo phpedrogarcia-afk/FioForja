@@ -267,9 +267,15 @@ export function fuseSwords(
     throw new Error("A fusão de espadas exige exatamente 4 espadas elegíveis do Arsenal.");
   }
 
-  // Verifica lâminas quebradas
+  // Verifica lâminas quebradas, de treino ou já entregues em encomendas
   if (swords.some((s) => s.broken || s.structuralState === "broken")) {
     throw new Error("Lâminas quebradas não podem ser fundidas no Crisol Superior. Recicle-as na oficina.");
+  }
+  if (swords.some((s) => s.isTraining)) {
+    throw new Error("Armas de treino não podem ser consumidas no Crisol de Fusão.");
+  }
+  if (swords.some((s) => Boolean(s.commissionDelivered))) {
+    throw new Error("Armas entregues em encomendas da guilda não podem ser consumidas no Crisol.");
   }
 
   const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
@@ -457,6 +463,12 @@ export function validateSwordFusionTransaction(
   }
   if (found.some((s) => s!.broken || s!.structuralState === "broken")) {
     throw new Error("Transação inválida: Lâminas quebradas não podem ser fundidas no Crisol.");
+  }
+  if (found.some((s) => s!.isTraining)) {
+    throw new Error("Transação inválida: Armas de treino não podem ser consumidas no Crisol de Fusão.");
+  }
+  if (found.some((s) => Boolean(s!.commissionDelivered))) {
+    throw new Error("Transação inválida: Armas entregues em encomendas da guilda não podem ser consumidas no Crisol.");
   }
   if (save.wallet.gold < outcome.goldCost || save.wallet.rubies < outcome.rubiesCost) {
     throw new Error("Recursos insuficientes para pagar a transmutação do Crisol.");

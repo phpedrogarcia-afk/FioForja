@@ -68,6 +68,7 @@ export const defaultCareer: CareerStats = {
 export const defaultSaveData: SaveData = {
   version: VERSION,
   gallery: [],
+  trainingGallery: [],
   lastDesign: DEFAULT_DESIGN,
   wallet: defaultWallet,
   inventory: defaultInventory,
@@ -218,6 +219,7 @@ export function migrateSave(raw: any): SaveData {
   return {
     version: VERSION,
     gallery,
+    trainingGallery: Array.isArray(raw.trainingGallery) ? raw.trainingGallery : [],
     lastDesign: { ...DEFAULT_DESIGN, ...(raw.lastDesign || {}) },
     wallet,
     inventory,

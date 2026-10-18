@@ -58,6 +58,16 @@ export function isSwordEligibleForCommission(
     return { eligible: false, reasons };
   }
 
+  if (sword.isTraining) {
+    reasons.push("Armas de treino básico não são aceitas em encomendas da guilda.");
+    return { eligible: false, reasons };
+  }
+
+  if (sword.commissionDelivered) {
+    reasons.push("Esta arma já foi entregue em outra encomenda da guilda.");
+    return { eligible: false, reasons };
+  }
+
   if (commission.family && sword.design.family !== commission.family) {
     reasons.push(`Família incompatível (exige ${commission.family}, arma é ${sword.design.family || "livre"}).`);
   }

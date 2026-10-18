@@ -534,10 +534,10 @@ export function rarityFor(design: SwordDesign, quality: number): import("./types
 export function calculateSwordAttributes(
   design: SwordDesign,
   quality: number,
-  warp: number,
-  heatScore: number,
-  forgeScore: number,
-  quenchScore: number,
+  warp = 0,
+  heatScore = 80,
+  forgeScore = 80,
+  quenchScore = 80,
 ) {
   const profile = PROFILES[design.profile] || PROFILES.long;
   const steel = STEELS[design.steel] || STEELS.steel;
@@ -552,10 +552,13 @@ export function calculateSwordAttributes(
   } else if (design.profile === "claymore" || design.profile === "falchion" || (design.family === "damascus" && design.profile !== "short")) {
     combatRole = "Ofensiva";
     roleModifier = { atkMult: 1.22, defMult: 0.95, agiMult: 0.85, durAdd: 4 };
-  } else if (design.profile === "long" && (design.family === "royal" || design.family === "runic")) {
+  } else if (
+    (design.profile === "long" && (design.family === "royal" || design.family === "runic" || design.family === "iron")) ||
+    (design.family === "iron" && (design.guard === "cross" || design.profile === "short"))
+  ) {
     combatRole = "Defensiva";
     roleModifier = { atkMult: 0.98, defMult: 1.22, agiMult: 0.92, durAdd: 8 };
-  } else if (design.profile === "katana" || design.profile === "short" || design.profile === "saber") {
+  } else if (design.profile === "katana" || (design.profile === "short" && design.family !== "iron") || design.profile === "saber") {
     combatRole = "Ágil";
     roleModifier = { atkMult: 1.00, defMult: 0.88, agiMult: 1.28, durAdd: -4 };
   }

@@ -68,9 +68,12 @@ interface Props {
   onHud: (hud: HudSnapshot) => void;
   onFinished: (sim: SimState) => void;
   onStrikeReward?: (reward: { amount: number; id: string }) => void;
+  onStrike?: () => void;
   inputRef: MutableRefObject<SimInput>;
   inventory?: PlayerInventory;
   activeCore?: FusionCore | null;
+  forgeRunId?: string;
+  isTraining?: boolean;
 }
 
 export function ForgeCanvas({
@@ -81,9 +84,12 @@ export function ForgeCanvas({
   onHud,
   onFinished,
   onStrikeReward,
+  onStrike,
   inputRef,
   inventory,
   activeCore,
+  forgeRunId,
+  isTraining,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -99,6 +105,8 @@ export function ForgeCanvas({
       hammer: inventory?.equipped?.hammer,
       equippedGear: inventory?.equipped,
       activeCore,
+      forgeRunId,
+      isTraining,
     });
     const sparks: Spark[] = [];
     const steams: SteamParticle[] = [];
@@ -200,6 +208,10 @@ export function ForgeCanvas({
           force,
           ev.kind === "perfect",
         );
+
+        if (onStrike) {
+          onStrike();
+        }
 
         if (ev.goldReward) {
           playCoinJingle();
@@ -317,7 +329,7 @@ export function ForgeCanvas({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [design, images, shake, reducedMotion, onHud, onFinished, onStrikeReward, inputRef, inventory]);
+  }, [design, images, shake, reducedMotion, onHud, onFinished, onStrikeReward, onStrike, inputRef, inventory, activeCore, forgeRunId, isTraining]);
 
   return (
     <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-bg touch-none">

@@ -40,13 +40,13 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 - O núcleo jogável reside em `src/game/`:
   - `materials.ts`: chaves primárias de insumos metalúrgicos, consumo atômico e refundição de sucata.
   - `blueprints.ts`: máquina de estados (6 estados explícitos de projetos) e critérios de desbloqueio.
-  - `commissions.ts`: catálogo de encomendas da guilda e validação estrita de critérios de entrega.
-  - `transactions.ts`: executores de transações atômicas fail-closed (fusão, forja, compra, entrega, refino).
-  - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas e cálculo de atributos.
-  - `ForgeCanvas.tsx`: cena da forja, duas mãos de ferreiro com tenazes e martelo, bigorna, fornalha e bacia de têmpera.
+  - `commissions.ts`: catálogo de encomendas da guilda e validação estrita de critérios de entrega (incluindo papel Defensiva do Capitão Valerius).
+  - `transactions.ts`: executores de transações atômicas fail-closed (ciclo de vida de tentativas, cancelamento justo, fusão, forja, compra, entrega, refino).
+  - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas, cálculo de atributos e isolamento hermético de treino.
+  - `ForgeCanvas.tsx`: cena da forja com tenazes, martelo, bigorna, fornalha, têmpera e rastreamento de tentativas ativas.
   - `swordDraw.ts`: renderizador paramétrico de lâminas, guardas, cabos, pomos e incisões rúnicas.
-  - `save.ts`: persistência com backup atômico, retry seguro, sanitização e migração de saves.
+  - `save.ts`: persistência com backup atômico, retry seguro, sanitização, migração de saves e segregação de `trainingGallery`.
   - `loot.ts`: motor dinâmico de drops e tabelas de recompensas ponderadas.
-  - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C).
+  - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C) com blindagem contra armas de treino e encomendas.
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
-- Testes automatizados executam via `npm test` e `npm run typecheck`. Não presuma funcionalidade sem verificação real.
+- Testes automatizados executam via `npm test` (126 testes em 27 suites, 0 falhas) e `npm run typecheck` (0 erros). Não presuma funcionalidade sem verificação real.

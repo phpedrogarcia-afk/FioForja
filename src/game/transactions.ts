@@ -476,7 +476,7 @@ export function executeFinishSwordTransaction(
 ): TransactionExecutionResult<FinishedSword> {
   const sword = finishSword(sim, design);
   const attempt = currentSave.activeForgeAttempt;
-  const isTraining = Boolean(attempt?.isTraining);
+  const isTraining = Boolean(attempt?.isTraining || sim.isTraining);
 
   if (isTraining) {
     sword.value = 0;
@@ -499,9 +499,15 @@ export function executeFinishSwordTransaction(
   const nextInventory = { ...(currentSave.inventory || defaultInventory) };
   const nextMaterials = { ...(nextInventory.materials || {}) };
 
-  // Scrap reward on blade break (anti-softlock fallback)
+  // Anti-softlock recovery:
+  // 1. Scrap reward on blade break in real forge (+2 scrap)
   if (sim.broken && !isTraining) {
     nextMaterials.scrap = (nextMaterials.scrap || 0) + 2;
+  }
+  // 2. Training mode filings/trimmings: apprentice completing practice sword with Q >= 50 gets +1 scrap
+  // (2 treinos bem-sucedidos = 2 sucatas = 1 lingote de ferro reciclado na oficina)
+  if (isTraining && !sim.broken && sword.quality >= 50) {
+    nextMaterials.scrap = (nextMaterials.scrap || 0) + 1;
   }
 
   if (sim.activeCore) {
@@ -509,42 +515,61 @@ export function executeFinishSwordTransaction(
     nextInventory.fusionCores = remainingCores;
   }
 
-  // Blueprint mastery & discovery tracking
-  const matchedPreset = CANONICAL_PRESETS.find(
-    (p) =>
-      p.id === (design as any).id ||
-      p.name === design.name ||
-      p.design.name === design.name ||
-      (p.family === design.family && p.design.profile === design.profile),
-  );
+  // Blueprint mastery & discovery tracking (ONLY FOR REAL FORGES — NEVER IN TRAINING)
   const nextBlueprints = [...(nextInventory.unlockedBlueprints || ["guarda_medieval"])];
   const nextMastered = [...(nextInventory.masteredBlueprints || [])];
-  if (matchedPreset) {
-    if (sword.quality >= 95 && !nextMastered.includes(matchedPreset.id)) {
-      nextMastered.push(matchedPreset.id);
+  if (!isTraining) {
+    const matchedPreset = CANONICAL_PRESETS.find(
+      (p) =>
+        p.id === (design as any).id ||
+        p.name === design.name ||
+        p.design.name === design.name ||
+        (p.family === design.family && p.design.profile === design.profile),
+    );
+    if (matchedPreset) {
+      if (sword.quality >= 95 && !nextMastered.includes(matchedPreset.id)) {
+        nextMastered.push(matchedPreset.id);
+      }
     }
   }
   nextInventory.unlockedBlueprints = nextBlueprints;
   nextInventory.masteredBlueprints = nextMastered;
   nextInventory.materials = nextMaterials;
 
+  // Career stats: STRICTLY PRESERVED IN TRAINING (ZERO PROGRESS)
   const prevCareer = currentSave.career || defaultCareer;
-  const isMasterpiece = sword.quality >= 95;
-  const nextCareer: CareerStats = {
-    totalForged: prevCareer.totalForged + 1,
-    masterpieces: prevCareer.masterpieces + (isMasterpiece ? 1 : 0),
-    legendaries: prevCareer.legendaries + (sword.rarity === "Lendária" ? 1 : 0),
-    relics: prevCareer.relics + (sword.rarity === "Relíquia" ? 1 : 0),
-    brokenBlades: prevCareer.brokenBlades + (sim.broken ? 1 : 0),
-    highestQuality: Math.max(prevCareer.highestQuality, sword.quality),
-    totalValueEarned: prevCareer.totalValueEarned + (sim.broken || isTraining ? 0 : (sword.value || 0)),
-  };
+  let nextCareer: CareerStats = prevCareer;
+  if (!isTraining) {
+    const isMasterpiece = sword.quality >= 95;
+    nextCareer = {
+      totalForged: prevCareer.totalForged + 1,
+      masterpieces: prevCareer.masterpieces + (isMasterpiece ? 1 : 0),
+      legendaries: prevCareer.legendaries + (sword.rarity === "Lendária" ? 1 : 0),
+      relics: prevCareer.relics + (sword.rarity === "Relíquia" ? 1 : 0),
+      brokenBlades: prevCareer.brokenBlades + (sim.broken ? 1 : 0),
+      highestQuality: Math.max(prevCareer.highestQuality, sword.quality),
+      totalValueEarned: prevCareer.totalValueEarned + (sim.broken ? 0 : (sword.value || 0)),
+    };
+  }
 
-  const nextGallery = !sim.broken ? [sword, ...currentSave.gallery] : currentSave.gallery;
+  // Gallery destination: Training swords go to trainingGallery, real swords go to regular gallery
+  let nextGallery = currentSave.gallery;
+  let nextTrainingGallery = currentSave.trainingGallery || [];
+
+  if (isTraining) {
+    if (!sim.broken) {
+      nextTrainingGallery = [sword, ...nextTrainingGallery];
+    }
+  } else {
+    if (!sim.broken) {
+      nextGallery = [sword, ...currentSave.gallery];
+    }
+  }
 
   const nextSave: SaveData = {
     ...currentSave,
     gallery: nextGallery,
+    trainingGallery: nextTrainingGallery,
     career: nextCareer,
     inventory: nextInventory,
     activeForgeAttempt: null, // Clear active attempt on finish
@@ -571,11 +596,21 @@ export function executeFinishSwordTransaction(
 
 /**
  * 8. Strike Reward Transaction: Credits gold per strike, checks forgeRunId lifecycle, and compacts history.
+ * Isolado no modo treino: rejeita concessão de ouro.
  */
 export function executeStrikeRewardTransaction(
   currentSave: SaveData,
   reward: { amount: number; id: string },
 ): TransactionExecutionResult {
+  if (currentSave.activeForgeAttempt?.isTraining) {
+    return {
+      success: false,
+      save: currentSave,
+      error: "Modo Treino não gera recompensas financeiras por golpes.",
+      code: "TRAINING_MODE_NO_GOLD",
+    };
+  }
+
   const tx = applyStrikeRewardTransaction(currentSave, reward);
   if (!tx.applied) {
     return {
@@ -586,10 +621,20 @@ export function executeStrikeRewardTransaction(
     };
   }
 
+  const nextAttempt = currentSave.activeForgeAttempt
+    ? {
+        ...currentSave.activeForgeAttempt,
+        status: "ACTIVE" as const,
+        strikesCount: (currentSave.activeForgeAttempt.strikesCount || 0) + 1,
+        lastStrikeAt: Date.now(),
+      }
+    : null;
+
   const nextSave: SaveData = {
     ...currentSave,
     wallet: tx.wallet,
     claimedStrikeRewardIds: tx.claimedStrikeRewardIds,
+    activeForgeAttempt: nextAttempt,
   };
 
   const writeRes = writeSave(nextSave);
@@ -609,6 +654,44 @@ export function executeStrikeRewardTransaction(
 }
 
 /**
+ * Registra um golpe no ciclo de vida da tentativa ativa (transição PREPARED -> ACTIVE e contador)
+ * Utilizado para golpes em treino ou sem premiação direta de ouro.
+ */
+export function executeRecordStrikeTransaction(currentSave: SaveData): TransactionExecutionResult<ActiveForgeAttempt> {
+  if (!currentSave.activeForgeAttempt) {
+    return { success: true, save: currentSave };
+  }
+
+  const nextAttempt: ActiveForgeAttempt = {
+    ...currentSave.activeForgeAttempt,
+    status: "ACTIVE",
+    strikesCount: (currentSave.activeForgeAttempt.strikesCount || 0) + 1,
+    lastStrikeAt: Date.now(),
+  };
+
+  const nextSave: SaveData = {
+    ...currentSave,
+    activeForgeAttempt: nextAttempt,
+  };
+
+  const writeRes = writeSave(nextSave);
+  if (!writeRes.ok) {
+    return {
+      success: false,
+      save: currentSave,
+      error: writeRes.error || "Falha ao registrar golpe no armazenamento.",
+      code: writeRes.code || "PERSISTENCE_FAILED",
+    };
+  }
+
+  return {
+    success: true,
+    save: nextSave,
+    payload: nextAttempt,
+  };
+}
+
+/**
  * 9. Start Forge Transaction: Transactionally validates blueprint knowledge, checks raw material stock,
  * reserves/deducts 1x material (unless free training), records activeForgeAttempt with attemptId, and persists fail-closed.
  */
@@ -620,6 +703,21 @@ export function executeStartForgeTransaction(
   const currentInv = currentSave.inventory || defaultInventory;
   const isTraining = Boolean(options?.isTraining);
 
+  // Impede iniciar uma nova forja caso uma tentativa já esteja ativa ou preparada
+  if (
+    currentSave.activeForgeAttempt &&
+    (currentSave.activeForgeAttempt.status === "PREPARED" ||
+      currentSave.activeForgeAttempt.status === "ACTIVE" ||
+      !currentSave.activeForgeAttempt.status)
+  ) {
+    return {
+      success: false,
+      save: currentSave,
+      error: "Uma forja já está em andamento. Conclua ou cancele a tentativa atual antes de iniciar outra.",
+      code: "ATTEMPT_ALREADY_ACTIVE",
+    };
+  }
+
   if (isTraining) {
     const attempt: ActiveForgeAttempt = {
       attemptId: generateUniqueId("attempt"),
@@ -629,6 +727,8 @@ export function executeStartForgeTransaction(
       materialConsumed: null,
       activeCoreId: null,
       startedAt: Date.now(),
+      status: "PREPARED",
+      strikesCount: 0,
     };
 
     const nextSave: SaveData = {
@@ -692,6 +792,76 @@ export function executeStartForgeTransaction(
     }
   }
 
+  // Proteção da metalurgia em design livre (gating contra craft de aço raro sem prestígio/núcleo)
+  const career = currentSave.career || defaultCareer;
+  if (design.steel === "damascus") {
+    const unlockedDamascus =
+      career.totalForged >= 3 ||
+      currentInv.unlockedBlueprints?.includes("cimitarra_damasco") ||
+      activeCore?.steel === "damascus";
+    if (!unlockedDamascus) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Metalurgia do Damasco bloqueada: Requer pelo menos 3 forjas concluídas ou autorização por Núcleo/Receita.",
+        code: "METALLURGY_LOCKED",
+      };
+    }
+  } else if (design.steel === "blacksteel") {
+    const unlockedBlacksteel =
+      career.totalForged >= 4 ||
+      currentInv.unlockedBlueprints?.includes("juramento_ferro") ||
+      activeCore?.steel === "blacksteel";
+    if (!unlockedBlacksteel) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Metalurgia do Aço Negro bloqueada: Requer pelo menos 4 forjas concluídas ou receita/núcleo.",
+        code: "METALLURGY_LOCKED",
+      };
+    }
+  } else if (design.steel === "elven_silver") {
+    const unlockedElven =
+      career.totalForged >= 7 ||
+      currentInv.unlockedBlueprints?.includes("folha_aereth") ||
+      activeCore?.steel === "elven_silver";
+    if (!unlockedElven) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Metalurgia Élfica bloqueada: Requer pelo menos 7 forjas concluídas ou receita élfica no Bazar.",
+        code: "METALLURGY_LOCKED",
+      };
+    }
+  } else if (design.steel === "meteor") {
+    const unlockedMeteor =
+      career.masterpieces >= 1 ||
+      career.legendaries >= 1 ||
+      currentInv.unlockedBlueprints?.includes("queda_asterion") ||
+      activeCore?.steel === "meteor";
+    if (!unlockedMeteor) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Metalurgia Meteórica bloqueada: Requer pelo menos 1 Obra-prima (Rank S) ou Núcleo de Fusão meteórico.",
+        code: "METALLURGY_LOCKED",
+      };
+    }
+  } else if (design.steel === "ancient_alloy") {
+    const unlockedAncient =
+      career.legendaries >= 1 ||
+      currentInv.unlockedBlueprints?.includes("cinzas_ancestrais") ||
+      activeCore?.steel === "ancient_alloy";
+    if (!unlockedAncient) {
+      return {
+        success: false,
+        save: currentSave,
+        error: "Metalurgia Primordial bloqueada: Requer pelo menos 1 arma Lendária ou Núcleo de Fusão primordial.",
+        code: "METALLURGY_LOCKED",
+      };
+    }
+  }
+
   const reqMat = getRequiredMaterialForSteel(design.steel);
   const stock = getMaterialStock(currentInv.materials, reqMat.key);
 
@@ -713,6 +883,8 @@ export function executeStartForgeTransaction(
     materialConsumed: { key: reqMat.key, name: reqMat.name, quantity: 1 },
     activeCoreId: activeCore ? activeCore.id : null,
     startedAt: Date.now(),
+    status: "PREPARED",
+    strikesCount: 0,
   };
 
   const nextInventory: PlayerInventory = {
@@ -744,22 +916,58 @@ export function executeStartForgeTransaction(
 }
 
 /**
- * 10. Cancel Forge Transaction: Safely refunds consumed material back to player inventory and clears attempt.
+ * 10. Cancel Forge Transaction: Fair cancellation policy.
+ * - Antes do primeiro golpe (PREPARED, strikesCount === 0): Reembolso integral (100%) do lingote consumido.
+ * - Após o primeiro golpe (ACTIVE, strikesCount > 0): Sem estorno de lingote; concede +1 sucata metálica.
+ * - Rejeita cancelamento se a tentativa já estiver COMPLETED ou CANCELLED.
  */
-export function executeCancelForgeTransaction(currentSave: SaveData): TransactionExecutionResult {
+export function executeCancelForgeTransaction(
+  currentSave: SaveData,
+  options?: { strikesCount?: number },
+): TransactionExecutionResult<{ refundedMaterial: boolean; scrapAwarded: number }> {
   const attempt = currentSave.activeForgeAttempt;
   if (!attempt) {
-    return { success: true, save: currentSave };
+    return {
+      success: true,
+      save: currentSave,
+      payload: { refundedMaterial: false, scrapAwarded: 0 },
+    };
   }
 
-  const nextInventory = { ...(currentSave.inventory || defaultInventory) };
-  if (attempt.materialConsumed && attempt.materialConsumed.quantity > 0) {
-    nextInventory.materials = addMaterialStock(
-      nextInventory.materials,
-      attempt.materialConsumed.key,
-      attempt.materialConsumed.quantity,
-    );
+  if (attempt.status === "COMPLETED" || attempt.status === "CANCELLED") {
+    return {
+      success: false,
+      save: currentSave,
+      error: "A tentativa de forja já foi encerrada e não pode ser cancelada.",
+      code: "ATTEMPT_ALREADY_COMPLETED",
+    };
   }
+
+  const effectiveStrikes = Math.max(attempt.strikesCount || 0, options?.strikesCount || 0);
+  const isStruck = effectiveStrikes > 0 || attempt.status === "ACTIVE";
+
+  const nextInventory = { ...(currentSave.inventory || defaultInventory) };
+  let nextMaterials = { ...(nextInventory.materials || {}) };
+  let refundedMaterial = false;
+  let scrapAwarded = 0;
+
+  if (!isStruck) {
+    // Reembolso de 100% dos insumos antes da primeira batida do martelo
+    if (attempt.materialConsumed && attempt.materialConsumed.quantity > 0) {
+      nextMaterials = addMaterialStock(
+        nextMaterials,
+        attempt.materialConsumed.key,
+        attempt.materialConsumed.quantity,
+      );
+      refundedMaterial = true;
+    }
+  } else {
+    // Tarugo deformado após a primeira martelada: perde o lingote mas recupera 1 sucata para reciclagem
+    nextMaterials.scrap = (nextMaterials.scrap || 0) + 1;
+    scrapAwarded = 1;
+  }
+
+  nextInventory.materials = nextMaterials;
 
   const nextSave: SaveData = {
     ...currentSave,
@@ -780,6 +988,7 @@ export function executeCancelForgeTransaction(currentSave: SaveData): Transactio
   return {
     success: true,
     save: nextSave,
+    payload: { refundedMaterial, scrapAwarded },
   };
 }
 

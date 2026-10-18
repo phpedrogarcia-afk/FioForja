@@ -40,8 +40,10 @@ export function FusionStationScreen({
   const [lastCompResult, setLastCompResult] = useState<ComponentFusionOutcome | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Eligible swords for fusion: not broken
-  const eligibleSwords = swords.filter((s) => !s.broken && s.structuralState !== "broken");
+  // Eligible swords for fusion: not broken, not training, not commission-delivered
+  const eligibleSwords = swords.filter(
+    (s) => !s.broken && s.structuralState !== "broken" && !s.isTraining && !s.commissionDelivered,
+  );
   const selectedSwords = eligibleSwords.filter((s) => selectedSwordIds.includes(s.id));
 
   // Eligible components for fusion

@@ -84,7 +84,57 @@ export function DesignScreen({
     ? evaluateBlueprintStatus(matchedPreset, inventory, career, gallery, activeCore)
     : null;
 
-  const isLocked = presetStatus ? presetStatus.state === "locked" : false;
+  let metallurgyLocked = false;
+  let metallurgyReason = "";
+  if (design.steel === "damascus") {
+    const unlockedDamascus =
+      career.totalForged >= 3 ||
+      inventory.unlockedBlueprints?.includes("cimitarra_damasco") ||
+      activeCore?.steel === "damascus";
+    if (!unlockedDamascus) {
+      metallurgyLocked = true;
+      metallurgyReason = "Metalurgia do Damasco: Requer 3 forjas concluídas ou autorização por Núcleo/Receita.";
+    }
+  } else if (design.steel === "blacksteel") {
+    const unlockedBlacksteel =
+      career.totalForged >= 4 ||
+      inventory.unlockedBlueprints?.includes("juramento_ferro") ||
+      activeCore?.steel === "blacksteel";
+    if (!unlockedBlacksteel) {
+      metallurgyLocked = true;
+      metallurgyReason = "Metalurgia do Aço Negro: Requer 4 forjas concluídas ou receita/núcleo.";
+    }
+  } else if (design.steel === "elven_silver") {
+    const unlockedElven =
+      career.totalForged >= 7 ||
+      inventory.unlockedBlueprints?.includes("folha_aereth") ||
+      activeCore?.steel === "elven_silver";
+    if (!unlockedElven) {
+      metallurgyLocked = true;
+      metallurgyReason = "Metalurgia Élfica: Requer 7 forjas concluídas ou segredo élfico no Bazar.";
+    }
+  } else if (design.steel === "meteor") {
+    const unlockedMeteor =
+      career.masterpieces >= 1 ||
+      career.legendaries >= 1 ||
+      inventory.unlockedBlueprints?.includes("queda_asterion") ||
+      activeCore?.steel === "meteor";
+    if (!unlockedMeteor) {
+      metallurgyLocked = true;
+      metallurgyReason = "Metalurgia Meteórica: Requer 1 Obra-prima (Rank S) ou Núcleo de Fusão meteórico.";
+    }
+  } else if (design.steel === "ancient_alloy") {
+    const unlockedAncient =
+      career.legendaries >= 1 ||
+      inventory.unlockedBlueprints?.includes("cinzas_ancestrais") ||
+      activeCore?.steel === "ancient_alloy";
+    if (!unlockedAncient) {
+      metallurgyLocked = true;
+      metallurgyReason = "Metalurgia Primordial: Requer 1 arma Lendária ou Núcleo de Fusão primordial.";
+    }
+  }
+
+  const isLocked = (presetStatus ? presetStatus.state === "locked" : false) || metallurgyLocked;
   const canForgeReal = !isLocked && hasMaterial;
 
   return (
@@ -228,6 +278,14 @@ export function DesignScreen({
             <div className="mt-3 rounded-md border border-red-500/30 bg-red-950/20 p-2.5 text-xs text-red-300">
               <span className="font-bold">🔒 Projeto Bloqueado: </span>
               {presetStatus.requirementText}
+            </div>
+          ) : null}
+
+          {/* Locked Metallurgy Banner */}
+          {metallurgyLocked ? (
+            <div className="mt-3 rounded-md border border-red-500/30 bg-red-950/20 p-2.5 text-xs text-red-300">
+              <span className="font-bold">🔒 Metalurgia Bloqueada: </span>
+              {metallurgyReason}
             </div>
           ) : null}
 

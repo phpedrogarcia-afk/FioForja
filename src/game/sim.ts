@@ -31,6 +31,7 @@ export function createSim(
     equippedGear?: EquippedWorkshopGear;
     activeCore?: FusionCore | null;
     forgeRunId?: string;
+    isTraining?: boolean;
   },
 ): SimState {
   const steel = STEELS[design.steel];
@@ -90,6 +91,7 @@ export function createSim(
     history: [],
     forgeRunId,
     activeCore,
+    isTraining: Boolean(options?.isTraining),
   };
 }
 
@@ -424,9 +426,9 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
   s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
 
-  // Real-time Strike Economy (+3 good, +8 perfect, +12 master)
+  // Real-time Strike Economy (+3 good, +8 perfect, +12 master) — Treinamento não gera ouro
   let goldGain = 0;
-  if (!isCold && !s.broken) {
+  if (!isCold && !s.broken && !s.isTraining) {
     if (kind === "perfect") {
       const isMasterStrike = s.activeHammer === "precision" || s.targetZone === "tip" || Math.abs(s.heat - (steel.heatMin + steel.heatMax) / 2) < 0.05;
       goldGain = isMasterStrike ? 12 : 8;
@@ -564,10 +566,13 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     cracks: s.cracks,
     physicalProfile: { ...s.physicalProfile },
     history: s.history,
+    isTraining: s.isTraining,
   };
 
-  // Pre-generate deterministic rewards tied strictly to this forgeRunId
-  resultSword.pendingRewards = generateDynamicForgeRewards(resultSword, { forgeRunId });
+  // Pre-generate deterministic rewards tied strictly to this forgeRunId (isolado no treino)
+  if (!s.isTraining) {
+    resultSword.pendingRewards = generateDynamicForgeRewards(resultSword, { forgeRunId });
+  }
 
   return recalculateSwordStats(resultSword);
 }
@@ -591,7 +596,7 @@ export function applyStrikeRewardTransaction(
     claimedStrikeRewardIds?: string[];
   },
   reward: { amount: number; id: string; strikeIndex?: number },
-  activeForgeRunId?: string,
+  _activeForgeRunId?: string,
 ): StrikeRewardTransactionResult {
   const currentWallet = currentSave.wallet || { gold: 0, rubies: 0, diamonds: 0 };
   const claimedStrikes = currentSave.claimedStrikeRewardIds || [];

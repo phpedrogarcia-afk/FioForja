@@ -14,6 +14,7 @@ import {
   executeClaimRewardsTransaction,
   executeFinishSwordTransaction,
   executeStrikeRewardTransaction,
+  executeRecordStrikeTransaction,
   executeStartForgeTransaction,
   executeCancelForgeTransaction,
   executeDeliverCommissionTransaction,
@@ -28,7 +29,7 @@ import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
+import type { ActiveForgeAttempt, CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
@@ -71,6 +72,7 @@ export function GameApp() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [errorToast, setErrorToast] = useState<string | null>(null);
   const [pendingFailedSave, setPendingFailedSave] = useState<{ sword: FinishedSword; uncommittedSave: SaveData } | null>(null);
+  const [recoveryAttempt, setRecoveryAttempt] = useState<ActiveForgeAttempt | null>(null);
   const showError = useCallback((msg: string) => {
     setErrorToast(msg);
     window.setTimeout(() => setErrorToast(null), 4500);
@@ -88,6 +90,15 @@ export function GameApp() {
     setInventory(loaded.inventory || defaultInventory);
     setCareer(loaded.career || defaultCareer);
     setMutedUi(loaded.muted);
+
+    if (
+      loaded.activeForgeAttempt &&
+      (loaded.activeForgeAttempt.status === "PREPARED" ||
+        loaded.activeForgeAttempt.status === "ACTIVE" ||
+        !loaded.activeForgeAttempt.status)
+    ) {
+      setRecoveryAttempt(loaded.activeForgeAttempt);
+    }
 
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
@@ -144,6 +155,13 @@ export function GameApp() {
     if (!res.success) return;
     save.current = res.save;
     setWallet(res.save.wallet);
+  }, []);
+
+  const handleStrike = useCallback(() => {
+    const res = executeRecordStrikeTransaction(save.current);
+    if (res.success) {
+      save.current = res.save;
+    }
   }, []);
 
   const handleClaimRewards = useCallback((rewards: ForgeRewardsData) => {
@@ -545,8 +563,11 @@ export function GameApp() {
             onHud={onHud}
             onFinished={onFinished}
             onStrikeReward={handleStrikeReward}
+            onStrike={handleStrike}
             inputRef={inputRef}
             inventory={inventory}
+            forgeRunId={save.current.activeForgeAttempt?.forgeRunId}
+            isTraining={save.current.activeForgeAttempt?.isTraining}
           />
         ) : (
           <div className="flex h-full items-center justify-center font-display text-muted">
@@ -572,7 +593,7 @@ export function GameApp() {
           }}
           onQuit={() => {
             inputRef.current.charging = false;
-            const cancelRes = executeCancelForgeTransaction(save.current);
+            const cancelRes = executeCancelForgeTransaction(save.current, { strikesCount: hud.strikes });
             if (cancelRes.success) {
               save.current = cancelRes.save;
               setInventory(cancelRes.save.inventory);
@@ -587,6 +608,62 @@ export function GameApp() {
   return (
     <>
       {renderScreen()}
+      {recoveryAttempt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in">
+          <div className="max-w-md w-full rounded-xl border border-amber-600/60 bg-[#120e0a] p-6 shadow-2xl text-center space-y-4">
+            <div className="text-3xl">⚒️</div>
+            <h3 className="font-display text-base font-bold text-amber-300">
+              Forja em Andamento Detectada
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {recoveryAttempt.isTraining
+                ? "Uma sessão de treinamento do aprendiz foi interrompida na bigorna."
+                : `Existe uma tentativa ativa de forja (${recoveryAttempt.design.name || "Lâmina"}) com matéria-prima alocada.`}
+            </p>
+            <div className="p-3 bg-black/50 border border-amber-900/40 rounded-lg text-left text-xs space-y-1.5 text-slate-300 font-sans">
+              <div><strong className="text-amber-400">Projeto:</strong> {recoveryAttempt.design.name || "Customizado"}</div>
+              <div><strong className="text-amber-400">Liga Metálica:</strong> {recoveryAttempt.design.steel}</div>
+              <div><strong className="text-amber-400">Progresso:</strong> {recoveryAttempt.status === "ACTIVE" ? "Tarugo deformado (Em forjamento)" : "Preparada na Bigorna (Sem marteladas)"}</div>
+              <div><strong className="text-amber-400">Marteladas registradas:</strong> {recoveryAttempt.strikesCount || 0}</div>
+            </div>
+            <div className="flex gap-3 justify-center pt-2">
+              <Button
+                className="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-display font-bold text-xs"
+                onClick={() => {
+                  setDesign(recoveryAttempt.design);
+                  setRecoveryAttempt(null);
+                  unlockAudio();
+                  setHud(EMPTY_HUD);
+                  setFinished(null);
+                  setForgeKey((k) => k + 1);
+                  setScreen("forge");
+                }}
+              >
+                Continuar Forja
+              </Button>
+              <Button
+                variant="secondary"
+                className="flex-1 border-border text-slate-400 hover:text-white text-xs font-display"
+                onClick={() => {
+                  const res = executeCancelForgeTransaction(save.current, { strikesCount: recoveryAttempt.strikesCount });
+                  if (res.success) {
+                    save.current = res.save;
+                    setInventory(res.save.inventory);
+                    if (res.payload?.refundedMaterial) {
+                      showError("Tentativa cancelada: 100% dos insumos foram devolvidos ao inventário.");
+                    } else if (res.payload?.scrapAwarded) {
+                      showError("Tentativa cancelada: Tarugo descartado com +1 Sucata metálica recuperada.");
+                    }
+                  }
+                  setRecoveryAttempt(null);
+                }}
+              >
+                Cancelar / Abandonar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {errorToast && (
         <div
           role="alert"

@@ -1,54 +1,60 @@
 # FioForja — Contrato de Transferência e Handoff para o Codex
-## Guia Definitivo de Continuidade entre Agentes Autônomos (Operação 03: O Ciclo do Ferreiro)
+## Guia Definitivo de Continuidade entre Agentes Autônomos (Operação 04: A Prova da Forja)
 
 ---
 
 ### 1. ONDE ESTAMOS?
 - **Repositório:** `phpedrogarcia-afk/FioForja`
-- **Branch Ativa:** `antigravity/blacksmith-progression-v1`
-- **Base de Continuidade:** `antigravity/forge-of-prestige-v1` (Commit `6674640aac8ff474db8e21cce357b24936b66713`)
-- **Estado Geral:** A Operação 03 fechou a lacuna entre a economia e a fabricação manual, conectando insumos, desbloqueios de projetos, encomendas da guilda e garantias anti-softlock em um ciclo jogável e virtuoso:
-  - **Gating de Insumos & Consumo Atômico de Metais (`src/game/materials.ts`):** 7 chaves primárias canônicas (`iron_ingot`, `steel_ingot`, `damascus_billet`, `blacksteel_chunk`, `elven_silver_ingot`, `starmetal_ore`, `ancient_relic_shard`). A forja regular consome atomicamente 1x metal base correspondente; cancelar a forja estorna 100% do insumo.
-  - **Garantia Anti-Softlock & Reciclagem de Sucata:** Saves iniciam com 8x ferro, 4x aço e 850 moedas. Quebrar lâminas na bigorna gera +2x sucata (`scrap`), e a Oficina possui ferramenta de bancada para refundir 2x sucata em 1x ferro utilizável.
-  - **Modo "Treino Básico de Oficina":** A qualquer momento (e automaticamente se o ferreiro estiver sem metais), o jogador pode iniciar forja de treino livre (`isTraining: true`), isolada com recompensas e drops zerados para impedir exploração econômica.
-  - **Compêndio com 6 Estados Explícitos de Blueprints (`src/game/blueprints.ts`):** `locked`, `known`, `discovered`, `ready`, `crafted`, `mastered`. A simples posse de metal raro **não** autoriza forjar Lendárias sem marcos reais de carreira ou Núcleos de Fusão.
-  - **Encomendas da Guilda dos Ferreiros (`src/game/commissions.ts`):** 8º pilar na Galeria com pedidos de Capitão Valerius, Comandante Kael e Lord Alistair, exigindo papéis de combate, qualidade e metais específicos, com etiquetagem de entrega na arma.
-  - **Recuperação de Persistência com Retry Seguro:** Se o storage estourar (`QuotaExceededError`), a arma não é perdida; o payload fica seguro em `uncommittedSave` com modal `[🔄 Tentar Gravar Novamente]` sem sortear novos atributos.
+- **Branch Ativa:** `antigravity/forge-lifecycle-proof-v1`
+- **Base de Continuidade:** `antigravity/blacksmith-progression-v1` (Commit `6e3920d4a8a92bca0b4d6f238d6232d3645a6b6c`)
+- **Estado Geral:** A Operação 04 consolidou a integridade de ciclo de vida das tentativas de forja, isolou hermeticamente o modo treino e garantiu uma rota anti-softlock justa baseada em mérito técnico:
+  - **Ciclo de Vida da Tentativa & Política Justa de Cancelamento (`src/game/transactions.ts`):** 4 estados estritos (`PREPARED`, `ACTIVE`, `COMPLETED`, `CANCELLED`). `executeStartForgeTransaction` rejeita tentativas simultâneas (`ATTEMPT_ALREADY_ACTIVE`). O cancelamento em `PREPARED` (0 golpes) devolve 100% do lingote; em `ACTIVE` (≥1 golpe), não devolve o metal nobre, mas concede +1x sucata (`scrap`) de salvamento. Tentativas canceladas ou completadas são imutáveis.
+  - **Identidade Estrita da Forja (`forgeRunId`):** O ID da tentativa é emitido na largada, passado ao simulador, ao canvas e impresso na lâmina `FinishedSword.forgeRunId`.
+  - **Modal de Recuperação de Tentativa Ativa:** Ao recarregar com tentativa pendente em disco, `GameApp.tsx` apresenta um modal contextual permitindo `[🔨 Continuar Forja]` ou `[❌ Cancelar / Abandonar]`.
+  - **Isolamento Hermético do Modo Treino:** O modo treino (`isTraining: true`) não gera ouro por golpe na bigorna (`TRAINING_MODE_NO_GOLD`), não gera drops de cartas, não pontua estatísticas de carreira/maestria e armazena espadas exclusivamente em `trainingGallery` no `SaveData`.
+  - **Rejeição Categórica no Crisol e Encomendas:** `validateSwordFusionTransaction` e `isSwordEligibleForCommission` rejeitam expressamente armas de treino e armas já entregues em encomendas (`commissionDelivered`).
+  - **Anti-Softlock por Mérito Técnico (Limalha de Oficina):** Concluir treino com qualidade $\ge 50$ concede +1x sucata (`scrap`). Duas sessões dedicadas de treino conferem 2 sucatas, recicláveis em 1 lingote de ferro (`executeRecycleScrapTransaction`), permitindo recuperação mesmo com 0 ouro e 0 materiais.
+  - **Bloqueio Metalúrgico de Projetos Customizados (`src/game/screens/DesignScreen.tsx`):** A seleção de aços nobres no construtor livre exige o respectivo tier de metalurgia na carreira (`career.unlockedTiers`), impedindo bypass da progressão.
+  - **Atribuição Legítima de Papel Defensivo & Encomenda do Capitão Valerius:** `calculateSwordAttributes` confere organicamente `combatRole: "Defensiva"` a espadas de ferro com cruzeta (`guard: "cross"`) ou perfil curto/longo, permitindo que a primeira encomenda da guilda (`comm_guard_captain`) seja concluída legitimamente desde a primeira forja do jogo.
 
 ---
 
 ### 2. O QUE QUEREMOS?
 - Consolidar o FioForja como o melhor jogo de forja e coleção de armas medievais no navegador.
 - O princípio sagrado é: **THE WEAPON IS THE HERO. THE PLAYER FORGES THE TROPHY**.
-- O ciclo central agora é completo: o jogador forja armas básicas, entrega encomendas da guilda, ganha ouro e metais superiores, compra receitas e lingotes no bazar, funde armas antigas em núcleos poderosos e forja troféus Lendários na bigorna.
+- O ciclo central agora é auditável e hermético: o ferreiro inicia a forja consumindo metal, martela a lâmina em tempo real, pode cancelar com regras justas ou recuperar a sessão em reload, conclui encomendas legítimas, adquire receitas e funde armas antigas no Crisol sem quebras de integridade.
 
 ---
 
-### 3. COMO FUNCIONA A ARQUITETURA?
-1. **Transações Puras Fail-Closed (`src/game/transactions.ts`):**
-   - Mutações de estado executadas deterministicamente: `executeStartForgeTransaction`, `executeCancelForgeTransaction`, `executeFinishSwordTransaction`, `executeDeliverCommissionTransaction`, `executeRecycleScrapTransaction`, `retryPersistSave`, além das transações prévias de bazar, fusão e refino.
-   - Retorno unificado `TransactionExecutionResult<T>`. Se `writeSave()` falhar, o estado em memória não avança.
-2. **Sistema de Materiais e Insumos (`src/game/materials.ts`):**
-   - Mapeamento universal de metais e insumos com suporte a chaves primárias e aliases legados (`getMaterialStock`, `deductMaterialStock`, `addMaterialStock`, `recycleScrapToIron`).
-3. **Avaliação de Projetos (`src/game/blueprints.ts`):**
-   - Função pura `evaluateBlueprintStatus(preset, inventory, career, gallery, activeCore)` retorna o estado (`state`) e requisitos detalhados de desbloqueio.
-4. **Galeria com 8 Pilares (`src/game/screens/GalleryScreen.tsx`):**
-   - Arsenal, Compêndio, Componentes, Runas, Oficina, Crisol de Fusão, Legado e **Encomendas**.
+### 3. COMO AUDITAR E EXECUTAR O PROJETO (Checklist do Codex)
+Para auditoria completa e sem intervenção manual, execute em ordem:
+```bash
+# 1. Verificar tipagem estrita (TypeScript)
+npm run typecheck
+
+# 2. Executar linter
+npm run lint
+
+# 3. Executar suíte completa de testes automatizados (126 testes, 27 suites)
+npm test
+
+# 4. Executar build de produção do Vite / Nitro
+npm run build
+```
 
 ---
 
 ### 4. O QUE ESTÁ COMPROVADO POR TESTES E EVIDÊNCIAS?
-- **TypeScript:** 0 erros (`npm run typecheck`).
-- **Testes Automatizados:** 117 testes em 26 suites 100% aprovados (`npm test`), incluindo os 15 testes adversariais em `src/game/progression.test.ts`.
-- **Linter:** 0 erros (`npm run lint`).
+- **TypeScript:** 0 erros (`npm run typecheck` código 0).
+- **Testes Automatizados:** 126 testes em 27 suites 100% aprovados (`npm test`), incluindo 9 testes adversariais e de ciclo de vida em `src/game/lifecycle-proof.test.ts`.
+- **Linter:** 0 erros (`npm run lint` código 0).
 - **Build de Produção:** Concluído com sucesso (`npm run build`).
-- **Simulação Econômica Monte Carlo:** 60 partidas por perfil (Iniciante, Intermediário, Experiente) comprovam sustentabilidade, progressão de materiais e ausência de softlocks (`scripts/simulate-economy-progression.mjs`).
-- **Evidências Visuais Capturadas via Playwright:**
-  - `progression-01-design-screen-gating.png`: Tela de Design com selos do Compêndio e estoque de metal.
-  - `progression-02-gallery-commissions-tab.png`: 8º Pilar da Galeria com a lista de encomendas da guilda.
-  - `progression-03-commission-delivered.png`: Entrega de encomenda com ouro/rubis/aço creditados.
-  - `progression-04-workshop-scrap-recycle.png`: Refundição de sucata na Oficina.
-  - `progression-05-practice-forge-live.png`: Modo de treino de oficina ao vivo.
+- **Evidências Visuais Reais em `public/game/evidence/`:**
+  - `proof-01-recovery-modal-active-attempt.png`: Modal de recuperação de tentativa ativa ao recarregar a tela com opções de continuar ou cancelar.
+  - `proof-02-cancel-fair-scrap-salvage.png`: Política justa de cancelamento após golpes desferidos concedendo +1x sucata de salvamento.
+  - `proof-03-metallurgy-gating-custom.png`: Banner de metalurgia bloqueada na tela de Design impedindo forja de aço nobre sem maestria.
+  - `proof-04-valerius-commission-defensive.png`: Encomenda do Capitão Valerius com espada de ferro Defensiva legítima pronta para entrega.
+  - `proof-05-commission-delivered-rewards.png`: Conclusão da entrega da encomenda com payout de 350 ouro, 5 rubis e 2x lingotes de aço.
 
 ---
 
@@ -63,6 +69,9 @@
 1. **NÃO altere `main`** sem autorização explícita e validação total.
 2. **NUNCA entregue uma espada pronta a partir de fusão de espadas.** Fusão gera Núcleo de Fusão que DEVE ser forjado na bigorna pelo jogador.
 3. **NUNCA permita iniciar forja regular sem possuir o insumo de metal.**
-4. **NUNCA permita softlock de novato:** Treino de oficina e reciclagem de sucata devem sempre permanecer disponíveis.
-5. **NUNCA execute force push.**
-6. **NUNCA descarte dados de save dos jogadores.** Migrações devem ser 100% preservativas.
+4. **NUNCA permita iniciar nova forja se já houver tentativa ativa (`ATTEMPT_ALREADY_ACTIVE`).**
+5. **NUNCA permita que modo treino gere ouro por golpes, recompensas monetárias, drops ou pontuação de carreira.**
+6. **NUNCA permita softlock de novato:** Treino de oficina com limalha (Q ≥ 50) e reciclagem de sucata devem sempre permitir ascensão econômica.
+7. **NUNCA execute force push.**
+8. **NUNCA descarte dados de save dos jogadores.** Migrações devem ser 100% preservativas.
+
