@@ -1,9 +1,10 @@
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SwordDesign } from "./types.ts";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SaveResult, SwordDesign } from "./types.ts";
 import { DEFAULT_DESIGN } from "./catalog.ts";
 
-export type { SaveData };
+export type { SaveData, SaveResult };
 
 const KEY = "a-forja-save";
+const BACKUP_KEY = "a-forja-save-backup";
 const VERSION = 5;
 
 export function generateUniqueId(prefix = "sword"): string {
@@ -219,23 +220,149 @@ export function migrateSave(raw: any): SaveData {
   };
 }
 
+let lastSuccessfulSaveSnapshot: SaveData | null = null;
+
+export function getLastSuccessfulSave(): SaveData | null {
+  return lastSuccessfulSaveSnapshot ? structuredClone(lastSuccessfulSaveSnapshot) : null;
+}
+
+function getStorage(): Storage | null {
+  if (typeof window !== "undefined" && window.localStorage) {
+    return window.localStorage;
+  }
+  if (typeof localStorage !== "undefined") {
+    return localStorage;
+  }
+  return null;
+}
+
 export function loadSave(): SaveData {
-  if (typeof window === "undefined") return structuredClone(defaults);
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return structuredClone(defaults);
-    const parsed = JSON.parse(raw);
-    return migrateSave(parsed);
-  } catch {
+  const storage = getStorage();
+  if (!storage) {
     return structuredClone(defaults);
+  }
+
+  // 1. Try loading primary save
+  try {
+    const raw = storage.getItem(KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const migrated = migrateSave(parsed);
+      lastSuccessfulSaveSnapshot = structuredClone(migrated);
+      return migrated;
+    }
+  } catch (err) {
+    console.warn("[SaveManager] Primary save corrupt or unreadable, attempting backup recovery...", err);
+  }
+
+  // 2. Fallback to backup if primary is corrupt
+  try {
+    const backupRaw = storage.getItem(BACKUP_KEY);
+    if (backupRaw) {
+      const parsedBackup = JSON.parse(backupRaw);
+      const recovered = migrateSave(parsedBackup);
+      // Re-persist recovered save to primary slot
+      try {
+        storage.setItem(KEY, JSON.stringify({ ...recovered, version: VERSION }));
+      } catch {
+        /* ignore */
+      }
+      lastSuccessfulSaveSnapshot = structuredClone(recovered);
+      console.info("[SaveManager] Successfully recovered game state from backup.");
+      return recovered;
+    }
+  } catch (backupErr) {
+    console.error("[SaveManager] Both primary and backup saves unreadable.", backupErr);
+  }
+
+  const fresh = structuredClone(defaults);
+  lastSuccessfulSaveSnapshot = structuredClone(fresh);
+  return fresh;
+}
+
+export function writeSave(data: SaveData): import("./types.ts").SaveResult {
+  const storage = getStorage();
+  if (!storage) {
+    return {
+      ok: false,
+      error: "Armazenamento local (localStorage) não disponível no ambiente.",
+      code: "STORAGE_UNAVAILABLE",
+    };
+  }
+
+  let serialized: string;
+  try {
+    serialized = JSON.stringify({ ...data, version: VERSION });
+  } catch (err: any) {
+    return {
+      ok: false,
+      error: `Falha na serialização dos dados do jogo: ${err?.message || "JSON inválido"}`,
+      code: "SERIALIZATION_FAILED",
+    };
+  }
+
+  try {
+    // Preserve current primary state into backup slot before overwriting
+    const existingRaw = storage.getItem(KEY);
+    if (existingRaw) {
+      try {
+        storage.setItem(BACKUP_KEY, existingRaw);
+      } catch {
+        /* non-fatal if backup slot is tight */
+      }
+    } else {
+      try {
+        storage.setItem(BACKUP_KEY, serialized);
+      } catch {
+        /* non-fatal */
+      }
+    }
+
+    // Write primary state
+    storage.setItem(KEY, serialized);
+    lastSuccessfulSaveSnapshot = structuredClone(data);
+    return { ok: true };
+  } catch (err: any) {
+    const isQuota =
+      err?.name === "QuotaExceededError" ||
+      err?.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+      err?.code === 22 ||
+      err?.code === 1014 ||
+      err?.number === -2147024882;
+
+    if (isQuota) {
+      console.error("[SaveManager] Quota de armazenamento esgotada! Não foi possível persistir a transação.");
+      return {
+        ok: false,
+        error: "Quota de armazenamento local excedida. Libere espaço no navegador para preservar seu progresso.",
+        code: "QUOTA_EXCEEDED",
+      };
+    }
+
+    return {
+      ok: false,
+      error: err?.message || "Erro desconhecido ao gravar no armazenamento local.",
+      code: "UNKNOWN",
+    };
   }
 }
 
-export function writeSave(data: SaveData) {
-  if (typeof window === "undefined") return;
+export function recoverFromBackup(): { success: boolean; data?: SaveData; error?: string } {
+  const storage = getStorage();
+  if (!storage) {
+    return { success: false, error: "Ambiente sem localStorage." };
+  }
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...data, version: VERSION }));
-  } catch {
-    /* private mode / quota */
+    const backupRaw = storage.getItem(BACKUP_KEY);
+    if (!backupRaw) {
+      return { success: false, error: "Nenhum backup encontrado no armazenamento." };
+    }
+    const parsed = JSON.parse(backupRaw);
+    const migrated = migrateSave(parsed);
+    storage.setItem(KEY, JSON.stringify({ ...migrated, version: VERSION }));
+    lastSuccessfulSaveSnapshot = structuredClone(migrated);
+    return { success: true, data: migrated };
+  } catch (err: any) {
+    return { success: false, error: err?.message || "Falha ao restaurar backup." };
   }
 }

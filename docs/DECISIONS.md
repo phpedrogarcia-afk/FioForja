@@ -38,36 +38,21 @@ Este registro separa decisões de produto aprovadas de hipóteses e comportament
 - Duas armas do mesmo projeto podem e devem diferir entre si com base no desempenho do artesão.
 
 ### FIOFORJA-ECONOMY-001: Economia em Tempo Real por Golpes e Rebalanceamento
-- **Ganhos Durante a Forja:** Golpes executados na bigorna concedem ouro em tempo real:
-  - Golpe fraco / desalinhado: 0 ouro.
-  - Golpe bom: +3 ouro.
-  - Golpe perfeito (janela térmica e força ideal): +8 ouro.
-  - Golpe magistral (sob dificuldade elevada / zona crítica): +12 ouro.
-- **Integridade da Recompensa:** Cada golpe possui identificador de evento único por rodada de forja (`strikeIndex`), impedindo ouro duplicado por re-render ou retenção contínua de botão.
-- **Rebalanceamento dos Prêmios Finais:** Valores astronômicos anteriores (e.g. 4.850 ouro por forja) são ajustados para escalas sustentáveis (Rank S: 450–650 ouro, Rank A: 280–380 ouro, Rank B: 150–220 ouro, Rank C: 50–90 ouro), em harmonia com os custos de ferramentas, materiais e taxas da oficina.
+- **Ganhos Durante a Forja:** Golpes executados na bigorna concedem ouro em tempo real (+3, +8, +12).
+- **Integridade da Recompensa:** Cada golpe possui identificador de evento único por rodada de forja (`${forgeRunId}:${strikeIndex}`), com transação pura fora dos callbacks de render (`applyStrikeRewardTransaction`) e histórico compactado para impedir estouro de memória.
 
 ### FIOFORJA-LOOT-001: Motor Real de Drops Dinâmicos
-- As 4 cartas estáticas de recompensa são substituídas por um motor de drops dinâmico baseado em tabelas de pesos por categoria (Materiais, Componentes, Runas, Fragmentos, Núcleos de Fusão).
-- As chances de raridade respeitam a performance (Rank S, A, B, C); lâminas quebradas (`broken: true`) rendem apenas sucata e ferro bruto, impossibilitando estratégias exploratórias de quebra intencional.
-- Sorteios possuem suporte a semente determinística para testes e validação reproduzível, persistindo o ID de coleta da sessão para barrar recolhe duplicado após reload.
+- As 4 cartas de recompensa são sorteadas por tabelas ponderadas de raridade e pool sem repetição de chave (`catalogKey`), garantindo 4 itens sempre distintos.
+- Catálogo expandido com itens autênticos desde a categoria Comum até Relíquia.
 
-### FIOFORJA-SAVE-001: Persistência v5 e Armazenamento do Arsenal
-- Save migrado para a versão 5 (`VERSION = 5`).
-- Identificadores de armas migrados para geração universal resistente a colisões (`crypto.randomUUID()` ou gerador não-colidente `sword_${timestamp}_${nanoId}`).
-- Capacidade do Arsenal expandida para além de 48 slots sem descarte silencioso de armas forjadas (remoção de truncamento em 120 e garantia de preservação íntegra de toda a coleção do jogador).
-
-### FIOFORJA-HARDENING-001: Integridade Transacional, Pedigree de Fusão e Bancada de Montagem
-- **Recompensas Imutáveis na Forja:** As recompensas da celebração são geradas deterministicamente uma única vez dentro de `finishSword()`, atreladas a `sword.pendingRewards` e validadas por `SaveData.claimedForgeRewardIds`. Reroll exploit via reload ou reabertura de modal eliminado.
-- **Herança Ativa do FusionCore:** O núcleo de fusão selecionado no inventário é transmitido ativamente para a simulação na bigorna (`activeCore` em `createSim()`), aplicando piso de raridade, bônus aditivo de qualidade (`bonusQuality`), herança de perks ancestrais (`inheritedPerks`) e linhagem histórica (`FusionHistory`), sendo consumido atomicamente na conclusão.
-- **Transações Atômicas de Fusão:** Implementadas `validateComponentFusionTransaction` e `validateSwordFusionTransaction`, exigindo 4 itens únicos, mesma categoria, integridade física (recusa estrita de lâminas quebradas) e saldo suficiente de catalisadores e moedas antes de qualquer alteração de estado.
-- **Salto Excepcional de 2 Tiers:** Implementados 3 patamares canônicos de fusão (Refinado, Superior +1 e Excepcional +2, e.g. 4 Raras -> Lendária) com probabilidades alinhadas a `docs/canon/fusao-hibrida.md` e exibição reativa em tempo real na interface do Crisol.
-- **Deduplicação de Ouro por Golpe:** Identificadores únicos com escopo da rodada `${forgeRunId}:${strikeIndex}` e persistência em `claimedStrikeRewardIds`.
-- **Bancada de Montagem e Personalização:** Integração direta na tela de inspeção em veludo (`RevealScreen.tsx`), permitindo instalar componentes e runas avulsas com atualização em tempo real da geometria renderizada no canvas e recálculo dos atributos de combate.
+### FIOFORJA-INTEGRITY-001: Decomposição de Atributos, Anti-Stacking e Backups Atômicos
+- **Anti-Stacking:** Atributos intrínsecos (`baseDamage`, `baseDefense`, `baseAgility`, `baseDurability`) são imutáveis após a têmpera. Montagem de componentes aloca exclusivamente 1 slot por categoria (guarda, pomo, empunhadura, runa), recalculando deterministicamente via `recalculateSwordStats()` e devolvendo peças anteriores ao inventário.
+- **Backups Atômicos:** `writeSave()` cria e atualiza um snapshot íntegro em `a-forja-save-backup` antes da sobrescrita e retorna `SaveResult`. `loadSave()` detecta corrupção no save primário e recupera o estado de backup automaticamente.
+- **Fail-Closed:** Se a persistência local falhar (e.g. quota excedida), o estado da UI não avança para dados não-persistidos.
 
 ---
 
 ## 3. Hipóteses em Avaliação Técnica (Provisórias)
-
 - **Fórmulas exatas de herança de afixos na fusão:** Percentual de transferência entre 15% e 35% por traço compartilhado.
 - **Preços dinâmicos na loja da oficina:** Custos de materiais raros atrelados a conquistas do Legado.
 - **Taxa de drop de Relíquias:** Fixada provisoriamente em 0.2% a 0.5% em forjas Rank S com aço especial.

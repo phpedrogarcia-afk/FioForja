@@ -29,7 +29,8 @@ export type WrapId =
   | "bone"
   | "goldwire"
   | "tsukamaki"
-  | "elven_wood";
+  | "elven_wood"
+  | "dragon_leather";
 
 export type GuardId =
   | "cross"
@@ -79,6 +80,8 @@ export interface SwordDesign {
   pommel: PommelId;
   inscription: string;
   runes: boolean;
+  runeSymbol?: string;
+  runeKey?: string;
   length: number;
 }
 
@@ -92,7 +95,12 @@ export interface FinishedSword {
   quenchScore: number;
   warp: number;
   createdAt: number;
-  // Metallurgical physical attributes (Pillar 5 / User section 5)
+  // Intrinsic base physical attributes from the forge (pure metallurgical baseline)
+  baseDamage?: number;
+  baseDefense?: number;
+  baseAgility?: number;
+  baseDurability?: number;
+  // Composite final attributes (base + quality bonus + components + runes + refinement)
   damage?: number; // ATK (potencial de corte e dureza)
   defense?: number; // DEF (integridade, espessura e têmpera)
   agility?: number; // AGI (equilíbrio de massa e alinhamento)
@@ -237,6 +245,17 @@ export interface ForgeRewardsData {
   claimed?: boolean;
 }
 
+export interface CoreHeritageProfile {
+  attackBias: number;    // e.g. -10 to +25 based on donor swords' damage tendency
+  defenseBias: number;   // e.g. -10 to +20 based on donor swords' defense tendency
+  agilityBias: number;   // e.g. -10 to +20 based on donor swords' agility tendency
+  durabilityBias: number;// e.g. -5 to +15 based on donor swords' durability tendency
+  runicAffinity: number; // 0 to 1
+  dominantFamily: FamilyId;
+  dominantSteel: SteelId;
+  donorProfiles?: Array<{ id: string; damage: number; defense: number; agility: number }>;
+}
+
 export interface FusionCore {
   id: string;
   name: string;
@@ -248,6 +267,7 @@ export interface FusionCore {
   inheritedPerks: string[];
   consumedSwordIds: string[];
   createdAt: number;
+  heritage?: CoreHeritageProfile;
 }
 
 export interface InventoryComponent {
@@ -321,4 +341,10 @@ export interface SaveData {
   shake: boolean;
   claimedForgeRewardIds: string[];
   claimedStrikeRewardIds: string[];
+}
+
+export interface SaveResult {
+  ok: boolean;
+  error?: string;
+  code?: "QUOTA_EXCEEDED" | "STORAGE_UNAVAILABLE" | "SERIALIZATION_FAILED" | "UNKNOWN";
 }

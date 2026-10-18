@@ -9,6 +9,7 @@ import {
   STEELS,
   WORKSHOP_EQUIPMENT,
   WRAPS,
+  recalculateSwordStats,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
 import type { CareerStats, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
@@ -61,6 +62,14 @@ export function GalleryScreen({
   const [filterRarity, setFilterRarity] = useState<string>("Todas");
   const [filterFamily, setFilterFamily] = useState<string>("Todas");
 
+  // Keep inspected sword in sync when swords array updates in gallery
+  useEffect(() => {
+    if (selectedSword) {
+      const match = swords.find((s) => s.id === selectedSword.id);
+      if (match) setSelectedSword(match);
+    }
+  }, [swords]);
+
   if (selectedSword) {
     if (inspectRewards) {
       return (
@@ -89,16 +98,7 @@ export function GalleryScreen({
           if (!onUpgrade) return false;
           const ok = onUpgrade(s);
           if (ok) {
-            setSelectedSword((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    damage: (prev.damage ?? 180) + 8,
-                    durability: Math.min(100, (prev.durability ?? 90) + 2),
-                    upgradesApplied: (prev.upgradesApplied || 0) + 1,
-                  }
-                : null,
-            );
+            setSelectedSword((prev) => (prev ? recalculateSwordStats({ ...prev, upgradesApplied: (prev.upgradesApplied || 0) + 1 }) : null));
           }
           return ok;
         }}

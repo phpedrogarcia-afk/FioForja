@@ -1,11 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { generateUniqueId, migrateSaveData, defaultSaveData, type SaveData } from "./save.ts";
+import { generateUniqueId, migrateSaveData, defaultSaveData, writeSave, loadSave, recoverFromBackup, type SaveData } from "./save.ts";
 import { generateDynamicForgeRewards, getRankTier, LOOT_CATALOG } from "./loot.ts";
 import { fuseComponents, fuseSwords, applyComponentFusionTransaction, applySwordFusionTransaction } from "./fusion.ts";
-import { createSim, finishSword } from "./sim.ts";
-import { calculateSwordAttributes } from "./catalog.ts";
-import type { FinishedSword, InventoryComponent, PlayerInventory, PlayerWallet, SwordDesign } from "./types.ts";
+import { createSim, finishSword, applyStrikeRewardTransaction } from "./sim.ts";
+import { calculateSwordAttributes, recalculateSwordStats, WRAPS } from "./catalog.ts";
+import type { FinishedSword, InventoryComponent, PlayerInventory, PlayerWallet, SwordDesign, FusionCore } from "./types.ts";
 
 const TEST_DESIGN: SwordDesign = {
   name: "Lâmina de Teste",
@@ -447,5 +447,283 @@ describe("Arsenal Vivo Hardening — Critical Fixes & System Integrations", () =
 
     const migrated = migrateSaveData(rawSave);
     assert.equal(migrated.gallery.length, 135, "Must preserve all 135 swords without truncation");
+  });
+});
+
+describe("Arsenal Vivo 01.2 — Item Integrity, Component Identity & System Hardening", () => {
+  it("P0: Anti-Stacking — repeated component installation refunds previous item and strictly recalculates stats", () => {
+    const baseSword: FinishedSword = {
+      ...createMockSword({ id: "sw_base" }),
+      baseDamage: 200,
+      baseDefense: 100,
+      baseAgility: 80,
+      baseDurability: 90,
+      damage: 200,
+      defense: 100,
+      agility: 80,
+      durability: 90,
+      upgradesApplied: 0,
+      installedComponents: {},
+    };
+
+    // Create 10 guard components with increasing damage modifiers
+    const guards: InventoryComponent[] = [];
+    for (let i = 0; i < 10; i++) {
+      guards.push({
+        id: `guard_comp_${i}`,
+        name: `Guarda Nível ${i + 1}`,
+        category: "guard",
+        componentKey: `guard_tier_${i}`,
+        rarity: "Rara",
+        icon: "🛡️",
+        description: "Test guard",
+        statModifier: { damageBonus: (i + 1) * 3 }, // +3, +6, +9, ... +30
+        acquiredAt: Date.now(),
+      });
+    }
+
+    let currentSword = { ...baseSword };
+    let inventoryComponents = [...guards];
+    const refunded: InventoryComponent[] = [];
+
+    // Mount all 10 guards in sequence
+    for (const newGuard of guards) {
+      const prevComp = currentSword.installedComponents?.guard;
+      if (prevComp) {
+        refunded.push(prevComp);
+      }
+      inventoryComponents = inventoryComponents.filter((c) => c.id !== newGuard.id);
+
+      currentSword = recalculateSwordStats({
+        ...currentSword,
+        installedComponents: {
+          ...currentSword.installedComponents,
+          guard: newGuard,
+        },
+      });
+    }
+
+    // Crucial check: Sword must have ONLY the 10th guard's bonus (+30 ATK), NOT 200 + 3 + 6 + ... + 30 = 365!
+    assert.equal(currentSword.damage, 230, `Damage must be 200 + 30 = 230, got ${currentSword.damage}`);
+    // Check that 9 guards were refunded
+    assert.equal(refunded.length, 9, "9 previous guards must have been refunded to inventory");
+
+    // Add workbench refinement (+2 upgrades = +16 ATK, +4 DUR)
+    currentSword = recalculateSwordStats({
+      ...currentSword,
+      upgradesApplied: 2,
+    });
+    assert.equal(currentSword.damage, 246, "Damage must be 200 + 16 (refine) + 30 (guard) = 246");
+    assert.equal(currentSword.durability, 94, "Durability must be 90 + 4 (refine) = 94");
+
+    // Replace 10th guard with a defensive guard (+0 ATK, +20 DEF)
+    const defensiveGuard: InventoryComponent = {
+      id: "guard_shield",
+      name: "Guarda Baluarte",
+      category: "guard",
+      componentKey: "guard_shield",
+      rarity: "Épica",
+      icon: "🛡️",
+      description: "Defensive guard",
+      statModifier: { damageBonus: 0, defenseBonus: 20 },
+      acquiredAt: Date.now(),
+    };
+
+    currentSword = recalculateSwordStats({
+      ...currentSword,
+      installedComponents: {
+        ...currentSword.installedComponents,
+        guard: defensiveGuard,
+      },
+    });
+
+    assert.equal(currentSword.damage, 216, "Damage must be 200 + 16 (refine) + 0 (new guard) = 216, zero ghost damage");
+    assert.equal(currentSword.defense, 120, "Defense must be 100 + 20 = 120");
+  });
+
+  it("P0: Save Persistence & Atomic Backup Recovery — recovers automatically from primary save corruption", () => {
+    const memStore: Record<string, string> = {};
+    const originalWindow = (globalThis as any).window;
+    const originalLocalStorage = (globalThis as any).localStorage;
+
+    const mockStorage = {
+      getItem: (key: string) => memStore[key] ?? null,
+      setItem: (key: string, val: string) => {
+        memStore[key] = val;
+      },
+      removeItem: (key: string) => {
+        delete memStore[key];
+      },
+      clear: () => {
+        for (const k in memStore) delete memStore[k];
+      },
+    };
+
+    (globalThis as any).window = { localStorage: mockStorage };
+    (globalThis as any).localStorage = mockStorage;
+
+    try {
+      const initialSave: SaveData = {
+        ...defaultSaveData,
+        wallet: { gold: 3450, rubies: 42, diamonds: 8 },
+        career: { ...defaultSaveData.career, totalForged: 19 },
+      };
+
+      // 1. Initial successful write
+      const writeRes1 = writeSave(initialSave);
+      assert.equal(writeRes1.ok, true);
+      assert.ok(memStore["a-forja-save"], "Primary slot must be written");
+      assert.ok(memStore["a-forja-save-backup"], "Backup slot must be created on update");
+
+      // 2. Corrupt the primary save slot
+      memStore["a-forja-save"] = "{{MALFORMED_JSON_STRING_DATA}}";
+
+      // 3. loadSave() should cleanly fall back to backup
+      const loaded = loadSave();
+      assert.equal(loaded.wallet.gold, 3450, "Must recover wallet gold from backup slot");
+      assert.equal(loaded.career.totalForged, 19, "Must recover career totalForged from backup slot");
+
+      // 4. Test explicit recoverFromBackup()
+      const explicitRecover = recoverFromBackup();
+      assert.equal(explicitRecover.success, true);
+      assert.equal(explicitRecover.data?.wallet.gold, 3450);
+
+      // 5. Test QuotaExceededError handling
+      mockStorage.setItem = () => {
+        const err = new Error("Quota exceeded");
+        err.name = "QuotaExceededError";
+        throw err;
+      };
+
+      const quotaFailResult = writeSave(initialSave);
+      assert.equal(quotaFailResult.ok, false);
+      assert.equal(quotaFailResult.code, "QUOTA_EXCEEDED");
+    } finally {
+      (globalThis as any).window = originalWindow;
+      (globalThis as any).localStorage = originalLocalStorage;
+    }
+  });
+
+  it("P1: Common Loot Expansion — catalog contains >= 10 Common items and draws 4 distinct items with zero duplicates", () => {
+    const commonItems = LOOT_CATALOG.filter((it) => it.rarity === "Comum");
+    assert.ok(commonItems.length >= 10, `Expected at least 10 Common items, found ${commonItems.length}`);
+
+    // Verify drawing algorithm across 100 random drops guarantees 4 distinct items
+    const sword = createMockSword({ quality: 50 }); // Rank C (primarily Common drops)
+    for (let seed = 1; seed <= 100; seed++) {
+      const rewards = generateDynamicForgeRewards(sword, { seed });
+      assert.equal(rewards.items.length, 4, "Must always draw 4 items");
+      const uniqueKeys = new Set(rewards.items.map((it) => it.catalogKey));
+      assert.equal(uniqueKeys.size, 4, `Seed ${seed} must yield 4 distinct catalog keys without duplicates`);
+    }
+  });
+
+  it("P1: Real Visual Component Identity — wrap types are defined in catalog with unique aesthetics", () => {
+    assert.ok(WRAPS["dragon_leather"], "dragon_leather must exist in WRAPS catalog");
+    assert.equal(WRAPS["dragon_leather"].name, "Couro de Dragão");
+    assert.ok(WRAPS["tsukamaki"], "tsukamaki must exist in WRAPS catalog");
+    assert.ok(WRAPS["goldwire"], "goldwire must exist in WRAPS catalog");
+    assert.ok(WRAPS["bone"], "bone must exist in WRAPS catalog");
+    assert.ok(WRAPS["darkwood"], "darkwood must exist in WRAPS catalog");
+    assert.ok(WRAPS["linen"], "linen must exist in WRAPS catalog");
+  });
+
+  it("P1: Functional Core Heritage — donor sword profile transmits distinct physical potential to finished weapon", () => {
+    // 4 Offensive donor swords (high damage, low agility)
+    const swordOff1 = createMockSword({ id: "off1", damage: 270, agility: 50, quality: 85, rarity: "Rara" });
+    const swordOff2 = createMockSword({ id: "off2", damage: 280, agility: 55, quality: 85, rarity: "Rara" });
+    const swordOff3 = createMockSword({ id: "off3", damage: 260, agility: 50, quality: 85, rarity: "Rara" });
+    const swordOff4 = createMockSword({ id: "off4", damage: 275, agility: 52, quality: 85, rarity: "Rara" });
+
+    // 4 Agile donor swords (low damage, high agility)
+    const swordAgi1 = createMockSword({ id: "agi1", damage: 160, agility: 120, quality: 85, rarity: "Rara" });
+    const swordAgi2 = createMockSword({ id: "agi2", damage: 165, agility: 125, quality: 85, rarity: "Rara" });
+    const swordAgi3 = createMockSword({ id: "agi3", damage: 155, agility: 118, quality: 85, rarity: "Rara" });
+    const swordAgi4 = createMockSword({ id: "agi4", damage: 170, agility: 122, quality: 85, rarity: "Rara" });
+
+    const fusionOff = fuseSwords([swordOff1, swordOff2, swordOff3, swordOff4], { seed: 42 });
+    const fusionAgi = fuseSwords([swordAgi1, swordAgi2, swordAgi3, swordAgi4], { seed: 42 });
+
+    const coreOff = fusionOff.resultCore;
+    const coreAgi = fusionAgi.resultCore;
+
+    assert.ok(coreOff.heritage, "Offensive core must possess heritage profile");
+    assert.ok(coreAgi.heritage, "Agile core must possess heritage profile");
+
+    assert.ok(
+      coreOff.heritage!.attackBias > coreAgi.heritage!.attackBias,
+      `Offensive attackBias (${coreOff.heritage!.attackBias}) must be higher than Agile attackBias (${coreAgi.heritage!.attackBias})`,
+    );
+
+    assert.ok(
+      coreAgi.heritage!.agilityBias > coreOff.heritage!.agilityBias,
+      `Agile agilityBias (${coreAgi.heritage!.agilityBias}) must be higher than Offensive agilityBias (${coreOff.heritage!.agilityBias})`,
+    );
+
+    // Forge finished weapons using these cores under identical forge inputs
+    const simOff = createSim(TEST_DESIGN, { activeCore: coreOff });
+    simOff.quality = 90;
+    simOff.shape = 1;
+    simOff.heatScore = 90;
+    simOff.quenchScore = 90;
+
+    const simAgi = createSim(TEST_DESIGN, { activeCore: coreAgi });
+    simAgi.quality = 90;
+    simAgi.shape = 1;
+    simAgi.heatScore = 90;
+    simAgi.quenchScore = 90;
+
+    const finishedOff = finishSword(simOff, TEST_DESIGN);
+    const finishedAgi = finishSword(simAgi, TEST_DESIGN);
+
+    assert.ok(
+      finishedOff.damage > finishedAgi.damage,
+      `Finished weapon from offensive core must have higher damage (${finishedOff.damage}) than from agile core (${finishedAgi.damage})`,
+    );
+
+    assert.ok(
+      finishedAgi.agility > finishedOff.agility,
+      `Finished weapon from agile core must have higher agility (${finishedAgi.agility}) than from offensive core (${finishedOff.agility})`,
+    );
+  });
+
+  it("P1: Strike Economy Transaction — guarantees idempotency and memory compaction without React setter side-effects", () => {
+    const initialSave = {
+      wallet: { gold: 500, rubies: 10, diamonds: 2 },
+      claimedStrikeRewardIds: ["old_strike_1"],
+    };
+
+    // 1. Valid strike reward application
+    const res1 = applyStrikeRewardTransaction(initialSave, { amount: 75, id: "run_alpha:strike_2" });
+    assert.equal(res1.applied, true);
+    assert.equal(res1.wallet.gold, 575);
+    assert.ok(res1.claimedStrikeRewardIds.includes("run_alpha:strike_2"));
+
+    // 2. Duplicate reward rejection (idempotency)
+    const res2 = applyStrikeRewardTransaction(
+      { wallet: res1.wallet, claimedStrikeRewardIds: res1.claimedStrikeRewardIds },
+      { amount: 75, id: "run_alpha:strike_2" },
+    );
+    assert.equal(res2.applied, false);
+    assert.equal(res2.wallet.gold, 575, "Gold must not increase on duplicate reward invocation");
+
+    // 3. Compact history when over 200 items to avoid memory leaks
+    let state = {
+      wallet: { gold: 1000, rubies: 0, diamonds: 0 },
+      claimedStrikeRewardIds: [] as string[],
+    };
+
+    for (let i = 0; i < 260; i++) {
+      const res = applyStrikeRewardTransaction(state, { amount: 1, id: `bulk_strike_${i}` });
+      state = {
+        wallet: res.wallet,
+        claimedStrikeRewardIds: res.claimedStrikeRewardIds,
+      };
+    }
+
+    assert.equal(state.wallet.gold, 1260);
+    assert.equal(state.claimedStrikeRewardIds.length, 200, "Claimed strike reward history must be compacted to 200 items");
+    assert.ok(state.claimedStrikeRewardIds.includes("bulk_strike_259"));
+    assert.ok(!state.claimedStrikeRewardIds.includes("bulk_strike_0"), "Oldest items should be pruned");
   });
 });

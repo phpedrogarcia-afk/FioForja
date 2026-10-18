@@ -193,15 +193,59 @@ async function run() {
         physicalProfile: { lengthMm: 920, widthMm: 50, spineMm: 6.0, edgeMm: 0.8, distalTaper: 0.5, profilePurity: 0.91 },
         history: [],
       },
+      {
+        id: "sword_05_dragon",
+        design: {
+          name: "Dracoforja Implacável",
+          family: "barbarian",
+          profile: "claymore",
+          steel: "blacksteel",
+          guard: "wings",
+          pommel: "wolf",
+          wrap: "dragon_leather",
+          inscription: "DRACO",
+          runes: true,
+          runeKey: "rune_fehu",
+          runeSymbol: "ᚠ",
+          length: 1.0,
+        },
+        quality: 94,
+        grade: "Magistral",
+        rarity: "Lendária",
+        heatScore: 94,
+        forgeScore: 93,
+        quenchScore: 95,
+        warp: 0.01,
+        createdAt: Date.now() - 10000,
+        baseDamage: 270,
+        baseDefense: 110,
+        baseAgility: 85,
+        baseDurability: 95,
+        damage: 270,
+        defense: 110,
+        agility: 85,
+        durability: 95,
+        upgradesApplied: 0,
+        flaws: [],
+        perks: ["Couro de Dragão Ancestral", "Equilíbrio de Vanguarda"],
+        affixes: ["Couro de Dragão Ancestral", "Equilíbrio de Vanguarda"],
+        forgeRunId: "run_mock_05",
+        structuralState: "stable",
+        broken: false,
+        cracks: 0,
+        physicalProfile: { lengthMm: 980, widthMm: 52, spineMm: 6.8, edgeMm: 0.6, distalTaper: 0.5, profilePurity: 0.95 },
+        history: [],
+      },
     ];
 
     const mockComponents = [
-      { id: "c1", name: "Guarda Real de Bronze", category: "guard", componentKey: "guard_royal", rarity: "Incomum", icon: "🛡", description: "Guarda polida com rebites forjados", acquiredAt: 1 },
-      { id: "c2", name: "Guarda Alada de Damasco", category: "guard", componentKey: "guard_damascus_cross", rarity: "Rara", icon: "🛡", description: "Padrão de ondas entrelaçadas", acquiredAt: 2 },
-      { id: "c3", name: "Guarda Estelar de Asterion", category: "guard", componentKey: "guard_star", rarity: "Épica", icon: "🛡", description: "Forjada em liga meteórica pura", acquiredAt: 3 },
-      { id: "c4", name: "Guarda Rúnica Primitiva", category: "guard", componentKey: "guard_runic", rarity: "Rara", icon: "🛡", description: "Gravada com entalhes de proteção", acquiredAt: 4 },
-      { id: "c5", name: "Pomo de Lobo de Prata", category: "pommel", componentKey: "pommel_wolf", rarity: "Rara", icon: "🐺", description: "Esculpido em prata densa", acquiredAt: 5 },
-      { id: "c6", name: "Runa Ansuz dos Ventos", category: "rune", componentKey: "rune_ansuz", rarity: "Épica", icon: "ᚨ", description: "Desperta velocidade e leveza", acquiredAt: 6 },
+      { id: "c1", name: "Guarda Real de Bronze", category: "guard", componentKey: "guard_royal", rarity: "Incomum", icon: "🛡", description: "Guarda polida com rebites forjados", acquiredAt: 1, statModifier: { defenseBonus: 8 } },
+      { id: "c2", name: "Guarda Alada de Damasco", category: "guard", componentKey: "guard_damascus_cross", rarity: "Rara", icon: "🛡", description: "Padrão de ondas entrelaçadas", acquiredAt: 2, statModifier: { defenseBonus: 14 } },
+      { id: "c3", name: "Guarda Estelar de Asterion", category: "guard", componentKey: "guard_star", rarity: "Épica", icon: "🛡", description: "Forjada em liga meteórica pura", acquiredAt: 3, statModifier: { damageBonus: 12, defenseBonus: 10 } },
+      { id: "c4", name: "Guarda Rúnica Primitiva", category: "guard", componentKey: "guard_runic", rarity: "Rara", icon: "🛡", description: "Gravada com entalhes de proteção", acquiredAt: 4, statModifier: { defenseBonus: 12 } },
+      { id: "c5", name: "Pomo de Lobo de Prata", category: "pommel", componentKey: "pommel_wolf", rarity: "Rara", icon: "🐺", description: "Esculpido em prata densa", acquiredAt: 5, statModifier: { agilityBonus: 6 } },
+      { id: "c6", name: "Runa Ansuz dos Ventos", category: "rune", componentKey: "rune_ansuz", rarity: "Épica", icon: "ᚨ", description: "Desperta velocidade e leveza", acquiredAt: 6, statModifier: { agilityBonus: 15 } },
+      { id: "c7", name: "Couro de Dragão Escamado", category: "wrap", componentKey: "wrap_dragon_leather", rarity: "Lendária", icon: "🐉", description: "Escamas de wyrm esmeralda curtidas", acquiredAt: 7, statModifier: { damageBonus: 10, agilityBonus: 5 } },
     ];
 
     const saveData = {
@@ -246,7 +290,14 @@ async function run() {
     await starSword.click();
     await page.waitForTimeout(600);
 
-    // Capture Workbench Mounting view with components
+    // Click "Instalar" on first component to verify anti-stacking workbench mounting and refund
+    const installBtn = page.getByRole("button", { name: /instalar/i }).first();
+    if (await installBtn.isVisible()) {
+      await installBtn.click();
+      await page.waitForTimeout(400);
+    }
+
+    // Capture Workbench Mounting view with installed component
     const shotWorkbench = join(outDir, "arsenal-vivo-04-workbench-mounting.png");
     await page.screenshot({ path: shotWorkbench });
     console.log(`Captured: ${shotWorkbench}`);
@@ -269,6 +320,25 @@ async function run() {
         await backArsenal.click();
         await page.waitForTimeout(500);
       }
+    }
+  }
+
+  // 2b. Inspect Dracoforja Implacável for Wrap Textures & Inscribed Runes
+  console.log("Inspecting Dracoforja for wrap texture details...");
+  const dragonSword = page.locator("h3", { hasText: "Dracoforja Implacável" });
+  if (await dragonSword.isVisible()) {
+    await dragonSword.click();
+    await page.waitForTimeout(600);
+
+    const shotWrap = join(outDir, "arsenal-vivo-05-wrap-textures-comparison.png");
+    await page.screenshot({ path: shotWrap });
+    console.log(`Captured: ${shotWrap}`);
+    if (existsSync(brainDir)) copyFileSync(shotWrap, join(brainDir, "arsenal-vivo-05-wrap-textures-comparison.png"));
+
+    const backBtn = page.getByRole("button", { name: /ver no arsenal/i });
+    if (await backBtn.isVisible()) {
+      await backBtn.click();
+      await page.waitForTimeout(500);
     }
   }
 

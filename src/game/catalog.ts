@@ -267,6 +267,7 @@ export const WRAPS: Record<WrapId, { name: string; color: string; desc: string }
   goldwire: { name: "Fio Dourado", color: "#d4af37", desc: "Fio de ouro nobre enrolado" },
   tsukamaki: { name: "Cordão Oriental", color: "#8a1c14", desc: "Trançado geométrico tradicional de seda" },
   elven_wood: { name: "Madeira Élfica", color: "#d8c4a0", desc: "Cerne de árvore prateada eterna" },
+  dragon_leather: { name: "Couro de Dragão", color: "#1c4a38", desc: "Couro escamoso de serpe esmeralda, pegada inabalável" },
 };
 
 export const GUARDS: Record<GuardId, { name: string; desc: string }> = {
@@ -601,4 +602,51 @@ export function renderInscription(text: string, runes: boolean): string {
       return RUNES[lower] ?? ch;
     })
     .join("");
+}
+
+export function recalculateSwordStats(sword: import("./types.ts").FinishedSword): import("./types.ts").FinishedSword {
+  // 1. Establish pure metallurgical base stats
+  const baseDamage = sword.baseDamage ?? sword.damage ?? 180;
+  const baseDefense = sword.baseDefense ?? sword.defense ?? 90;
+  const baseAgility = sword.baseAgility ?? sword.agility ?? 75;
+  const baseDurability = sword.baseDurability ?? sword.durability ?? 90;
+
+  // 2. Refinement bonus (+8 ATK, +2 DUR per upgrade tier, up to 3 tiers)
+  const upgrades = Math.max(0, Math.min(3, sword.upgradesApplied || 0));
+  const refineDamageBonus = upgrades * 8;
+  const refineDurabilityBonus = upgrades * 2;
+
+  // 3. Installed Component Modifiers (Strict slot allocation: 1 guard, 1 pommel, 1 wrap, 1 rune)
+  const comps = Object.values(sword.installedComponents || {});
+  let compDamage = 0;
+  let compDefense = 0;
+  let compAgility = 0;
+  let compDurability = 0;
+
+  for (const comp of comps) {
+    if (comp?.statModifier) {
+      compDamage += comp.statModifier.damageBonus || 0;
+      compDefense += comp.statModifier.defenseBonus || 0;
+      compAgility += comp.statModifier.agilityBonus || 0;
+      compDurability += comp.statModifier.durabilityBonus || 0;
+    }
+  }
+
+  // 4. Calculate final deterministic attributes
+  const finalDamage = baseDamage + refineDamageBonus + compDamage;
+  const finalDefense = baseDefense + compDefense;
+  const finalAgility = Math.max(15, baseAgility + compAgility);
+  const finalDurability = Math.max(10, Math.min(100, baseDurability + refineDurabilityBonus + compDurability));
+
+  return {
+    ...sword,
+    baseDamage,
+    baseDefense,
+    baseAgility,
+    baseDurability,
+    damage: finalDamage,
+    defense: finalDefense,
+    agility: finalAgility,
+    durability: finalDurability,
+  };
 }

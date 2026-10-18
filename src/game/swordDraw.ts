@@ -111,9 +111,9 @@ function drawSwordBody(
   opts: Required<Omit<DrawSwordOptions, "angle" | "physicalProfile">> & { physicalProfile?: import("./types.ts").PhysicalBladeProfile },
 ) {
   const { heat, shape, assembled, quality, warp, cracks, broken, lightOffset, runicCharge, physicalProfile } = opts;
-  const profile = PROFILES[design.profile];
-  const st = STEELS[design.steel];
-  const wrap = WRAPS[design.wrap];
+  const profile = PROFILES[design.profile] || PROFILES.long;
+  const st = STEELS[design.steel] || STEELS.steel;
+  const wrap = WRAPS[design.wrap] || WRAPS.leather;
 
   const L = lengthPx * (0.62 + design.length * 0.38) * profile.length;
   const W = (20 + profile.width * 14) * (0.6 + shape * 0.4);
@@ -458,9 +458,10 @@ function drawSwordBody(
   }
 
   // 8. Runes & Inscriptions (Bíblia Estética: Gravação física e iluminação controlada)
-  const inscription = renderInscription(design.inscription || "AETHELGARD", design.runes);
+  const defaultText = design.runeSymbol ? design.runeSymbol : (design.runes ? "ᚠ · ᚨ · ᛊ" : "AETHELGARD");
+  const inscription = design.runeSymbol ? design.runeSymbol : renderInscription(design.inscription || defaultText, design.runes);
   // Strictly gated: never carved on crude billet or early preform (requires refined blade shape >= 0.65 or finished assembly)
-  const showRunes = (design.runes || design.inscription) && (shape >= 0.65 || assembled);
+  const showRunes = (design.runes || Boolean(design.runeSymbol) || Boolean(design.inscription)) && (shape >= 0.65 || assembled);
 
   if (showRunes && inscription) {
     drawLuminousRunes(ctx, inscription, bladeLen, W, totalCurve, {
@@ -468,7 +469,7 @@ function drawSwordBody(
       quality,
       runicCharge,
       assembled,
-      hasRunes: Boolean(design.runes),
+      hasRunes: Boolean(design.runes || design.runeSymbol),
     });
   }
 
@@ -703,28 +704,189 @@ function drawHilt(
   // Crossguard
   drawGuard(ctx, design.guard, W, quality);
 
-  // Leather wrapped grip with ribs
-  ctx.fillStyle = wrapColor;
-  roundRect(ctx, -grip - 6, -W * 0.24, grip, W * 0.48, 4);
-  ctx.fill();
-  ctx.strokeStyle = "rgba(18,12,8,0.55)";
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-
-  // Braided Wire Ribs (brass/gold wire in Masterwork)
-  const ribColor = quality >= 85 ? "rgba(220,185,90,0.8)" : "rgba(30,18,10,0.45)";
-  ctx.strokeStyle = ribColor;
-  ctx.lineWidth = quality >= 88 ? 1.4 : 1.0;
-  for (let i = 0; i < 7; i++) {
-    ctx.beginPath();
-    const x = -12 - i * (grip / 7.2);
-    ctx.moveTo(x, -W * 0.22);
-    ctx.lineTo(x - 5, W * 0.22);
-    ctx.stroke();
-  }
+  // Specialized wrap grip texture and physical material
+  drawWrapGrip(ctx, design.wrap, wrapColor, -grip - 6, W, grip, quality);
 
   // Pommel
   drawPommel(ctx, design.pommel, -grip - 6, W, quality);
+
+  ctx.restore();
+}
+
+function drawWrapGrip(
+  ctx: CanvasRenderingContext2D,
+  wrapId: SwordDesign["wrap"],
+  wrapColor: string,
+  x: number,
+  W: number,
+  grip: number,
+  quality: number,
+) {
+  ctx.save();
+  const h = W * 0.48;
+  const y = -h * 0.5;
+
+  // 1. Base grip foundation
+  ctx.fillStyle = wrapColor;
+  roundRect(ctx, x, y, grip, h, 4);
+  ctx.fill();
+
+  // 2. Specialized Material Textures
+  if (wrapId === "dragon_leather") {
+    // Scaled reptilian dragon hide with iridescent hexagonal/diamond scales
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+
+    // Scale rows
+    const scaleSize = 7;
+    for (let gx = x; gx < x + grip; gx += scaleSize) {
+      for (let gy = y - 2; gy < y + h + 2; gy += scaleSize * 0.7) {
+        ctx.beginPath();
+        ctx.arc(gx + scaleSize * 0.5, gy + scaleSize * 0.4, scaleSize * 0.45, 0, Math.PI);
+        ctx.strokeStyle = "rgba(46, 204, 113, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(10, 35, 20, 0.5)";
+        ctx.fill();
+      }
+    }
+    // Gilded bolster ferrules at both ends
+    ctx.fillStyle = "#d4af37";
+    ctx.fillRect(x, y, 4, h);
+    ctx.fillRect(x + grip - 4, y, 4, h);
+    ctx.restore();
+  } else if (wrapId === "tsukamaki") {
+    // Authentic Japanese diamond crossed cords over white rayskin
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+
+    // White pebbled samegawa underlayer
+    ctx.fillStyle = "#f0ebe1";
+    ctx.fillRect(x, y, grip, h);
+
+    // Crossed silk diamonds (ito)
+    ctx.fillStyle = "#8a1c14";
+    const diamondW = 10;
+    for (let dx = x; dx < x + grip + diamondW; dx += diamondW) {
+      ctx.beginPath();
+      ctx.moveTo(dx, y);
+      ctx.lineTo(dx + diamondW * 0.5, y + h * 0.5);
+      ctx.lineTo(dx, y + h);
+      ctx.lineTo(dx - diamondW * 0.5, y + h * 0.5);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  } else if (wrapId === "goldwire") {
+    // Spiraling gold wire thread coils
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+    for (let gx = x; gx < x + grip; gx += 4.5) {
+      ctx.beginPath();
+      ctx.moveTo(gx, y);
+      ctx.lineTo(gx - 3, y + h);
+      ctx.strokeStyle = "#ffd700";
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(gx + 1.5, y);
+      ctx.lineTo(gx - 1.5, y + h);
+      ctx.strokeStyle = "#855800";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    ctx.restore();
+  } else if (wrapId === "bone") {
+    // Segmented ivory with dark joint rings and polished highlights
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+    ctx.fillStyle = "#f5efe1";
+    ctx.fillRect(x, y, grip, h);
+
+    // Three carved dark horn ring bands
+    const segment = grip / 4;
+    ctx.fillStyle = "#2c221c";
+    for (let s = 1; s <= 3; s++) {
+      ctx.fillRect(x + s * segment - 2, y, 4, h);
+      ctx.fillStyle = "rgba(212, 175, 55, 0.8)";
+      ctx.fillRect(x + s * segment - 0.5, y, 1, h);
+      ctx.fillStyle = "#2c221c";
+    }
+    ctx.restore();
+  } else if (wrapId === "darkwood") {
+    // Wood grain lines and twin brass collars
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+    ctx.strokeStyle = "rgba(20, 10, 5, 0.4)";
+    ctx.lineWidth = 1;
+    for (let ly = y + 2; ly < y + h; ly += 3.5) {
+      ctx.beginPath();
+      ctx.moveTo(x, ly);
+      ctx.lineTo(x + grip, ly + (Math.sin(ly) * 1.5));
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#c5a059";
+    ctx.fillRect(x + 2, y, 3, h);
+    ctx.fillRect(x + grip - 5, y, 3, h);
+    ctx.restore();
+  } else if (wrapId === "linen") {
+    // Overlapping cloth bands
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, grip, h, 4);
+    ctx.clip();
+    ctx.strokeStyle = "rgba(90, 80, 65, 0.35)";
+    ctx.lineWidth = 1.2;
+    for (let lx = x; lx < x + grip; lx += 8) {
+      ctx.beginPath();
+      ctx.moveTo(lx, y);
+      ctx.lineTo(lx - 4, y + h);
+      ctx.stroke();
+    }
+    ctx.restore();
+  } else if (wrapId === "braided") {
+    // Braided cord chevron ribs
+    const ribColor = quality >= 85 ? "rgba(220,185,90,0.8)" : "rgba(30,18,10,0.55)";
+    ctx.strokeStyle = ribColor;
+    ctx.lineWidth = 1.4;
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath();
+      const rx = x + 4 + i * (grip / 8);
+      ctx.moveTo(rx, y);
+      ctx.lineTo(rx - 5, y + h * 0.5);
+      ctx.lineTo(rx, y + h);
+      ctx.stroke();
+    }
+  } else {
+    // Classical leather with stitched center line and cross ribs
+    ctx.strokeStyle = "rgba(20,12,8,0.55)";
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < 7; i++) {
+      ctx.beginPath();
+      const rx = x + 6 + i * (grip / 7.2);
+      ctx.moveTo(rx, y);
+      ctx.lineTo(rx - 4, y + h);
+      ctx.stroke();
+    }
+  }
+
+  // Border outline
+  ctx.strokeStyle = "rgba(18,12,8,0.65)";
+  ctx.lineWidth = 1.2;
+  roundRect(ctx, x, y, grip, h, 4);
+  ctx.stroke();
 
   ctx.restore();
 }

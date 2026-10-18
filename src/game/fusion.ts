@@ -1,4 +1,5 @@
 import type {
+  CoreHeritageProfile,
   FamilyId,
   FinishedSword,
   FusionCore,
@@ -344,6 +345,37 @@ export function fuseSwords(
   const bonusQuality = tierJump === "exceptional" ? 14 : tierJump === "superior" ? 8 : 4;
   const jumpLabel = tierJump === "exceptional" ? " [Salto Excepcional +2]" : "";
 
+  // Heritage tendencies from the 4 donor swords (functional biological pedigree)
+  const avgAtk = swords.reduce((acc, s) => acc + (s.damage || 200), 0) / 4;
+  const attackBias = Math.round(Math.max(-10, Math.min(25, (avgAtk - 200) * 0.15)));
+
+  const avgDef = swords.reduce((acc, s) => acc + (s.defense || 110), 0) / 4;
+  const defenseBias = Math.round(Math.max(-10, Math.min(20, (avgDef - 110) * 0.15)));
+
+  const avgAgi = swords.reduce((acc, s) => acc + (s.agility || 85), 0) / 4;
+  const agilityBias = Math.round(Math.max(-10, Math.min(20, (avgAgi - 85) * 0.15)));
+
+  const avgDur = swords.reduce((acc, s) => acc + (s.durability || 85), 0) / 4;
+  const durabilityBias = Math.round(Math.max(-5, Math.min(15, (avgDur - 85) * 0.12)));
+
+  const runicAffinity = swords.filter((s) => s.design.runes || (s.perks || []).some((p) => p.toLowerCase().includes("rúnic"))).length / 4;
+
+  const heritage: CoreHeritageProfile = {
+    attackBias,
+    defenseBias,
+    agilityBias,
+    durabilityBias,
+    runicAffinity,
+    dominantFamily: targetFamily,
+    dominantSteel: targetSteel,
+    donorProfiles: swords.map((s) => ({
+      id: s.id,
+      damage: s.damage || 200,
+      defense: s.defense || 110,
+      agility: s.agility || 85,
+    })),
+  };
+
   const resultCore: FusionCore = {
     id: generateUniqueId("core"),
     name: `${coreTitles[finalRarity]}${jumpLabel} — ${bestSword.design.name || "Heroica"}`,
@@ -355,6 +387,7 @@ export function fuseSwords(
     inheritedPerks,
     consumedSwordIds: swords.map((s) => s.id),
     createdAt: Date.now(),
+    heritage,
   };
 
   return {

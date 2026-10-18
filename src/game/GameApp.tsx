@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
 import { isMuted, playCoinJingle, playLootFanfare, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
-import { finishSword, generateForgeRewards } from "./sim";
+import { finishSword, generateForgeRewards, applyStrikeRewardTransaction, type StrikeRewardTransactionResult } from "./sim";
 import { defaultCareer, defaultEquippedGear, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
 import { applyComponentFusionTransaction, applySwordFusionTransaction, type ComponentFusionOutcome, type SwordFusionOutcome } from "./fusion";
 import { DesignScreen } from "./screens/DesignScreen";
@@ -13,7 +13,9 @@ import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
-import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
+import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT, recalculateSwordStats } from "./catalog";
+
+export { applyStrikeRewardTransaction, type StrikeRewardTransactionResult };
 
 const EMPTY_HUD: HudSnapshot = {
   phase: "heat",
@@ -80,9 +82,15 @@ export function GameApp() {
     };
   }, []);
 
-  const persist = useCallback((patch: Partial<typeof save.current>) => {
-    save.current = { ...save.current, ...patch };
-    writeSave(save.current);
+  const persist = useCallback((patch: Partial<typeof save.current>): import("./types").SaveResult => {
+    const next = { ...save.current, ...patch };
+    const res = writeSave(next);
+    if (res.ok) {
+      save.current = next;
+    } else {
+      console.error("[FioForja] Falha na persistência:", res.error, res.code);
+    }
+    return res;
   }, []);
 
   const startForge = useCallback(() => {
@@ -100,19 +108,13 @@ export function GameApp() {
   }, []);
 
   const handleStrikeReward = useCallback((reward: { amount: number; id: string }) => {
-    const claimedStrikes = save.current.claimedStrikeRewardIds || [];
-    if (claimedStrikes.includes(reward.id)) {
-      return;
-    }
-    const nextClaimedStrikes = [...claimedStrikes, reward.id];
+    const tx = applyStrikeRewardTransaction(save.current, reward);
+    if (!tx.applied) return;
 
-    setWallet((prev) => {
-      const next = { ...prev, gold: prev.gold + reward.amount };
-      persist({
-        wallet: next,
-        claimedStrikeRewardIds: nextClaimedStrikes,
-      });
-      return next;
+    setWallet(tx.wallet);
+    persist({
+      wallet: tx.wallet,
+      claimedStrikeRewardIds: tx.claimedStrikeRewardIds,
     });
   }, [persist]);
 
@@ -296,12 +298,10 @@ export function GameApp() {
 
     // Workbench refinement strictly polishes the edge (+8 ATK) and reinforces the grip (+2 Durability).
     // Intrinsic metallurgical properties (quality, grade, rarity, flaws, cracks, warp) are permanent physical facts from the forge.
-    const updatedSword: FinishedSword = {
+    const updatedSword: FinishedSword = recalculateSwordStats({
       ...targetSword,
-      damage: (targetSword.damage ?? 180) + 8,
-      durability: Math.min(100, (targetSword.durability ?? 90) + 2),
       upgradesApplied: upgrades + 1,
-    };
+    });
 
     playUpgradeChime();
     setWallet(nextWallet);
@@ -362,7 +362,22 @@ export function GameApp() {
     const comp = currentSave.inventory.components.find((c) => c.id === componentId);
     if (!targetSword || !comp) return false;
 
-    // Update design physical appearance
+    // Structural integrity rule: Broken blades cannot receive component mounting
+    if (targetSword.broken) return false;
+
+    // 1. Identify previously installed component in this slot category for inventory refund
+    const existingInstalled = targetSword.installedComponents || {};
+    const previousComp = existingInstalled[comp.category];
+
+    // Remove the newly mounted component from inventory
+    const nextComponents = currentSave.inventory.components.filter((c) => c.id !== componentId);
+
+    // If a component was previously mounted in this category, unequip and refund it to inventory!
+    if (previousComp) {
+      nextComponents.push(previousComp);
+    }
+
+    // 2. Update physical design appearance
     const nextDesign = { ...targetSword.design };
     if (comp.category === "guard") {
       const raw = comp.componentKey.replace(/^guard_/, "");
@@ -374,35 +389,40 @@ export function GameApp() {
       if (match) nextDesign.pommel = match as any;
     } else if (comp.category === "wrap") {
       const raw = comp.componentKey.replace(/^wrap_/, "");
-      const match = ["leather", "braided", "linen", "darkwood", "bone", "goldwire", "tsukamaki", "elven_wood"].find((w) => raw.startsWith(w));
+      const match = ["leather", "braided", "linen", "darkwood", "bone", "goldwire", "tsukamaki", "dragon_leather", "elven_wood"].find((w) => raw.startsWith(w));
       if (match) nextDesign.wrap = match as any;
     } else if (comp.category === "rune") {
       nextDesign.runes = true;
+      if (comp.componentKey) {
+        nextDesign.runeKey = comp.componentKey;
+      }
     }
 
-    // Apply physical stat modifiers
-    const nextDamage = (targetSword.damage ?? 180) + (comp.statModifier?.damageBonus || 0);
-    const nextDefense = (targetSword.defense ?? 90) + (comp.statModifier?.defenseBonus || 0);
-    const nextAgility = (targetSword.agility ?? 75) + (comp.statModifier?.agilityBonus || 0);
-    const nextDurability = Math.min(100, (targetSword.durability ?? 90) + (comp.statModifier?.durabilityBonus || 0));
-
-    const updatedSword: FinishedSword = {
-      ...targetSword,
-      design: nextDesign,
-      damage: nextDamage,
-      defense: nextDefense,
-      agility: nextAgility,
-      durability: nextDurability,
-      affixes: [...(targetSword.affixes || []), `Montagem de Bancada: ${comp.name}`],
-      installedComponents: {
-        ...(targetSword.installedComponents || {}),
-        [comp.category]: comp,
-      },
+    // 3. Assemble sword with new component in category slot
+    const nextInstalled = {
+      ...existingInstalled,
+      [comp.category]: comp,
     };
 
-    // Remove component from inventory
-    const nextComponents = currentSave.inventory.components.filter((c) => c.id !== componentId);
-    const nextInventory: PlayerInventory = { ...currentSave.inventory, components: nextComponents };
+    // Cleanly replace affix for this slot to avoid stacking affix labels
+    const existingAffixes = (targetSword.affixes || []).filter(
+      (affix) => !affix.startsWith(`Montagem [${comp.category}]:`) && !affix.startsWith(`Montagem de Bancada: ${previousComp?.name}`)
+    );
+    const newAffix = `Montagem [${comp.category}]: ${comp.name}`;
+
+    // 4. Recalculate deterministic attributes from metallurgical base + refinement + active components
+    const updatedSword = recalculateSwordStats({
+      ...targetSword,
+      design: nextDesign,
+      affixes: [...existingAffixes, newAffix],
+      installedComponents: nextInstalled,
+    });
+
+    // 5. Update state and persist
+    const nextInventory: PlayerInventory = {
+      ...currentSave.inventory,
+      components: nextComponents,
+    };
     const nextGallery = currentSave.gallery.map((s) => (s.id === swordId ? updatedSword : s));
 
     playUpgradeChime();
@@ -411,7 +431,10 @@ export function GameApp() {
     if (finished && finished.id === swordId) {
       setFinished(updatedSword);
     }
-    persist({ inventory: nextInventory, gallery: nextGallery });
+    const saveRes = persist({ inventory: nextInventory, gallery: nextGallery });
+    if (!saveRes.ok) {
+      console.warn("[FioForja] Alerta de persistência na montagem de componente:", saveRes.error);
+    }
     return true;
   }, [finished, persist]);
 

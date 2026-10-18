@@ -1,5 +1,5 @@
-import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
-import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, FusionCore, HammerType, PhysicalBladeProfile, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import { STEELS, calculateSwordAttributes, gradeFor, rarityFor, recalculateSwordStats } from "./catalog.ts";
+import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, FusionCore, HammerType, PhysicalBladeProfile, PlayerWallet, SimState, StrikeKind, SwordDesign } from "./types.ts";
 import { generateUniqueId } from "./save.ts";
 import { generateDynamicForgeRewards } from "./loot.ts";
 import { RARITY_RANK_VALUES } from "./fusion.ts";
@@ -479,6 +479,25 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     attrs.perks.push(...s.activeCore.inheritedPerks);
   }
 
+  // Functional heritage from donor swords via Fusion Core
+  if (s.activeCore?.heritage) {
+    const h = s.activeCore.heritage;
+    attrs.damage += h.attackBias || 0;
+    attrs.defense += h.defenseBias || 0;
+    attrs.agility = Math.max(15, attrs.agility + (h.agilityBias || 0));
+    attrs.durability = Math.max(15, Math.min(100, attrs.durability + (h.durabilityBias || 0)));
+    if (h.runicAffinity > 0.5) {
+      attrs.perks.push("Afinidade Rúnica Ancestral: Ressonância com energias arcanas");
+    }
+    if (h.attackBias >= 8) {
+      attrs.perks.push("Herança de Impacto: Linhagem forjada para corte ofensivo");
+    } else if (h.agilityBias >= 8) {
+      attrs.perks.push("Herança de Vento: Equilíbrio ágil transmitido do núcleo");
+    } else if (h.defenseBias >= 8) {
+      attrs.perks.push("Herança de Fortaleza: Massa sólida e resistência inabalável");
+    }
+  }
+
   // Additional perks based on multi-zone harmony and tool mastery
   if (s.zoneProgress.base >= 2 && s.zoneProgress.mid >= 2 && s.zoneProgress.tip >= 2) {
     attrs.perks.push("Harmonia da Forja: Estiramento uniforme entre base, centro e ponta");
@@ -525,6 +544,10 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     quenchScore,
     warp: s.warp,
     createdAt: Date.now(),
+    baseDamage: attrs.damage,
+    baseDefense: attrs.defense,
+    baseAgility: attrs.agility,
+    baseDurability: attrs.durability,
     damage: attrs.damage,
     defense: attrs.defense,
     agility: attrs.agility,
@@ -545,7 +568,7 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   // Pre-generate deterministic rewards tied strictly to this forgeRunId
   resultSword.pendingRewards = generateDynamicForgeRewards(resultSword, { forgeRunId });
 
-  return resultSword;
+  return recalculateSwordStats(resultSword);
 }
 
 export function generateForgeRewards(
@@ -554,3 +577,44 @@ export function generateForgeRewards(
 ): ForgeRewardsData {
   return generateDynamicForgeRewards(sword, options);
 }
+
+export interface StrikeRewardTransactionResult {
+  applied: boolean;
+  wallet: PlayerWallet;
+  claimedStrikeRewardIds: string[];
+}
+
+export function applyStrikeRewardTransaction(
+  currentSave: {
+    wallet?: PlayerWallet;
+    claimedStrikeRewardIds?: string[];
+  },
+  reward: { amount: number; id: string; strikeIndex?: number },
+  activeForgeRunId?: string,
+): StrikeRewardTransactionResult {
+  const currentWallet = currentSave.wallet || { gold: 0, rubies: 0, diamonds: 0 };
+  const claimedStrikes = currentSave.claimedStrikeRewardIds || [];
+
+  if (!reward || !reward.id || typeof reward.id !== "string" || reward.amount <= 0 || claimedStrikes.includes(reward.id)) {
+    return {
+      applied: false,
+      wallet: currentWallet,
+      claimedStrikeRewardIds: claimedStrikes,
+    };
+  }
+
+  const updated = [...claimedStrikes, reward.id];
+  const compacted = updated.length > 200 ? updated.slice(updated.length - 200) : updated;
+
+  const nextWallet: PlayerWallet = {
+    ...currentWallet,
+    gold: currentWallet.gold + Math.round(reward.amount),
+  };
+
+  return {
+    applied: true,
+    wallet: nextWallet,
+    claimedStrikeRewardIds: compacted,
+  };
+}
+
