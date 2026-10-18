@@ -519,8 +519,8 @@ export function calculateSwordAttributes(
   forgeScore: number,
   quenchScore: number,
 ) {
-  const profile = PROFILES[design.profile];
-  const steel = STEELS[design.steel];
+  const profile = PROFILES[design.profile] || PROFILES.long;
+  const steel = STEELS[design.steel] || STEELS.steel;
 
   // ATK: Gume bem formado, dureza do aço, qualidade do martelo e proporção de corte
   const baseAtk = 100 + steel.hardness * 140 + profile.width * 60;

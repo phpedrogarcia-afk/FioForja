@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
-import { isMuted, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
+import { isMuted, playCoinJingle, playLootFanfare, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
 import { finishSword, generateForgeRewards } from "./sim";
 import { defaultCareer, defaultEquippedGear, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
+import { applyComponentFusionTransaction, applySwordFusionTransaction, type ComponentFusionOutcome, type SwordFusionOutcome } from "./fusion";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
@@ -96,25 +97,111 @@ export function GameApp() {
     setHud(next);
   }, []);
 
+  const handleStrikeReward = useCallback((reward: { amount: number; id: string }) => {
+    setWallet((prev) => {
+      const next = { ...prev, gold: prev.gold + reward.amount };
+      persist({ wallet: next });
+      return next;
+    });
+  }, [persist]);
+
   const handleClaimRewards = useCallback((rewards: ForgeRewardsData) => {
     const currentWallet = save.current.wallet || defaultWallet;
     const currentInventory = save.current.inventory || defaultInventory;
+    const runId = rewards.forgeRunId || (finished ? finished.forgeRunId : null);
+    const claimedRuns = save.current.claimedForgeRewardIds || [];
+
+    // Idempotency: prevent double claim on reload or multiple clicks
+    if (runId && claimedRuns.includes(runId)) {
+      return;
+    }
+
     const nextWallet: PlayerWallet = {
       gold: currentWallet.gold + (rewards.gold || 0),
       rubies: currentWallet.rubies + (rewards.rubies || 0),
       diamonds: currentWallet.diamonds + (rewards.diamonds || 0),
     };
+
     const nextMaterials = { ...(currentInventory.materials || {}) };
+    const nextComponents = [...(currentInventory.components || [])];
+
     for (const item of rewards.items) {
-      nextMaterials[item.id] = (nextMaterials[item.id] || 0) + 1;
+      if (item.category === "material" || item.category === "fusion") {
+        const key = item.catalogKey || item.id;
+        nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
+      } else if (item.category === "guard" || item.category === "pommel" || item.category === "wrap" || item.category === "rune") {
+        nextComponents.push({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          componentKey: item.catalogKey || item.id,
+          rarity: item.rarity,
+          icon: item.icon,
+          description: item.description,
+          statModifier: item.statsModifier,
+          acquiredAt: Date.now(),
+        });
+      } else {
+        const key = item.catalogKey || item.id;
+        nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
+      }
     }
+
+    const nextClaimedRuns = runId ? [...claimedRuns, runId] : claimedRuns;
+
     const nextInventory: PlayerInventory = {
       ...currentInventory,
       materials: nextMaterials,
+      components: nextComponents,
     };
+
+    // Fanfare for highest rarity
+    const rarityOrder: import("./types").RarityGrade[] = ["Relíquia", "Lendária", "Épica", "Rara", "Incomum", "Comum"];
+    const highest = rarityOrder.find((r) => rewards.items.some((it) => it.rarity === r)) || "Comum";
+    playLootFanfare(highest);
+
     setWallet(nextWallet);
     setInventory(nextInventory);
-    persist({ wallet: nextWallet, inventory: nextInventory });
+    persist({
+      wallet: nextWallet,
+      inventory: nextInventory,
+      claimedForgeRewardIds: nextClaimedRuns,
+    });
+  }, [finished, persist]);
+
+  const handleApplyComponentFusion = useCallback((outcome: ComponentFusionOutcome) => {
+    const nextSave = applyComponentFusionTransaction(save.current, outcome);
+    save.current = nextSave;
+    setWallet(nextSave.wallet);
+    setInventory(nextSave.inventory);
+    writeSave(nextSave);
+  }, []);
+
+  const handleApplySwordFusion = useCallback((outcome: SwordFusionOutcome) => {
+    const nextSave = applySwordFusionTransaction(save.current, outcome);
+    save.current = nextSave;
+    setWallet(nextSave.wallet);
+    setInventory(nextSave.inventory);
+    setGallery(nextSave.gallery);
+    writeSave(nextSave);
+  }, []);
+
+  const handleForgeCore = useCallback((core: FusionCore) => {
+    const coreDesign: SwordDesign = {
+      name: core.name.split("—")[1]?.trim() || "Espada do Crisol",
+      family: core.family,
+      profile: core.profile,
+      steel: core.steel,
+      guard: "cross",
+      pommel: "disc",
+      wrap: "leather",
+      inscription: "",
+      runes: core.rarity === "Lendária" || core.rarity === "Relíquia" || core.rarity === "Épica",
+      length: 0.75,
+    };
+    setDesign(coreDesign);
+    persist({ lastDesign: coreDesign });
+    setScreen("forge");
   }, [persist]);
 
   const handleBuyTool = useCallback((toolId: string): boolean => {
@@ -227,7 +314,7 @@ export function GameApp() {
     setCareer(nextCareer);
 
     if (!sim.broken) {
-      const nextGallery = [sword, ...save.current.gallery].slice(0, 48);
+      const nextGallery = [sword, ...save.current.gallery].slice(0, 120);
       setGallery(nextGallery);
       persist({ gallery: nextGallery, career: nextCareer });
     } else {
@@ -343,6 +430,9 @@ export function GameApp() {
         onEquipTool={handleEquipTool}
         onSelectPreset={handleSelectPreset}
         onUpgrade={handleUpgradeSword}
+        onApplyComponentFusion={handleApplyComponentFusion}
+        onApplySwordFusion={handleApplySwordFusion}
+        onForgeCore={handleForgeCore}
       />
     );
   }
@@ -389,6 +479,7 @@ export function GameApp() {
           reducedMotion={reducedMotion}
           onHud={onHud}
           onFinished={onFinished}
+          onStrikeReward={handleStrikeReward}
           inputRef={inputRef}
           inventory={inventory}
         />

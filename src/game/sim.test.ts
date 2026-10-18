@@ -112,7 +112,7 @@ describe("FioForja Simulator Core & Physical Metallurgy", () => {
     assert.ok(attrsFlawed.flaws.some((f) => f.includes("Empenamento")));
   });
 
-  it("generates forge celebration rewards conforming to Reference Image 3", () => {
+  it("generates forge celebration rewards conforming to dynamic loot engine", () => {
     const sim = createSim({ ...DEFAULT_DESIGN, steel: "meteor", runes: true });
     sim.quality = 98;
     sim.shape = 1;
@@ -123,16 +123,31 @@ describe("FioForja Simulator Core & Physical Metallurgy", () => {
     assert.equal(finished.grade, "Obra-prima");
     assert.equal(finished.rarity, "Lendária");
 
-    const rewards = generateForgeRewards(finished);
+    const rewards = generateForgeRewards(finished, { seed: 42 });
     assert.equal(rewards.rank, "S (98%)");
-    assert.equal(rewards.gold, 4850);
-    assert.equal(rewards.rubies, 165);
-    assert.equal(rewards.diamonds, 165);
+    assert.ok(rewards.gold >= 480 && rewards.gold <= 650, `Gold ${rewards.gold} in Rank S expected range`);
+    assert.ok(rewards.rubies >= 18 && rewards.rubies <= 30, `Rubies ${rewards.rubies} in Rank S expected range`);
+    assert.ok(rewards.diamonds >= 12 && rewards.diamonds <= 20, `Diamonds ${rewards.diamonds} in Rank S expected range`);
     assert.equal(rewards.items.length, 4);
-    assert.equal(rewards.items[0].name, "Fiery Rune Stone");
-    assert.equal(rewards.items[1].name, "Damascus Crossguard");
-    assert.equal(rewards.items[2].name, "Dragon Leather Sword Grip");
-    assert.equal(rewards.items[3].name, "Star Metal Ingot");
+
+    // Each reward item must have valid catalog fields
+    for (const item of rewards.items) {
+      assert.ok(item.name.length > 0);
+      assert.ok(item.category);
+      assert.ok(item.rarity);
+      assert.ok(item.icon);
+      assert.ok((item.quantity ?? 1) >= 1);
+    }
+
+    // Verify seed determinism: same seed yields identical rewards
+    const rewardsClone = generateForgeRewards(finished, { seed: 42 });
+    assert.equal(rewards.gold, rewardsClone.gold);
+    assert.equal(rewards.rubies, rewardsClone.rubies);
+    assert.equal(rewards.diamonds, rewardsClone.diamonds);
+    assert.deepEqual(
+      rewards.items.map((i) => i.catalogKey),
+      rewardsClone.items.map((i) => i.catalogKey),
+    );
   });
 
   it("handles multi-zone targeting and awards Forge Harmony perk on balanced forging", () => {

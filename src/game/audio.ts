@@ -272,6 +272,159 @@ function startFire() {
   tick();
 }
 
+export function playCoinJingle() {
+  if (!ctx || !sfx) return;
+  const audioCtx = ctx;
+  const t = now();
+  // Delicate double chime in high register (C7: 2093Hz, E7: 2637Hz)
+  const freqs = [2093.0, 2637.0];
+  freqs.forEach((freq, idx) => {
+    const delay = idx * 0.055;
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, t + delay);
+    const g = envGain(0.14, 0.22, 0.003);
+    if (g) {
+      osc.connect(g);
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.15);
+    }
+  });
+}
+
+export function playLootFanfare(rarity: "Comum" | "Incomum" | "Rara" | "Épica" | "Lendária" | "Relíquia") {
+  if (!ctx || !sfx) return;
+  const audioCtx = ctx;
+  const t = now();
+
+  if (rarity === "Comum") {
+    // Quick clean ping
+    const osc = audioCtx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(783.99, t);
+    const g = envGain(0.2, 0.25, 0.005);
+    if (g) {
+      osc.connect(g);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    }
+  } else if (rarity === "Incomum") {
+    // Dual chord
+    const freqs = [783.99, 987.77]; // G5, B5
+    freqs.forEach((f) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, t);
+      const g = envGain(0.3, 0.25, 0.008);
+      if (g) {
+        osc.connect(g);
+        osc.start(t);
+        osc.stop(t + 0.3);
+      }
+    });
+  } else if (rarity === "Rara") {
+    // Triad ascending chime
+    const notes = [783.99, 987.77, 1174.66]; // G5, B5, D6
+    notes.forEach((freq, idx) => {
+      const delay = idx * 0.07;
+      const osc = audioCtx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t + delay);
+      const g = envGain(0.45, 0.3, 0.008);
+      if (g) {
+        osc.connect(g);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.45);
+      }
+    });
+  } else if (rarity === "Épica") {
+    // Rich harmonic 4-note chord
+    const notes = [587.33, 739.99, 880.0, 1174.66]; // D5, F#5, A5, D6
+    notes.forEach((freq, idx) => {
+      const delay = idx * 0.08;
+      const osc = audioCtx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, t + delay);
+      const g = envGain(0.65, 0.35, 0.01);
+      if (g) {
+        osc.connect(g);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.65);
+      }
+    });
+  } else if (rarity === "Lendária") {
+    // Majestic fanfare
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C5, E5, G5, C6, E6
+    notes.forEach((freq, idx) => {
+      const delay = idx * 0.09;
+      const osc = audioCtx.createOscillator();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freq, t + delay);
+      const f = audioCtx.createBiquadFilter();
+      f.type = "lowpass";
+      f.frequency.setValueAtTime(1200 + idx * 300, t + delay);
+      const g = envGain(0.85, 0.38, 0.015);
+      if (g) {
+        osc.connect(f);
+        f.connect(g);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.85);
+      }
+    });
+  } else {
+    // Relic: deep ancient resonance with subharmonics
+    const notes = [110.0, 220.0, 440.0, 554.37, 659.25];
+    notes.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = idx === 0 ? "triangle" : "sine";
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, t + 1.2);
+      const g = envGain(1.4, 0.45, 0.03);
+      if (g) {
+        osc.connect(g);
+        osc.start(t);
+        osc.stop(t + 1.4);
+      }
+    });
+  }
+}
+
+export function playFusionHum() {
+  if (!ctx || !sfx) return;
+  const audioCtx = ctx;
+  const t = now();
+  const osc = audioCtx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(160, t);
+  osc.frequency.exponentialRampToValueAtTime(420, t + 0.8);
+  const g = envGain(0.85, 0.35, 0.05);
+  if (g) {
+    osc.connect(g);
+    osc.start(t);
+    osc.stop(t + 0.85);
+  }
+}
+
+export function playFusionSuccess() {
+  if (!ctx || !sfx) return;
+  const audioCtx = ctx;
+  const t = now();
+  // Harmonic chime
+  const notes = [440, 554.37, 659.25, 880];
+  notes.forEach((freq, idx) => {
+    const delay = idx * 0.07;
+    const osc = audioCtx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, t + delay);
+    const g = envGain(0.7, 0.35, 0.01);
+    if (g) {
+      osc.connect(g);
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.7);
+    }
+  });
+}
+
 export function resumeAudio() {
   if (ctx?.state === "suspended") void ctx.resume();
 }

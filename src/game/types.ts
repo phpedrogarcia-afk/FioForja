@@ -102,6 +102,14 @@ export interface FinishedSword {
   upgradesApplied?: number;
   flaws?: string[];
   perks?: string[];
+  affixes?: string[]; // Distinct masterwork / fusion affixes
+  fusionHistory?: {
+    parentIds: string[];
+    coreName: string;
+    date: number;
+    inheritedPerks: string[];
+  };
+  forgeRunId?: string;
   structuralState?: StructuralState;
   broken?: boolean;
   cracks?: number;
@@ -163,6 +171,7 @@ export interface SimState {
   activeHammer: HammerType;
   equippedGear: EquippedWorkshopGear;
   history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
+  strikeReward?: { amount: number; kind: StrikeKind; strikeIndex: number; id: string } | null;
 }
 
 export interface HudSnapshot {
@@ -188,24 +197,67 @@ export interface HudSnapshot {
   activeHammer?: HammerType;
   physicalProfile?: PhysicalBladeProfile;
   quenchSteam?: number;
+  strikeReward?: { amount: number; kind: StrikeKind; strikeIndex: number; id: string } | null;
 }
 
 export interface ForgeRewardItem {
   id: string;
+  catalogKey?: string;
   name: string;
   type: string;
+  category?: "material" | "guard" | "pommel" | "wrap" | "rune" | "fusion" | "recipe";
   rarity: RarityGrade;
   icon: string;
   description: string;
+  quantity?: number;
+  value?: number;
+  statsModifier?: {
+    damageBonus?: number;
+    defenseBonus?: number;
+    agilityBonus?: number;
+    durabilityBonus?: number;
+  };
 }
 
 export interface ForgeRewardsData {
+  forgeRunId?: string;
   rank: string;
   scorePercent: number;
   gold: number;
   rubies: number;
   diamonds: number;
   items: ForgeRewardItem[];
+  claimed?: boolean;
+}
+
+export interface FusionCore {
+  id: string;
+  name: string;
+  rarity: RarityGrade;
+  family: FamilyId;
+  profile: ProfileId;
+  steel: SteelId;
+  bonusQuality: number;
+  inheritedPerks: string[];
+  consumedSwordIds: string[];
+  createdAt: number;
+}
+
+export interface InventoryComponent {
+  id: string;
+  name: string;
+  category: "guard" | "pommel" | "wrap" | "rune";
+  componentKey: string;
+  rarity: RarityGrade;
+  icon: string;
+  description: string;
+  statModifier?: {
+    damageBonus?: number;
+    defenseBonus?: number;
+    agilityBonus?: number;
+    durabilityBonus?: number;
+  };
+  acquiredAt: number;
 }
 
 export interface PlayerWallet {
@@ -223,6 +275,8 @@ export interface PlayerInventory {
   unlockedRunes: string[];
   unlockedTools: string[];
   materials: Record<string, number>;
+  fusionCores: FusionCore[];
+  components: InventoryComponent[];
   equipped?: EquippedWorkshopGear;
 }
 
@@ -247,4 +301,16 @@ export interface CareerStats {
   brokenBlades: number;
   highestQuality: number;
   totalValueEarned: number;
+}
+
+export interface SaveData {
+  version: number;
+  gallery: FinishedSword[];
+  lastDesign: SwordDesign;
+  wallet: PlayerWallet;
+  inventory: PlayerInventory;
+  career: CareerStats;
+  muted: boolean;
+  shake: boolean;
+  claimedForgeRewardIds: string[];
 }

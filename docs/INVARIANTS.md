@@ -1,12 +1,16 @@
 # Invariantes do FioForja
 
-Estas propriedades governam mudanças futuras. “Regra” não significa que o protótipo já a satisfaça completamente; veja o estado e as lacunas em [PROJECT-STATE.md](PROJECT-STATE.md).
+Estas propriedades governam todas as mudanças de código e design. Qualquer implementação que viole um destes invariantes é considerada inválida.
 
-1. **Habilidade não é substituída por RNG.** Sorte não pode corrigir uma execução insuficiente nem conceder sozinha prestígio raro.
-2. **Qualidade precisa deixar uma marca perceptível na arma.** A nota deve corresponder a forma, alinhamento e acabamento que o jogador consiga observar.
-3. **Qualidade e raridade permanecem conceitos distintos.** Uma peça bem executada não se torna automaticamente Lendária, e uma classe rara não prova qualidade de execução.
-4. **Conteúdo raro exige gates de execução.** Lendárias e Relíquias precisam de conquista; Relíquias também dependem de condições especiais ou descoberta.
-5. **Customização preserva identidade estética.** Componentes, materiais e runas precisam respeitar ou justificar compatibilidade com a família e a silhueta.
-6. **Cada arma forjada conserva identidade própria.** Repetições do mesmo projeto não substituem automaticamente uma à outra; história e resultados da peça devem continuar associados a ela.
-7. **Simulação e apresentação mantêm fronteira explícita.** A lógica de forja não deve depender do desenho em Canvas; o padrão atual separa `sim.ts`, `ForgeCanvas.tsx` e `swordDraw.ts`.
-8. **Mudanças no core loop são comparadas a um baseline.** Medir resultados observáveis antes e depois; um único sucesso não demonstra confiabilidade. Ainda não há baseline registrado para a simulação atual.
+1. **Habilidade não é substituída por RNG:** Sorte amplia oportunidades (drops, núcleos raros, projetos especiais), mas jamais corrige execução insuficiente nem concede sozinha prestígio ou vitória.
+2. **Qualidade deixa marca física visível:** A nota da forja (0–100) deve alterar perceptivelmente a geometria, alinhamento, gume, reflexo e acabamento da arma. Uma nota alta sem diferença visual é uma falha de produto.
+3. **Qualidade e raridade são eixos distintos:** Uma peça comum perfeitamente forjada é uma obra-prima de sua categoria; uma arma de material raro mal forjada exibirá trincas, empenamento e imperfeições.
+4. **Conteúdo raro exige gates de execução:** Lendárias e Relíquias exigem maestria, dificuldade elevada e condições especiais de forja.
+5. **Customização preserva identidade estética:** Componentes, materiais e runas respeitam a silhueta e a herança visual de sua família (Bíblia Estética). Não há armas cobertas de neon ou puramente coloridas por rótulos de raridade.
+6. **Cada arma conserva identidade individual:** Duas armas do mesmo projeto mantêm instâncias distintas com histórico de forja, atributos físicos (`P.ATK`, `DEF`, `AGI`, `DUR`), afixos e marcas de fabricação.
+7. **Simulação e apresentação mantêm fronteira explícita:** A física de temperatura, estresse e deformação reside em `sim.ts`; a renderização em `ForgeCanvas.tsx` e `swordDraw.ts`; a interface em componentes React dedicados.
+8. **THE PLAYER FORGES THE TROPHY (Fusão Híbrida — Opção C):** A fusão de espadas gera um núcleo, pré-forma ou projeto superior que exige forjamento manual na bigorna. A fusão nunca entrega uma espada Lendária pronta sem a execução da forja.
+9. **Integridade Econômica e Transacional:** Cada evento de recompensa (moedas na bigorna, drops pós-forja, compra na oficina, consumo de 4 itens na fusão) possui chave de idempotência e transação atômica. Recarregar a página, duplo clique ou re-renderizações não duplicam pagamentos nem itens.
+10. **Prevenção de Exploração por Fratura:** Lâminas quebradas propositalmente (`broken: true`) rendem apenas escória ou ferro bruto. Quebrar armas não pode se tornar estratégia rentável de obtenção de itens de alto escalão.
+11. **Preservação de Dados do Jogador:** Migrações de save devem ser retrocompatíveis. Nenhuma versão nova de schema pode deletar, truncar ou corromper espadas, moedas ou inventário pré-existentes.
+12. **Isolamento de Branches:** Desenvolvimento experimental ocorre em branch dedicada. A branch `main` nunca é modificada sem autorização explícita e validação total.

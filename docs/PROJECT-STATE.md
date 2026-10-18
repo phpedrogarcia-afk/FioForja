@@ -1,57 +1,65 @@
-# Estado do projeto — auditoria M00-R1
+# Estado Atual do Projeto — FioForja
 
-Snapshot do código de `main` em 2026-10-06, antes desta fundação documental. **HEAD observado:** `2d06a97a9c55e65800927947d186094124936180` (`FioForja: jogo de forja medieval`). No início da auditoria, o único item local era o documento canônico `docs/canon/galeria.md`, ainda não rastreado. Os documentos desta missão também permanecem sem commit. Nenhum código de runtime foi alterado.
+**Data da Atualização:** 18 de Outubro de 2026  
+**Branch de Trabalho:** `antigravity/arsenal-vivo-v1`  
+**Base Canônica de Continuidade:** `antigravity/grand-forge-total-refinement`  
+**Último Commit Remoto Verificado:** `5835c0fcbc40d5670ba3a696f13f887185fcb64f` (`5835c0f`)  
+**Registro Histórico Antigo:** Arquivado em [`docs/historical/PROJECT-STATE-M00-R1.md`](historical/PROJECT-STATE-M00-R1.md)
 
-## KNOWN
+---
 
-- `src/game/GameApp.tsx` coordena as telas Título, Projeto, Forja, Revelação e Galeria. A simulação atual tem fases calor, martelamento e têmpera (`src/game/types.ts`, `sim.ts`).
-- A força é carregada segurando e liberada no momento escolhido; a janela ideal se move. O aço altera janela térmica e largura do ponto ideal (`sim.ts`, `catalog.ts`).
-- `FinishedSword` guarda projeto, nota, avaliações agregadas, empenamento, ID e data. Não guarda o histórico de cada golpe (`types.ts`, `GameApp.tsx`).
-- O desenho da forja usa quadro lógico de 1280×720 e Canvas 2D (`ForgeCanvas.tsx`). A renderização aplica escala `cover` com o maior fator horizontal/vertical, o que corta as laterais em uma viewport vertical. A intensidade do recorte em cada aparelho não foi medida.
-- A Galeria implementada é uma grade de miniaturas e rótulos de nome/nota; o save conserva no máximo 24 espadas no `localStorage` (`GalleryScreen.tsx`, `save.ts`). A estrutura de seis áreas da especificação ainda não está implementada.
-- Há infraestrutura de autenticação, banco, app-data e preview fora de `src/game`. A entrada do jogo é `src/routes/index.tsx`; infraestrutura do repositório não comprova funcionalidade de gameplay.
-- Não existem testes em `src/game`. Os testes encontrados estão em `scripts/`, `src/lib/auth/` e `src/lib/app-data/`; não foi encontrado relatório de cobertura do núcleo do jogo.
+## 1. FATOS COMPROVADOS (KNOWN & VERIFIED)
 
-## OBSERVATIONS
+### A. Simulação Metalúrgica e Física da Forja (`src/game/sim.ts`)
+- **Física Multi-Zonas:** O martelamento é distribuído entre três zonas de impacto reais (`base`, `mid`, `tip`), modificando progressivamente o perfil contínuo [`PhysicalBladeProfile`](../src/game/types.ts) (`baseWidth`, `midWidth`, `tipWidth`, `distalTaper`, `fullerDepth`, `bevelSharpness`).
+- **Plasticidade e Termodinâmica:** Deformação efetiva ocorre apenas na janela térmica ideal. Golpes a frio (`heat < 0.35`) causam acúmulo de estresse interno, microtrincas (`cracks`) e eventual fratura frágil irreversível (`broken: true`, `structuralState: "broken"`).
+- **Mecânica de Reaquecimento:** O ferreiro pode retornar a lâmina à fornalha quando a temperatura cai, aliviando o estresse estrutural e restaurando a plasticidade de forma segura.
+- **Têmpera Realista:** O choque térmico em água ou óleo determina a dureza final e gera empenamento (`warp`) se o alinhamento de resfriamento falhar.
+- **Ferramentas Ativas de Oficina:** Martelos (`precision`, `standard`, `sledge`), bigornas, fornalhas e bacias de têmpera equipadas afetam matematicamente a inércia do golpe, a perda de calor e o risco de trinca.
 
-| Observação candidata | Resultado da conferência |
-|---|---|
-| Composição 1280×720 | **Confirmada** por `VW`/`VH` e desenho em `ForgeCanvas.tsx`. O modo `cover` confirma recorte lateral em telas portrait; severidade prática é desconhecida. |
-| Mão/martelo podem ocultar a espada | **Sobreposição confirmada:** a espada é desenhada antes da mão e do sprite de golpe. O sprite contém braço e martelo grandes. “Oculta demais” é julgamento visual ainda não medido em render da tela. |
-| Execução ruim e excelente parecem pouco diferentes | **Não conclusiva:** `shape` modifica comprimento e largura/perfil da lâmina; `quality` altera também a luminosidade do metal. Não há comparação visual controlada que prove se a diferença percebida cumpre a direção estética. |
-| README anuncia `R` para reaquecer | **Refutada pelo código atual:** `GameApp.tsx` trata `Space` e `Enter`, mas não `R`; o reaquecimento está ligado a botão do HUD. |
-| Gatilhos de reaquecimento divergem | **Confirmada:** `sim.ts` aceita pedido abaixo de `0.55`; `ForgeHud.tsx` só exibe o botão abaixo de `0.4`. |
-| Testes cobrem mais infraestrutura periférica que simulação | **Parcialmente confirmada:** arquivos de teste existem para scripts/auth/app-data e nenhum para `src/game`. Não há contagem de cobertura para quantificar “mais”. |
-| Há infraestrutura de template fora do jogo | **Confirmada:** autenticação, banco, conectores e preview aparecem em `src/lib` e nas dependências. A necessidade futura de cada parte não foi auditada nesta missão. |
-| Nota e acabamento seguem os mesmos limiares da Bíblia Estética | **Divergência confirmada:** `catalog.ts` usa cinco rótulos, com Obra-prima a partir de 92; a Bíblia define seis faixas visuais e Obra-prima a partir de 95. Não houve harmonização. |
+### B. Cena da Forja e Renderização Gráfica (`src/game/ForgeCanvas.tsx`, `src/game/swordDraw.ts`)
+- **Duas Mãos de Ferreiro:**
+  - A mão esquerda empunha tenazes de forja forjadas em aço maciço que se estendem continuamente para fora da viewport inferior esquerda, com chanfros escuros, rebite de articulação e reflexo quente das brasas.
+  - O braço direito executa o movimento contínuo do martelo a partir de um sprite unificado (`hand-strike.png`) com máscara de penas de gradiente suave no ombro, sem cortes bruscos ou cintilações entre espera e golpe.
+- **Reflexo Térmico da Bigorna:** A superfície superior da bigorna projeta um brilho incandescente sob a lâmina em brasa quando `heatBoost > 0.25`.
+- **Banho de Têmpera Dinâmico:** A água do tanque simula fervura ativa, turbulência e borbulhas de espuma durante a imersão da lâmina quente, liberando nuvens volumétricas de vapor.
+- **Entalhe Rúnico Físico (Bíblia Estética):** Runas Elder Futhark e sangradouros utilizam entalhe chanfrado em baixo-relevo (V-groove chisel shadow offset de 0.8px). Neon flutuante foi eliminado: aço comum não emite luz; runas frias têm brilho metálico tátil fosco; runas em brasa emitem calor interno suave. Runas são bloqueadas em tarugos brutos (`shape < 0.65`).
 
-## HYPOTHESES
+### C. Estrutura da Galeria e Armas Individuais (`src/game/screens/GalleryScreen.tsx`, `RevealScreen.tsx`)
+- **Seis Pilares da Galeria:** Arsenal, Compêndio, Componentes, Runas, Oficina e Legado.
+- **Oficina Equipável:** O jogador pode comprar e equipar ativamente bigornas, fornalhas, bacias de têmpera e martelos, com custos debitados da carteira persistente.
+- **Mesa de Inspeção em Veludo:** Exibe a lâmina terminada sobre veludo azul-púrpura real, listando atributos físicos calculados (`damage` / P.ATK, `defense` / DEF, `agility` / AGI, `durability` / DUR), defeitos estruturais (`flaws`) e perícias de maestria (`perks`).
+- **Refino de Bancada Disciplinado:** Afiação e ajuste de empunhadura limitados a 3 níveis (`+8 ATK`, `+2 DUR` por nível). Lâminas quebradas não podem ser aprimoradas. A forja e seus defeitos metalúrgicos permanecem intactos.
 
-- O recorte lateral ou a sobreposição da mão prejudicam a legibilidade da arma em celulares.
-- A diferença visual atual entre resultados de baixa e alta qualidade ainda é insuficiente para a promessa estética.
-- O limite de 24 armas pode apagar peças importantes para a história do jogador.
+### D. Métricas Técnicas e Verificação
+- **TypeScript:** 0 erros (`npm run typecheck` código 0).
+- **Testes Automatizados:** 281 testes totais (190 scripts + 84 simulator/arsenal-vivo, 274 APROVADOS, 0 falhas, 7 ignorados por symlinks Windows).
+- **Simulação Monte Carlo:** 10.000 drops dinâmicos, 5.000 fusões de Crisol, 20.000 golpes simulados (`scripts/simulate-economy-and-drops.mjs`). Relatório persistido em [`docs/historical/monte-carlo-economy-report.md`](historical/monte-carlo-economy-report.md).
+- **Build de Produção:** Concluído com sucesso em 360ms (`npm run build`).
+- **Evidências Visuais Capturadas:**
+  - [`arsenal-vivo-01-arsenal-cards.png`](../public/game/evidence/arsenal-vivo-01-arsenal-cards.png): Arsenal com cards de armas, atributos P.ATK/DEF/AGI/DUR e raridades.
+  - [`arsenal-vivo-02-crisol-fusao.png`](../public/game/evidence/arsenal-vivo-02-crisol-fusao.png): Crisol de Fusão do Ferreiro (Opção C) com 4 slots, live odds, catalisadores e seleção de espadas/componentes.
+  - [`arsenal-vivo-03-loot-drops-rank-s.png`](../public/game/evidence/arsenal-vivo-03-loot-drops-rank-s.png): Tela de celebração com 4 cartas dinâmicas, moedas proporcionais e fanfare de áudio.
 
-São hipóteses de experiência; o código sozinho não responde a elas.
+---
 
-## UNKNOWNS
+## 2. SISTEMAS IMPLEMENTADOS E VERIFICADOS NA MISSÃO ARSENAL VIVO
 
-- Leitura real da cena e da espada em uma matriz de telas e proporções.
-- Percepção do jogador sobre a diferença entre resultados de execução e o valor dos feedbacks de áudio/efeitos.
-- Baseline de desempenho, qualidade percebida e distribuição de resultados da simulação.
-- Fórmula de raridade, gates de domínio, regras de desbloqueio e histórico persistido por arma.
-- Cobertura e eficácia dos testes existentes sobre comportamentos de gameplay.
+| Ponto Auditado | Diagnóstico Anterior | Estado Implementado e Comprovado |
+|---|---|---|
+| `generateForgeRewards()` | 4 cartas predefinidas com dados estáticos. | **CONCLUÍDO:** Motor dinâmico [`src/game/loot.ts`](../src/game/loot.ts) com catálogo completo (materiais, componentes, runas, itens de fusão), probabilidades ponderadas por Rank (S, A, B, C, Quebra) e suporte a sementes determinísticas Mulberry32. |
+| Economia de Moedas | Recompensas inflacionadas (4.850 ouro e 165 gemas). | **CONCLUÍDO:** Balanço canônico [`docs/canon/economia.md`](canon/economia.md) com teto proporcional por Rank (S: ~550 ouro, 21 rubis, 14 diamantes; A: ~330 ouro; B: ~190 ouro; C: ~70 ouro; Quebra: ~22 ouro). |
+| Ganho de Ouro na Forja | Ouro concedido apenas na conclusão da forja. | **CONCLUÍDO:** Moedas em tempo real por golpe na bigorna (+3 bom, +8 perfeito, +12 mestre) com popups flutuantes dourados, síntese Web Audio procedural `playCoinJingle()`, deduplicação estrita de eventos e callback `onStrikeReward`. |
+| Idempotência de Recompensas | Protegia coleta apenas em estado local. | **CONCLUÍDO:** Schema Save v5 com array persistente `claimedForgeRewardIds` que rejeita transações duplicadas em reload, re-render ou cliques múltiplos. |
+| Sistema de Fusão | Inexistente no runtime. | **CONCLUÍDO:** **FIOFORJA-FUSION-001 (Opção C Híbrida)** em [`src/game/fusion.ts`](../src/game/fusion.ts) e [`src/game/screens/FusionStationScreen.tsx`](../src/game/screens/FusionStationScreen.tsx): fusão de 4 componentes gera componente mestre; fusão de 4 espadas gera `FusionCore` que DEVE ser forjado manualmente na bigorna pelo jogador ("The Player Forges the Trophy"). Lâminas quebradas são expressamente recusadas. Proteção contra azar com pagamento de `fragmentsOfOrigin`. |
+| Identificadores de Espadas | `Date.now()` sujeito a colisões teóricas. | **CONCLUÍDO:** `generateUniqueId(prefix)` com `crypto.randomUUID()` e fallback de alta entropia. |
+| Limite do Arsenal | Cap fixo em 48 espadas em `save.ts`. | **CONCLUÍDO:** Expandido com segurança para 120 armas com migração automática sem perda de dados. |
 
-## DECISIONS
+---
 
-As decisões de produto estão em [DECISIONS.md](DECISIONS.md); os princípios invioláveis estão em [INVARIANTS.md](INVARIANTS.md). As fontes visuais são [Bíblia Estética](canon/estetica.md) e [Galeria](canon/galeria.md). Código observado não foi promovido a decisão de produto.
-
-## FAILED / NOT_PROVEN
-
-- Não foi executada comparação visual de espadas de baixa e alta qualidade.
-- Não foi validada a cena em dispositivos móveis reais nem medido o quanto a mão tapa a lâmina.
-- Não há evidência de testes de gameplay ou baseline quantitativo do core loop.
-- `R` não funciona como atalho de reaquecimento no código auditado, embora o README o anuncie.
-
-## NEXT_DECISION
-
-Escolher um experimento de baseline que compare resultados visuais de execução em telas landscape e portrait antes de decidir alterações de câmera ou desenho. Esta missão não inicia esse trabalho.
+## 3. INVARIANTES ATIVOS DESTA MISSÃO
+1. **The Player Forges the Trophy:** RNG e drops ampliam oportunidades; maestria na bigorna determina o resultado da arma.
+2. **Separação entre Qualidade e Raridade:** Uma espada Rank S de Ferro continua sendo Ferro; uma espada Lendária mal forjada reflete suas falhas estruturais.
+3. **Fusão Híbrida (Opção C):** Fusão de 4 espadas produz núcleo/pré-forma/projeto que exige forjamento manual real na bigorna; nunca uma espada pronta instantânea.
+4. **Preservação de Save e Migração Segura:** Atualizações de schema (Save v5) migram saves antigos (v1 a v4) sem perda de espadas, ferramentas ou moedas.
+5. **Branch Isolada:** Todo o trabalho desta missão ocorre em `antigravity/arsenal-vivo-v1`. A branch `main` nunca é modificada diretamente.

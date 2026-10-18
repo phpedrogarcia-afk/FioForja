@@ -16,6 +16,9 @@ import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
 import { generateForgeRewards } from "../sim";
 import { defaultInventory, defaultWallet } from "../save";
+import { FusionStationScreen } from "./FusionStationScreen";
+import type { ComponentFusionOutcome, SwordFusionOutcome } from "../fusion";
+import type { FusionCore } from "../types";
 
 interface Props {
   swords: FinishedSword[];
@@ -28,9 +31,12 @@ interface Props {
   onEquipTool?: (toolId: string) => void;
   onSelectPreset?: (design: SwordDesign) => void;
   onUpgrade?: (sword: FinishedSword) => boolean;
+  onApplyComponentFusion?: (outcome: ComponentFusionOutcome) => void;
+  onApplySwordFusion?: (outcome: SwordFusionOutcome) => void;
+  onForgeCore?: (core: FusionCore) => void;
 }
 
-type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "legado";
+type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "fusao" | "legado";
 
 export function GalleryScreen({
   swords,
@@ -43,6 +49,9 @@ export function GalleryScreen({
   onEquipTool,
   onSelectPreset,
   onUpgrade,
+  onApplyComponentFusion,
+  onApplySwordFusion,
+  onForgeCore,
 }: Props) {
   const [currentTab, setCurrentTab] = useState<GalleryTab>("arsenal");
   const [selectedSword, setSelectedSword] = useState<FinishedSword | null>(null);
@@ -142,7 +151,7 @@ export function GalleryScreen({
         </div>
       </header>
 
-      {/* 6-Pillar Tab Navigation Bar */}
+      {/* 7-Pillar Tab Navigation Bar */}
       <nav className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap justify-center gap-1.5 border-b border-[#1b2434] pb-3 sm:justify-start">
         {[
           { id: "arsenal" as const, label: "Arsenal", count: swords.length, icon: "⚔️" },
@@ -150,6 +159,7 @@ export function GalleryScreen({
           { id: "componentes" as const, label: "Componentes", count: "32", icon: "🛡️" },
           { id: "runas" as const, label: "Runas", count: RUNES_COMPENDIUM.length, icon: "ᚠ" },
           { id: "oficina" as const, label: "Oficina", count: WORKSHOP_EQUIPMENT.length, icon: "⚒️" },
+          { id: "fusao" as const, label: "Crisol de Fusão", count: `${(inventory.fusionCores || []).length} Núcleos`, icon: "🔥" },
           { id: "legado" as const, label: "Legado", count: `${masterpieces} Obra(s)`, icon: "🏆" },
         ].map((tab) => (
           <button
@@ -670,6 +680,18 @@ export function GalleryScreen({
             </div>
           </div>
         </div>
+      )}
+
+      {/* PILLAR 7: CRISOL DE FUSÃO */}
+      {currentTab === "fusao" && (
+        <FusionStationScreen
+          swords={swords}
+          inventory={inventory}
+          wallet={wallet}
+          onApplyComponentFusion={onApplyComponentFusion || (() => {})}
+          onApplySwordFusion={onApplySwordFusion || (() => {})}
+          onForgeCore={onForgeCore}
+        />
       )}
     </div>
   );

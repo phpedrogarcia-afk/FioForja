@@ -1,23 +1,48 @@
 # FioForja — AI Start Here
 
-Leia este mapa antes de propor mudanças. Ele separa direção de produto, comportamento observado e trabalho ainda hipotético.
+Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direção de produto aprovada, as evidências verificadas do código e as regras inegociáveis.
 
-## Leitura curta
+---
 
-1. [Constituição](CONSTITUTION.md): missão, princípios e sinais de sucesso ou falha.
-2. [Conceito](CONCEPT.md): promessa do jogo e fronteira entre protótipo atual e direção futura.
-3. [Estado do projeto](PROJECT-STATE.md): evidências verificadas no commit auditado e desconhecidos.
-4. [Invariantes](INVARIANTS.md): propriedades que mudanças futuras precisam preservar.
-5. [Glossário](GLOSSARY.md): termos de produto e equivalentes reais no código.
-6. [Decisões](DECISIONS.md): decisões aceitas, hipóteses e escolhas ainda abertas.
-7. Documentos de design canônicos: [Bíblia Estética](canon/estetica.md) e [Estrutura da Galeria](canon/galeria.md).
+## 1. Documentação Essencial de Leitura Rápida
 
-## Evidência e implementação
+1. [Constituição](CONSTITUTION.md): missão, princípios de design (*The Weapon is the Hero*, *The Player Forges the Trophy*) e sinais de falha.
+2. [Estado Atual do Projeto](PROJECT-STATE.md): estado real, evidências comprovadas do commit mais recente, o que existe e lacunas conhecidas.
+3. [Invariantes](INVARIANTS.md): 12 regras inegociáveis que nenhuma alteração de código ou agente pode violar.
+4. [Registro de Decisões](DECISIONS.md): decisões canônicas aprovadas (incluindo `FIOFORJA-FUSION-001`), hipóteses e itens em avaliação.
+5. [Glossário](GLOSSARY.md): termos canônicos de produto e seus correspondentes exatos no código TypeScript.
+6. [Handoff para o Codex](HANDOFF-CODEX.md): contrato completo de transição e continuidade entre agentes de IA.
 
-Para dizer o que existe hoje, confira o código e os testes. Um documento de design descreve intenção; não prova implementação. Use `KNOWN`, `OBSERVATION`, `HYPOTHESIS`, `UNKNOWN` e `NOT_PROVEN` quando a distinção mudar uma decisão. Não converta exemplos, nomes provisórios ou números de mockup em balanceamento aprovado.
+---
 
-O núcleo jogável está em `src/game/`: `sim.ts` calcula a forja, `ForgeCanvas.tsx` apresenta a cena, `swordDraw.ts` desenha a arma e `save.ts` persiste o arsenal local. A aplicação ao redor também contém infraestrutura de autenticação, banco e conectores; isso não significa que esses serviços sejam sistemas de gameplay.
+## 2. Documentos Canônicos de Design (`docs/canon/`)
 
-Registre aprendizados duráveis em [Project Intelligence](../.project-intelligence/README.md), com evidência e limites. Não repita verificações sem mudança de estado ou hipótese.
+- [Bíblia Estética](canon/estetica.md): regras visuais das lâminas, acabamento de metal, incisão rúnica chanfrada e as 9 famílias canônicas.
+- [Estrutura da Galeria](canon/galeria.md): os 6 pilares canônicos (Arsenal, Compêndio, Componentes, Runas, Oficina, Legado).
+- [Sistema Híbrido de Fusão (Opção C)](canon/fusao-hibrida.md): regras do Crisol de Fusão de componentes e espadas (núcleos que exigem forja).
+- [Motor de Loot e Drops](canon/loot-drops.md): tabelas reais de recompensas, categorias, probabilidades por rank e integridade de sorteio.
+- [Economia e Moedas](canon/economia.md): ganhos em tempo real na bigorna (+3/+8/+12 ouro), prêmios balanceados e custos da oficina.
 
-Na auditoria de 2026-10-06 não havia `AGENTS.md` no checkout; `.gitignore` ignora `AGENTS.md` e `AGENTS.project.md`. Verifique instruções locais ignoradas ao iniciar uma tarefa neste ambiente.
+---
+
+## 3. Especificações Técnicas (`docs/specs/`)
+
+- [Atributos Físicos e Lógica de Raridade](specs/weapon-attributes-and-rarity.md): cálculo de `P.ATK`, `DEF`, `AGI`, `DUR`, afixos e separação estrita entre nota de forja e raridade.
+- [Persistência v5 e Migração](specs/save-persistence-v5.md): schema v5, migração retrocompatível de v1–v4, idempotência transacional e capacidade do Arsenal.
+- [Assinaturas de Áudio Procedural](specs/audio-signatures.md): síntese procedural via Web Audio API para moedas, fanfarras de loot e crisol.
+- [Modelo de Identidade das Armas](specs/weapon-identity-model.md): características das famílias e anatomia das armas.
+- [Estado da Lâmina Terminada](specs/finished-weapon-state.md): preservação de empenamento, trincas e marcas de martelamento.
+
+---
+
+## 4. Evidência, Código e Testes
+
+- O núcleo jogável reside em `src/game/`:
+  - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas e cálculo de atributos.
+  - `ForgeCanvas.tsx`: cena da forja, duas mãos de ferreiro com tenazes e martelo, bigorna, fornalha e bacia de têmpera.
+  - `swordDraw.ts`: renderizador paramétrico de lâminas, guardas, cabos, pomos e incisões rúnicas.
+  - `save.ts`: persistência, sanitização e migração de saves locais.
+  - `loot.ts`: motor dinâmico de drops e tabelas de recompensas ponderadas.
+  - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C).
+  - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
+- Testes automatizados executam via `npm test` e `npm run typecheck`. Não presuma funcionalidade sem verificação real.

@@ -1,18 +1,18 @@
-import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SwordDesign } from "./types.ts";
+import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SwordDesign } from "./types.ts";
 import { DEFAULT_DESIGN } from "./catalog.ts";
 
-const KEY = "a-forja-save";
-const VERSION = 4;
+export type { SaveData };
 
-export interface SaveData {
-  version: number;
-  gallery: FinishedSword[];
-  lastDesign: SwordDesign;
-  wallet: PlayerWallet;
-  inventory: PlayerInventory;
-  career: CareerStats;
-  muted: boolean;
-  shake: boolean;
+const KEY = "a-forja-save";
+const VERSION = 5;
+
+export function generateUniqueId(prefix = "sword"): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `${prefix}_${crypto.randomUUID()}`;
+  }
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 10);
+  return `${prefix}_${timestamp}_${randomPart}`;
 }
 
 export const defaultWallet: PlayerWallet = {
@@ -39,9 +39,15 @@ export const defaultInventory: PlayerInventory = {
   materials: {
     iron_ingot: 8,
     steel_ingot: 4,
+    damascus_billet: 0,
+    starmetal_ore: 0,
+    fusion_fragment: 0,
+    catalyst_crystal: 0,
     scrap: 0,
     refined_iron: 1,
   },
+  fusionCores: [],
+  components: [],
   equipped: defaultEquippedGear,
 };
 
@@ -55,7 +61,7 @@ export const defaultCareer: CareerStats = {
   totalValueEarned: 0,
 };
 
-const defaults: SaveData = {
+export const defaultSaveData: SaveData = {
   version: VERSION,
   gallery: [],
   lastDesign: DEFAULT_DESIGN,
@@ -64,22 +70,41 @@ const defaults: SaveData = {
   career: defaultCareer,
   muted: false,
   shake: true,
+  claimedForgeRewardIds: [],
 };
+
+const defaults = defaultSaveData;
+
+export const migrateSaveData = migrateSave;
 
 export function migrateSave(raw: any): SaveData {
   if (!raw || typeof raw !== "object") return structuredClone(defaults);
 
   const rawGallery: FinishedSword[] = Array.isArray(raw.gallery) ? raw.gallery : [];
-  const gallery = rawGallery.slice(0, 48).map((sword) => ({
-    ...sword,
-    design: {
-      ...DEFAULT_DESIGN,
-      ...(sword.design || {}),
-      profile: sword.design?.profile || "long",
-      steel: sword.design?.steel || "iron",
-    },
-    quality: Number.isFinite(sword.quality) ? sword.quality : 50,
-  }));
+  const seenIds = new Set<string>();
+
+  // Support expanded gallery up to 120 swords without silent truncation
+  const gallery = rawGallery.slice(0, 120).map((sword) => {
+    let id = typeof sword.id === "string" && sword.id.trim().length > 0 ? sword.id : generateUniqueId("sword");
+    if (seenIds.has(id)) {
+      id = generateUniqueId("sword");
+    }
+    seenIds.add(id);
+
+    return {
+      ...sword,
+      id,
+      design: {
+        ...DEFAULT_DESIGN,
+        ...(sword.design || {}),
+        profile: sword.design?.profile || "long",
+        steel: sword.design?.steel || "iron",
+      },
+      quality: Number.isFinite(sword.quality) ? sword.quality : 50,
+      affixes: Array.isArray(sword.affixes) ? sword.affixes : (Array.isArray(sword.perks) ? [...sword.perks] : []),
+      forgeRunId: typeof sword.forgeRunId === "string" ? sword.forgeRunId : generateUniqueId("run"),
+    };
+  });
 
   // Reconstruct or populate career stats from actual gallery history
   const totalForged = Math.max(raw.career?.totalForged ?? 0, gallery.length);
@@ -150,6 +175,8 @@ export function migrateSave(raw: any): SaveData {
       ...defaultInventory.materials,
       ...(rawInv.materials || {}),
     },
+    fusionCores: Array.isArray(rawInv.fusionCores) ? rawInv.fusionCores : [],
+    components: Array.isArray(rawInv.components) ? rawInv.components : [],
     equipped: {
       hammer: rawInv.equipped?.hammer || defaultEquippedGear.hammer,
       anvil: rawInv.equipped?.anvil || defaultEquippedGear.anvil,
@@ -157,6 +184,10 @@ export function migrateSave(raw: any): SaveData {
       quench: rawInv.equipped?.quench || defaultEquippedGear.quench,
     },
   };
+
+  const claimedForgeRewardIds: string[] = Array.isArray(raw.claimedForgeRewardIds)
+    ? raw.claimedForgeRewardIds
+    : [];
 
   return {
     version: VERSION,
@@ -167,6 +198,7 @@ export function migrateSave(raw: any): SaveData {
     career,
     muted: Boolean(raw.muted),
     shake: raw.shake !== undefined ? Boolean(raw.shake) : true,
+    claimedForgeRewardIds,
   };
 }
 

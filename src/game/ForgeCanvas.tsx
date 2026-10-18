@@ -4,7 +4,7 @@ import { drawSheetFrame, type GameImages } from "./assets";
 import { createSim, stepSim, type SimInput } from "./sim";
 import { drawFinishedSword } from "./swordDraw";
 import type { ForgePhase, HudSnapshot, PlayerInventory, SimState, SwordDesign } from "./types";
-import { playClang, playCrack, playHiss, playPull, playRuneHum, playShatter, playWhoosh } from "./audio";
+import { playClang, playCoinJingle, playCrack, playHiss, playPull, playRuneHum, playShatter, playWhoosh } from "./audio";
 
 const VW = 1280;
 const VH = 720;
@@ -51,6 +51,15 @@ interface SteamParticle {
   alpha: number;
 }
 
+interface GoldPop {
+  text: string;
+  x: number;
+  y: number;
+  vy: number;
+  life: number;
+  max: number;
+}
+
 interface Props {
   design: SwordDesign;
   images: GameImages;
@@ -58,6 +67,7 @@ interface Props {
   reducedMotion: boolean;
   onHud: (hud: HudSnapshot) => void;
   onFinished: (sim: SimState) => void;
+  onStrikeReward?: (reward: { amount: number; id: string }) => void;
   inputRef: MutableRefObject<SimInput>;
   inventory?: PlayerInventory;
 }
@@ -69,6 +79,7 @@ export function ForgeCanvas({
   reducedMotion,
   onHud,
   onFinished,
+  onStrikeReward,
   inputRef,
   inventory,
 }: Props) {
@@ -88,6 +99,7 @@ export function ForgeCanvas({
     });
     const sparks: Spark[] = [];
     const steams: SteamParticle[] = [];
+    const goldPops: GoldPop[] = [];
     let trauma = 0;
     let hitstop = 0;
     let raf = 0;
@@ -185,6 +197,21 @@ export function ForgeCanvas({
           force,
           ev.kind === "perfect",
         );
+
+        if (ev.goldReward) {
+          playCoinJingle();
+          goldPops.push({
+            text: ev.goldReward.text,
+            x: baseImpact[0] + zoneOffsetX,
+            y: baseImpact[1] + zoneOffsetY - 30,
+            vy: -75,
+            life: 0.95,
+            max: 0.95,
+          });
+          if (onStrikeReward && sim.strikeReward) {
+            onStrikeReward({ amount: sim.strikeReward.amount, id: sim.strikeReward.id });
+          }
+        }
       }
 
       if (ev.finished && !finishedSent) {
@@ -212,6 +239,14 @@ export function ForgeCanvas({
       }
       for (let i = steams.length - 1; i >= 0; i--) {
         if (steams[i]!.life <= 0) steams.splice(i, 1);
+      }
+
+      for (const gp of goldPops) {
+        gp.life -= dt;
+        gp.y += gp.vy * dt;
+      }
+      for (let i = goldPops.length - 1; i >= 0; i--) {
+        if (goldPops[i]!.life <= 0) goldPops.splice(i, 1);
       }
 
       // Continuous steam during quench
@@ -267,7 +302,7 @@ export function ForgeCanvas({
       ctx.save();
       ctx.translate(ox + sx, oy + sy);
       ctx.scale(scale, scale);
-      paint(ctx, images, design, sim, sparks, steams, time, portrait);
+      paint(ctx, images, design, sim, sparks, steams, goldPops, time, portrait);
       ctx.restore();
 
       raf = requestAnimationFrame(loop);
@@ -279,7 +314,7 @@ export function ForgeCanvas({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [design, images, shake, reducedMotion, onHud, onFinished, inputRef]);
+  }, [design, images, shake, reducedMotion, onHud, onFinished, onStrikeReward, inputRef, inventory]);
 
   return (
     <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-bg touch-none">
@@ -295,6 +330,7 @@ function paint(
   sim: ReturnType<typeof createSim>,
   sparks: Spark[],
   steams: SteamParticle[],
+  goldPops: GoldPop[],
   time: number,
   portrait: boolean,
 ) {
@@ -451,6 +487,19 @@ function paint(
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     drawSheetFrame(ctx, images.sparks, 2, 2, fi, bladeX - 90, bladeY - 110, 210, 210);
+    ctx.restore();
+  }
+
+  // 10b. Floating Real-time Strike Gold Rewards
+  for (const gp of goldPops) {
+    const a = Math.max(0, gp.life / gp.max);
+    ctx.save();
+    ctx.font = "bold 26px 'Cinzel', serif";
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(245, 158, 11, 0.95)";
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = `rgba(255, 235, 120, ${a})`;
+    ctx.fillText(gp.text, gp.x, gp.y);
     ctx.restore();
   }
 

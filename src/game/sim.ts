@@ -1,5 +1,7 @@
 import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
 import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, HammerType, PhysicalBladeProfile, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import { generateUniqueId } from "./save.ts";
+import { generateDynamicForgeRewards } from "./loot.ts";
 
 export interface SimInput {
   charging: boolean;
@@ -18,6 +20,7 @@ export interface SimEvent {
   message?: string;
   finished?: boolean;
   broken?: boolean;
+  goldReward?: { amount: number; text: string };
 }
 
 export function createSim(
@@ -410,6 +413,29 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
   s.shape = clamp(s.shape + shapeGain, 0, 1);
   s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
+
+  // Real-time Strike Economy (+3 good, +8 perfect, +12 master)
+  let goldGain = 0;
+  if (!isCold && !s.broken) {
+    if (kind === "perfect") {
+      const isMasterStrike = s.activeHammer === "precision" || s.targetZone === "tip" || Math.abs(s.heat - (steel.heatMin + steel.heatMax) / 2) < 0.05;
+      goldGain = isMasterStrike ? 12 : 8;
+    } else if (kind === "good") {
+      goldGain = 3;
+    }
+  }
+
+  if (goldGain > 0) {
+    s.strikeReward = {
+      amount: goldGain,
+      kind,
+      strikeIndex: s.strikes,
+      id: `strike_${s.strikes}_${goldGain}`,
+    };
+    event.goldReward = { amount: goldGain, text: `+${goldGain} 🪙` };
+  } else {
+    s.strikeReward = null;
+  }
 }
 
 export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
@@ -446,7 +472,7 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   }
 
   return {
-    id: `${Date.now()}`,
+    id: generateUniqueId("sword"),
     design,
     quality: q,
     grade,
@@ -463,6 +489,8 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     upgradesApplied: 0,
     flaws: attrs.flaws,
     perks: attrs.perks,
+    affixes: [...attrs.perks],
+    forgeRunId: generateUniqueId("run"),
     structuralState: s.structuralState,
     broken: s.broken,
     cracks: s.cracks,
@@ -471,76 +499,9 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   };
 }
 
-export function generateForgeRewards(sword: FinishedSword): ForgeRewardsData {
-  const q = sword.quality;
-  let rank = "C";
-  let gold = 500;
-  let rubies = 15;
-  let diamonds = 10;
-
-  if (q >= 95) {
-    rank = "S (98%)";
-    gold = 4850;
-    rubies = 165;
-    diamonds = 165;
-  } else if (q >= 88) {
-    rank = "A (90%)";
-    gold = 2950;
-    rubies = 95;
-    diamonds = 80;
-  } else if (q >= 75) {
-    rank = "B (78%)";
-    gold = 1600;
-    rubies = 45;
-    diamonds = 35;
-  } else {
-    rank = "C (55%)";
-    gold = 850;
-    rubies = 20;
-    diamonds = 15;
-  }
-
-  const items = [
-    {
-      id: "rune_fire",
-      name: "Fiery Rune Stone",
-      type: "Pedra Rúnica",
-      rarity: (q >= 90 ? "Lendária" : "Rara") as import("./types").RarityGrade,
-      icon: "🔥",
-      description: "Pedra primordial de calor rúnico que confere chama perene às incisões da lâmina.",
-    },
-    {
-      id: "crossguard_damascus",
-      name: "Damascus Crossguard",
-      type: "Componente de Guarda",
-      rarity: (q >= 95 ? "Lendária" : "Épica") as import("./types").RarityGrade,
-      icon: "⚔️",
-      description: "Guarda em aço de Damasco gravada com volutas nórdicas e equilíbrio supremo.",
-    },
-    {
-      id: "grip_dragon",
-      name: "Dragon Leather Sword Grip",
-      type: "Empunhadura",
-      rarity: (q >= 85 ? "Épica" : "Rara") as import("./types").RarityGrade,
-      icon: "🐉",
-      description: "Couro escamoso de alta densidade que repele umidade e oferece aderência inabalável.",
-    },
-    {
-      id: "ingot_starmetal",
-      name: "Star Metal Ingot",
-      type: "Lingote Raro",
-      rarity: (q >= 90 ? "Relíquia" : "Épica") as import("./types").RarityGrade,
-      icon: "✨",
-      description: "Lingotes celestes reluzentes forjados no coração de meteoritos ancestrais.",
-    },
-  ];
-
-  return {
-    rank,
-    scorePercent: q,
-    gold,
-    rubies,
-    diamonds,
-    items,
-  };
+export function generateForgeRewards(
+  sword: FinishedSword,
+  options?: { seed?: number; forgeRunId?: string },
+): ForgeRewardsData {
+  return generateDynamicForgeRewards(sword, options);
 }
