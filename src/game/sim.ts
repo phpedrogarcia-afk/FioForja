@@ -464,6 +464,7 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     flaws: attrs.flaws,
     perks: attrs.perks,
     structuralState: s.structuralState,
+    broken: s.broken,
     cracks: s.cracks,
     physicalProfile: { ...s.physicalProfile },
     history: s.history,

@@ -28,23 +28,30 @@ export function RevealScreen({
   const [lightOffset, setLightOffset] = useState(0.5);
   const [upgradeFeedback, setUpgradeFeedback] = useState<string | null>(null);
 
-  const isBroken = sword.structuralState === "broken" || sword.quality <= 15;
-  const profile = PROFILES[sword.design.profile];
-  const steel = STEELS[sword.design.steel];
-  const wrap = WRAPS[sword.design.wrap];
-  const guard = GUARDS[sword.design.guard];
-  const pommel = POMMELS[sword.design.pommel];
+  const [currentSword, setCurrentSword] = useState<FinishedSword>(sword);
+  useEffect(() => {
+    setCurrentSword(sword);
+  }, [sword]);
 
-  const upgrades = sword.upgradesApplied || 0;
-  const goldCost = 50 * (upgrades + 1);
+  const isBroken = currentSword.structuralState === "broken" || currentSword.quality <= 15;
+  const profile = PROFILES[currentSword.design.profile];
+  const steel = STEELS[currentSword.design.steel];
+  const wrap = WRAPS[currentSword.design.wrap];
+  const guard = GUARDS[currentSword.design.guard];
+  const pommel = POMMELS[currentSword.design.pommel];
+
+  const upgrades = currentSword.upgradesApplied || 0;
+  const maxUpgrades = 3;
+  const isMaxUpgraded = upgrades >= maxUpgrades;
+  const goldCost = 60 * (upgrades + 1);
   const rubyCost = upgrades >= 1 ? 1 : 0;
-  const canAffordUpgrade = wallet.gold >= goldCost && wallet.rubies >= rubyCost;
+  const canAffordUpgrade = !isBroken && !isMaxUpgraded && wallet.gold >= goldCost && wallet.rubies >= rubyCost;
 
-  const damage = sword.damage ?? Math.round(180 + sword.quality * 1.5);
-  const defense = sword.defense ?? Math.round(90 + sword.quality * 0.8);
-  const agility = sword.agility ?? Math.round(75 + sword.quality * 0.6);
-  const durability = sword.durability ?? Math.max(20, Math.round(sword.quenchScore * 0.9));
-  const rarity = sword.rarity ?? (sword.quality >= 95 ? "Lendária" : sword.quality >= 85 ? "Épica" : sword.quality >= 70 ? "Rara" : sword.quality >= 50 ? "Incomum" : "Comum");
+  const damage = currentSword.damage ?? Math.round(180 + currentSword.quality * 1.5);
+  const defense = currentSword.defense ?? Math.round(90 + currentSword.quality * 0.8);
+  const agility = currentSword.agility ?? Math.round(75 + currentSword.quality * 0.6);
+  const durability = currentSword.durability ?? Math.max(20, Math.round(currentSword.quenchScore * 0.9));
+  const rarity = currentSword.rarity ?? (currentSword.quality >= 95 ? "Lendária" : currentSword.quality >= 85 ? "Épica" : currentSword.quality >= 70 ? "Rara" : currentSword.quality >= 50 ? "Incomum" : "Comum");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,18 +89,18 @@ export function RevealScreen({
 
     // Draw the sword vertically on velvet (as in Reference Image 3)
     const swordLen = Math.min(w * 0.86, h * 0.86);
-    drawFinishedSword(ctx, sword.design, w / 2, h * 0.88, swordLen, {
+    drawFinishedSword(ctx, currentSword.design, w / 2, h * 0.88, swordLen, {
       angle: -Math.PI / 2, // Vertical presentation
       assembled: !isBroken,
       heat: 0,
       shape: 1,
-      quality: sword.quality,
-      warp: sword.warp,
-      cracks: sword.cracks ?? (isBroken ? 2 : 0),
+      quality: currentSword.quality,
+      warp: currentSword.warp,
+      cracks: currentSword.cracks ?? (isBroken ? 2 : 0),
       broken: isBroken,
       lightOffset,
     });
-  }, [sword, lightOffset, isBroken]);
+  }, [currentSword, lightOffset, isBroken]);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -103,10 +110,16 @@ export function RevealScreen({
 
   const handleUpgradeClick = () => {
     if (!onUpgrade || !canAffordUpgrade) return;
-    const success = onUpgrade(sword);
+    const success = onUpgrade(currentSword);
     if (success) {
-      setUpgradeFeedback("Aço aprimorado na têmpera secundária! +16 ATK / +4 Durabilidade");
-      window.setTimeout(() => setUpgradeFeedback(null), 3000);
+      setCurrentSword((prev) => ({
+        ...prev,
+        damage: (prev.damage ?? 180) + 8,
+        durability: Math.min(100, (prev.durability ?? 90) + 2),
+        upgradesApplied: (prev.upgradesApplied || 0) + 1,
+      }));
+      setUpgradeFeedback("Fio afiado na pedra-d'água e empunhadura ajustada! (+8 ATK / +2 Durabilidade)");
+      window.setTimeout(() => setUpgradeFeedback(null), 3500);
     }
   };
 
@@ -239,18 +252,23 @@ export function RevealScreen({
               </div>
             </div>
 
-            {/* INTERACTIVE UPGRADE PANEL (Reference Image 3) */}
+            {/* INTERACTIVE WORKBENCH REFINEMENT PANEL (Reference Image 3 & Directive 4) */}
             <div className="rounded-lg border border-amber-600/50 bg-[#121626] p-3 shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="font-display text-xs font-bold uppercase tracking-wider text-amber-300">
-                  Aprimoramento (+{upgrades})
+                  Refino de Bancada ({upgrades}/{maxUpgrades})
                 </span>
-                <span className="rounded bg-black/40 px-2 py-0.5 text-[0.65rem] font-bold text-amber-200">
-                  {goldCost.toLocaleString()} 🪙 {rubyCost > 0 ? `+ ${rubyCost} 💎` : ""}
-                </span>
+                {!isMaxUpgraded && (
+                  <span className="rounded bg-black/40 px-2 py-0.5 text-[0.65rem] font-bold text-amber-200">
+                    {goldCost.toLocaleString()} 🪙 {rubyCost > 0 ? `+ ${rubyCost} 💎` : ""}
+                  </span>
+                )}
               </div>
               <p className="mt-1 text-[0.7rem] text-slate-300">
-                Forja de refino: adiciona <span className="text-amber-300 font-semibold">+16 ATK</span> e <span className="text-cyan-300 font-semibold">+4 Durabilidade</span>.
+                Afiação em pedra-d&apos;água e reforço de empunhadura: adiciona <span className="text-amber-300 font-semibold">+8 ATK</span> e <span className="text-cyan-300 font-semibold">+2 Durabilidade</span>.
+              </p>
+              <p className="mt-1 text-[0.65rem] italic text-slate-400">
+                Propriedades metalúrgicas, têmpera e defeitos físicos da forja são imutáveis.
               </p>
               {upgradeFeedback && (
                 <p className="mt-1.5 text-[0.68rem] text-emerald-400 font-semibold animate-pulse">
@@ -263,7 +281,7 @@ export function RevealScreen({
                 onClick={handleUpgradeClick}
                 className="mt-2.5 w-full bg-linear-to-r from-amber-600 via-amber-500 to-amber-600 font-bold text-xs text-stone-950 shadow-[0_0_15px_rgba(217,119,6,0.4)] hover:brightness-110 disabled:opacity-50"
               >
-                ⚒️ APRIMORAR LÂMINA
+                {isMaxUpgraded ? "✓ LIMITE DE AFIAÇÃO ATINGIDO (+3)" : "⚒️ AFIAR & AJUSTAR EMPUNHADURA"}
               </Button>
             </div>
 

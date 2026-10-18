@@ -355,7 +355,7 @@ function paint(
     ctx.restore();
   }
 
-  // 5. Workpiece Contact Shadow on Anvil
+  // 5. Workpiece Contact Shadow & Thermal Cast on Anvil
   if (onAnvil) {
     ctx.save();
     ctx.translate(bladeX, bladeY + 8);
@@ -364,6 +364,17 @@ function paint(
     ctx.beginPath();
     ctx.ellipse(blade.length * 0.35, 2, blade.length * 0.35, 12, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    // Incandescent anvil face thermal cast
+    if (heatBoost > 0.25) {
+      ctx.globalCompositeOperation = "lighter";
+      const castG = ctx.createRadialGradient(blade.length * 0.35, 0, 8, blade.length * 0.35, 0, blade.length * 0.45);
+      castG.addColorStop(0, `rgba(255, 120, 20, ${heatBoost * 0.38})`);
+      castG.addColorStop(0.6, `rgba(200, 50, 10, ${heatBoost * 0.16})`);
+      castG.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = castG;
+      ctx.fillRect(0, -20, blade.length * 0.8, 40);
+    }
     ctx.restore();
   }
 
@@ -397,6 +408,20 @@ function paint(
     qg.addColorStop(1, "rgba(10,25,45,0.85)");
     ctx.fillStyle = qg;
     ctx.fillRect(860, 220, 420, VH - 220);
+
+    // Water surface turbulence and boiling foam
+    if (sim.quenching) {
+      ctx.globalCompositeOperation = "lighter";
+      const bubbleTime = time * 14;
+      for (let b = 0; b < 18; b++) {
+        const bx = 890 + ((b * 41 + Math.sin(bubbleTime + b) * 18) % 360);
+        const by = 250 + ((b * 31 + bubbleTime * 12) % 200);
+        ctx.fillStyle = "rgba(215, 235, 255, 0.45)";
+        ctx.beginPath();
+        ctx.arc(bx, by, 1.8 + (b % 3.5), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
     ctx.restore();
   }
 
@@ -490,111 +515,32 @@ function drawTongs(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
   ctx.fill();
   ctx.stroke();
 
-  // Heavy forged handles extending off left down toward blacksmith hand
+  // Heavy forged handles extending cleanly off-screen toward the blacksmith
   ctx.beginPath();
   ctx.moveTo(-28, -3);
-  ctx.lineTo(-270, 42);
+  ctx.lineTo(-550, 88);
   ctx.moveTo(-28, 3);
-  ctx.lineTo(-270, 78);
-  ctx.strokeStyle = "#28201a";
-  ctx.lineWidth = 4.8;
+  ctx.lineTo(-550, 142);
+  ctx.strokeStyle = "#241d18";
+  ctx.lineWidth = 5.4;
   ctx.stroke();
-  ctx.strokeStyle = "#100c08";
+
+  // Forged iron edge highlight from forge fire
+  ctx.beginPath();
+  ctx.moveTo(-28, -4);
+  ctx.lineTo(-550, 86);
+  ctx.strokeStyle = "rgba(255, 140, 40, 0.35)";
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
-  // Blacksmith's Left Arm and Hand in heavy leather bracer gripping the tongs (Reference Image 2)
-  ctx.save();
-  const gx = -180;
-  const gy = 54;
-
-  // Forearm sleeve entering from lower-left
+  // Dark shadow on lower reins
   ctx.beginPath();
-  ctx.moveTo(-450, 250);
-  ctx.lineTo(-240, 100);
-  ctx.lineTo(-210, 142);
-  ctx.lineTo(-390, 310);
-  ctx.closePath();
-  ctx.fillStyle = "#1e1814"; // Rough medieval tunic wool
-  ctx.fill();
-
-  // Hardened leather vambrace / bracer
-  const bracerGrad = ctx.createLinearGradient(-340, 180, -220, 90);
-  bracerGrad.addColorStop(0, "#4a2e1b");
-  bracerGrad.addColorStop(0.5, "#331f12");
-  bracerGrad.addColorStop(1, "#24150b");
-  ctx.fillStyle = bracerGrad;
-  ctx.beginPath();
-  ctx.moveTo(-350, 175);
-  ctx.lineTo(-215, 82);
-  ctx.lineTo(-195, 122);
-  ctx.lineTo(-315, 225);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle = "#180e07";
-  ctx.lineWidth = 2;
+  ctx.moveTo(-28, 4);
+  ctx.lineTo(-550, 144);
+  ctx.strokeStyle = "#0e0906";
+  ctx.lineWidth = 1.4;
   ctx.stroke();
 
-  // Bracer strapping & brass rivets
-  ctx.strokeStyle = "#150d06";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(-305, 145);
-  ctx.lineTo(-285, 185);
-  ctx.moveTo(-255, 110);
-  ctx.lineTo(-235, 150);
-  ctx.stroke();
-
-  [[-295, 165], [-245, 130]].forEach(([rx, ry]) => {
-    [-14, 0, 14].forEach((offset) => {
-      ctx.beginPath();
-      ctx.arc(rx + offset * 0.6, ry + offset * 0.8, 2.8, 0, Math.PI * 2);
-      ctx.fillStyle = "#c89438"; // Brass rivet
-      ctx.fill();
-      ctx.strokeStyle = "#422808";
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-    });
-  });
-
-  // Leather glove hand grasping tongs
-  const gloveGrad = ctx.createRadialGradient(gx, gy, 6, gx, gy, 38);
-  gloveGrad.addColorStop(0, "#5a3a22");
-  gloveGrad.addColorStop(1, "#301d10");
-  ctx.fillStyle = gloveGrad;
-
-  // Curled thumb & fingers around tongs reins
-  ctx.beginPath();
-  ctx.ellipse(gx, gy, 26, 20, 0.45, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#140b05";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Knuckles and finger segments
-  for (let f = 0; f < 4; f++) {
-    const fx = gx + 8 - f * 6;
-    const fy = gy - 14 + f * 9;
-    ctx.beginPath();
-    ctx.ellipse(fx, fy, 7, 5, 0.4, 0, Math.PI * 2);
-    ctx.fillStyle = "#4a2d19";
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  // Fire warmth highlight on top edge of arm
-  const rimG = ctx.createLinearGradient(-450, 250, -170, 45);
-  rimG.addColorStop(0, "rgba(255,140,40,0.45)");
-  rimG.addColorStop(1, "rgba(255,100,20,0.1)");
-  ctx.strokeStyle = rimG;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(-450, 250);
-  ctx.lineTo(-215, 82);
-  ctx.lineTo(gx + 10, gy - 14);
-  ctx.stroke();
-
-  ctx.restore();
   ctx.restore();
 }
 
@@ -606,34 +552,53 @@ function drawHand(
   bladeX: number,
   bladeY: number,
 ) {
-  const size = 410;
-  const zoneOffsetX = sim.targetZone === "base" ? -70 : sim.targetZone === "tip" ? 95 : 0;
+  const size = 420;
+  const zoneOffsetX = sim.targetZone === "base" ? -75 : sim.targetZone === "tip" ? 95 : 0;
   const zoneOffsetY = sim.targetZone === "base" ? 14 : sim.targetZone === "tip" ? -18 : 0;
-  const hx = bladeX - 85 + zoneOffsetX;
-  const hy = bladeY - 325 + zoneOffsetY;
+  // Position hammer so its striking head lands squarely on the anvil workpiece zone
+  const hx = bladeX - 105 + zoneOffsetX;
+  const hy = bladeY - 265 + zoneOffsetY;
 
   if (sim.strikeAnim > 0 && images.strike) {
     const t = 1 - sim.strikeAnim / 0.38;
     const frame = Math.min(5, Math.floor(t * 6));
-    // Strike anim swings down with head landing squarely on workpiece
-    drawSheetFrame(ctx, images.strike, 3, 2, frame, hx - 12, hy + 24, size + 20, (size + 20) * 0.66);
+    drawSheetFrame(ctx, images.strike, 3, 2, frame, hx, hy, size, size * 0.66);
+    featherShoulder(ctx, hx, hy, size);
     return;
   }
 
   const charge = sim.charging ? sim.force : 0;
-  const bob = Math.sin(time * 2.2) * 4;
-  // In rest position, arm is pulled back and held high in ready stance so the blade and anvil remain completely visible!
-  const restElevation = 65 * (1 - charge);
+  const bob = Math.sin(time * 2.2) * 3;
   ctx.save();
-  const pivotX = hx + size * 0.74;
-  const pivotY = hy + size * 0.16;
+  const pivotX = hx + size * 0.78;
+  const pivotY = hy + size * 0.18;
   ctx.translate(pivotX, pivotY);
-  // Cock hammer back as charge builds
-  ctx.rotate(-0.16 - charge * 0.45);
+  ctx.rotate(-charge * 0.22 + bob * 0.01);
   ctx.translate(-pivotX, -pivotY);
-  if (images.hand) {
-    ctx.drawImage(images.hand, hx, hy + bob - restElevation, size, size);
+
+  if (images.strike) {
+    // Frame 0 of hand-strike is the authentic high ready stance with hammer raised!
+    drawSheetFrame(ctx, images.strike, 3, 2, 0, hx, hy, size, size * 0.66);
+  } else if (images.hand) {
+    ctx.drawImage(images.hand, hx, hy, size, size);
   }
+  featherShoulder(ctx, hx, hy, size);
+  ctx.restore();
+}
+
+function featherShoulder(ctx: CanvasRenderingContext2D, hx: number, hy: number, size: number) {
+  // Soft atmospheric feather over the cut shoulder edge so it emerges seamlessly from forge shadow
+  ctx.save();
+  const cx = hx + size * 0.88;
+  const cy = hy + size * 0.15;
+  const fade = ctx.createRadialGradient(cx, cy, 12, cx, cy, 80);
+  fade.addColorStop(0, "rgba(18, 12, 8, 0.95)");
+  fade.addColorStop(0.55, "rgba(18, 12, 8, 0.6)");
+  fade.addColorStop(1, "rgba(18, 12, 8, 0)");
+  ctx.fillStyle = fade;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 85, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
 }
 

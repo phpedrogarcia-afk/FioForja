@@ -365,29 +365,70 @@ function drawSwordBody(
     ctx.restore();
   }
 
-  // 4. Central Fuller (Sangradouro)
+  // 4. Central Fuller (Sangradouro) or Spinal Ridge
   if (shape > 0.5) {
+    ctx.save();
     const fullerStart = 16;
     const fullerEnd = bladeLen * 0.74;
-    const fullerY = totalCurve * 0.15;
-    const fullerW = Math.max(1.8, W * (quality >= 88 ? 0.12 : 0.16));
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(fullerStart, fullerY - 0.5);
-    ctx.quadraticCurveTo(bladeLen * 0.4, fullerY + totalCurve * 0.1, fullerEnd, fullerY + totalCurve * 0.2);
-    ctx.strokeStyle = heat > 0.4 ? "rgba(255,100,20,0.7)" : "rgba(10,8,6,0.55)";
-    ctx.lineWidth = fullerW;
-    ctx.stroke();
-
-    // Fuller inner highlight
-    if (quality >= 75 && heat < 0.3) {
+    if (design.profile === "short") {
+      // Gladius: Central diamond spine ridge instead of a fuller groove
       ctx.beginPath();
-      ctx.moveTo(fullerStart, fullerY + 0.8);
-      ctx.quadraticCurveTo(bladeLen * 0.4, fullerY + 1.2 + totalCurve * 0.1, fullerEnd, fullerY + totalCurve * 0.2);
-      ctx.strokeStyle = "rgba(255,255,255,0.22)";
-      ctx.lineWidth = Math.max(1, fullerW * 0.4);
+      ctx.moveTo(fullerStart, 0);
+      ctx.lineTo(bladeLen * 0.76, totalCurve * 0.15);
+      ctx.strokeStyle = heat > 0.4 ? "rgba(255, 120, 30, 0.6)" : "rgba(255, 255, 255, 0.28)";
+      ctx.lineWidth = 1.2;
       ctx.stroke();
+    } else if (design.guard === "imperial" || design.pommel === "crown") {
+      // Imperial: Double Fuller with gilded spinal inlay ridge
+      const fDist = W * 0.16;
+      [-fDist, fDist].forEach((offsetY) => {
+        ctx.beginPath();
+        ctx.moveTo(fullerStart, offsetY + totalCurve * 0.1);
+        ctx.quadraticCurveTo(bladeLen * 0.4, offsetY + totalCurve * 0.15, fullerEnd, offsetY + totalCurve * 0.22);
+        ctx.strokeStyle = heat > 0.4 ? "rgba(255,100,20,0.7)" : "rgba(10,8,6,0.6)";
+        ctx.lineWidth = Math.max(1.4, W * 0.08);
+        ctx.stroke();
+      });
+      // Gilded spinal inlay between fullers
+      if (quality >= 85) {
+        ctx.beginPath();
+        ctx.moveTo(fullerStart + 6, totalCurve * 0.1);
+        ctx.lineTo(fullerEnd - 12, totalCurve * 0.22);
+        ctx.strokeStyle = "rgba(212, 175, 55, 0.75)";
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
+    } else if (design.profile === "katana") {
+      // Katana: Bo-hi groove offset toward the curved mune spine
+      const bohiY = -W * 0.25;
+      ctx.beginPath();
+      ctx.moveTo(fullerStart, bohiY + totalCurve * 0.18);
+      ctx.quadraticCurveTo(bladeLen * 0.45, bohiY + totalCurve * 0.32, bladeLen * 0.82, bohiY + totalCurve * 0.68);
+      ctx.strokeStyle = heat > 0.4 ? "rgba(255,100,20,0.7)" : "rgba(12,10,8,0.58)";
+      ctx.lineWidth = Math.max(1.6, W * 0.1);
+      ctx.stroke();
+    } else {
+      // Classic or Broad Fuller (Claymore, Longsword, Saber, etc.)
+      const fullerY = totalCurve * 0.15;
+      const fullerW = Math.max(1.8, W * (design.profile === "claymore" ? 0.22 : quality >= 88 ? 0.12 : 0.16));
+
+      ctx.beginPath();
+      ctx.moveTo(fullerStart, fullerY - 0.5);
+      ctx.quadraticCurveTo(bladeLen * 0.4, fullerY + totalCurve * 0.1, fullerEnd, fullerY + totalCurve * 0.2);
+      ctx.strokeStyle = heat > 0.4 ? "rgba(255,100,20,0.7)" : "rgba(10,8,6,0.55)";
+      ctx.lineWidth = fullerW;
+      ctx.stroke();
+
+      // Fuller inner highlight
+      if (quality >= 75 && heat < 0.3) {
+        ctx.beginPath();
+        ctx.moveTo(fullerStart, fullerY + 0.8);
+        ctx.quadraticCurveTo(bladeLen * 0.4, fullerY + 1.2 + totalCurve * 0.1, fullerEnd, fullerY + totalCurve * 0.2);
+        ctx.strokeStyle = "rgba(255,255,255,0.22)";
+        ctx.lineWidth = Math.max(1, fullerW * 0.4);
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -416,9 +457,10 @@ function drawSwordBody(
     drawCrackFissures(ctx, bladeLen, W, cracks, heat);
   }
 
-  // 8. Runes & Inscriptions (Incandescent Cyan/Gold Glow as in Reference Image 1 & 2!)
+  // 8. Runes & Inscriptions (Bíblia Estética: Gravação física e iluminação controlada)
   const inscription = renderInscription(design.inscription || "AETHELGARD", design.runes);
-  const showRunes = (design.runes || design.inscription) && (shape > 0.3 || runicCharge > 0.08 || assembled);
+  // Strictly gated: never carved on crude billet or early preform (requires refined blade shape >= 0.65 or finished assembly)
+  const showRunes = (design.runes || design.inscription) && (shape >= 0.65 || assembled);
 
   if (showRunes && inscription) {
     drawLuminousRunes(ctx, inscription, bladeLen, W, totalCurve, {
@@ -426,6 +468,7 @@ function drawSwordBody(
       quality,
       runicCharge,
       assembled,
+      hasRunes: Boolean(design.runes),
     });
   }
 
@@ -443,11 +486,11 @@ function drawLuminousRunes(
   bladeLen: number,
   W: number,
   curve: number,
-  opts: { heat: number; quality: number; runicCharge: number; assembled: boolean },
+  opts: { heat: number; quality: number; runicCharge: number; assembled: boolean; hasRunes: boolean },
 ) {
-  const { heat, quality, runicCharge, assembled } = opts;
+  const { heat, quality, runicCharge, assembled, hasRunes } = opts;
   const isHot = heat > 0.35;
-  const fontSize = Math.max(9, Math.floor(W * (assembled ? 0.38 : 0.34)));
+  const fontSize = Math.max(9, Math.floor(W * (assembled ? 0.36 : 0.32)));
 
   ctx.save();
   ctx.font = `600 ${fontSize}px Cinzel, "Segoe UI Historic", serif`;
@@ -458,43 +501,63 @@ function drawLuminousRunes(
   const runeY = curve * 0.15;
   ctx.translate(runeX, runeY);
 
-  // When hot with runic resonance OR masterwork finished: brilliant cyan/gold glow!
-  const glowIntensity = isHot
-    ? Math.min(1, 0.4 + runicCharge * 0.6)
-    : quality >= 88
-      ? 0.95
-      : quality >= 70
-        ? 0.6
-        : 0.3;
+  // 1. PHYSICAL INCISION: First draw the carved chisel groove shadow (recessed depth in steel)
+  ctx.fillStyle = "rgba(10, 8, 6, 0.92)";
+  ctx.fillText(text, 0.8, 0.8);
 
-  if (glowIntensity > 0.4) {
-    // Outer cyan bloom
-    ctx.shadowColor = quality >= 92 ? "#00f2fe" : "#4facfe";
-    ctx.shadowBlur = 12 * glowIntensity;
-  }
-
-  // Color selection: Masterwork has cyan with golden highlights matching Image 2
-  if (isHot) {
-    // Glowing brightly through molten steel (Image 1)
-    ctx.fillStyle = `rgba(180,240,255,${glowIntensity})`;
-  } else if (quality >= 90) {
-    // Dual Cyan/Gold runic finish (Image 2)
-    ctx.fillStyle = "rgba(0, 242, 254, 0.95)";
-  } else if (quality >= 75) {
-    ctx.fillStyle = "rgba(180, 220, 240, 0.85)";
-  } else {
-    // Crude, dim or misaligned runes for low quality
-    ctx.fillStyle = "rgba(40, 32, 24, 0.75)";
-  }
-
-  ctx.fillText(text, 0, 0);
-
-  // Secondary gold inner core for Masterwork
-  if (quality >= 92 && !isHot) {
-    ctx.shadowBlur = 4;
-    ctx.shadowColor = "#ffd700";
-    ctx.fillStyle = "rgba(255, 235, 160, 0.85)";
+  if (!hasRunes) {
+    // Non-runic maker's mark or latin motto: purely physical etched steel inscription
+    ctx.fillStyle = isHot ? "rgba(45, 15, 8, 0.85)" : "rgba(22, 18, 15, 0.82)";
     ctx.fillText(text, 0, 0);
+    ctx.restore();
+    return;
+  }
+
+  // 2. RUNIC INCISED INLAY & ILLUMINATION: Controlled by developmental stage & runic power
+  if (isHot) {
+    // Hot on anvil: runes catch internal heat through the carved channel
+    if (runicCharge > 0.35) {
+      // Molten inner core inside the carved channel with tight heat bloom (no giant neon halo)
+      ctx.shadowColor = "rgba(255, 120, 30, 0.55)";
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = "rgba(255, 215, 140, 0.9)";
+      ctx.fillText(text, 0, 0);
+
+      // Subtle mystic temper spark at high charge
+      if (runicCharge >= 0.75) {
+        ctx.shadowColor = "rgba(100, 210, 240, 0.45)";
+        ctx.shadowBlur = 2.5;
+        ctx.fillStyle = "rgba(170, 240, 255, 0.75)";
+        ctx.fillText(text, 0, 0);
+      }
+    } else {
+      // Uncharged hot runes: deep oxidized chisel groove in incandescent steel
+      ctx.fillStyle = "rgba(55, 18, 8, 0.85)";
+      ctx.fillText(text, 0, 0);
+    }
+  } else {
+    // Cold / Assembled / Gallery / Reveal: physically incised inlays
+    if (quality >= 88) {
+      // Masterwork: silver / electrum wire inlay with restrained, ethereal mystic glow
+      ctx.shadowColor = "rgba(80, 190, 230, 0.45)";
+      ctx.shadowBlur = 3;
+      ctx.fillStyle = "rgba(210, 235, 245, 0.95)";
+      ctx.fillText(text, 0, 0);
+
+      // Delicate gold accent in center
+      ctx.shadowBlur = 1.5;
+      ctx.shadowColor = "rgba(255, 215, 0, 0.35)";
+      ctx.fillStyle = "rgba(255, 245, 200, 0.75)";
+      ctx.fillText(text, 0, 0);
+    } else if (quality >= 70) {
+      // Refined steel: silver-pewter hammered inlay, non-glowing
+      ctx.fillStyle = "rgba(175, 185, 195, 0.85)";
+      ctx.fillText(text, 0, 0);
+    } else {
+      // Rough / Flawed: dark oxidized iron chisel marks
+      ctx.fillStyle = "rgba(30, 24, 20, 0.85)";
+      ctx.fillText(text, 0, 0);
+    }
   }
 
   ctx.restore();

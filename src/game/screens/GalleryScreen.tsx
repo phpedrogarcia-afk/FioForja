@@ -73,7 +73,23 @@ export function GalleryScreen({
         onGallery={() => setSelectedSword(null)}
         onTitle={onBack}
         wallet={wallet}
-        onUpgrade={onUpgrade}
+        onUpgrade={(s) => {
+          if (!onUpgrade) return false;
+          const ok = onUpgrade(s);
+          if (ok) {
+            setSelectedSword((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    damage: (prev.damage ?? 180) + 8,
+                    durability: Math.min(100, (prev.durability ?? 90) + 2),
+                    upgradesApplied: (prev.upgradesApplied || 0) + 1,
+                  }
+                : null,
+            );
+          }
+          return ok;
+        }}
       />
     );
   }

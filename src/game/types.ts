@@ -103,6 +103,7 @@ export interface FinishedSword {
   flaws?: string[];
   perks?: string[];
   structuralState?: StructuralState;
+  broken?: boolean;
   cracks?: number;
   physicalProfile?: PhysicalBladeProfile;
   history?: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;

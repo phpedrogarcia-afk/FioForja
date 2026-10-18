@@ -170,9 +170,14 @@ export function GameApp() {
   }, [persist]);
 
   const handleUpgradeSword = useCallback((targetSword: FinishedSword): boolean => {
+    // Structural integrity rule: Broken blades cannot be assembled or upgraded
+    if (targetSword.broken) return false;
+
     const currentWallet = save.current.wallet || defaultWallet;
     const upgrades = targetSword.upgradesApplied || 0;
-    const goldCost = 50 * (upgrades + 1);
+    if (upgrades >= 3) return false;
+
+    const goldCost = 60 * (upgrades + 1);
     const rubyCost = upgrades >= 1 ? 1 : 0;
 
     if (currentWallet.gold < goldCost || currentWallet.rubies < rubyCost) return false;
@@ -183,10 +188,12 @@ export function GameApp() {
       rubies: currentWallet.rubies - rubyCost,
     };
 
+    // Workbench refinement strictly polishes the edge (+8 ATK) and reinforces the grip (+2 Durability).
+    // Intrinsic metallurgical properties (quality, grade, rarity, flaws, cracks, warp) are permanent physical facts from the forge.
     const updatedSword: FinishedSword = {
       ...targetSword,
-      damage: (targetSword.damage ?? 180) + 16,
-      durability: Math.min(100, (targetSword.durability ?? 90) + 4),
+      damage: (targetSword.damage ?? 180) + 8,
+      durability: Math.min(100, (targetSword.durability ?? 90) + 2),
       upgradesApplied: upgrades + 1,
     };
 
