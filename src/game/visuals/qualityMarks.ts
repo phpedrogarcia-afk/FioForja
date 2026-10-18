@@ -62,9 +62,9 @@ export function paintEdgeCondition(
     // Build a honed band that follows the contour, with a quality-controlled
     // waver: a crisp razor line at high quality, irregular at low quality.
     const innerU = (t: number): number =>
-      clamp(0.6 + sharpness * 0.12 + edgeSideWaver(t, waver, phase) * 0.16, 0.42, 0.9);
+      clamp(0.8 + sharpness * 0.1 + edgeSideWaver(t, waver, phase) * 0.12, 0.62, 0.94);
     const outerU = (t: number): number =>
-      clamp(0.99 + edgeSideWaver(t, waver, phase * 1.13) * 0.05, 0.9, 1);
+      clamp(0.995 + edgeSideWaver(t, waver, phase * 1.13) * 0.04, 0.92, 1);
     const innerPts: Pt[] = [];
     const outerPts: Pt[] = [];
     for (let i = 0; i <= steps; i++) {
@@ -79,7 +79,7 @@ export function paintEdgeCondition(
     for (let i = 1; i < innerPts.length; i++) ctx.lineTo(innerPts[i].x, innerPts[i].y);
     for (let i = outerPts.length - 1; i >= 0; i--) ctx.lineTo(outerPts[i].x, outerPts[i].y);
     ctx.closePath();
-    ctx.globalAlpha = 0.28 + sharpness * 0.24;
+    ctx.globalAlpha = 0.18 + sharpness * 0.18;
     ctx.fillStyle = paint.edge;
     ctx.fill();
 

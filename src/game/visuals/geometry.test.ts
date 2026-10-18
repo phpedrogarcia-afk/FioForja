@@ -116,7 +116,9 @@ function assertFiniteness(geo: WeaponGeometry, label: string): void {
   checkPoints(geo.blade.edge, "blade.edge");
   checkPoints(geo.blade.outline, "blade.outline");
   checkPoints(geo.blade.ridgeline, "blade.ridgeline");
-  checkPoints(geo.blade.tip.shoulder, "blade.tip.shoulder");
+  if (geo.blade.tip.shoulder) {
+    assert.ok(isFinitePoint(geo.blade.tip.shoulder), label + ": tip.shoulder not finite");
+  }
   assert.ok(isFinitePoint(geo.blade.tip.base), label + ": tip.base not finite");
   assert.ok(isFinitePoint(geo.blade.tip.apex), label + ": tip.apex not finite");
   if (geo.blade.fuller) {

@@ -2,7 +2,7 @@
   "schema": 1,
   "experiment": "M02-weapon-dna",
   "description": "Weapon DNA visual evidence matrices A-G rendered by the transpiled game renderers",
-  "generatedAt": "2026-10-18T20:20:22.744Z",
+  "generatedAt": "2026-10-18T20:30:26.043Z",
   "renderMode": "dna",
   "dnaReady": true,
   "dnaError": null,
@@ -29,14 +29,27 @@
       "weaponSeedFor",
       "weaponVisualBounds",
       "weaponVisualSignature"
+    ],
+    "geometryExports": [
+      "BLADE_STATION_COUNT",
+      "bandPath",
+      "bladePath",
+      "buildWeaponGeometry",
+      "dedupePoints",
+      "fullerBands",
+      "gripPath",
+      "guardPath",
+      "pathFromPoints",
+      "polylinePath",
+      "pommelPath"
     ]
   },
-  "labUrl": "http://127.0.0.1:50703/",
-  "bootMs": 1126,
-  "captureMs": 3448,
+  "labUrl": "http://127.0.0.1:64460/",
+  "bootMs": 1173,
+  "captureMs": 3613,
   "build": {
-    "hash": "c59ae4f7a68b3149cfdf6f51ade1d8eed55eb76f06ad1c1c19099d8e9194dedb",
-    "builtAt": "2026-10-18T20:20:18.918Z",
+    "hash": "1bec6a443a9a8751a28cbce2467817734d62803809c96829d61f84859f2bd275",
+    "builtAt": "2026-10-18T20:30:22.011Z",
     "moduleCount": 12,
     "entries": [
       "src/game/types.ts",
@@ -74,9 +87,9 @@
       "file": "evidence/A.png",
       "width": 1428,
       "height": 1392,
-      "bytes": 235754,
+      "bytes": 232320,
       "renderer": "dna",
-      "inkRatio": 0.7962,
+      "inkRatio": 0.7963,
       "itemCount": 9,
       "items": [
         {
@@ -84,10 +97,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 255,
-            "h": 755
+            "w": 235,
+            "h": 749
           },
-          "scale": 0.386,
+          "scale": 0.389,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -97,10 +110,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 210,
-            "h": 751
+            "w": 223,
+            "h": 758
           },
-          "scale": 0.388,
+          "scale": 0.384,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -110,7 +123,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 255,
+            "w": 251,
             "h": 762
           },
           "scale": 0.382,
@@ -123,10 +136,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 132,
-            "h": 728
+            "w": 123,
+            "h": 720
           },
-          "scale": 0.4,
+          "scale": 0.405,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -136,7 +149,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 199,
+            "w": 197,
             "h": 758
           },
           "scale": 0.384,
@@ -162,7 +175,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 207,
+            "w": 205,
             "h": 752
           },
           "scale": 0.388,
@@ -175,10 +188,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 234,
-            "h": 762
+            "w": 249,
+            "h": 770
           },
-          "scale": 0.382,
+          "scale": 0.378,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -206,9 +219,9 @@
       "file": "evidence/B.png",
       "width": 1428,
       "height": 626,
-      "bytes": 121865,
+      "bytes": 123166,
       "renderer": "dna",
-      "inkRatio": 0.7011,
+      "inkRatio": 0.7007,
       "itemCount": 3,
       "items": [
         {
@@ -216,10 +229,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 206,
-            "h": 761
+            "w": 219,
+            "h": 769
           },
-          "scale": 0.469,
+          "scale": 0.464,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -229,10 +242,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 215,
-            "h": 753
+            "w": 227,
+            "h": 761
           },
-          "scale": 0.474,
+          "scale": 0.469,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -242,10 +255,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 219,
-            "h": 753
+            "w": 233,
+            "h": 760
           },
-          "scale": 0.474,
+          "scale": 0.47,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -260,9 +273,9 @@
       "file": "evidence/C.png",
       "width": 1428,
       "height": 974,
-      "bytes": 198437,
+      "bytes": 194236,
       "renderer": "dna",
-      "inkRatio": 0.7625,
+      "inkRatio": 0.7623,
       "itemCount": 6,
       "items": [
         {
@@ -270,7 +283,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 243,
+            "w": 239,
             "h": 768
           },
           "scale": 0.379,
@@ -283,10 +296,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 247,
-            "h": 750
+            "w": 243,
+            "h": 751
           },
-          "scale": 0.389,
+          "scale": 0.388,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -322,7 +335,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 237,
+            "w": 233,
             "h": 765
           },
           "scale": 0.381,
@@ -353,9 +366,9 @@
       "file": "evidence/D.png",
       "width": 1428,
       "height": 974,
-      "bytes": 172724,
+      "bytes": 169382,
       "renderer": "dna",
-      "inkRatio": 0.7628,
+      "inkRatio": 0.7626,
       "itemCount": 6,
       "items": [
         {
@@ -363,10 +376,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 219,
-            "h": 743
+            "w": 231,
+            "h": 750
           },
-          "scale": 0.392,
+          "scale": 0.389,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -376,10 +389,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 229,
-            "h": 757
+            "w": 243,
+            "h": 764
           },
-          "scale": 0.385,
+          "scale": 0.381,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -389,10 +402,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 138,
-            "h": 720
+            "w": 148,
+            "h": 728
           },
-          "scale": 0.405,
+          "scale": 0.4,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -402,10 +415,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 238,
-            "h": 748
+            "w": 253,
+            "h": 755
           },
-          "scale": 0.39,
+          "scale": 0.386,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -415,10 +428,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 236,
-            "h": 775
+            "w": 254,
+            "h": 783
           },
-          "scale": 0.376,
+          "scale": 0.372,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -428,10 +441,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 221,
-            "h": 779
+            "w": 237,
+            "h": 788
           },
-          "scale": 0.374,
+          "scale": 0.37,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -446,9 +459,9 @@
       "file": "evidence/E.png",
       "width": 1428,
       "height": 626,
-      "bytes": 112215,
+      "bytes": 114801,
       "renderer": "dna",
-      "inkRatio": 0.7009,
+      "inkRatio": 0.7008,
       "itemCount": 3,
       "items": [
         {
@@ -456,10 +469,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 209,
-            "h": 737
+            "w": 207,
+            "h": 738
           },
-          "scale": 0.485,
+          "scale": 0.484,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -469,10 +482,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 221,
-            "h": 776
+            "w": 235,
+            "h": 784
           },
-          "scale": 0.46,
+          "scale": 0.456,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -482,10 +495,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 149,
-            "h": 735
+            "w": 140,
+            "h": 724
           },
-          "scale": 0.486,
+          "scale": 0.493,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -498,11 +511,11 @@
       "title": "MATRIX F · Scale",
       "subtitle": "Same weapon at card (~180 px), inspection (~420 px), presentation (~900 px) — 1:1 scale, shared baseline",
       "file": "evidence/F.png",
-      "width": 1044,
-      "height": 1556,
-      "bytes": 303507,
+      "width": 1081,
+      "height": 1568,
+      "bytes": 321512,
       "renderer": "dna",
-      "inkRatio": 0.7364,
+      "inkRatio": 0.7395,
       "itemCount": 3,
       "items": [
         {
@@ -510,8 +523,8 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 72,
-            "h": 242
+            "w": 77,
+            "h": 244
           },
           "scale": 1,
           "clipped": false,
@@ -523,8 +536,8 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 170,
-            "h": 563
+            "w": 180,
+            "h": 569
           },
           "scale": 1,
           "clipped": false,
@@ -536,8 +549,8 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 364,
-            "h": 1212
+            "w": 386,
+            "h": 1224
           },
           "scale": 1,
           "clipped": false,
@@ -554,9 +567,9 @@
       "file": "evidence/G.png",
       "width": 1500,
       "height": 1022,
-      "bytes": 219085,
+      "bytes": 216015,
       "renderer": "mixed",
-      "inkRatio": 0.7005,
+      "inkRatio": 0.7007,
       "itemCount": 10,
       "items": [
         {
@@ -629,10 +642,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 227,
-            "h": 752
+            "w": 241,
+            "h": 760
           },
-          "scale": 0.418,
+          "scale": 0.413,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -642,10 +655,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 239,
-            "h": 759
+            "w": 235,
+            "h": 760
           },
-          "scale": 0.414,
+          "scale": 0.413,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -655,10 +668,10 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 133,
-            "h": 718
+            "w": 125,
+            "h": 712
           },
-          "scale": 0.437,
+          "scale": 0.441,
           "clipped": false,
           "fitted": false,
           "error": null
@@ -668,7 +681,7 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 202,
+            "w": 199,
             "h": 748
           },
           "scale": 0.42,
@@ -681,10 +694,115 @@
           "mode": "dna",
           "missing": false,
           "bbox": {
-            "w": 199,
+            "w": 197,
             "h": 752
           },
           "scale": 0.418,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "H",
+      "title": "MATRIX H · Detail — three reading distances",
+      "subtitle": "Hilt, blade-middle and tip close-ups for three representative weapons — macro detail at 2x supersampling",
+      "file": "evidence/H.png",
+      "width": 1564,
+      "height": 1506,
+      "bytes": 462278,
+      "renderer": "dna",
+      "inkRatio": 0.6394,
+      "itemCount": 9,
+      "items": [
+        {
+          "label": "Guarda da Fronteira · hilt",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Guarda da Fronteira · middle",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Guarda da Fronteira · tip",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lua Silenciosa · hilt",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lua Silenciosa · middle",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lua Silenciosa · tip",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha de Aereth · hilt",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha de Aereth · middle",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha de Aereth · tip",
+          "mode": "dna",
+          "missing": false,
+          "bbox": null,
+          "scale": null,
           "clipped": false,
           "fitted": false,
           "error": null

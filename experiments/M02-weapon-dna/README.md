@@ -42,6 +42,8 @@ renders each matrix, and screenshots the canvas **at exact backing-store size**
 | `node experiments/M02-weapon-dna/capture.mjs --mode=legacy` | Force legacy `drawFinishedSword` renderer |
 | `node experiments/M02-weapon-dna/capture.mjs --only=A,G` | Capture a subset |
 | `node experiments/M02-weapon-dna/capture.mjs --no-build` | Reuse the last `.build/` |
+| `node experiments/M02-weapon-dna/bench.mjs` | Build + run the Canvas 2D performance benchmark (no evidence PNGs touched) |
+| `node experiments/M02-weapon-dna/capture.mjs --bench` | Same benchmark, invoked through the capture entry point |
 
 ## Matrices
 
@@ -54,6 +56,7 @@ renders each matrix, and screenshots the canvas **at exact backing-store size**
 | E | `evidence/E.png` | **Attributes** — offensive (high P.ATK), defensive (high DEF) and agile (high AGI) weapons; attributes and geometry must be coherent. |
 | F | `evidence/F.png` | **Scale** — the same weapon at card (~180 px), inspection (~420 px) and presentation (~900 px), rendered 1:1 on a shared baseline (no rescaling). |
 | G | `evidence/G.png` | **Legacy vs DNA** — the five canonical hero weapons: legacy `swordDraw.ts` (top row) next to the Weapon DNA renderer (bottom row). |
+| H | `evidence/H.png` | **Detail — three reading distances** — Guarda da Fronteira, Lua Silenciosa and Folha de Aereth at macro scale: hilt (guard + grip + pommel + 1/3 blade), blade-middle (pattern/fuller/inscription) and tip (apex/taper/kissaki). Caption shows the magnification relative to the 180 px card scale. DNA-only: shows a placeholder until the engine is available. |
 
 The five canonical heroes are `guarda_medieval`, `cimitarra_damasco`,
 `lua_silenciosa`, `folha_aereth` and `queda_asterion` (from
@@ -144,14 +147,39 @@ build must produce the same images; only `manifest.json` timestamps change.
 | Genome contract | `node --experimental-strip-types --test src/game/visuals/weaponGenome.test.ts` | determinism, JSON round-trip, documented ranges, legacy-save tolerance, isolated component mutation |
 | Geometry invariants | `node --experimental-strip-types --test src/game/visuals/geometry.test.ts` | finite geometry, monotonic stations, closed & non-self-intersecting outlines, valid tip, sane hilt bounds over a 520-genome deterministic sweep |
 
+## Performance benchmark
+
+`node experiments/M02-weapon-dna/bench.mjs` measures the renderer inside the
+same headless Chromium used for evidence, on a real Canvas 2D context (no mocks),
+and writes `evidence/benchmark.json`:
+
+| Metric | Iterations | What it measures |
+| --- | --- | --- |
+| `genomeDerivation` | 520 weapons | `deriveWeaponVisualGenome` cost (us/weapon, batched for timer resolution) |
+| `coldGeometryBuild` | 220 weapons | `prepareFromGenome` with `clearWeaponGeometryCache()` before every weapon (us/weapon) |
+| `cachedDraw@180px` / `@420px` / `@900px` | 120 frames each | warm-cache `drawWeaponGenome` frame cost (ms/frame) |
+| `galleryDna` | 60 frames | 24 distinct weapons into one 1400x900 canvas, DNA renderer (ms/frame + ms/weapon) |
+| `galleryLegacy` | 60 frames | the same gallery with `drawFinishedSword` (ms/frame + ms/weapon) |
+
+The JSON records environment (Node/CPU/RAM), Chromium version and executable,
+`deviceScaleFactor`, all counts, every metric with `mean/min/p50/p95/max/totalMs`
+and the raw sample arrays, plus the module-graph `build.hash`. The console prints
+a compact table. `--no-build` reuses the current `.build/`.
+
 ## Evidence status
 
 The Weapon DNA renderer (`weaponRenderer.ts` + `geometry.ts` + `materials.ts` +
-`ornamentation.ts` + `qualityMarks.ts`) is integrated: matrices **A–F are
+`ornamentation.ts` + `qualityMarks.ts`) is integrated: matrices **A–F and H are
 captured with the DNA renderer** and **G is a real legacy-vs-DNA comparison**
 (top row legacy `drawFinishedSword`, bottom row DNA `drawWeaponFromSword`).
-`--mode=legacy` still reproduces the historical baseline for A–F whenever the
-"before" comparison is needed.
+`--mode=legacy` still reproduces the historical baseline for A–G whenever the
+"before" comparison is needed (H is macro detail and is DNA-only).
+
+Matrix H needs no new renderer API: it derives the genome + geometry to know the
+unit-space crop of the hilt / blade-middle / tip, then renders with a computed
+`drawWeaponFromSword` viewport offset and 2× supersampling, and scales the crop
+into the cell. The caption reports `×N card scale`, where card scale is the
+180 px blade length used by matrix F.
 
 ## Troubleshooting
 

@@ -370,11 +370,12 @@ function halfWidths(genome: WeaponVisualGenome, t: number): WidthSample {
   let he = hw * (1 - asym) * edgeF;
 
   const ricRatio = clamp(num(sil.ricassoRatio, 0.08), 0.02, 0.22);
-  const ricHW = clamp(num(sil.ricassoHalfWidth, base * 1.08), base * 0.9, base * 1.4);
+  const ricHW = clamp(num(sil.ricassoHalfWidth, base * 1.08), base * 0.9, base * 1.3);
   if (t < ricRatio) {
     const local = clamp01(t / Math.max(1e-4, ricRatio));
-    const blend = smoothstep(0.52, 1, local);
-    const factor = mix(ricHW / base, 1, blend);
+    // Long soft blend: the root reinforcement must never read as a step.
+    const blend = smoothstep(0.15, 1, local);
+    const factor = mix(1 + (ricHW / base - 1) * 0.85, 1, blend);
     hs *= factor;
     he *= factor;
   }
@@ -722,11 +723,15 @@ function buildBlade(genome: WeaponVisualGenome): BladeGeometry {
 // Guard
 // ---------------------------------------------------------------------------
 
-/** Chamfered central plate: the anchor block every guard archetype hangs on. */
-function chamferBlock(T: number, B: number, front: number, back: number): Pt[] {
-  const xf = T * front;
-  const xb = -T * back;
-  const chamfer = Math.min(T * 0.75, B * 0.55);
+/**
+ * Chamfered central plate. xFront / xBack are absolute X extents: the plate
+ * must overlap the blade root by at least 0.02 so the blade appears to emerge
+ * from the guard instead of meeting a stray square seam.
+ */
+function chamferBlock(xFront: number, xBack: number, B: number): Pt[] {
+  const xf = Math.max(0.008, xFront);
+  const xb = -Math.max(0.008, xBack);
+  const chamfer = Math.min(Math.max(0.004, B * 0.48), Math.min(xf, -xb) * 0.5, B * 0.6);
   return dedupePoints([
     P(xf, -B + chamfer),
     P(xf, B - chamfer),
@@ -739,6 +744,47 @@ function chamferBlock(T: number, B: number, front: number, back: number): Pt[] {
   ]);
 }
 
+/**
+ * Central plate extents. The plate overlaps the blade root from behind (>= 0.02
+ * behind x=0) and only slightly forward, so pale blades emerge cleanly from the
+ * guard instead of being covered by a dark block.
+ */
+function guardBlock(T: number, span: number): { xf: number; xb: number } {
+  return {
+    xf: Math.max(T * 0.5, 0.006),
+    xb: Math.max(T * 1.8, 0.024, span * 0.06),
+  };
+}
+
+/**
+ * Heraldic wing / eagle quillon. The wing sweeps forward toward the blade and
+ * its trailing edge breaks into distinct feather lobes so the silhouette reads
+ * as a wing instead of a serrated bar. sgn is -1 or +1 for the two sides.
+ */
+function wingLimb(sgn: number, span: number, T: number, B: number, feathers: number, leadScale: number): Pt[] {
+  const rootY = B * 0.45;
+  const yAt = (f: number) => sgn * mix(rootY, span, clamp01(f));
+  const pts: Pt[] = [];
+  // Leading edge: root -> wing tip, swept toward the blade (+X).
+  const leadF = [0.02, 0.18, 0.4, 0.62, 0.82, 0.95, 1];
+  const leadX = [0.12, 0.3, 0.42, 0.4, 0.28, 0.16, 0.1];
+  for (let i = 0; i < leadF.length; i++) {
+    pts.push(P(span * leadX[i] * leadScale, yAt(leadF[i])));
+  }
+  // Trailing edge: feather lobes pointing back toward the guard (-X).
+  const featherF = feathers >= 4 ? [0.86, 0.68, 0.5, 0.32] : [0.85, 0.62, 0.4];
+  const featherX = feathers >= 4 ? [-0.17, -0.21, -0.19, -0.13] : [-0.15, -0.2, -0.14];
+  const notchF = feathers >= 4 ? [0.77, 0.59, 0.41, 0.23] : [0.73, 0.5, 0.28];
+  const notchX = feathers >= 4 ? [-0.02, -0.03, -0.04, -0.03] : [-0.02, -0.03, -0.02];
+  for (let i = 0; i < featherF.length; i++) {
+    pts.push(P(span * featherX[i] * leadScale, yAt(featherF[i])));
+    pts.push(P(span * notchX[i] * leadScale, yAt(notchF[i])));
+  }
+  pts.push(P(span * 0.03 * leadScale, yAt(0.07)));
+  pts.push(P(-T * 0.55, sgn * rootY));
+  return dedupePoints(pts);
+}
+
 function buildLangets(genome: WeaponVisualGenome, blade: BladeGeometry, T: number): Pt[][] {
   const guard = genome.mount.guard;
   if (!guard.langets) return [];
@@ -746,13 +792,14 @@ function buildLangets(genome: WeaponVisualGenome, blade: BladeGeometry, T: numbe
   const baseHW = clamp(blade.stations[0].halfWidth, 0.015, 0.1);
   const ricRatio = clamp(num(sil.ricassoRatio, 0.08), 0.02, 0.22);
   const L = clamp(num(sil.bladeLengthUnits, 1), 0.5, 1.55);
-  const length = clamp(ricRatio * L * 0.8, 0.026, 0.08);
-  const thickness = clamp(baseHW * 0.26, 0.006, 0.016);
-  const x0 = T * 0.4;
+  const length = clamp(ricRatio * L * 0.62, 0.018, 0.04);
+  const thickness = clamp(baseHW * 0.16, 0.004, 0.009);
+  const x0 = -0.002;
   const x1 = x0 + length;
   const out: Pt[][] = [];
   for (const sgn of [-1, 1]) {
-    const y = sgn * baseHW * 0.7;
+    // Ride the blade edge: a thin reinforcement, not a plate over the blade face.
+    const y = sgn * Math.max(baseHW * 0.96, thickness * 1.4);
     const h = thickness * 0.5;
     out.push(dedupePoints([
       P(x0, y - h),
@@ -789,84 +836,80 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
   let bossR = 0;
 
   if (archetype === "cross") {
-    outline = chamferBlock(T, B * 1.08, 1.25, 1.35);
+    // Medieval cross: a tall central ecusson (about 0.55 of the guard span along
+    // the blade axis) plus two stepped, spatulate quillons whose ends step out
+    // into small forward terminals. Reads as a cross, never as a lens.
+    const ecussonHalf = Math.max(span * 0.19, B * 1.12);
+    const ecussonX = Math.max(span * 0.28, T * 2.2, 0.028);
+    outline = chamferBlock(ecussonX, ecussonX, ecussonHalf);
+    const tipY = Math.min(span * 0.985, 0.252);
+    const rootHalf = Math.max(T * 1.5, ecussonX * 0.42);
+    const neckHalf = rootHalf * 0.66;
+    const spatHalf = rootHalf * 1.05;
+    const sweep = qq * span * 0.06;
+    const termForward = T * 1.2;
+    const yAt = (f: number) => mix(ecussonHalf, tipY, f);
+    const xAt = (f: number) => sweep * Math.pow(f, 1.35);
     for (const sgn of [-1, 1]) {
-      const y0 = B * 0.55;
-      const tipX = T * 0.55 + qq * span * 0.08;
-      quillons.push(dedupePoints([
-        P(-T * 0.7, sgn * y0),
-        P(T * 0.55, sgn * y0),
-        P(T * 0.75, sgn * span * 0.55),
-        P(tipX, sgn * span * 0.9),
-        P(tipX - T * 0.25, sgn * (span - T * 0.05)),
-        P(tipX - T * 0.8, sgn * span * 0.86),
-        P(-T * 0.6 - qq * span * 0.03, sgn * span * 0.5),
-        P(-T * 0.9, sgn * (y0 + B * 0.15)),
-      ]));
+      const limb: Pt[] = [];
+      // Outer edge: taper to a neck, then step out into the spatulate terminal.
+      limb.push(P(xAt(0) + rootHalf, sgn * ecussonHalf));
+      limb.push(P(xAt(0.32) + mix(rootHalf, neckHalf, 0.55), sgn * yAt(0.32)));
+      limb.push(P(xAt(0.68) + neckHalf, sgn * yAt(0.68)));
+      limb.push(P(xAt(0.86) + neckHalf, sgn * yAt(0.86)));
+      limb.push(P(xAt(0.9) + spatHalf + termForward, sgn * yAt(0.9)));
+      limb.push(P(xAt(0.98) + spatHalf + termForward, sgn * yAt(0.98)));
+      limb.push(P(xAt(1) + spatHalf + termForward, sgn * tipY));
+      limb.push(P(xAt(1) - spatHalf + termForward, sgn * tipY));
+      limb.push(P(xAt(0.98) - spatHalf + termForward, sgn * yAt(0.98)));
+      limb.push(P(xAt(0.9) - spatHalf + termForward, sgn * yAt(0.9)));
+      limb.push(P(xAt(0.86) - neckHalf, sgn * yAt(0.86)));
+      limb.push(P(xAt(0.68) - neckHalf, sgn * yAt(0.68)));
+      limb.push(P(xAt(0.32) - mix(rootHalf, neckHalf, 0.55), sgn * yAt(0.32)));
+      limb.push(P(xAt(0) - rootHalf, sgn * ecussonHalf));
+      quillons.push(dedupePoints(limb));
     }
     if (orn > 0.12) {
-      strokes.push([P(-T * 0.25, -B * 0.5), P(-T * 0.25, B * 0.5)]);
-      strokes.push([P(-T * 0.62, -B * 0.3), P(-T * 0.88, 0), P(-T * 0.62, B * 0.3)]);
+      strokes.push([P(-T * 0.2, -ecussonHalf * 0.55), P(T * 0.65, 0), P(-T * 0.2, ecussonHalf * 0.55)]);
+      strokes.push([P(ecussonX * 0.34, -ecussonHalf * 0.42), P(0, 0), P(ecussonX * 0.34, ecussonHalf * 0.42)]);
     }
-    if (orn > 0.22) bossR = clamp(0.007 + orn * 0.014, 0.007, 0.02);
+    if (orn > 0.22) bossR = clamp(0.007 + orn * 0.014, 0.007, 0.022);
   } else if (archetype === "curved") {
-    outline = chamferBlock(T, B * 0.95, 1.1, 1.3);
+    const cover = guardBlock(T, span);
+    outline = chamferBlock(cover.xf, cover.xb, B * 0.95);
+    // Sinuous quillon: one consistent forward sweep from the block to the tip
+    // (no mid-limb belly that reads as a moustache). Mirror symmetry is exact.
     for (const sgn of [-1, 1]) {
       const front: Pt[] = [];
       const back: Pt[] = [];
+      const groove: Pt[] = [];
       const steps = 12;
+      const forward = T * 0.85 + qq * span * 0.62;
       for (let i = 0; i <= steps; i++) {
         const u = i / steps;
-        const yy = sgn * mix(B * 0.45, span, Math.pow(u, 0.9));
-        const xx = -T * 0.4 + qq * span * 0.5 * Math.sin(Math.PI * u) + T * 0.8 * u;
-        const hw = mix(T * 1.05, T * 0.3, u);
+        const yy = sgn * mix(B * 0.62, span * 0.985, Math.pow(u, 0.92));
+        const xx = -T * 0.5 + forward * Math.pow(u, 1.6);
+        const hw = mix(T * 1.2, T * 0.34, u);
         front.push(P(xx + hw, yy));
         back.push(P(xx - hw, yy));
+        groove.push(P(xx, yy));
       }
       quillons.push(dedupePoints(front.concat(back.slice().reverse())));
-      if (orn > 0.3) {
-        const groove: Pt[] = [];
-        for (let i = 0; i <= 8; i++) {
-          const u = i / 8;
-          const yy = sgn * mix(B * 0.5, span * 0.92, Math.pow(u, 0.9));
-          const xx = -T * 0.4 + qq * span * 0.5 * Math.sin(Math.PI * u) + T * 0.8 * u;
-          groove.push(P(xx, yy));
-        }
-        strokes.push(groove);
-      }
+      if (orn > 0.3) strokes.push(groove.slice(1, 10));
     }
     if (orn > 0.28) bossR = clamp(0.006 + orn * 0.012, 0.006, 0.018);
   } else if (archetype === "wings") {
-    outline = chamferBlock(T, B * 1.05, 1.2, 1.3);
+    const cover = guardBlock(T, span);
+    outline = chamferBlock(cover.xf, cover.xb, B * 1.05);
     for (const sgn of [-1, 1]) {
-      const rootY = B * 0.45;
-      const step = (span - rootY) / 4.6;
-      const wing: Pt[] = [
-        P(-T * 0.5, sgn * rootY),
-        P(T * 0.55, sgn * (rootY + step * 0.2)),
-        P(T * 0.5, sgn * (rootY + step * 0.75)),
-        P(T * 0.32, sgn * (rootY + step * 1.35)),
-        P(T * 0.12, sgn * (rootY + step * 2)),
-        P(-T * 0.02, sgn * (rootY + step * 2.65)),
-        P(-T * 0.1, sgn * span),
-      ];
-      let y = span;
-      for (let k = 0; k < 4; k++) {
-        const featherY = y - step * 0.55;
-        const notchY = y - step * 0.92;
-        wing.push(P(-T * 0.3 - step * 1.25, sgn * featherY));
-        wing.push(P(-T * 0.18, sgn * notchY));
-        y = notchY;
-      }
-      wing.push(P(-T * 0.55, sgn * (rootY + step * 0.3)));
-      quillons.push(dedupePoints(wing));
+      const wing = wingLimb(sgn, span, T, B, 4, 1);
+      quillons.push(wing);
       if (orn > 0.2) {
+        const rootY = B * 0.45;
+        const yAt = (f: number) => sgn * mix(rootY, span, clamp01(f));
         for (let k = 0; k < 3; k++) {
-          const yTop = rootY + step * (1.1 + k * 0.85);
-          strokes.push([
-            P(T * 0.28, sgn * yTop),
-            P(-T * 0.12, sgn * (yTop + step * 0.55)),
-          ]);
+          const f = 0.24 + k * 0.2;
+          strokes.push([P(span * 0.36, yAt(f + 0.03)), P(span * 0.02, yAt(f + 0.11))]);
         }
       }
     }
@@ -877,10 +920,11 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
     outline = ellipseLoop(cxR, 0, R * 0.92, R, 26, false);
     // Inner void: opposite winding so nonzero fill cancels it out.
     quillons.push(ellipseLoop(cxR, 0, R * 0.58, R * 0.66, 22, true));
-    strokes.push([P(cxR - R * 0.5, -R * 0.5), P(cxR + R * 0.5, R * 0.5)]);
-    strokes.push([P(cxR - R * 0.5, R * 0.5), P(cxR + R * 0.5, -R * 0.5)]);
+    // Basket bars: two symmetric knuckle-bow arcs, never a diagonal X.
+    strokes.push(ellipseArc(cxR + R * 0.04, 0, R * 0.68, R * 0.74, 14, -1.25, 1.25));
+    strokes.push(ellipseArc(cxR - R * 0.04, 0, R * 0.68, R * 0.74, 14, Math.PI - 1.25, Math.PI + 1.25));
   } else if (archetype === "tsuba") {
-    const hx = T * 1.9;
+    const hx = Math.max(T * 1.9, 0.026);
     const hy = span;
     outline = dedupePoints([
       P(hx, -hy * 0.42),
@@ -911,10 +955,15 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
       P(hx * 0.56, hy * 0.7),
       P(hx * 0.82, hy * 0.34),
     ])));
-    strokes.push(closedStroke(ellipseLoop(-T * 0.15, span * 0.46, T * 0.9, span * 0.14, 14, false)));
-    strokes.push(closedStroke(ellipseLoop(-T * 0.15, -span * 0.46, T * 0.9, span * 0.14, 14, false)));
+    // Engraved rim inset (closed stroke) plus the two hitsu-ana cutouts.
+    strokes.push(closedStroke(outline.map((p) => P(p.x * 0.8, p.y * 0.84))));
+    strokes.push(closedStroke(ellipseLoop(-hx * 0.12, span * 0.52, hx * 0.42, span * 0.15, 16, false)));
+    strokes.push(closedStroke(ellipseLoop(-hx * 0.12, -span * 0.52, hx * 0.42, span * 0.15, 16, false)));
   } else if (archetype === "leaf") {
-    outline = chamferBlock(T, B * 0.9, 1, 1.15);
+    const cover = guardBlock(T, span);
+    outline = chamferBlock(cover.xf, cover.xb, B * 0.9);
+    // Organic leaf tendrils: a single forward sweep from the block, widest just
+    // past the middle, tapering to a tip. Mirrored exactly around the axis.
     for (const sgn of [-1, 1]) {
       const front: Pt[] = [];
       const back: Pt[] = [];
@@ -922,9 +971,9 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
       const steps = 14;
       for (let i = 0; i <= steps; i++) {
         const u = i / steps;
-        const yy = sgn * mix(B * 0.4, span, smoothstep(0, 1, u));
-        const xx = -T * 0.35 + span * 0.42 * Math.sin(Math.PI * u) - span * 0.16 * smoothstep(0.72, 1, u);
-        const leafW = span * 0.15 * Math.sin(Math.PI * Math.pow(u, 0.78)) + T * 0.22 * (1 - u);
+        const yy = sgn * mix(B * 0.62, span * 0.985, smoothstep(0, 1, u));
+        const xx = -T * 0.45 + span * 0.4 * smoothstep(0, 1, u);
+        const leafW = span * 0.14 * Math.sin(Math.PI * Math.pow(u, 0.8)) + T * 0.28 * (1 - u);
         front.push(P(xx + leafW, yy));
         back.push(P(xx - leafW, yy));
         midrib.push(P(xx, yy));
@@ -934,27 +983,10 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
     }
     if (orn > 0.25) bossR = clamp(0.007 + orn * 0.012, 0.007, 0.017);
   } else if (archetype === "imperial") {
-    outline = chamferBlock(T, B * 1.15, 1.3, 1.45);
+    const cover = guardBlock(T, span);
+    outline = chamferBlock(cover.xf, cover.xb, B * 1.15);
     for (const sgn of [-1, 1]) {
-      const rootY = B * 0.5;
-      const step = (span - rootY) / 3.9;
-      const eagle: Pt[] = [
-        P(-T * 0.5, sgn * rootY),
-        P(T * 0.6, sgn * (rootY + step * 0.18)),
-        P(T * 0.5, sgn * (rootY + step * 0.85)),
-        P(T * 0.34, sgn * (rootY + step * 1.55)),
-        P(T * 0.16, sgn * (rootY + step * 2.25)),
-        P(-T * 0.02, sgn * span),
-        P(-T * 0.28, sgn * (span - step * 0.2)),
-      ];
-      let y = span - step * 0.2;
-      for (let k = 0; k < 3; k++) {
-        eagle.push(P(-T * 0.34 - step * 1.05, sgn * (y - step * 0.42)));
-        eagle.push(P(-T * 0.2, sgn * (y - step * 0.78)));
-        y -= step * 0.78;
-      }
-      eagle.push(P(-T * 0.55, sgn * (rootY + step * 0.25)));
-      quillons.push(dedupePoints(eagle));
+      quillons.push(wingLimb(sgn, span, T, B, 3, 0.86));
     }
     // Crown crest behind the guard plate (heraldic, symmetric).
     quillons.push(dedupePoints([
@@ -975,7 +1007,7 @@ function buildGuard(genome: WeaponVisualGenome, blade: BladeGeometry): GuardGeom
     bossR = clamp(0.01 + orn * 0.008, 0.01, 0.019);
   } else {
     // runic: heavy geometric monolith with a vertical rune channel.
-    const hx = T * 2.4;
+    const hx = Math.max(T * 2.4, 0.03);
     const hy = span * 0.9;
     outline = dedupePoints([
       P(hx, -hy * 0.55),

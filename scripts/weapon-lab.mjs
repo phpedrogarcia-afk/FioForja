@@ -38,6 +38,13 @@ if (hasFlag('--capture')) {
   process.exit(code ?? 0);
 }
 
+if (hasFlag('--bench')) {
+  const child = spawn(process.execPath, [join(LAB_DIR, 'capture.mjs'), '--bench', '--no-build'], { stdio: 'inherit' });
+  const code = await new Promise((resolvePromise) => child.on('close', resolvePromise));
+  await close();
+  process.exit(code ?? 0);
+}
+
 const stop = async () => { await close(); process.exit(0); };
 process.on('SIGINT', stop);
 process.on('SIGTERM', stop);

@@ -86,7 +86,8 @@ function layoutRun(
   const midHalf = geo.stationAt(clamp(posT, 0.05, 0.95)).halfWidth;
   if (!(midHalf > 0.002)) return null;
 
-  let fontSize = clamp(midHalf * 1.35, 0.012, 0.05);
+  // Glyph height ~= 0.22 of the local FULL blade width, per art direction.
+  let fontSize = clamp(midHalf * 0.62, 0.0065, 0.028);
   ctx.font = fontFor(fontSize);
   let widths = chars.map((ch) => {
     const w = ctx.measureText(ch).width;
@@ -115,7 +116,7 @@ function layoutRun(
     if (h < minHalf) minHalf = h;
   }
   if (Number.isFinite(minHalf) && minHalf > 0.001) {
-    const maxFont = minHalf * 1.48;
+    const maxFont = minHalf * 0.95;
     if (fontSize > maxFont) {
       const scale = maxFont / fontSize;
       fontSize = maxFont;
@@ -130,111 +131,118 @@ function layoutRun(
   return { chars, widths, fontSize: Math.max(0.006, fontSize), gap, startX, total, tStart, tEnd };
 }
 
-/** A thin incised border groove following the blade, used by band/straight. */
-function borderGroove(
+/** One carved border groove following the blade, centred on the text line. */
+function drawRunBorder(
   ctx: CanvasRenderingContext2D,
   geo: WeaponGeometry,
+  centerU: number,
   offsetUnits: number,
   t0: number,
   t1: number,
   darkColor: string,
   lightColor: string,
   width: number,
-  alpha: number,
 ): void {
   if (t1 <= t0) return;
-  const uAt = (t: number): number => {
+  const lateralFor = (sign: number) => (t: number): number => {
     const st = geo.stationAt(t);
-    return clamp(offsetUnits / Math.max(st.halfWidth, 1e-4), -0.94, 0.94);
+    const frac = offsetUnits / Math.max(st.halfWidth, 1e-4);
+    return clamp(centerU + sign * frac, -0.92, 0.92);
   };
   ctx.lineCap = "round";
-  ctx.globalAlpha = clamp01(alpha);
-  ctx.strokeStyle = darkColor;
-  ctx.lineWidth = Math.max(0.0004, width);
-  traceLateral(ctx, geo, uAt, 26, t0, t1);
-  ctx.stroke();
-  ctx.globalAlpha = clamp01(alpha * 0.45);
-  ctx.strokeStyle = lightColor;
-  ctx.lineWidth = Math.max(0.0003, width * 0.5);
-  traceLateral(ctx, geo, (t) => uAt(t) + 0.02, 26, t0, t1);
-  ctx.stroke();
+  for (const sign of [-1, 1]) {
+    ctx.globalAlpha = 0.62;
+    ctx.strokeStyle = darkColor;
+    ctx.lineWidth = Math.max(0.00035, width);
+    traceLateral(ctx, geo, lateralFor(sign), 26, t0, t1);
+    ctx.stroke();
+    ctx.globalAlpha = 0.28;
+    ctx.strokeStyle = lightColor;
+    ctx.lineWidth = Math.max(0.00028, width * 0.55);
+    traceLateral(ctx, geo, (t) => lateralFor(sign)(t) * 0.985, 26, t0, t1);
+    ctx.stroke();
+  }
 }
 
-/** Short perpendicular tick joining the two band borders at the run ends. */
-function bandTick(
+/** Short perpendicular chisel tick closing a band/channel end. */
+function drawRunTick(
   ctx: CanvasRenderingContext2D,
   geo: WeaponGeometry,
+  centerU: number,
+  halfFrac: number,
   t: number,
-  offsetUnits: number,
   darkColor: string,
   lightColor: string,
   width: number,
 ): void {
   const st = geo.stationAt(t);
-  if (st.halfWidth < 0.002) return;
   const side = bladeEdgeSide(geo);
-  const a = bladeLateralPoint(st, -offsetUnits / Math.max(st.halfWidth, 1e-4), side);
-  const b = bladeLateralPoint(st, offsetUnits / Math.max(st.halfWidth, 1e-4), side);
-  ctx.globalAlpha = 0.5;
+  const a = bladeLateralPoint(st, clamp(centerU - halfFrac, -0.92, 0.92), side);
+  const b = bladeLateralPoint(st, clamp(centerU + halfFrac, -0.92, 0.92), side);
+  ctx.globalAlpha = 0.6;
   ctx.strokeStyle = darkColor;
-  ctx.lineWidth = Math.max(0.0004, width);
+  ctx.lineWidth = Math.max(0.00035, width);
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
   ctx.lineTo(b.x, b.y);
   ctx.stroke();
-  ctx.globalAlpha = 0.2;
+  ctx.globalAlpha = 0.28;
   ctx.strokeStyle = lightColor;
-  ctx.lineWidth = Math.max(0.0003, width * 0.5);
+  ctx.lineWidth = Math.max(0.00025, width * 0.5);
   ctx.beginPath();
-  ctx.moveTo(a.x - width, a.y - width);
-  ctx.lineTo(b.x - width, b.y - width);
+  ctx.moveTo(a.x - width * 0.6, a.y - width * 0.6);
+  ctx.lineTo(b.x - width * 0.6, b.y - width * 0.6);
   ctx.stroke();
 }
 
-/** Engraved flanking diamond used by the triad composition. */
-function flankingMark(
+/** Small engraved flanking mark used by the triad composition. */
+function drawFlankingMark(
   ctx: CanvasRenderingContext2D,
   geo: WeaponGeometry,
   t: number,
+  lateralU: number,
   size: number,
-  darkColor: string,
-  lightColor: string,
-  fillColor: string,
+  groove: string,
+  wall: string,
+  material: string,
+  materialAlpha: number,
 ): void {
   const st = geo.stationAt(clamp(t, MIN_RUNE_T, MAX_RUNE_T));
   if (st.halfWidth < 0.004) return;
-  if (size > st.halfWidth * 1.1) size = st.halfWidth * 1.1;
-  const c = bladeLateralPoint(st, 0, bladeEdgeSide(geo));
+  const s = Math.min(size, st.halfWidth * 0.42);
+  const c = bladeLateralPoint(st, clamp(lateralU, -0.7, 0.7), bladeEdgeSide(geo));
   const angle = Math.atan2(st.tangent.y, st.tangent.x);
   ctx.save();
   try {
     ctx.translate(c.x, c.y);
     ctx.rotate(angle);
-    ctx.globalAlpha = 0.8;
-    ctx.fillStyle = darkColor;
+    ctx.globalAlpha = 0.78;
+    ctx.fillStyle = groove;
     ctx.beginPath();
-    ctx.moveTo(size, 0);
-    ctx.lineTo(0, size * 0.72);
-    ctx.lineTo(-size, 0);
-    ctx.lineTo(0, -size * 0.72);
+    ctx.moveTo(s, 0);
+    ctx.lineTo(0, s * 0.66);
+    ctx.lineTo(-s, 0);
+    ctx.lineTo(0, -s * 0.66);
     ctx.closePath();
     ctx.fill();
-    ctx.globalAlpha = 0.24;
-    ctx.strokeStyle = lightColor;
-    ctx.lineWidth = Math.max(0.0003, size * 0.12);
+    ctx.globalAlpha = 0.26;
+    ctx.strokeStyle = wall;
+    ctx.lineWidth = Math.max(0.00025, s * 0.11);
     ctx.beginPath();
-    ctx.moveTo(-size * 0.7, -size * 0.5);
-    ctx.lineTo(size * 0.7, -size * 0.5);
+    ctx.moveTo(-s * 0.7, -s * 0.42);
+    ctx.lineTo(s * 0.7, -s * 0.42);
     ctx.stroke();
-    ctx.globalAlpha = 0.7;
-    ctx.fillStyle = fillColor;
-    ctx.beginPath();
-    ctx.moveTo(size * 0.42, 0);
-    ctx.lineTo(0, size * 0.3);
-    ctx.lineTo(-size * 0.42, 0);
-    ctx.lineTo(0, -size * 0.3);
-    ctx.closePath();
-    ctx.fill();
+    if (materialAlpha > 0.01) {
+      ctx.globalAlpha = materialAlpha;
+      ctx.fillStyle = material;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.4, 0);
+      ctx.lineTo(0, s * 0.26);
+      ctx.lineTo(-s * 0.4, 0);
+      ctx.lineTo(0, -s * 0.26);
+      ctx.closePath();
+      ctx.fill();
+    }
   } finally {
     ctx.restore();
   }
@@ -243,6 +251,20 @@ function flankingMark(
 export interface InscriptionOptions {
   runicCharge?: number;
   heat?: number;
+}
+
+interface RuneMaterial {
+  color: string;
+  alpha: number;
+}
+
+/** Fill material is muted on purpose: the steel must never be outshone. */
+function mutedFillMaterial(genome: WeaponVisualGenome): RuneMaterial {
+  const kind = genome.inscriptions.fill ? genome.inscriptions.fill.kind : "silver";
+  if (kind === "gold") return { color: "rgba(206,178,110,1)", alpha: 0.55 };
+  if (kind === "silver") return { color: "rgba(178,192,206,1)", alpha: 0.52 };
+  if (kind === "oxide") return { color: "rgba(44,38,32,1)", alpha: 0.6 };
+  return { color: "rgba(18,15,12,1)", alpha: 0.55 };
 }
 
 export function paintInscription(
@@ -254,10 +276,23 @@ export function paintInscription(
   const ins = genome.inscriptions;
   const composition = ins.composition;
   const hasText = Boolean((ins.text ?? "").trim());
-  const hasGlyph = Boolean(ins.symbol && ins.symbol.length > 0);
-  if (!hasText && !hasGlyph) return;
+  const hasSymbol = Boolean(ins.symbol && ins.symbol.length > 0);
+  if (!hasText && !hasSymbol) return;
   const heat = clamp01(opts.heat ?? 0);
   const charge = clamp01(opts.runicCharge ?? 0);
+  const quality = clamp01(genome.quality.score / 100);
+  const crude = genome.quality.score < 62;
+  const side = bladeEdgeSide(geo);
+  const rng = makeGenomeRng(genome.individuality.subSeeds.inscription);
+  const material = mutedFillMaterial(genome);
+  const materialAlpha = crude ? 0 : material.alpha * (0.85 + quality * 0.15);
+  const groove = heat > 0.25 ? "rgba(20,8,4,0.9)" : "rgba(8,6,5,0.86)";
+  const wall = heat > 0.25 ? "rgba(255,196,126,0.55)" : "rgba(226,200,158,0.5)";
+  const emission = clamp(ins.emission, 0, 0.34);
+  const run = layoutRun(ctx, geo, genome);
+  // Inscription sits on the fuller / ridge line, never on the widest belly.
+  const fuller = genome.structure.fuller;
+  const textU = fuller.enabled ? clamp(fuller.offset, -0.52, 0.52) : 0;
 
   ctx.save();
   try {
@@ -265,45 +300,37 @@ export function paintInscription(
     ctx.clip();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
 
-    const paint = alloyPaint(genome);
-    const grooveDark = heat > 0.25 ? "rgba(22,9,4,0.92)" : paint.deep;
-    const wallLight = heat > 0.25 ? "rgba(255,196,126,0.5)" : paint.highlight;
-    const material = fillColorOf(genome);
-    const run = layoutRun(ctx, geo, genome);
-    const quality = clamp01(genome.quality.score / 100);
-    const rng = makeGenomeRng(genome.individuality.subSeeds.inscription);
-
-    // Composition furniture is drawn first, under the glyphs: the text sits
-    // inside a prepared channel, never on top of loose decoration.
+    // Composition furniture first: the text must sit inside a prepared cut.
     if (run && composition === "band") {
-      const off = run.fontSize * 0.92;
-      borderGroove(ctx, geo, off, run.tStart, run.tEnd, grooveDark, wallLight, run.fontSize * 0.07, 0.45);
-      borderGroove(ctx, geo, -off, run.tStart, run.tEnd, grooveDark, wallLight, run.fontSize * 0.07, 0.45);
-      bandTick(ctx, geo, run.tStart, off, grooveDark, wallLight, run.fontSize * 0.06);
-      bandTick(ctx, geo, run.tEnd, off, grooveDark, wallLight, run.fontSize * 0.06);
+      const borderOff = run.fontSize * 0.82;
+      drawRunBorder(ctx, geo, textU, borderOff, run.tStart, run.tEnd, groove, wall, run.fontSize * 0.07);
+      const midHalf = Math.max(0.001, geo.stationAt((run.tStart + run.tEnd) * 0.5).halfWidth);
+      const halfFrac = clamp((run.fontSize * 0.82) / midHalf, 0.12, 0.75);
+      drawRunTick(ctx, geo, textU, halfFrac, run.tStart, groove, wall, run.fontSize * 0.06);
+      drawRunTick(ctx, geo, textU, halfFrac, run.tEnd, groove, wall, run.fontSize * 0.06);
     } else if (run && composition === "straight") {
-      // Relic: a deep straight channel prepared in the metal.
-      const midHalf = Math.max(geo.stationAt((run.tStart + run.tEnd) * 0.5).halfWidth, 1e-4);
-      const uHalf = clamp((run.fontSize * 0.86) / midHalf, 0.15, 0.9);
-      traceBand(ctx, geo, -uHalf, uHalf, run.tStart - 0.015, run.tEnd + 0.015, 22);
-      ctx.globalAlpha = 0.42;
-      ctx.fillStyle = grooveDark;
+      const midHalf = Math.max(0.001, geo.stationAt((run.tStart + run.tEnd) * 0.5).halfWidth);
+      const halfFrac = clamp((run.fontSize * 0.8) / midHalf, 0.12, 0.72);
+      const low = clamp(textU - halfFrac, -0.92, 0.92);
+      const high = clamp(textU + halfFrac, -0.92, 0.92);
+      traceBand(ctx, geo, low, high, run.tStart - 0.015, run.tEnd + 0.015, 22);
+      ctx.globalAlpha = 0.45;
+      ctx.fillStyle = groove;
       ctx.fill();
-      borderGroove(ctx, geo, run.fontSize * 0.88, run.tStart - 0.01, run.tEnd + 0.01, grooveDark, wallLight, run.fontSize * 0.08, 0.6);
-      borderGroove(ctx, geo, -run.fontSize * 0.88, run.tStart - 0.01, run.tEnd + 0.01, grooveDark, wallLight, run.fontSize * 0.08, 0.6);
-      // Chisel hatches at the channel ends.
-      for (const tt of [run.tStart - 0.01, run.tEnd + 0.01]) {
-        bandTick(ctx, geo, tt, run.fontSize * 0.88, grooveDark, wallLight, run.fontSize * 0.07);
-        bandTick(ctx, geo, tt, run.fontSize * 0.45, grooveDark, wallLight, run.fontSize * 0.04);
-      }
+      drawRunBorder(ctx, geo, textU, run.fontSize * 0.78, run.tStart - 0.01, run.tEnd + 0.01, groove, wall, run.fontSize * 0.075);
+      drawRunTick(ctx, geo, textU, halfFrac, run.tStart - 0.01, groove, wall, run.fontSize * 0.07);
+      drawRunTick(ctx, geo, textU, halfFrac, run.tEnd + 0.01, groove, wall, run.fontSize * 0.07);
+      drawRunTick(ctx, geo, textU, halfFrac * 0.5, run.tStart - 0.01, groove, wall, run.fontSize * 0.04);
+      drawRunTick(ctx, geo, textU, halfFrac * 0.5, run.tEnd + 0.01, groove, wall, run.fontSize * 0.04);
     }
 
     if (run) {
       ctx.font = fontFor(run.fontSize);
-      const fillAlpha = ins.fill && ins.fill.kind === "empty" ? 0.62 : 0.88;
-      const emission = heat > 0.25 ? 0 : clamp(ins.emission, 0, 0.4);
       const emitActive = charge > 0.01 && emission > 0.001 && genome.quality.score >= 72;
+      const emitAlpha = emitActive ? clamp(emission * (0.35 + charge * 0.65), 0, 0.34) : 0;
       let cursor = 0;
       for (let i = 0; i < run.chars.length; i++) {
         const ch = run.chars[i];
@@ -313,53 +340,48 @@ export function paintInscription(
         const t = clamp(xCenter / Math.max(geo.bladeLength, 1e-6), MIN_RUNE_T, MAX_RUNE_T);
         const st = geo.stationAt(t);
         if (st.halfWidth < 0.003) continue;
-        const center = bladeLateralPoint(st, 0, bladeEdgeSide(geo));
+        const center = bladeLateralPoint(st, textU, side);
         const angle = Math.atan2(st.tangent.y, st.tangent.x);
-        const rough = 1 - quality;
-        const jitterAngle = rng.range(-1, 1) * rough * 0.05;
+        // Low quality = irregular hand-cut groove, but still legible.
+        const rough = crude ? 1 : (1 - quality) * 0.45;
+        const jitterAngle = rng.range(-1, 1) * rough * 0.06;
+        const jitterX = rng.range(-1, 1) * rough * run.fontSize * 0.09;
         const jitterY = rng.range(-1, 1) * rough * run.fontSize * 0.1;
+        const s = run.fontSize;
         ctx.save();
         try {
-          ctx.translate(center.x, center.y + jitterY);
+          ctx.translate(center.x + jitterX, center.y + jitterY);
           ctx.rotate(angle + jitterAngle);
-          const s = run.fontSize;
-          const shadowX = s * 0.055;
-          const shadowY = s * 0.07;
-          const wallX = -s * 0.045;
-          const wallY = -s * 0.055;
-
-          // 1. Excavated groove: wider dark stroke + offset depth shadow
-          //    + dark interior. The cut is wider than the inlay.
-          ctx.globalAlpha = 0.5;
-          ctx.strokeStyle = grooveDark;
-          ctx.lineWidth = Math.max(0.0004, s * 0.1);
+          // 1. Excavated groove: wider dark cut + offset depth shadow + dark interior.
+          ctx.globalAlpha = 0.82;
+          ctx.strokeStyle = groove;
+          ctx.lineWidth = Math.max(0.00035, s * (crude ? 0.2 : 0.15));
           ctx.strokeText(ch, 0, 0);
           ctx.globalAlpha = 0.55;
-          ctx.fillStyle = grooveDark;
-          ctx.fillText(ch, shadowX, shadowY);
-          ctx.globalAlpha = 0.85;
+          ctx.fillStyle = groove;
+          ctx.fillText(ch, s * 0.035, s * 0.05);
+          ctx.globalAlpha = 0.88;
+          ctx.fillStyle = groove;
           ctx.fillText(ch, 0, 0);
-
-          // 2. Inner wall catch light on one side only (upper-left key).
-          ctx.globalAlpha = heat > 0.25 ? 0.28 : 0.34;
-          ctx.strokeStyle = wallLight;
-          ctx.lineWidth = Math.max(0.0003, s * 0.035);
-          ctx.strokeText(ch, wallX, wallY);
-
-          // 3. Fill material from the genome.
-          ctx.globalAlpha = fillAlpha;
-          ctx.fillStyle = material;
-          ctx.fillText(ch, 0, 0);
-
-          // 4. Controlled emission inside the groove only: the glyph itself
-          //    is the light; no shadowBlur, so it can never halo.
+          // 2. Single-sided warm wall highlight (light from the upper-left).
+          ctx.globalAlpha = crude ? 0.16 : 0.34;
+          ctx.strokeStyle = wall;
+          ctx.lineWidth = Math.max(0.0003, s * 0.055);
+          ctx.strokeText(ch, -s * 0.028, -s * 0.038);
+          // 3. Fill material, muted, never outshining the steel.
+          if (materialAlpha > 0.01) {
+            ctx.globalAlpha = materialAlpha;
+            ctx.fillStyle = material.color;
+            ctx.fillText(ch, 0, 0);
+          }
+          // 4. Emission inside the groove only: glyph-shaped, no halo.
           if (heat > 0.25) {
-            ctx.globalAlpha = 0.22 + heat * 0.18;
+            ctx.globalAlpha = 0.2 + heat * 0.16;
             ctx.fillStyle = "rgba(255,186,104,1)";
             ctx.fillText(ch, 0, 0);
-          } else if (emitActive) {
+          } else if (emitAlpha > 0.002) {
             ctx.globalCompositeOperation = "lighter";
-            ctx.globalAlpha = clamp01(emission * (0.35 + charge * 0.65));
+            ctx.globalAlpha = emitAlpha;
             ctx.fillStyle = emissionColorOf(genome);
             ctx.fillText(ch, 0, 0);
           }
@@ -369,40 +391,47 @@ export function paintInscription(
       }
 
       if (composition === "triad") {
-        const size = run.fontSize * 0.62;
-        flankingMark(ctx, geo, run.startX / geo.bladeLength - size / geo.bladeLength * 1.8, size, grooveDark, wallLight, material);
-        flankingMark(ctx, geo, (run.startX + run.total) / geo.bladeLength + size / geo.bladeLength * 1.8, size, grooveDark, wallLight, material);
+        const size = run.fontSize * 0.72;
+        drawFlankingMark(ctx, geo, run.startX / geo.bladeLength - size / geo.bladeLength * 1.7, textU, size, groove, wall, material.color, materialAlpha);
+        drawFlankingMark(ctx, geo, (run.startX + run.total) / geo.bladeLength + size / geo.bladeLength * 1.7, textU, size, groove, wall, material.color, materialAlpha);
       }
-    } else if (hasGlyph && ins.symbol) {
-      // A single big rune symbol placed on the blade centerline.
+    } else if (hasSymbol && ins.symbol) {
+      // One large rune symbol: same carved order, sized to 0.22 local width.
       const t = clamp(ins.positionT, MIN_RUNE_T, MAX_RUNE_T);
       const st = geo.stationAt(t);
-      const c = bladeLateralPoint(st, 0, bladeEdgeSide(geo));
+      const size = clamp(st.halfWidth * 0.62, 0.007, 0.028);
+      const c = bladeLateralPoint(st, textU, side);
       const angle = Math.atan2(st.tangent.y, st.tangent.x);
-      const size = clamp(st.halfWidth * 1.35, 0.012, 0.05);
       ctx.save();
       try {
         ctx.translate(c.x, c.y);
         ctx.rotate(angle);
         ctx.font = fontFor(size);
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = grooveDark;
-        ctx.lineWidth = Math.max(0.0004, size * 0.1);
+        ctx.globalAlpha = 0.82;
+        ctx.strokeStyle = groove;
+        ctx.lineWidth = Math.max(0.00035, size * 0.15);
         ctx.strokeText(ins.symbol, 0, 0);
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = grooveDark;
+        ctx.globalAlpha = 0.6;
+        ctx.fillStyle = groove;
+        ctx.fillText(ins.symbol, size * 0.035, size * 0.05);
+        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = groove;
         ctx.fillText(ins.symbol, 0, 0);
-        ctx.globalAlpha = 0.32;
-        ctx.strokeStyle = wallLight;
-        ctx.lineWidth = Math.max(0.0003, size * 0.035);
-        ctx.strokeText(ins.symbol, -size * 0.045, -size * 0.055);
-        ctx.globalAlpha = 0.85;
-        ctx.fillStyle = material;
-        ctx.fillText(ins.symbol, 0, 0);
-        const emission = clamp(ins.emission, 0, 0.4);
-        if (charge > 0.01 && emission > 0.001 && genome.quality.score >= 72) {
+        ctx.globalAlpha = crude ? 0.16 : 0.34;
+        ctx.strokeStyle = wall;
+        ctx.lineWidth = Math.max(0.0003, size * 0.055);
+        ctx.strokeText(ins.symbol, -size * 0.028, -size * 0.038);
+        if (materialAlpha > 0.01) {
+          ctx.globalAlpha = materialAlpha;
+          ctx.fillStyle = material.color;
+          ctx.fillText(ins.symbol, 0, 0);
+        }
+        const emitAlpha = charge > 0.01 && emission > 0.001 && genome.quality.score >= 72
+          ? clamp(emission * (0.35 + charge * 0.65), 0, 0.34)
+          : 0;
+        if (emitAlpha > 0.002) {
           ctx.globalCompositeOperation = "lighter";
-          ctx.globalAlpha = clamp01(emission * (0.35 + charge * 0.65));
+          ctx.globalAlpha = emitAlpha;
           ctx.fillStyle = emissionColorOf(genome);
           ctx.fillText(ins.symbol, 0, 0);
         }
@@ -415,7 +444,6 @@ export function paintInscription(
   }
 }
 
-// ---------------------------------------------------------------------------
 // Guard ornament: filigree / crest using mount.ornaments
 // ---------------------------------------------------------------------------
 

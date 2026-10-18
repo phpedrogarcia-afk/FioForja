@@ -687,7 +687,7 @@ export function deriveWeaponVisualGenome(source: WeaponVisualSource): WeaponVisu
   const quality = deriveQuality(source, qualityScore, tier, effWarp, symmetry, polish, phys);
   const silhouette = deriveSilhouette(source, design, profile, grammar, quality, qualityScore, subSeeds.blade, seed);
   const structure = deriveStructure(grammar, silhouette, quality, qualityScore, phys, subSeeds.blade);
-  const mount = deriveMount(design, profile, grammar, quality, qualityScore, subSeeds);
+  const mount = deriveMount(design, profile, grammar, quality, qualityScore, provenance.role, subSeeds);
   const surface = deriveSurface(design, steel, grammar, quality, qualityScore, provenance, subSeeds.surface);
   const inscriptions = deriveInscriptions(design, grammar, quality, qualityScore, source, subSeeds.inscription);
   const individuality = deriveIndividuality(
@@ -812,8 +812,13 @@ function deriveSilhouette(
   const designLength = clamp(design.length ?? 1, 0.5, 1.5);
   const bladeLengthUnits = clamp(profile.length * (0.62 + 0.38 * designLength), 0.55, 1.45);
 
-  const roleWidth = role === "Ofensiva" ? 1.07 : role === "Defensiva" ? 1.05 : role === "Ágil" ? 0.93 : 1;
-  const roleTaper = role === "Ofensiva" ? 0.06 : role === "Defensiva" ? -0.04 : role === "Ágil" ? 0.09 : 0;
+  // Attribute interpretation: P.ATK buys mass at the base and a stronger distal
+  // taper (power), DEF buys a reinforced root and a broader guard, AGI buys a
+  // slimmer blade, a stronger taper and a shorter grip. Ranges are curated so an
+  // agile blade stays elegant and an offensive one never becomes grotesque.
+  const roleWidth = role === "Ofensiva" ? 1.14 : role === "Defensiva" ? 1.08 : role === "Ágil" ? 0.88 : role === "Excepcional" ? 1.02 : 1;
+  const roleTaper = role === "Ofensiva" ? 0.12 : role === "Defensiva" ? -0.1 : role === "Ágil" ? 0.14 : 0;
+  const roleCurve = role === "Ágil" ? 0.02 : 0;
 
   // Forge data first: the simulation already recorded the physical cross-section.
   const phys = source.physicalProfile;
@@ -841,7 +846,7 @@ function deriveSilhouette(
   );
 
   const curvature = clamp(
-    profile.curve * grammar.curveBias * 0.3 * rng.jitter(1, 0.16) + quality.warp * 0.12 * quality.warpSign,
+    profile.curve * grammar.curveBias * 0.3 * rng.jitter(1, 0.16) + quality.warp * 0.12 * quality.warpSign + roleCurve,
     0,
     0.13,
   );
@@ -923,6 +928,7 @@ function deriveMount(
   grammar: FamilyGrammar,
   quality: QualityGenome,
   qualityScore: number,
+  role: CombatRole,
   subSeeds: { guard: number; grip: number; pommel: number },
 ): MountGenome {
   const guardRng = makeGenomeRng(subSeeds.guard);
@@ -939,11 +945,15 @@ function deriveMount(
     design.guard === "curved" ? 0.185 :
     design.guard === "ring" ? 0.15 :
     0.175;
-  const roleBonus = qualityScore >= 88 ? 1.04 : 1;
+  const roleBonus = (qualityScore >= 88 ? 1.04 : 1) * (role === "Defensiva" ? 1.08 : role === "Ágil" ? 0.93 : 1);
   const span = clamp(guardBaseSpan * guardRng.jitter(1, 0.07) * roleBonus, 0.09, 0.26);
 
+  const roleGrip = role === "Defensiva" ? 1.05 : role === "Ágil" ? 0.95 : 1;
   const gripLength = clamp(
-    (0.205 + (profile.length - 0.78) * 0.29) * gripRng.jitter(1, 0.06) * (design.profile === "claymore" ? 1.06 : 1),
+    (0.205 + (profile.length - 0.78) * 0.29) *
+      gripRng.jitter(1, 0.06) *
+      (design.profile === "claymore" ? 1.06 : 1) *
+      roleGrip,
     0.16,
     0.38,
   );

@@ -68,10 +68,11 @@ const DNA = {
   error: null,
   genome: null,
   renderer: null,
+  geometry: null,
   details: null,
 };
 
-const MATRIX_ORDER = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+const MATRIX_ORDER = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
 // ---------------------------------------------------------------------------
 // Small utilities
@@ -245,21 +246,28 @@ async function loadDna() {
     const modules = await Promise.all([
       import('./.build/src/game/visuals/weaponGenome.js'),
       import('./.build/src/game/visuals/weaponRenderer.js'),
+      import('./.build/src/game/visuals/geometry.js'),
     ]);
     const genome = modules[0];
     const renderer = modules[1];
+    const geometry = modules[2];
     if (typeof genome.deriveWeaponVisualGenome !== 'function') {
       throw new Error('weaponGenome.js does not export deriveWeaponVisualGenome');
     }
     if (typeof renderer.drawWeaponFromSword !== 'function') {
       throw new Error('weaponRenderer.js does not export drawWeaponFromSword');
     }
+    if (typeof geometry.buildWeaponGeometry !== 'function') {
+      throw new Error('geometry.js does not export buildWeaponGeometry');
+    }
     DNA.genome = genome;
     DNA.renderer = renderer;
+    DNA.geometry = geometry;
     DNA.ready = true;
     DNA.details = {
       genomeExports: Object.keys(genome),
       rendererExports: Object.keys(renderer),
+      geometryExports: Object.keys(geometry),
     };
   } catch (err) {
     DNA.ready = false;
@@ -631,6 +639,51 @@ function scaleSpec() {
   };
 }
 
+const DETAIL_PRESET_IDS = ['guarda_medieval', 'lua_silenciosa', 'folha_aereth'];
+
+const DETAIL_KINDS = [
+  { kind: 'hilt', label: 'HILT · guard + grip + pommel', note: 'hilt + 1/3 blade' },
+  { kind: 'middle', label: 'BLADE MIDDLE · pattern / fuller / inscription', note: 'mid-blade macro' },
+  { kind: 'tip', label: 'TIP · apex / taper / kissaki', note: 'tip macro' },
+];
+
+function detailSpec() {
+  const rows = DETAIL_PRESET_IDS.map((presetId) => {
+    const preset = CANONICAL_PRESETS.find((entry) => entry.id === presetId);
+    const source = makeSword(preset.design, 94, {
+      heatScore: 0.9,
+      forgeScore: 0.88,
+      quenchScore: 0.92,
+      history: forgeHistory(stringHash('detail:' + presetId), 26),
+    });
+    return { preset: preset, source: source };
+  });
+  const items = [];
+  for (const row of rows) {
+    for (const detail of DETAIL_KINDS) {
+      items.push({
+        label: shortPresetName(row.preset.name),
+        sub: detail.label,
+        detail: detail.kind,
+        source: row.source,
+      });
+    }
+  }
+  return {
+    id: 'H',
+    kind: 'detail',
+    title: 'MATRIX H · Detail — three reading distances',
+    subtitle: 'Hilt, blade-middle and tip close-ups for three representative weapons — macro detail at 2x supersampling',
+    cols: DETAIL_KINDS.length,
+    rows: rows.length,
+    cellW: 420,
+    cellH: 420,
+    columnHeaders: DETAIL_KINDS.map((detail) => detail.label),
+    rowLabels: rows.map((row) => shortPresetName(row.preset.name)),
+    items: items,
+  };
+}
+
 function matrixSpec(id) {
   switch (id) {
     case 'A': return familiesSpec();
@@ -640,6 +693,7 @@ function matrixSpec(id) {
     case 'E': return attributesSpec();
     case 'F': return scaleSpec();
     case 'G': return legacyVsDnaSpec();
+    case 'H': return detailSpec();
     default: throw new Error('Unknown matrix id: ' + id);
   }
 }
@@ -659,10 +713,11 @@ function planSpec(spec) {
     return { width: width, height: height, panelH: panelH, panels: panels };
   }
   const rows = Math.ceil(spec.items.length / spec.cols);
-  const gutter = spec.rowLabels ? 96 : 0;
+  const gutter = spec.rowLabels ? (spec.kind === 'detail' ? 196 : 96) : 0;
+  const columnHeaderH = spec.kind === 'detail' ? 54 : 0;
   const width = MARGIN * 2 + gutter + spec.cols * spec.cellW + (spec.cols - 1) * GRID_GAP;
-  const height = HEADER_H + rows * spec.cellH + (rows - 1) * GRID_GAP + FOOTER_H + 14;
-  return { rows: rows, gutter: gutter, width: width, height: height };
+  const height = HEADER_H + columnHeaderH + rows * spec.cellH + (rows - 1) * GRID_GAP + FOOTER_H + 14;
+  return { rows: rows, gutter: gutter, columnHeaderH: columnHeaderH, width: width, height: height };
 }
 
 // ---------------------------------------------------------------------------
@@ -973,6 +1028,165 @@ function drawScaleMatrix(ctx, spec, prepared) {
 }
 
 // ---------------------------------------------------------------------------
+// Matrix H: macro detail crops (hilt / blade-middle / tip)
+// ---------------------------------------------------------------------------
+
+/**
+ * Unit-space region shown by each reading distance. One unit is one blade
+ * length; +X runs from the guard to the tip, +Y is the cutting-edge side.
+ */
+function detailRegion(geo, kind) {
+  const L = geo.bladeLength;
+  if (kind === 'hilt') {
+    const xMin = Math.min(geo.bounds.minX, -geo.grip.length - 0.06) - 0.02;
+    const xMax = L * 0.34;
+    return { cx: (xMin + xMax) / 2, cy: 0, width: Math.max(0.2, xMax - xMin) };
+  }
+  if (kind === 'middle') {
+    const middle = geo.stationAt(0.5);
+    return { cx: L * 0.5, cy: middle.cy, width: L * 0.34 };
+  }
+  const nearTip = geo.stationAt(0.88);
+  return { cx: L * 0.88, cy: nearTip.cy, width: L * 0.3 };
+}
+
+/**
+ * Render a macro crop of one weapon with the existing renderer API only.
+ * The renderer maps unit (u, 0) to the viewport anchor and +X to "up"; with
+ * angle = -PI/2 the mapping is screen = (x + scale * uy, y - scale * ux), so a
+ * viewport offset lets us centre any unit-space region in a cell of fixed size.
+ */
+function renderDetailRaster(source, kind, cellPx) {
+  try {
+    const genome = DNA.genome.deriveWeaponVisualGenome(source);
+    const geo = DNA.geometry.buildWeaponGeometry(genome);
+    const region = detailRegion(geo, kind);
+    const sample = Math.max(320, Math.round(cellPx * 2)); // 2x supersampling
+    const scale = sample / Math.max(region.width, 1e-4); // pixels per unit
+    const lengthPx = scale * geo.bladeLength;
+    const vx = sample / 2 - scale * region.cy;
+    const vy = sample / 2 + scale * region.cx;
+    const canvas = document.createElement('canvas');
+    canvas.width = sample;
+    canvas.height = sample;
+    const ctx = canvas.getContext('2d');
+    DNA.renderer.drawWeaponFromSword(ctx, source, { x: vx, y: vy, lengthPx: lengthPx, angle: -Math.PI / 2 });
+    const magnification = cellPx / region.width / 180; // 180 px = card scale (matrix F)
+    return { canvas: canvas, region: region, scale: scale, lengthPx: lengthPx, magnification: magnification };
+  } catch (err) {
+    return { error: String(err && err.message ? err.message : err) };
+  }
+}
+
+function drawDetailMatrix(ctx, spec, plan) {
+  const infos = [];
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = TEXT;
+  ctx.font = font(650, 14);
+  for (let col = 0; col < spec.cols; col += 1) {
+    const x = MARGIN + plan.gutter + col * (spec.cellW + GRID_GAP) + spec.cellW / 2;
+    ctx.fillText(fitText(ctx, spec.columnHeaders[col] || '', spec.cellW - 16), x, HEADER_H + plan.columnHeaderH / 2);
+  }
+  ctx.restore();
+
+  for (let index = 0; index < spec.items.length; index += 1) {
+    const item = spec.items[index];
+    const row = Math.floor(index / spec.cols);
+    const col = index % spec.cols;
+    const x = MARGIN + plan.gutter + col * (spec.cellW + GRID_GAP);
+    const y = HEADER_H + plan.columnHeaderH + row * (spec.cellH + GRID_GAP);
+    const detail = DETAIL_KINDS[col];
+    const imageBox = { x: x + 10, y: y + 10, w: spec.cellW - 20, h: spec.cellH - 20 };
+    drawCellFrame(ctx, x, y, spec.cellW, spec.cellH);
+
+    if (!DNA.ready) {
+      drawPlaceholder(ctx, imageBox, 'DNA renderer pending', 'macro detail needs the DNA engine');
+      infos.push({ label: item.label + ' · ' + detail.kind, mode: 'dna', missing: true });
+      continue;
+    }
+    const raster = renderDetailRaster(item.source, item.detail, imageBox.w);
+    if (raster.error) {
+      drawPlaceholder(ctx, imageBox, 'detail render error', raster.error);
+      infos.push({ label: item.label + ' · ' + detail.kind, mode: 'dna', error: raster.error });
+      continue;
+    }
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(raster.canvas, 0, 0, raster.canvas.width, raster.canvas.height, imageBox.x, imageBox.y, imageBox.w, imageBox.h);
+
+    // Soft edge fade: a cropped macro must read as intentional framing.
+    const fade = 26;
+    const fadeFrom = 'rgba(27,32,41,0.95)';
+    const fadeTo = 'rgba(27,32,41,0)';
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(imageBox.x, imageBox.y, imageBox.w, imageBox.h);
+    ctx.clip();
+    let edgeGradient = ctx.createLinearGradient(0, imageBox.y, 0, imageBox.y + fade);
+    edgeGradient.addColorStop(0, fadeFrom);
+    edgeGradient.addColorStop(1, fadeTo);
+    ctx.fillStyle = edgeGradient;
+    ctx.fillRect(imageBox.x, imageBox.y, imageBox.w, fade);
+    edgeGradient = ctx.createLinearGradient(0, imageBox.y + imageBox.h, 0, imageBox.y + imageBox.h - fade);
+    edgeGradient.addColorStop(0, fadeFrom);
+    edgeGradient.addColorStop(1, fadeTo);
+    ctx.fillStyle = edgeGradient;
+    ctx.fillRect(imageBox.x, imageBox.y + imageBox.h - fade, imageBox.w, fade);
+    edgeGradient = ctx.createLinearGradient(imageBox.x, 0, imageBox.x + fade, 0);
+    edgeGradient.addColorStop(0, fadeFrom);
+    edgeGradient.addColorStop(1, fadeTo);
+    ctx.fillStyle = edgeGradient;
+    ctx.fillRect(imageBox.x, imageBox.y, fade, imageBox.h);
+    edgeGradient = ctx.createLinearGradient(imageBox.x + imageBox.w, 0, imageBox.x + imageBox.w - fade, 0);
+    edgeGradient.addColorStop(0, fadeFrom);
+    edgeGradient.addColorStop(1, fadeTo);
+    ctx.fillStyle = edgeGradient;
+    ctx.fillRect(imageBox.x + imageBox.w - fade, imageBox.y, fade, imageBox.h);
+    ctx.restore();
+
+    // Magnification caption in the top-left corner so the central detail stays clear.
+    const caption = detail.note + ' · ×' + raster.magnification.toFixed(1) + ' card scale';
+    ctx.font = font(600, 12);
+    const captionWidth = Math.min(imageBox.w - 20, ctx.measureText(caption).width + 18);
+    ctx.fillStyle = 'rgba(10,12,16,0.8)';
+    roundRect(ctx, imageBox.x + 8, imageBox.y + 8, captionWidth, 24, 6);
+    ctx.fill();
+    ctx.fillStyle = TEXT;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fitText(ctx, caption, captionWidth - 12), imageBox.x + 16, imageBox.y + 20);
+    ctx.restore();
+
+    infos.push({
+      label: item.label + ' · ' + detail.kind,
+      mode: 'dna',
+      region: { cx: raster.region.cx, cy: raster.region.cy, width: raster.region.width },
+      magnification: Math.round(raster.magnification * 100) / 100,
+      lengthPx: Math.round(raster.lengthPx),
+      missing: false,
+    });
+  }
+
+  ctx.save();
+  ctx.fillStyle = TEXT;
+  ctx.font = font(650, 14);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for (let row = 0; row < plan.rows; row += 1) {
+    const y = HEADER_H + plan.columnHeaderH + row * (spec.cellH + GRID_GAP) + spec.cellH / 2;
+    ctx.fillText(fitText(ctx, spec.rowLabels[row] || '', plan.gutter - 16), MARGIN, y);
+  }
+  ctx.restore();
+
+  return infos;
+}
+
+// ---------------------------------------------------------------------------
 // Rendering entry point
 // ---------------------------------------------------------------------------
 
@@ -995,6 +1209,7 @@ function renderMatrix(id) {
   drawHeader(ctx, plan.width, spec);
   let items;
   if (spec.kind === 'scale') items = drawScaleMatrix(ctx, spec, preparedScale);
+  else if (spec.kind === 'detail') items = drawDetailMatrix(ctx, spec, plan);
   else items = drawGridMatrix(ctx, spec, plan);
   drawFooter(ctx, plan.width, plan.height, spec);
 

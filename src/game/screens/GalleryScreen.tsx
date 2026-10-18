@@ -13,6 +13,8 @@ import {
   recalculateSwordStats,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
+import { isWeaponDnaEnabled } from "../visuals/rendererAdapter";
+import { fitWeaponViewport, drawWeaponGenome, weaponGenomeFor } from "../visuals/weaponRenderer";
 import type { BlacksmithCommission, CareerStats, CombatRole, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
 import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
@@ -1562,6 +1564,12 @@ function Thumb({ sword }: { sword: FinishedSword }) {
     ctx.fillRect(0, 0, w, h);
 
     const isBroken = sword.structuralState === "broken" || sword.quality <= 15;
+    // EXPERIMENTAL: Weapon Visual DNA renderer (opt-in via ?weaponRender=dna).
+    if (isWeaponDnaEnabled() && !isBroken) {
+      const genome = weaponGenomeFor(sword);
+      drawWeaponGenome(ctx, genome, fitWeaponViewport(genome, w, h), {});
+      return;
+    }
     drawFinishedSword(ctx, sword.design, w / 2, h * 0.58, Math.min(w, h) * 0.92, {
       assembled: !isBroken,
       quality: sword.quality,

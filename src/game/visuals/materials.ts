@@ -311,63 +311,80 @@ export function paintBladeBase(
     const paint = alloyPaint(genome);
     const surface = genome.surface;
     const structure = genome.structure;
+    const pal = surface.palette;
     const polish = clamp01(surface.polish);
+    const hue = Number.isFinite(pal.hue) ? pal.hue : 210;
+    const sat = clamp(Number.isFinite(pal.sat) ? pal.sat : 8, 0, 30);
     const extent = bladeExtent(geo);
-    const ySpine = extent.minY - extent.maxHalf * 0.12;
-    const yEdge = extent.maxY + extent.maxHalf * 0.12;
+    const ySpine = extent.minY - extent.maxHalf * 0.1;
+    const yEdge = extent.maxY + extent.maxHalf * 0.1;
+
+    // Cross-section palette uses the genome light range, not a flat tone:
+    // shadowLight at the spine, mid tone at the fuller, edgeLight at the bevel.
+    const spineDark = cssHsl(hue - 4, sat + 2.5, clamp(pal.shadowLight, 4, 60));
+    const spineMid = cssHsl(hue - 2, sat + 1, clamp(pal.shadowLight + 7, 8, 64));
+    const bodyMid = cssHsl(hue, sat, clamp(pal.light, 10, 68));
+    const bodyLift = cssHsl(hue + 1, sat * 0.9 + 1, clamp(pal.light + 6, 14, 72));
+    const edgeBand = cssHsl(hue + 3, sat * 0.8 + 2, clamp(pal.edgeLight, 22, 88));
+    const edgeHot = cssHsl(hue + 4, sat * 0.7 + 2, clamp(pal.edgeLight + 2, 24, 90));
+    const rimLight = cssHsl(hue + 2, sat * 0.7 + 1, clamp(pal.edgeLight + 7, 26, 93));
 
     bladePath(ctx, geo);
     ctx.clip();
 
-    // Body: one cross-section gradient, spine rim light -> facet shadow ->
-    // ridge crease -> edge bevel -> cutting band.
+    // A wide fixed gradient would break where the blade curves into the tip, so
+    // the base is a mid-tone wash and the real section is built from
+    // station-following bands that continue through the tip with no seam.
     const body = ctx.createLinearGradient(0, ySpine, 0, yEdge);
-    body.addColorStop(0, paint.highlight);
-    body.addColorStop(0.07, paint.base);
-    body.addColorStop(0.24, paint.base);
-    body.addColorStop(0.4, paint.shadow);
-    body.addColorStop(0.48, paint.deep);
-    body.addColorStop(0.56, paint.shadow);
-    body.addColorStop(0.7, paint.base);
-    body.addColorStop(0.86, paint.edge);
-    body.addColorStop(0.97, paint.highlight);
+    body.addColorStop(0, spineMid);
+    body.addColorStop(0.4, bodyMid);
+    body.addColorStop(1, bodyLift);
     ctx.fillStyle = body;
     bladePath(ctx, geo);
     ctx.fill();
 
-    const facetAlpha = 0.06 + clamp01(structure.bevels.prominence) * 0.1;
+    const sectionBand = (low: number, high: number, color: string, alpha: number): void => {
+      if (alpha <= 0.004) return;
+      ctx.globalAlpha = clamp01(alpha);
+      ctx.fillStyle = color;
+      traceBand(ctx, geo, low, high, 0.008, 0.995, 30);
+      ctx.fill();
+    };
+    // Spine zone: dark, layered twice for a soft falloff instead of a step.
+    sectionBand(-1, -0.3, spineDark, 0.22);
+    sectionBand(-1, -0.58, spineDark, 0.13);
+    sectionBand(-0.58, -0.2, spineMid, 0.1);
+    // Body stays mid-tone; only the narrow band approaching the edge lifts.
+    sectionBand(0.7, 0.9, edgeBand, 0.2);
+    sectionBand(0.84, 0.98, edgeHot, 0.2);
+    sectionBand(0.94, 0.995, edgeHot, 0.12);
 
-    // Spine facet falls away from the light.
-    ctx.globalAlpha = facetAlpha * 1.1;
-    ctx.fillStyle = paint.deep;
-    traceBand(ctx, geo, -1, -0.58, 0.012, 0.982, 26);
-    ctx.fill();
-
-    // Edge bevel plane catches the light.
+    const facetAlpha = 0.04 + clamp01(structure.bevels.prominence) * 0.07;
     ctx.globalAlpha = facetAlpha;
+    ctx.fillStyle = paint.deep;
+    traceBand(ctx, geo, -1, -0.66, 0.012, 0.982, 26);
+    ctx.fill();
+    ctx.globalAlpha = facetAlpha * 0.55;
     ctx.fillStyle = paint.highlight;
-    traceBand(ctx, geo, 0.34, 0.74, 0.012, 0.982, 26);
+    traceBand(ctx, geo, 0.52, 0.82, 0.012, 0.982, 26);
+    ctx.fill();
+    ctx.globalAlpha = 0.06 + polish * 0.05;
+    ctx.fillStyle = edgeHot;
+    traceBand(ctx, geo, 0.9, 0.995, 0.012, 0.982, 22);
     ctx.fill();
 
-    // Honed cutting band gets a slightly warmer, brighter plane.
-    ctx.globalAlpha = 0.13 + polish * 0.09;
-    ctx.fillStyle = paint.edge;
-    traceBand(ctx, geo, 0.86, 0.995, 0.012, 0.982, 22);
-    ctx.fill();
-
-    // Root reinforcement: the base of the blade is thicker and sits in shade.
+    // Root reinforcement: thicker base sits in shade.
     const root = clamp01(structure.rootReinforcement);
     if (root > 0.05) {
       const rootGrad = ctx.createLinearGradient(0, 0, geo.bladeLength * 0.16, 0);
       rootGrad.addColorStop(0, paint.deep);
       rootGrad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.globalAlpha = 0.12 + root * 0.14;
+      ctx.globalAlpha = 0.1 + root * 0.12;
       ctx.fillStyle = rootGrad;
       ctx.fillRect(-0.02, extent.minY - 0.02, geo.bladeLength * 0.2, extent.maxY - extent.minY + 0.04);
     }
 
-    // Ridge / spine line: directional highlight with a shadow partner on the
-    // edge side of it. The section decides where the ridge lives.
+    // Ridge / spine crease with its shadow partner.
     const section = structure.section;
     const ridgeLateral =
       section === "diamond" || section === "hexagonal" ? 0
@@ -375,45 +392,40 @@ export function paintBladeBase(
           : section === "fullered" ? -0.34
             : 0;
     const ridgeStrength =
-      clamp01(structure.spineHeight) * (section === "flat" ? 0.55 : 1) *
-      (0.35 + clamp01(structure.ridge.prominence) * 0.65);
-    const lw = strokeWidth(geo, 0.0022, 0.0008, 0.004);
+      clamp01(structure.spineHeight) * (section === "flat" ? 0.5 : 1) *
+      (0.32 + clamp01(structure.ridge.prominence) * 0.58);
+    const lw = strokeWidth(geo, 0.0018, 0.0007, 0.0035);
     if (ridgeStrength > 0.08) {
-      ctx.globalAlpha = 0.1 + ridgeStrength * 0.22;
+      ctx.globalAlpha = 0.09 + ridgeStrength * 0.2;
       ctx.strokeStyle = paint.highlight;
       ctx.lineWidth = lw;
       ctx.lineCap = "round";
       traceLateral(ctx, geo, () => ridgeLateral, 30, 0.02, 0.97);
       ctx.stroke();
-
-      ctx.globalAlpha = 0.07 + ridgeStrength * 0.12;
+      ctx.globalAlpha = 0.07 + ridgeStrength * 0.11;
       ctx.strokeStyle = paint.deep;
-      ctx.lineWidth = lw * 1.7;
-      traceLateral(ctx, geo, () => ridgeLateral + 0.045, 30, 0.02, 0.97);
+      ctx.lineWidth = lw * 1.6;
+      traceLateral(ctx, geo, () => ridgeLateral + 0.04, 30, 0.02, 0.97);
       ctx.stroke();
     }
 
-    // Spine rim light: the thick back of the blade catches the key light.
-    const rim = ctx.createLinearGradient(0, ySpine, 0, extent.minY + extent.maxHalf * 0.5);
-    rim.addColorStop(0, paint.highlight);
-    rim.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.globalAlpha = 0.16 + polish * 0.12;
-    ctx.fillStyle = rim;
-    const rimTop = ySpine - extent.maxHalf * 0.05;
-    const rimBottom = extent.minY + extent.maxHalf * 0.55;
-    ctx.fillRect(-0.02, rimTop, geo.bladeLength * 1.04, Math.max(0.002, rimBottom - rimTop));
+    // Narrow spine rim light (a line, not a wash).
+    ctx.globalAlpha = 0.12 + polish * 0.1;
+    ctx.strokeStyle = rimLight;
+    ctx.lineWidth = lw * 0.9;
+    traceLateral(ctx, geo, () => -0.985, 30, 0.02, 0.97);
+    ctx.stroke();
 
-    // Temper line: a quiet wavy transition only where it is physically
-    // justified (oriental quench / dark steel). Never a glow.
+    // Temper line: only where physically justified, never a glow.
     if (genome.identity.family === "oriental" || surface.alloy === "blacksteel" || surface.alloy === "meteor") {
       const grain = surface.grainPhase;
-      ctx.globalAlpha = 0.1 + polish * 0.1;
+      ctx.globalAlpha = 0.09 + polish * 0.08;
       ctx.strokeStyle = paint.warm;
-      ctx.lineWidth = lw * 1.8;
+      ctx.lineWidth = lw * 1.6;
       traceLateral(
         ctx,
         geo,
-        (t) => 0.56 + Math.sin(t * Math.PI * 13 + grain) * 0.045 + Math.sin(t * Math.PI * 31 + grain * 0.7) * 0.014,
+        (t) => 0.62 + Math.sin(t * Math.PI * 13 + grain) * 0.04 + Math.sin(t * Math.PI * 31 + grain * 0.7) * 0.012,
         34,
         0.05,
         0.9,
@@ -421,7 +433,7 @@ export function paintBladeBase(
       ctx.stroke();
     }
 
-    // Ricasso block: physically a different, less refined zone at the root.
+    // Ricasso block: a different, less refined zone at the root.
     const ricasso = geo.blade.ricasso;
     if (ricasso && ricasso.t > 0.015) {
       const rt = clamp(ricasso.t, 0.01, 0.3);
@@ -429,20 +441,19 @@ export function paintBladeBase(
       ctx.fillStyle = paint.shadow;
       traceBand(ctx, geo, -1, 1, 0.002, rt, 12);
       ctx.fill();
-
       const st = geo.stationAt(rt);
       const side = bladeEdgeSide(geo);
       const a = bladeLateralPoint(st, -1, side);
       const b = bladeLateralPoint(st, 1, side);
-      ctx.globalAlpha = 0.28;
+      ctx.globalAlpha = 0.3;
       ctx.strokeStyle = paint.deep;
       ctx.lineWidth = lw * 0.9;
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
       ctx.stroke();
-      ctx.globalAlpha = 0.16;
-      ctx.strokeStyle = paint.highlight;
+      ctx.globalAlpha = 0.14;
+      ctx.strokeStyle = pal.edgeLight > 40 ? paint.highlight : paint.shadow;
       ctx.beginPath();
       ctx.moveTo(a.x + lw, a.y + lw);
       ctx.lineTo(b.x + lw, b.y + lw);
@@ -453,7 +464,6 @@ export function paintBladeBase(
   }
 }
 
-// ---------------------------------------------------------------------------
 // 2. Bevel facets
 // ---------------------------------------------------------------------------
 
@@ -482,7 +492,7 @@ export function paintBevels(
         // buildBevels emits the edge-side facet first, the spine-side one second.
         const edgeward = count > 1 ? (i === 0 ? 1 : 0) : 1;
         bandPath(ctx, band, true);
-        ctx.globalAlpha = (0.05 + prominence * 0.09) * (0.5 + edgeward * 0.8);
+        ctx.globalAlpha = (0.03 + prominence * 0.05) * (0.4 + edgeward * 0.6);
         ctx.fillStyle = edgeward > 0.5 ? paint.highlight : paint.shadow;
         ctx.fill();
 
@@ -747,8 +757,9 @@ export function paintSteelPattern(
     const surface = genome.surface;
     const density = clamp(surface.patternDensity, 4, 22);
     const phase = surface.patternPhase;
-    const contrast = clamp(surface.patternContrast, 0.15, 0.85);
-    const baseAlpha = 0.06 + contrast * 0.16;
+    const damascusPattern = pattern === "damascus-waves" || pattern === "damascus-ripple";
+    const contrast = clamp(surface.patternContrast, 0.15, damascusPattern ? 0.42 : 0.6);
+    const baseAlpha = 0.05 + contrast * 0.14;
     const rng = makeGenomeRng(genome.individuality.subSeeds.surface);
     const lw = strokeWidth(geo, 0.0034, 0.0012, 0.006);
     const fineLw = strokeWidth(geo, 0.0016, 0.0005, 0.003);
@@ -764,55 +775,56 @@ export function paintSteelPattern(
 
     switch (pattern) {
       case "damascus-waves": {
-        const layers = clamp(Math.round(density * 0.85), 6, 16);
+        // Evenly spaced laminations held clear of the spine/edge bands; small
+        // amplitudes so neighbouring lines never merge into a dark blotch.
+        const layers = clamp(Math.round(density * 0.85), 6, 14);
         for (let i = 0; i < layers; i++) {
-          const baseU = lerp(-0.94, 0.94, (i + 0.5) / layers);
-          const amp = 0.06 + 0.07 * Math.abs(Math.sin(i * 1.7 + phase));
-          const freq = 1.7 + (i % 3) * 0.45;
+          const baseU = lerp(-0.7, 0.7, (i + 0.5) / layers);
+          const amp = 0.018 + 0.02 * Math.abs(Math.sin(i * 1.7 + phase));
+          const freq = 1.5 + (i % 3) * 0.4;
           const phaseI = phase + i * 0.91;
           const uAt = (t: number): number => {
-            const converge = 1 - smoothstep(0.18, 1, t) * 0.5;
+            const converge = 1 - smoothstep(0.2, 1, t) * 0.28;
             const wave =
               Math.sin(t * Math.PI * freq * 2 + phaseI) * amp +
-              Math.sin(t * Math.PI * freq * 3.1 + phaseI * 0.6) * amp * 0.32;
-            return baseU * converge + wave * (1 - t * 0.55);
+              Math.sin(t * Math.PI * freq * 3.1 + phaseI * 0.6) * amp * 0.28;
+            return baseU * converge + wave;
           };
-          patternLine(ctx, geo, uAt, 0.04, 0.955, darkInk, baseAlpha * 0.85, lw, 34);
+          patternLine(ctx, geo, uAt, 0.05, 0.94, darkInk, baseAlpha * 0.6, lw, 34);
           patternLine(
             ctx, geo,
-            (t) => uAt(t) + 0.018 + Math.sin(t * 9 + phaseI) * 0.004,
-            0.05, 0.94, lightInk, baseAlpha * 0.36, fineLw, 30,
+            (t) => uAt(t) + 0.012 + Math.sin(t * 9 + phaseI) * 0.003,
+            0.06, 0.93, lightInk, baseAlpha * 0.22, fineLw, 30,
           );
         }
-        // Short lamination echoes so the waves are not perfect stripes.
-        const echoes = 7;
-        for (let i = 0; i < echoes; i++) {
-          const t0 = 0.08 + rng.next() * 0.62;
-          const t1 = clamp(t0 + 0.08 + rng.next() * 0.14, t0 + 0.03, 0.95);
-          const u0 = rng.range(-0.85, 0.85);
+        // Short echoes inside the clean margins, low contrast.
+        for (let i = 0; i < 4; i++) {
+          const t0 = 0.1 + rng.next() * 0.55;
+          const t1 = clamp(t0 + 0.08 + rng.next() * 0.12, t0 + 0.03, 0.93);
+          const u0 = rng.range(-0.55, 0.55);
           patternLine(
             ctx, geo,
-            (t) => u0 + Math.sin(t * 14 + phase + i) * 0.035,
-            t0, t1, darkInk, baseAlpha * 0.5, fineLw, 16,
+            (t) => u0 + Math.sin(t * 14 + phase + i) * 0.018,
+            t0, t1, darkInk, baseAlpha * 0.32, fineLw, 16,
           );
         }
         break;
       }
       case "damascus-ripple": {
-        const lines = clamp(Math.round(density * 1.5), 10, 26);
+        const lines = clamp(Math.round(density * 1.5), 10, 22);
         for (let i = 0; i < lines; i++) {
-          const u0 = lerp(-0.95, 0.95, i / Math.max(1, lines - 1));
+          const u0 = lerp(-0.72, 0.72, i / Math.max(1, lines - 1));
           const t0 = 0.04 + rng.next() * 0.16;
-          const t1 = clamp(0.9 - rng.next() * 0.22, t0 + 0.15, 0.95);
+          const t1 = clamp(0.9 - rng.next() * 0.22, t0 + 0.15, 0.94);
           const phaseI = phase + i * 0.37;
           patternLine(
             ctx, geo,
-            (t) => u0 + Math.sin((t - t0) * Math.PI * 3.2 + phaseI) * 0.055 * (1 - t * 0.4),
-            t0, t1, i % 2 === 0 ? darkInk : midInk, baseAlpha * 0.62, fineLw, 26,
+            (t) => u0 + Math.sin((t - t0) * Math.PI * 3.2 + phaseI) * 0.03 * (1 - t * 0.4),
+            t0, t1, i % 2 === 0 ? darkInk : midInk, baseAlpha * 0.45, fineLw, 26,
           );
         }
         // Ripple eyes: small elongated loops that read as folded steel.
-        const eyes = 3;
+        const eyes = 2;
         for (let i = 0; i < eyes; i++) {
           const t = 0.2 + i * 0.22 + rng.range(-0.04, 0.04);
           const st = geo.stationAt(t);
@@ -928,17 +940,18 @@ export function paintSteelPattern(
         break;
       }
       case "elven-sheen": {
-        const lines = clamp(Math.round(density * 1.15), 12, 20);
+        // Very fine chatter: a cold sheen on pale silver, never a glow wash.
+        const lines = clamp(Math.round(density * 0.8), 8, 14);
         for (let i = 0; i < lines; i++) {
-          const u0 = lerp(-0.94, 0.94, (i + 0.5) / lines) + rng.range(-0.015, 0.015);
-          const drift = rng.range(-0.012, 0.012);
-          const fade = rng.range(0.02, 0.1);
+          const u0 = lerp(-0.9, 0.9, (i + 0.5) / lines) + rng.range(-0.012, 0.012);
+          const drift = rng.range(-0.008, 0.008);
+          const fade = rng.range(0.03, 0.12);
           patternLine(
             ctx, geo,
-            (t) => u0 + drift * t + Math.sin(t * 12 + phase + i * 0.6) * 0.007,
+            (t) => u0 + drift * t + Math.sin(t * 12 + phase + i * 0.6) * 0.005,
             fade, 0.97 - fade * 0.5,
             i % 3 === 0 ? lightInk : midInk,
-            baseAlpha * 0.42, fineLw * 0.75, 30,
+            baseAlpha * 0.2, fineLw * 0.6, 30,
           );
         }
         break;
@@ -1069,51 +1082,48 @@ export function paintBladeHighlight(
     const surface = genome.surface;
     const polish = clamp01(surface.polish);
     const luster = clamp01(surface.luster);
-    const strength = 0.05 + polish * 0.15 + luster * 0.06;
-    if (strength < 0.02) return;
-    const extent = bladeExtent(geo);
-    const center = clamp(lightOffset, 0.04, 0.96) * geo.bladeLength;
-    const halfSpan = geo.bladeLength * (0.1 + polish * 0.09);
+    if (polish < 0.18) return;
+    const mid = geo.stationAt(0.5);
+    const halfMid = Math.max(0.004, mid.halfWidth);
+    // The specular is a narrow longitudinal reflection: at most 18% of the
+    // local half width, with a soft falloff built from nested strokes.
+    const specWidth = clamp(halfMid * 0.18, 0.0007, 0.0045);
+    const uSpec = clamp(0.22 + clamp01(lightOffset) * 0.46, 0.16, 0.82);
+    const total = clamp((0.05 + polish * 0.45) * (0.85 + luster * 0.15), 0.06, 0.5);
     const tint = surface.palette.highlightTint;
-
     bladePath(ctx, geo);
     ctx.clip();
-
-    const grad = ctx.createLinearGradient(center - halfSpan, 0, center + halfSpan, 0);
-    grad.addColorStop(0, "rgba(255,255,255,0)");
-    grad.addColorStop(0.38, "rgba(255,255,255,0)");
-    grad.addColorStop(0.5, tint);
-    grad.addColorStop(0.62, "rgba(255,255,255,0)");
-    grad.addColorStop(1, "rgba(255,255,255,0)");
     ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = clamp01(strength);
-    ctx.fillStyle = grad;
-    ctx.fillRect(
-      center - halfSpan * 1.1,
-      extent.minY - extent.maxHalf,
-      halfSpan * 2.2,
-      extent.maxY - extent.minY + extent.maxHalf * 2,
-    );
-
-    // A narrow, harder core inside the same sweep: metal, not fog.
-    const core = ctx.createLinearGradient(center - halfSpan * 0.24, 0, center + halfSpan * 0.24, 0);
-    core.addColorStop(0, "rgba(255,255,255,0)");
-    core.addColorStop(0.5, tint);
-    core.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.globalAlpha = clamp01(strength * 0.55);
-    ctx.fillStyle = core;
-    ctx.fillRect(
-      center - halfSpan * 0.28,
-      extent.minY - extent.maxHalf * 0.4,
-      halfSpan * 0.56,
-      extent.maxY - extent.minY + extent.maxHalf * 0.8,
-    );
+    ctx.lineCap = "round";
+    const layers = [
+      { w: specWidth, a: total * 0.28 },
+      { w: specWidth * 0.58, a: total * 0.34 },
+      { w: specWidth * 0.26, a: total * 0.38 },
+    ];
+    for (const layer of layers) {
+      ctx.globalAlpha = clamp01(layer.a);
+      ctx.strokeStyle = tint;
+      ctx.lineWidth = Math.max(0.0003, layer.w);
+      traceLateral(ctx, geo, () => uSpec, 34, 0.03, 0.97);
+      ctx.stroke();
+    }
+    // Mirror finish only: one extra hairline glint, same width budget.
+    if (polish > 0.86) {
+      ctx.globalAlpha = clamp01(total * 0.16);
+      ctx.strokeStyle = "rgba(255,255,255,1)";
+      ctx.lineWidth = Math.max(0.0002, specWidth * 0.16);
+      traceLateral(ctx, geo, () => clamp(uSpot(uSpec), 0.05, 0.9), 30, 0.08, 0.92);
+      ctx.stroke();
+    }
   } finally {
     ctx.restore();
   }
 }
 
-// ---------------------------------------------------------------------------
+function uSpot(u: number): number {
+  return u - 0.06;
+}
+
 // 7. Guard metal
 // ---------------------------------------------------------------------------
 
@@ -1155,34 +1165,75 @@ export function paintGuardMetal(
     guardPath(ctx, geo);
     ctx.clip();
 
-    // Plating body: light from the upper-left, like the rest of the weapon.
+    // Metal body: a diagonal key light plus a darker underside.
     const body = ctx.createLinearGradient(box.minX, box.minY, box.maxX, box.maxY);
     body.addColorStop(0, pp.light);
-    body.addColorStop(0.22, pp.base);
-    body.addColorStop(0.56, pp.dark);
-    body.addColorStop(0.76, pp.base);
+    body.addColorStop(0.16, pp.base);
+    body.addColorStop(0.42, pp.base);
+    body.addColorStop(0.66, pp.dark);
+    body.addColorStop(0.88, pp.deep);
     body.addColorStop(1, pp.deep);
     ctx.fillStyle = body;
     guardPath(ctx, geo);
     ctx.fill();
 
-    // Rim light along the silhouette, and a bottom shadow seat.
-    ctx.globalAlpha = 0.42 + polish * 0.18;
+    // Vertical shading: lit top edge, shaded underside (no flat paper look).
+    const vert = ctx.createLinearGradient(0, box.minY, 0, box.maxY);
+    vert.addColorStop(0, "rgba(255,255,255,0)");
+    vert.addColorStop(0.55, "rgba(0,0,0,0.04)");
+    vert.addColorStop(1, "rgba(0,0,0,0.38)");
+    ctx.fillStyle = vert;
+    guardPath(ctx, geo);
+    ctx.fill();
+
+    // Contact shadow where the blade leaves the guard: occlusion before detail.
+    const contact = ctx.createLinearGradient(-span * 0.07, 0, span * 0.07, 0);
+    contact.addColorStop(0, "rgba(0,0,0,0)");
+    contact.addColorStop(0.5, "rgba(0,0,0,0.42)");
+    contact.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = contact;
+    ctx.fillRect(-span * 0.07, box.minY - lw, span * 0.14, box.height + lw * 2);
+
+    // Bright rim only on the light side, dark inner rim on the underside.
+    ctx.save();
+    ctx.translate(-lw * 1.5, -lw * 1.5);
+    ctx.globalAlpha = 0.3 + polish * 0.2;
     ctx.strokeStyle = pp.rim;
-    ctx.lineWidth = lw * 1.2;
+    ctx.lineWidth = lw * 1.5;
     guardPath(ctx, geo);
     ctx.stroke();
-    ctx.globalAlpha = 0.2;
+    ctx.restore();
+    ctx.save();
+    ctx.translate(lw * 1.1, lw * 1.3);
+    ctx.globalAlpha = 0.3;
     ctx.strokeStyle = pp.deep;
-    ctx.lineWidth = lw * 2.4;
+    ctx.lineWidth = lw * 1.4;
     guardPath(ctx, geo);
     ctx.stroke();
+    ctx.restore();
+
+    // Central plate: a machined boss of light, so gold reads as an accent.
+    const plateX = guard.boss ? guard.boss.x : box.cx;
+    const plateY = guard.boss ? guard.boss.y : box.cy;
+    const plateR = Math.max(span * 0.22, lw * 6);
+    const plate = ctx.createRadialGradient(
+      plateX - plateR * 0.3, plateY - plateR * 0.35, plateR * 0.05,
+      plateX, plateY, plateR,
+    );
+    plate.addColorStop(0, pp.light);
+    plate.addColorStop(0.55, pp.base);
+    plate.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.globalAlpha = 0.34;
+    ctx.fillStyle = plate;
+    ctx.beginPath();
+    ctx.arc(plateX, plateY, plateR, 0, Math.PI * 2);
+    ctx.fill();
 
     if (plating === "ivory") {
-      // Bone: warm, slightly uneven, veined. Never a plastic white.
+      // Bone: warm, uneven, veined. Never a plastic white.
       for (let i = 0; i < 5; i++) {
         const y = lerp(box.minY, box.maxY, rng.next());
-        ctx.globalAlpha = 0.06 + rng.next() * 0.05;
+        ctx.globalAlpha = 0.07 + rng.next() * 0.05;
         ctx.strokeStyle = pp.dark;
         ctx.lineWidth = lw * 0.7;
         ctx.beginPath();
@@ -1192,17 +1243,17 @@ export function paintGuardMetal(
         }
         ctx.stroke();
       }
-      ctx.globalAlpha = 0.1;
+      ctx.globalAlpha = 0.12;
       ctx.fillStyle = pp.deep;
       ctx.beginPath();
-      ctx.ellipse(box.cx + box.width * 0.2, box.cy + box.height * 0.14, box.width * 0.18, box.height * 0.1, 0.4, 0, Math.PI * 2);
+      ctx.ellipse(box.cx + box.width * 0.16, box.cy + box.height * 0.12, box.width * 0.2, box.height * 0.1, 0.4, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // Forged metal micro-structure: a few directional hammer planes.
-      for (let i = 0; i < 4; i++) {
-        const y = lerp(box.minY + box.height * 0.2, box.maxY - box.height * 0.2, rng.next());
+      // Forged metal micro-structure: directional hammer planes, subtle.
+      for (let i = 0; i < 5; i++) {
+        const y = lerp(box.minY + box.height * 0.16, box.maxY - box.height * 0.16, rng.next());
         ctx.globalAlpha = 0.05 + rng.next() * 0.05;
-        ctx.strokeStyle = i % 2 === 0 ? pp.dark : pp.light;
+        ctx.strokeStyle = i % 2 === 0 ? pp.deep : pp.light;
         ctx.lineWidth = lw * 0.8;
         ctx.beginPath();
         ctx.moveTo(box.minX, y);
@@ -1213,46 +1264,46 @@ export function paintGuardMetal(
 
     // Engraved strokes: dark incision with a single-side light lip.
     for (const stroke of guard.strokes) {
-      strokePolyline(ctx, stroke, pp.deep, 0.5, lw * 1.1);
-      strokePolyline(ctx, stroke, pp.light, 0.22, lw * 0.7, -lw * 0.5, -lw * 0.5);
+      strokePolyline(ctx, stroke, pp.deep, 0.55, lw * 1.15);
+      strokePolyline(ctx, stroke, pp.light, 0.22, lw * 0.7, -lw * 0.55, -lw * 0.55);
     }
 
-    // Langets: reinforced tabs, slightly darker with a chamfered light.
+    // Langets: reinforced tabs with a chamfered light.
     for (const langet of guard.langets) {
       if (langet.length < 3) continue;
       pathFromPoints(ctx, langet, true);
-      ctx.globalAlpha = 0.28;
+      ctx.globalAlpha = 0.34;
       ctx.fillStyle = pp.dark;
       ctx.fill();
       pathFromPoints(ctx, langet, true);
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.26;
       ctx.strokeStyle = pp.light;
-      ctx.lineWidth = lw * 0.8;
+      ctx.lineWidth = lw * 0.75;
       ctx.stroke();
     }
 
-    // Central boss: a machined disc with a warm reflected light.
+    // Boss: a machined disc with a bright light-side rim and a dark seat.
     const boss = guard.boss;
     if (boss && boss.r > 0) {
       const r = Math.max(0.002, boss.r);
       const bg = ctx.createRadialGradient(
-        boss.x - r * 0.35, boss.y - r * 0.4, r * 0.1,
-        boss.x, boss.y, r * 1.1,
+        boss.x - r * 0.35, boss.y - r * 0.4, r * 0.08,
+        boss.x, boss.y, r * 1.15,
       );
       bg.addColorStop(0, pp.spec);
-      bg.addColorStop(0.45, pp.light);
-      bg.addColorStop(0.85, pp.dark);
+      bg.addColorStop(0.42, pp.light);
+      bg.addColorStop(0.82, pp.dark);
       bg.addColorStop(1, pp.deep);
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 0.92;
       ctx.fillStyle = bg;
       ctx.beginPath();
       ctx.arc(boss.x, boss.y, r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = 0.45;
+      ctx.globalAlpha = 0.5;
       ctx.strokeStyle = pp.deep;
       ctx.lineWidth = lw;
       ctx.stroke();
-      ctx.globalAlpha = 0.25;
+      ctx.globalAlpha = 0.3;
       ctx.strokeStyle = pp.rim;
       ctx.beginPath();
       ctx.arc(boss.x, boss.y, r * 0.74, Math.PI * 1.02, Math.PI * 1.85);
@@ -1263,7 +1314,6 @@ export function paintGuardMetal(
   }
 }
 
-// ---------------------------------------------------------------------------
 // 8. Grip materials
 // ---------------------------------------------------------------------------
 
@@ -1725,7 +1775,7 @@ function gripColorFor(
     braided: { base: override, light: "#7d4a2c", dark: "#2f1a10", deep: "#1b0f08" },
     linen: { base: override, light: "#e2d3b6", dark: "#9c8a6c", deep: "#6b5b45" },
     darkwood: { base: override, light: "#6a4230", dark: "#160c08", deep: "#0d0705" },
-    bone: { base: "#d8cdb6", light: "#efe6d2", dark: "#8f8168", deep: "#5d5040" },
+    bone: { base: "#c9bda4", light: "#e2d7c2", dark: "#7b6d58", deep: "#4f4536" },
     goldwire: { base: "#b8912f", light: "#f0d27a", dark: "#6b4f16", deep: "#3f2d0c" },
     tsukamaki: { base: "#d9cfba", light: "#efe8d8", dark: "#7d6f58", deep: "#4c4134" },
     elven_wood: { base: override, light: "#f0e2c6", dark: "#9a805c", deep: "#6c583c" },
@@ -1758,31 +1808,53 @@ export function paintPommelMetal(
     pommelPath(ctx, geo);
     ctx.clip();
 
-    // Sphere/volume read: an off-centre radial highlight, not a flat disc.
+    // Volume: off-centre radial highlight (sphere-like), not a flat disc.
     const radial = ctx.createRadialGradient(
-      box.cx - r * 0.32, box.cy - r * 0.38, r * 0.08,
+      box.cx - r * 0.34, box.cy - r * 0.4, r * 0.08,
       box.cx, box.cy, r * 1.35,
     );
     radial.addColorStop(0, pp.spec);
-    radial.addColorStop(0.28, pp.light);
-    radial.addColorStop(0.62, pp.base);
-    radial.addColorStop(0.86, pp.dark);
+    radial.addColorStop(0.26, pp.light);
+    radial.addColorStop(0.58, pp.base);
+    radial.addColorStop(0.82, pp.dark);
     radial.addColorStop(1, pp.deep);
     ctx.fillStyle = radial;
     pommelPath(ctx, geo);
     ctx.fill();
 
-    // Rim light + bottom occlusion.
-    ctx.globalAlpha = 0.5 + polish * 0.15;
+    // Underside occlusion.
+    const shade = ctx.createLinearGradient(0, box.minY, 0, box.maxY);
+    shade.addColorStop(0, "rgba(0,0,0,0)");
+    shade.addColorStop(0.55, "rgba(0,0,0,0.05)");
+    shade.addColorStop(1, "rgba(0,0,0,0.42)");
+    ctx.fillStyle = shade;
+    pommelPath(ctx, geo);
+    ctx.fill();
+
+    // Contact shadow where the pommel meets the grip (+X side).
+    const contact = ctx.createLinearGradient(box.maxX - r * 0.35, 0, box.maxX, 0);
+    contact.addColorStop(0, "rgba(0,0,0,0)");
+    contact.addColorStop(1, "rgba(0,0,0,0.45)");
+    ctx.fillStyle = contact;
+    ctx.fillRect(box.maxX - r * 0.35, box.minY - lw, r * 0.4, box.height + lw * 2);
+
+    // Light-side rim and dark-side rim: the metal reads with a direction.
+    ctx.save();
+    ctx.translate(-lw * 1.2, -lw * 1.2);
+    ctx.globalAlpha = 0.34 + polish * 0.16;
     ctx.strokeStyle = pp.rim;
     ctx.lineWidth = lw;
     pommelPath(ctx, geo);
     ctx.stroke();
-    ctx.globalAlpha = 0.22;
+    ctx.restore();
+    ctx.save();
+    ctx.translate(lw * 1.0, lw * 1.2);
+    ctx.globalAlpha = 0.28;
     ctx.strokeStyle = pp.deep;
-    ctx.lineWidth = lw * 2.2;
+    ctx.lineWidth = lw * 1.1;
     pommelPath(ctx, geo);
     ctx.stroke();
+    ctx.restore();
 
     if (plating === "ivory") {
       for (let i = 0; i < 4; i++) {
@@ -1795,27 +1867,32 @@ export function paintPommelMetal(
         ctx.lineTo(box.maxX, y + box.height * rng.range(-0.05, 0.05));
         ctx.stroke();
       }
-      ctx.globalAlpha = 0.1;
+      ctx.globalAlpha = 0.11;
       ctx.fillStyle = pp.deep;
       ctx.beginPath();
       ctx.ellipse(box.cx + box.width * 0.16, box.cy + box.height * 0.1, box.width * 0.2, box.height * 0.12, 0.3, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // Turned-metal bands: a couple of shallow concentric facets.
+      // Turned-metal bands: shallow concentric facets, darker underside.
       const bands = plating === "gold" ? 2 : 1;
       for (let i = 1; i <= bands; i++) {
-        ctx.globalAlpha = 0.16;
+        ctx.globalAlpha = 0.2;
         ctx.strokeStyle = pp.light;
         ctx.lineWidth = lw * 0.7;
         ctx.beginPath();
         ctx.ellipse(box.cx, box.cy, box.width * (0.42 - i * 0.12), box.height * (0.42 - i * 0.12), 0, Math.PI * 0.1, Math.PI * 1.1);
+        ctx.stroke();
+        ctx.globalAlpha = 0.16;
+        ctx.strokeStyle = pp.deep;
+        ctx.beginPath();
+        ctx.ellipse(box.cx, box.cy, box.width * (0.42 - i * 0.12), box.height * (0.42 - i * 0.12), 0, Math.PI * 1.12, Math.PI * 2.05);
         ctx.stroke();
       }
     }
 
     // Engraved strokes, same incised light rule as the guard.
     for (const stroke of pommel.strokes) {
-      strokePolyline(ctx, stroke, pp.deep, 0.45, lw * 0.9);
+      strokePolyline(ctx, stroke, pp.deep, 0.5, lw * 0.9);
       strokePolyline(ctx, stroke, pp.light, 0.2, lw * 0.55, -lw * 0.4, -lw * 0.4);
     }
   } finally {

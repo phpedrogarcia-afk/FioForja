@@ -19,6 +19,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from './build.mjs';
 import { startServer } from './serve.mjs';
+import { runBenchmark } from './bench.mjs';
 
 const LAB_DIR = dirname(fileURLToPath(import.meta.url));
 const EVIDENCE_DIR = join(LAB_DIR, 'evidence');
@@ -77,6 +78,12 @@ function findChromiumExecutable() {
 const executable = findChromiumExecutable();
 if (!executable) {
   throw new Error('No Chromium binary found. Checked ' + chromium.executablePath() + ' and the %LOCALAPPDATA%\\ms-playwright cache; set PLAYWRIGHT_CHROMIUM_EXECUTABLE to override.');
+}
+
+if (flag('bench')) {
+  const result = await runBenchmark({ buildMeta });
+  console.log('[capture] --bench complete: ' + result.metrics.galleryDna.iterations + ' gallery frames, build ' + buildMeta.hash.slice(0, 12) + '; evidence PNGs untouched.');
+  process.exit(0);
 }
 
 const serverInfo = await startServer({ root: LAB_DIR });
