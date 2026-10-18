@@ -303,30 +303,49 @@ export interface CanonicalPreset {
 
 export const CANONICAL_PRESETS: CanonicalPreset[] = [
   {
-    id: "veu_damasco",
-    name: "Véu de Damasco",
+    id: "guarda_medieval",
+    name: "Guarda da Fronteira (Medieval Comum)",
+    family: "iron",
+    rarity: "Comum",
+    lore: "A espada do sentinela medieval — lâmina reta forjada em ferro leal, empunhadura em couro envelhecido e cruz reta firme.",
+    design: {
+      name: "Guarda da Fronteira",
+      family: "iron",
+      profile: "long",
+      steel: "iron",
+      wrap: "leather",
+      guard: "cross",
+      pommel: "disc",
+      inscription: "VIGILIS",
+      runes: false,
+      length: 0.95,
+    },
+  },
+  {
+    id: "cimitarra_damasco",
+    name: "Cimitarra de Damasco",
     family: "damascus",
     rarity: "Lendária",
-    lore: "Poucos conseguem preservar o padrão perfeito das dobras até a têmpera.",
+    lore: "Gume curvo de falchion com padrão fluido de dobras sucessivas no aço, equilibrado com guarda sinuosa e empunhadura trançada.",
     design: {
-      name: "Véu de Damasco",
+      name: "Cimitarra de Damasco",
       family: "damascus",
-      profile: "long",
+      profile: "falchion",
       steel: "damascus",
-      wrap: "darkwood",
+      wrap: "braided",
       guard: "curved",
       pommel: "disc",
       inscription: "DAMASCUS",
       runes: false,
-      length: 1.05,
+      length: 1.02,
     },
   },
   {
     id: "lua_silenciosa",
-    name: "Lua Silenciosa",
+    name: "Lua Silenciosa (Katana)",
     family: "oriental",
     rarity: "Lendária",
-    lore: "Um gume que desliza pelo ar sem produzir som. Forjada sob a lua minguante.",
+    lore: "Curvatura sori milimétrica em aço escurecido, tsuba cinzelada com cortes tradicionais e tsukamaki de precisão impecável.",
     design: {
       name: "Lua Silenciosa",
       family: "oriental",
@@ -342,10 +361,10 @@ export const CANONICAL_PRESETS: CanonicalPreset[] = [
   },
   {
     id: "folha_aereth",
-    name: "Folha de Aereth",
+    name: "Folha de Aereth (Élfica)",
     family: "elven",
     rarity: "Lendária",
-    lore: "Forjada em prata élfica pálida; parece ter sido cultivada em um bosque sagrado.",
+    lore: "Geometria foliar orgânica esculpida em liga sagrada de prata élfica, quilhões em folha viva e pomo em gema lapidada.",
     design: {
       name: "Folha de Aereth",
       family: "elven",
@@ -360,30 +379,11 @@ export const CANONICAL_PRESETS: CanonicalPreset[] = [
     },
   },
   {
-    id: "juramento_ferro",
-    name: "Juramento de Ferro",
-    family: "runic",
-    rarity: "Lendária",
-    lore: "Nenhum homem que quebrou um juramento selado por esta lâmina sobreviveu.",
-    design: {
-      name: "Juramento de Ferro",
-      family: "runic",
-      profile: "claymore",
-      steel: "iron",
-      wrap: "braided",
-      guard: "runic",
-      pommel: "knot",
-      inscription: "TIWAZ·ODIN",
-      runes: true,
-      length: 1.18,
-    },
-  },
-  {
     id: "queda_asterion",
-    name: "Queda de Asterion",
+    name: "Queda de Asterion (Meteórica)",
     family: "meteor",
     rarity: "Lendária",
-    lore: "Nascida de fragmentos de meteoro que caíram nas cordilheiras do norte.",
+    lore: "Forjada do núcleo azul-escuro de um bólido sideral; reluz com partículas astrais, empunhadura em fio de ouro e guarda de asas abertas.",
     design: {
       name: "Queda de Asterion",
       family: "meteor",
@@ -395,6 +395,25 @@ export const CANONICAL_PRESETS: CanonicalPreset[] = [
       inscription: "ASTERION",
       runes: true,
       length: 1.06,
+    },
+  },
+  {
+    id: "juramento_ferro",
+    name: "Juramento de Ferro (Rúnica)",
+    family: "runic",
+    rarity: "Lendária",
+    lore: "Nenhum homem que quebrou um juramento selado por esta lâmina sobreviveu. O aço bruto ecoa cantos do Elder Futhark.",
+    design: {
+      name: "Juramento de Ferro",
+      family: "runic",
+      profile: "claymore",
+      steel: "iron",
+      wrap: "braided",
+      guard: "runic",
+      pommel: "knot",
+      inscription: "TIWAZ·ODIN",
+      runes: true,
+      length: 1.18,
     },
   },
   {
@@ -418,7 +437,7 @@ export const CANONICAL_PRESETS: CanonicalPreset[] = [
   },
   {
     id: "cinzas_ancestrais",
-    name: "Cinzas Ancestrais",
+    name: "Cinzas Ancestrais (Relíquia)",
     family: "relic",
     rarity: "Relíquia",
     lore: "A primeira relíquia desenterrada das fornalhas da primeira era dos homens.",
@@ -523,23 +542,41 @@ export function calculateSwordAttributes(
   const profile = PROFILES[design.profile] || PROFILES.long;
   const steel = STEELS[design.steel] || STEELS.steel;
 
+  // Combat role archetypes
+  let roleModifier = { atkMult: 1.0, defMult: 1.0, agiMult: 1.0, durAdd: 0 };
+  let combatRole: import("./types.ts").CombatRole = "Equilibrada";
+
+  if (design.family === "meteor" || design.family === "relic" || design.profile === "relic_blade" || design.profile === "elven_blade") {
+    combatRole = "Excepcional";
+    roleModifier = { atkMult: 1.16, defMult: 1.12, agiMult: 1.14, durAdd: 6 };
+  } else if (design.profile === "claymore" || design.profile === "falchion" || (design.family === "damascus" && design.profile !== "short")) {
+    combatRole = "Ofensiva";
+    roleModifier = { atkMult: 1.22, defMult: 0.95, agiMult: 0.85, durAdd: 4 };
+  } else if (design.profile === "long" && (design.family === "royal" || design.family === "viking")) {
+    combatRole = "Defensiva";
+    roleModifier = { atkMult: 0.98, defMult: 1.22, agiMult: 0.92, durAdd: 8 };
+  } else if (design.profile === "katana" || design.profile === "short" || design.profile === "saber") {
+    combatRole = "Ágil";
+    roleModifier = { atkMult: 1.00, defMult: 0.88, agiMult: 1.28, durAdd: -4 };
+  }
+
   // ATK: Gume bem formado, dureza do aço, qualidade do martelo e proporção de corte
-  const baseAtk = 100 + steel.hardness * 140 + profile.width * 60;
+  const baseAtk = (100 + steel.hardness * 140 + profile.width * 60) * roleModifier.atkMult;
   const edgeFactor = (quality / 100) * 0.75 + (forgeScore / 100) * 0.25;
   const damage = Math.round(baseAtk * edgeFactor);
 
   // DEF: Integridade, espessura da lâmina, têmpera limpa e capacidade de aparar
-  const baseDef = 60 + profile.width * 75 + (quenchScore / 100) * 55;
+  const baseDef = (60 + profile.width * 75 + (quenchScore / 100) * 55) * roleModifier.defMult;
   const warpPenalty = Math.max(0.4, 1 - warp * 0.5);
   const defense = Math.round(baseDef * (quality / 100) * warpPenalty);
 
   // AGI: Equilíbrio, distribuição de massa e alinhamento
   const lightness = 1.35 - profile.length * 0.35 - profile.width * 0.25;
   const alignmentBonus = Math.max(0.3, (1 - warp * 0.7) * (0.4 + heatScore * 0.006));
-  const agility = Math.max(15, Math.round((75 + lightness * 45) * alignmentBonus * (0.65 + quality * 0.0035)));
+  const agility = Math.max(15, Math.round((75 + lightness * 45) * alignmentBonus * (0.65 + quality * 0.0035) * roleModifier.agiMult));
 
   // Durability: do choque térmico e integridade
-  const durability = Math.max(15, Math.min(100, Math.round(quenchScore * 0.55 + quality * 0.45 - warp * 30)));
+  const durability = Math.max(15, Math.min(100, Math.round(quenchScore * 0.55 + quality * 0.45 - warp * 30 + roleModifier.durAdd)));
 
   // Defeitos visuais e metalúrgicos
   const flaws: string[] = [];
@@ -560,7 +597,7 @@ export function calculateSwordAttributes(
   if (quenchScore >= 90) perks.push("Martensita Pura: Retenção eterna de fio");
   if (warp < 0.03 && quality >= 88) perks.push("Alinhamento Perfeito: Centro de massa ideal");
 
-  return { damage, defense, agility, durability, flaws, perks };
+  return { damage, defense, agility, durability, flaws, perks, combatRole };
 }
 
 const RUNES: Record<string, string> = {

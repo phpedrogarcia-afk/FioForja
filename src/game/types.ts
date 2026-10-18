@@ -69,6 +69,7 @@ export type HammerType = "precision" | "standard" | "sledge";
 export type StrikeKind = "weak" | "good" | "perfect" | "hard";
 export type StructuralState = "stable" | "deformed" | "damaged" | "cracked" | "broken";
 export type RarityGrade = "Comum" | "Incomum" | "Rara" | "Épica" | "Lendária" | "Relíquia";
+export type CombatRole = "Ofensiva" | "Defensiva" | "Ágil" | "Equilibrada" | "Excepcional";
 
 export interface SwordDesign {
   name: string;
@@ -100,6 +101,8 @@ export interface FinishedSword {
   baseDefense?: number;
   baseAgility?: number;
   baseDurability?: number;
+  // Combat Role specialization (Ofensiva, Defensiva, Ágil, Equilibrada, Excepcional)
+  combatRole?: CombatRole;
   // Composite final attributes (base + quality bonus + components + runes + refinement)
   damage?: number; // ATK (potencial de corte e dureza)
   defense?: number; // DEF (integridade, espessura e têmpera)

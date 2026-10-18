@@ -2,9 +2,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
 import { isMuted, playCoinJingle, playLootFanfare, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
-import { finishSword, generateForgeRewards, applyStrikeRewardTransaction, type StrikeRewardTransactionResult } from "./sim";
+import { generateForgeRewards, applyStrikeRewardTransaction, type StrikeRewardTransactionResult } from "./sim";
 import { defaultCareer, defaultEquippedGear, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
-import { applyComponentFusionTransaction, applySwordFusionTransaction, type ComponentFusionOutcome, type SwordFusionOutcome } from "./fusion";
+import type { ComponentFusionOutcome, SwordFusionOutcome } from "./fusion";
+import {
+  executeSwordFusionTransaction,
+  executeComponentFusionTransaction,
+  executeComponentInstallTransaction,
+  executeUpgradeSwordTransaction,
+  executeShopPurchaseTransaction,
+  executeClaimRewardsTransaction,
+  executeFinishSwordTransaction,
+  executeStrikeRewardTransaction,
+  type ShopPurchaseItem,
+} from "./transactions";
 import { DesignScreen } from "./screens/DesignScreen";
 import { ForgeHud } from "./screens/ForgeHud";
 import { GalleryScreen } from "./screens/GalleryScreen";
@@ -13,7 +24,7 @@ import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 import type { CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
-import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT, recalculateSwordStats } from "./catalog";
+import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
 export { applyStrikeRewardTransaction, type StrikeRewardTransactionResult };
 
@@ -52,6 +63,11 @@ export function GameApp() {
   const [muted, setMutedUi] = useState(false);
   const [forgeKey, setForgeKey] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [errorToast, setErrorToast] = useState<string | null>(null);
+  const showError = useCallback((msg: string) => {
+    setErrorToast(msg);
+    window.setTimeout(() => setErrorToast(null), 4500);
+  }, []);
   const inputRef = useRef<SimInput>({ charging: false, action: false, reheat: false });
   const designRef = useRef(design);
   designRef.current = design;
@@ -108,96 +124,50 @@ export function GameApp() {
   }, []);
 
   const handleStrikeReward = useCallback((reward: { amount: number; id: string }) => {
-    const tx = applyStrikeRewardTransaction(save.current, reward);
-    if (!tx.applied) return;
-
-    setWallet(tx.wallet);
-    persist({
-      wallet: tx.wallet,
-      claimedStrikeRewardIds: tx.claimedStrikeRewardIds,
-    });
-  }, [persist]);
+    const res = executeStrikeRewardTransaction(save.current, reward);
+    if (!res.success) return;
+    save.current = res.save;
+    setWallet(res.save.wallet);
+  }, []);
 
   const handleClaimRewards = useCallback((rewards: ForgeRewardsData) => {
-    const currentWallet = save.current.wallet || defaultWallet;
-    const currentInventory = save.current.inventory || defaultInventory;
-    const runId = rewards.forgeRunId || (finished ? finished.forgeRunId : null);
-    const claimedRuns = save.current.claimedForgeRewardIds || [];
-
-    // Idempotency: prevent double claim on reload or multiple clicks
-    if (runId && claimedRuns.includes(runId)) {
+    const res = executeClaimRewardsTransaction(save.current, rewards, finished);
+    if (!res.success) {
+      showError(res.error || "Erro ao resgatar recompensas.");
       return;
     }
-
-    const nextWallet: PlayerWallet = {
-      gold: currentWallet.gold + (rewards.gold || 0),
-      rubies: currentWallet.rubies + (rewards.rubies || 0),
-      diamonds: currentWallet.diamonds + (rewards.diamonds || 0),
-    };
-
-    const nextMaterials = { ...(currentInventory.materials || {}) };
-    const nextComponents = [...(currentInventory.components || [])];
-
-    for (const item of rewards.items) {
-      if (item.category === "material" || item.category === "fusion") {
-        const key = item.catalogKey || item.id;
-        nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
-      } else if (item.category === "guard" || item.category === "pommel" || item.category === "wrap" || item.category === "rune") {
-        nextComponents.push({
-          id: item.id,
-          name: item.name,
-          category: item.category,
-          componentKey: item.catalogKey || item.id,
-          rarity: item.rarity,
-          icon: item.icon,
-          description: item.description,
-          statModifier: item.statsModifier,
-          acquiredAt: Date.now(),
-        });
-      } else {
-        const key = item.catalogKey || item.id;
-        nextMaterials[key] = (nextMaterials[key] || 0) + (item.quantity || 1);
-      }
-    }
-
-    const nextClaimedRuns = runId ? [...claimedRuns, runId] : claimedRuns;
-
-    const nextInventory: PlayerInventory = {
-      ...currentInventory,
-      materials: nextMaterials,
-      components: nextComponents,
-    };
+    save.current = res.save;
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
 
     // Fanfare for highest rarity
     const rarityOrder: import("./types").RarityGrade[] = ["Relíquia", "Lendária", "Épica", "Rara", "Incomum", "Comum"];
     const highest = rarityOrder.find((r) => rewards.items.some((it) => it.rarity === r)) || "Comum";
     playLootFanfare(highest);
-
-    setWallet(nextWallet);
-    setInventory(nextInventory);
-    persist({
-      wallet: nextWallet,
-      inventory: nextInventory,
-      claimedForgeRewardIds: nextClaimedRuns,
-    });
-  }, [finished, persist]);
+  }, [finished, showError]);
 
   const handleApplyComponentFusion = useCallback((outcome: ComponentFusionOutcome) => {
-    const nextSave = applyComponentFusionTransaction(save.current, outcome);
-    save.current = nextSave;
-    setWallet(nextSave.wallet);
-    setInventory(nextSave.inventory);
-    writeSave(nextSave);
-  }, []);
+    const res = executeComponentFusionTransaction(save.current, outcome);
+    if (!res.success) {
+      showError(res.error || "Falha na fusão de componentes.");
+      return;
+    }
+    save.current = res.save;
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
+  }, [showError]);
 
   const handleApplySwordFusion = useCallback((outcome: SwordFusionOutcome) => {
-    const nextSave = applySwordFusionTransaction(save.current, outcome);
-    save.current = nextSave;
-    setWallet(nextSave.wallet);
-    setInventory(nextSave.inventory);
-    setGallery(nextSave.gallery);
-    writeSave(nextSave);
-  }, []);
+    const res = executeSwordFusionTransaction(save.current, outcome);
+    if (!res.success) {
+      showError(res.error || "Falha na fusão de espadas.");
+      return;
+    }
+    save.current = res.save;
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
+    setGallery(res.save.gallery);
+  }, [showError]);
 
   const handleForgeCore = useCallback((core: FusionCore) => {
     const coreInInventory = save.current.inventory?.fusionCores?.some((c) => c.id === core.id);
@@ -226,27 +196,37 @@ export function GameApp() {
   }, [persist]);
 
   const handleBuyTool = useCallback((toolId: string): boolean => {
-    const currentWallet = save.current.wallet || defaultWallet;
-    const currentInventory = save.current.inventory || defaultInventory;
     const tool = WORKSHOP_EQUIPMENT.find((t) => t.id === toolId);
     if (!tool) return false;
-    if (currentInventory.unlockedTools.includes(toolId)) return true;
-    if (currentWallet.gold < tool.costGold || currentWallet.rubies < tool.costRubies) return false;
-
-    const nextWallet: PlayerWallet = {
-      ...currentWallet,
-      gold: currentWallet.gold - tool.costGold,
-      rubies: currentWallet.rubies - tool.costRubies,
-    };
-    const nextInventory: PlayerInventory = {
-      ...currentInventory,
-      unlockedTools: [...currentInventory.unlockedTools, toolId],
-    };
-    setWallet(nextWallet);
-    setInventory(nextInventory);
-    persist({ wallet: nextWallet, inventory: nextInventory });
+    const res = executeShopPurchaseTransaction(save.current, {
+      id: tool.id,
+      name: tool.name,
+      type: "tool",
+      costGold: tool.costGold,
+      costRubies: tool.costRubies,
+    });
+    if (!res.success) {
+      showError(res.error || "Falha na aquisição da ferramenta.");
+      return false;
+    }
+    save.current = res.save;
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
     return true;
-  }, [persist]);
+  }, [showError]);
+
+  const handleBuyShopItem = useCallback((item: ShopPurchaseItem): boolean => {
+    const res = executeShopPurchaseTransaction(save.current, item);
+    if (!res.success) {
+      showError(res.error || "Falha na aquisição do item.");
+      return false;
+    }
+    save.current = res.save;
+    setWallet(res.save.wallet);
+    setInventory(res.save.inventory);
+    playCoinJingle();
+    return true;
+  }, [showError]);
 
   const handleSelectPreset = useCallback((presetDesign: SwordDesign) => {
     setDesign(presetDesign);
@@ -278,165 +258,54 @@ export function GameApp() {
   }, [persist]);
 
   const handleUpgradeSword = useCallback((targetSword: FinishedSword): boolean => {
-    // Structural integrity rule: Broken blades cannot be assembled or upgraded
-    if (targetSword.broken) return false;
-
-    const currentWallet = save.current.wallet || defaultWallet;
-    const upgrades = targetSword.upgradesApplied || 0;
-    if (upgrades >= 3) return false;
-
-    const goldCost = 60 * (upgrades + 1);
-    const rubyCost = upgrades >= 1 ? 1 : 0;
-
-    if (currentWallet.gold < goldCost || currentWallet.rubies < rubyCost) return false;
-
-    const nextWallet: PlayerWallet = {
-      ...currentWallet,
-      gold: currentWallet.gold - goldCost,
-      rubies: currentWallet.rubies - rubyCost,
-    };
-
-    // Workbench refinement strictly polishes the edge (+8 ATK) and reinforces the grip (+2 Durability).
-    // Intrinsic metallurgical properties (quality, grade, rarity, flaws, cracks, warp) are permanent physical facts from the forge.
-    const updatedSword: FinishedSword = recalculateSwordStats({
-      ...targetSword,
-      upgradesApplied: upgrades + 1,
-    });
-
+    const res = executeUpgradeSwordTransaction(save.current, targetSword.id);
+    if (!res.success) {
+      showError(res.error || "Falha no refino da lâmina.");
+      return false;
+    }
+    save.current = res.save;
     playUpgradeChime();
-    setWallet(nextWallet);
-    setFinished(updatedSword);
-
-    const nextGallery = save.current.gallery.map((s) => (s.id === targetSword.id ? updatedSword : s));
-    setGallery(nextGallery);
-    persist({ wallet: nextWallet, gallery: nextGallery });
+    setWallet(res.save.wallet);
+    setGallery(res.save.gallery);
+    if (res.payload) {
+      setFinished(res.payload);
+    }
     return true;
-  }, [persist]);
+  }, [showError]);
 
   const onFinished = useCallback((sim: SimState) => {
-    const sword = finishSword(sim, designRef.current);
-    const swordValue = sword.value ?? Math.round(sword.quality * 28 + (sword.rarity === "Lendária" ? 1800 : sword.rarity === "Relíquia" ? 3500 : 250));
-    sword.value = swordValue;
-    setFinished(sword);
-
-    // Consume FusionCore if forge was run from an active core
-    let nextInventory = save.current.inventory;
+    const res = executeFinishSwordTransaction(save.current, sim, designRef.current);
+    if (!res.success) {
+      showError(res.error || "Falha ao registrar lâmina finalizada.");
+    }
+    save.current = res.save;
+    setCareer(res.save.career);
+    setInventory(res.save.inventory);
+    setGallery(res.save.gallery);
+    if (res.payload) {
+      setFinished(res.payload);
+    }
     if (sim.activeCore) {
-      const remainingCores = (save.current.inventory.fusionCores || []).filter((c) => c.id !== sim.activeCore!.id);
-      nextInventory = {
-        ...save.current.inventory,
-        fusionCores: remainingCores,
-      };
-      setInventory(nextInventory);
       setActiveCore(null);
     }
-
-    const prevCareer = save.current.career || defaultCareer;
-    const isMasterpiece = sword.quality >= 95;
-    const nextCareer: CareerStats = {
-      totalForged: prevCareer.totalForged + 1,
-      masterpieces: prevCareer.masterpieces + (isMasterpiece ? 1 : 0),
-      legendaries: prevCareer.legendaries + (sword.rarity === "Lendária" ? 1 : 0),
-      relics: prevCareer.relics + (sword.rarity === "Relíquia" ? 1 : 0),
-      brokenBlades: prevCareer.brokenBlades + (sim.broken ? 1 : 0),
-      highestQuality: Math.max(prevCareer.highestQuality, sword.quality),
-      totalValueEarned: prevCareer.totalValueEarned + (sim.broken ? 0 : swordValue),
-    };
-    setCareer(nextCareer);
-
-    if (!sim.broken) {
-      // Entire gallery without silent truncation
-      const nextGallery = [sword, ...save.current.gallery];
-      setGallery(nextGallery);
-      persist({ gallery: nextGallery, career: nextCareer, inventory: nextInventory });
-    } else {
-      persist({ career: nextCareer, inventory: nextInventory });
-    }
-
     window.setTimeout(() => setScreen("reveal"), 800);
-  }, [persist]);
+  }, [showError]);
 
   const handleInstallComponent = useCallback((swordId: string, componentId: string): boolean => {
-    const currentSave = save.current;
-    const targetSword = currentSave.gallery.find((s) => s.id === swordId) || (finished && finished.id === swordId ? finished : null);
-    const comp = currentSave.inventory.components.find((c) => c.id === componentId);
-    if (!targetSword || !comp) return false;
-
-    // Structural integrity rule: Broken blades cannot receive component mounting
-    if (targetSword.broken) return false;
-
-    // 1. Identify previously installed component in this slot category for inventory refund
-    const existingInstalled = targetSword.installedComponents || {};
-    const previousComp = existingInstalled[comp.category];
-
-    // Remove the newly mounted component from inventory
-    const nextComponents = currentSave.inventory.components.filter((c) => c.id !== componentId);
-
-    // If a component was previously mounted in this category, unequip and refund it to inventory!
-    if (previousComp) {
-      nextComponents.push(previousComp);
+    const res = executeComponentInstallTransaction(save.current, swordId, componentId, finished);
+    if (!res.success) {
+      showError(res.error || "Falha na montagem do componente.");
+      return false;
     }
-
-    // 2. Update physical design appearance
-    const nextDesign = { ...targetSword.design };
-    if (comp.category === "guard") {
-      const raw = comp.componentKey.replace(/^guard_/, "");
-      const match = ["cross", "curved", "wings", "ring", "tsuba", "leaf", "imperial", "runic"].find((g) => raw.startsWith(g));
-      if (match) nextDesign.guard = match as any;
-    } else if (comp.category === "pommel") {
-      const raw = comp.componentKey.replace(/^pommel_/, "");
-      const match = ["disc", "sphere", "wolf", "cross", "crescent", "elven", "crown", "knot"].find((p) => raw.startsWith(p));
-      if (match) nextDesign.pommel = match as any;
-    } else if (comp.category === "wrap") {
-      const raw = comp.componentKey.replace(/^wrap_/, "");
-      const match = ["leather", "braided", "linen", "darkwood", "bone", "goldwire", "tsukamaki", "dragon_leather", "elven_wood"].find((w) => raw.startsWith(w));
-      if (match) nextDesign.wrap = match as any;
-    } else if (comp.category === "rune") {
-      nextDesign.runes = true;
-      if (comp.componentKey) {
-        nextDesign.runeKey = comp.componentKey;
-      }
-    }
-
-    // 3. Assemble sword with new component in category slot
-    const nextInstalled = {
-      ...existingInstalled,
-      [comp.category]: comp,
-    };
-
-    // Cleanly replace affix for this slot to avoid stacking affix labels
-    const existingAffixes = (targetSword.affixes || []).filter(
-      (affix) => !affix.startsWith(`Montagem [${comp.category}]:`) && !affix.startsWith(`Montagem de Bancada: ${previousComp?.name}`)
-    );
-    const newAffix = `Montagem [${comp.category}]: ${comp.name}`;
-
-    // 4. Recalculate deterministic attributes from metallurgical base + refinement + active components
-    const updatedSword = recalculateSwordStats({
-      ...targetSword,
-      design: nextDesign,
-      affixes: [...existingAffixes, newAffix],
-      installedComponents: nextInstalled,
-    });
-
-    // 5. Update state and persist
-    const nextInventory: PlayerInventory = {
-      ...currentSave.inventory,
-      components: nextComponents,
-    };
-    const nextGallery = currentSave.gallery.map((s) => (s.id === swordId ? updatedSword : s));
-
+    save.current = res.save;
     playUpgradeChime();
-    setInventory(nextInventory);
-    setGallery(nextGallery);
-    if (finished && finished.id === swordId) {
-      setFinished(updatedSword);
-    }
-    const saveRes = persist({ inventory: nextInventory, gallery: nextGallery });
-    if (!saveRes.ok) {
-      console.warn("[FioForja] Alerta de persistência na montagem de componente:", saveRes.error);
+    setInventory(res.save.inventory);
+    setGallery(res.save.gallery);
+    if (res.payload && finished && finished.id === swordId) {
+      setFinished(res.payload);
     }
     return true;
-  }, [finished, persist]);
+  }, [finished, showError]);
 
   useEffect(() => {
     if (screen !== "forge") return;
@@ -507,127 +376,145 @@ export function GameApp() {
     unlockAudio();
   };
 
-  if (screen === "title") {
-    return (
-      <TitleScreen
-        galleryCount={gallery.length}
-        onStart={() => {
-          unlockAudio();
-          setScreen("design");
-        }}
-        onGallery={() => setScreen("gallery")}
-      />
-    );
-  }
+  const renderScreen = () => {
+    if (screen === "title") {
+      return (
+        <TitleScreen
+          galleryCount={gallery.length}
+          onStart={() => {
+            unlockAudio();
+            setScreen("design");
+          }}
+          onGallery={() => setScreen("gallery")}
+        />
+      );
+    }
 
-  if (screen === "design") {
-    return (
-      <DesignScreen
-        design={design}
-        onChange={setDesign}
-        onBack={() => setScreen("title")}
-        onForge={startForge}
-      />
-    );
-  }
+    if (screen === "design") {
+      return (
+        <DesignScreen
+          design={design}
+          onChange={setDesign}
+          onBack={() => setScreen("title")}
+          onForge={startForge}
+        />
+      );
+    }
 
-  if (screen === "gallery") {
-    return (
-      <GalleryScreen
-        swords={gallery}
-        wallet={wallet}
-        inventory={inventory}
-        career={career}
-        onBack={() => setScreen("title")}
-        onForge={() => setScreen("design")}
-        onBuyTool={handleBuyTool}
-        onEquipTool={handleEquipTool}
-        onSelectPreset={handleSelectPreset}
-        onUpgrade={handleUpgradeSword}
-        onApplyComponentFusion={handleApplyComponentFusion}
-        onApplySwordFusion={handleApplySwordFusion}
-        onForgeCore={handleForgeCore}
-        onInstallComponent={handleInstallComponent}
-      />
-    );
-  }
+    if (screen === "gallery") {
+      return (
+        <GalleryScreen
+          swords={gallery}
+          wallet={wallet}
+          inventory={inventory}
+          career={career}
+          onBack={() => setScreen("title")}
+          onForge={() => setScreen("design")}
+          onBuyTool={handleBuyTool}
+          onBuyShopItem={handleBuyShopItem}
+          onEquipTool={handleEquipTool}
+          onSelectPreset={handleSelectPreset}
+          onUpgrade={handleUpgradeSword}
+          onApplyComponentFusion={handleApplyComponentFusion}
+          onApplySwordFusion={handleApplySwordFusion}
+          onForgeCore={handleForgeCore}
+          onInstallComponent={handleInstallComponent}
+        />
+      );
+    }
 
-  if (screen === "reveal" && finished) {
-    return (
-      <RevealScreen
-        sword={finished}
-        wallet={wallet}
-        inventory={inventory}
-        onUpgrade={handleUpgradeSword}
-        onInstallComponent={handleInstallComponent}
-        onClaimRewards={() => setScreen("rewards")}
-        onAgain={() => setScreen("design")}
-        onGallery={() => setScreen("gallery")}
-        onTitle={() => setScreen("title")}
-      />
-    );
-  }
+    if (screen === "reveal" && finished) {
+      return (
+        <RevealScreen
+          sword={finished}
+          wallet={wallet}
+          inventory={inventory}
+          onUpgrade={handleUpgradeSword}
+          onInstallComponent={handleInstallComponent}
+          onClaimRewards={() => setScreen("rewards")}
+          onAgain={() => setScreen("design")}
+          onGallery={() => setScreen("gallery")}
+          onTitle={() => setScreen("title")}
+        />
+      );
+    }
 
-  if (screen === "rewards" && finished) {
-    const rewards = finished.pendingRewards || generateForgeRewards(finished, { forgeRunId: finished.forgeRunId });
-    return (
-      <RewardsScreen
-        sword={finished}
-        rewards={rewards}
-        onClaim={handleClaimRewards}
-        onGallery={() => setScreen("gallery")}
-        onAgain={() => setScreen("design")}
-      />
-    );
-  }
+    if (screen === "rewards" && finished) {
+      const rewards = finished.pendingRewards || generateForgeRewards(finished, { forgeRunId: finished.forgeRunId });
+      return (
+        <RewardsScreen
+          sword={finished}
+          rewards={rewards}
+          onClaim={handleClaimRewards}
+          onGallery={() => setScreen("gallery")}
+          onAgain={() => setScreen("design")}
+        />
+      );
+    }
 
-  const unlockedHammers: import("./types").HammerType[] = ["standard"];
-  if (inventory.unlockedTools.includes("hammer_precision")) unlockedHammers.push("precision");
-  if (inventory.unlockedTools.includes("hammer_sledge")) unlockedHammers.push("sledge");
+    const unlockedHammers: import("./types").HammerType[] = ["standard"];
+    if (inventory.unlockedTools.includes("hammer_precision")) unlockedHammers.push("precision");
+    if (inventory.unlockedTools.includes("hammer_sledge")) unlockedHammers.push("sledge");
+
+    return (
+      <div className="relative h-dvh overflow-hidden bg-bg">
+        {images ? (
+          <ForgeCanvas
+            key={forgeKey}
+            design={design}
+            activeCore={activeCore}
+            images={images}
+            shake={save.current.shake}
+            reducedMotion={reducedMotion}
+            onHud={onHud}
+            onFinished={onFinished}
+            onStrikeReward={handleStrikeReward}
+            inputRef={inputRef}
+            inventory={inventory}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center font-display text-muted">
+            Acendendo o fogo da forja…
+          </div>
+        )}
+        <ForgeHud
+          hud={hud}
+          muted={muted}
+          unlockedHammers={unlockedHammers}
+          onMute={toggleMute}
+          onPull={() => {
+            inputRef.current.action = true;
+          }}
+          onReheat={() => {
+            inputRef.current.reheat = true;
+          }}
+          onSelectZone={(zone) => {
+            inputRef.current.switchZone = zone;
+          }}
+          onSelectHammer={(hammer) => {
+            inputRef.current.switchHammer = hammer;
+          }}
+          onQuit={() => {
+            inputRef.current.charging = false;
+            setScreen("title");
+          }}
+        />
+      </div>
+    );
+  };
 
   return (
-    <div className="relative h-dvh overflow-hidden bg-bg">
-      {images ? (
-        <ForgeCanvas
-          key={forgeKey}
-          design={design}
-          activeCore={activeCore}
-          images={images}
-          shake={save.current.shake}
-          reducedMotion={reducedMotion}
-          onHud={onHud}
-          onFinished={onFinished}
-          onStrikeReward={handleStrikeReward}
-          inputRef={inputRef}
-          inventory={inventory}
-        />
-      ) : (
-        <div className="flex h-full items-center justify-center font-display text-muted">
-          Acendendo o fogo da forja…
+    <>
+      {renderScreen()}
+      {errorToast && (
+        <div
+          role="alert"
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-red-950/95 border border-red-500/60 rounded-md text-amber-200 text-xs shadow-2xl font-display flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2"
+        >
+          <span className="text-red-400 font-bold">⚠️</span>
+          <span>{errorToast}</span>
         </div>
       )}
-      <ForgeHud
-        hud={hud}
-        muted={muted}
-        unlockedHammers={unlockedHammers}
-        onMute={toggleMute}
-        onPull={() => {
-          inputRef.current.action = true;
-        }}
-        onReheat={() => {
-          inputRef.current.reheat = true;
-        }}
-        onSelectZone={(zone) => {
-          inputRef.current.switchZone = zone;
-        }}
-        onSelectHammer={(hammer) => {
-          inputRef.current.switchHammer = hammer;
-        }}
-        onQuit={() => {
-          inputRef.current.charging = false;
-          setScreen("title");
-        }}
-      />
-    </div>
+    </>
   );
 }

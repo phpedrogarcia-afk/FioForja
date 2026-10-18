@@ -12,7 +12,7 @@ import {
   recalculateSwordStats,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
-import type { CareerStats, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
+import type { CareerStats, CombatRole, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
 import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
 import { generateForgeRewards } from "../sim";
@@ -20,6 +20,438 @@ import { defaultInventory, defaultWallet } from "../save";
 import { FusionStationScreen } from "./FusionStationScreen";
 import type { ComponentFusionOutcome, SwordFusionOutcome } from "../fusion";
 import type { FusionCore } from "../types";
+import type { ShopPurchaseItem } from "../transactions";
+
+export interface ShopArticle {
+  id: string;
+  name: string;
+  category: "materials" | "components" | "runes" | "catalysts";
+  type: "material" | "component" | "rune" | "catalyst";
+  costGold: number;
+  costRubies?: number;
+  icon: string;
+  desc: string;
+  stats?: string;
+  rarity: RarityGrade;
+  componentData?: {
+    category: "guard" | "pommel" | "wrap" | "rune";
+    componentKey: string;
+    rarity: RarityGrade;
+    icon: string;
+    description: string;
+    statModifier?: { damageBonus?: number; defenseBonus?: number; agilityBonus?: number; durabilityBonus?: number };
+  };
+}
+
+export const BAZAAR_ARTICLES: ShopArticle[] = [
+  // MATERIAIS & LINGOTES
+  {
+    id: "iron",
+    name: "Lingote de Ferro Forjado",
+    category: "materials",
+    type: "material",
+    costGold: 50,
+    icon: "🧱",
+    rarity: "Comum",
+    desc: "Massa sólida de ferro maleável tradicional para forjamento básico.",
+    stats: "Dureza: 75% · Faixa Térmica: 48-68%",
+  },
+  {
+    id: "steel",
+    name: "Barra de Aço Nobre do Reino",
+    category: "materials",
+    type: "material",
+    costGold: 140,
+    icon: "🪙",
+    rarity: "Incomum",
+    desc: "Liga de carbono balanceada para corte fino e lâminas cavalheirescas.",
+    stats: "Dureza: 88% · Faixa Térmica: 55-72%",
+  },
+  {
+    id: "damascus",
+    name: "Tarugo Dobrado de Damasco",
+    category: "materials",
+    type: "material",
+    costGold: 350,
+    costRubies: 1,
+    icon: "🌊",
+    rarity: "Rara",
+    desc: "Múltiplas dobras de aços nobres que produzem padrões ondulados e retenção elástica.",
+    stats: "Dureza: 94% · Padrão Moiré Natural",
+  },
+  {
+    id: "blacksteel",
+    name: "Bloco de Aço Negro Forjado",
+    category: "materials",
+    type: "material",
+    costGold: 450,
+    costRubies: 1,
+    icon: "⬛",
+    rarity: "Épica",
+    desc: "Aço de dureza extrema temperado em cinzas vulcânicas para retenção navalha.",
+    stats: "Dureza: 98% · Retenção Extrema de Fio",
+  },
+  {
+    id: "elven_silver",
+    name: "Lingote de Prata Élfica Sagrada",
+    category: "materials",
+    type: "material",
+    costGold: 850,
+    costRubies: 3,
+    icon: "✨",
+    rarity: "Lendária",
+    desc: "Liga ancestral luminosa forjada com harmonia natural e massa ultraleve.",
+    stats: "Dureza: 92% · Leveza Mítica e Equilíbrio",
+  },
+  {
+    id: "meteor",
+    name: "Fragmento de Meteorito Celestial",
+    category: "materials",
+    type: "material",
+    costGold: 1400,
+    costRubies: 5,
+    icon: "☄️",
+    rarity: "Relíquia",
+    desc: "Núcleo de bólido estelar colhido nas cordilheiras do norte cintilando com partículas astrais.",
+    stats: "Dureza: 105% · Estrutura Estelar Inquebrável",
+  },
+
+  // GUARNIÇÕES & CABOS
+  {
+    id: "guard_cross_iron",
+    name: "Guarda em Cruz Clássica",
+    category: "components",
+    type: "component",
+    costGold: 120,
+    icon: "🛡️",
+    rarity: "Comum",
+    desc: "Quilhões retos tradicionais de ferro maciço para proteção lateral confiável.",
+    stats: "+10 DEF",
+    componentData: {
+      category: "guard",
+      componentKey: "guard_cross",
+      rarity: "Comum",
+      icon: "🛡️",
+      description: "Quilhões retos tradicionais de ferro maciço.",
+      statModifier: { defenseBonus: 10 },
+    },
+  },
+  {
+    id: "guard_curved_falchion",
+    name: "Guarda Curva de Falchion",
+    category: "components",
+    type: "component",
+    costGold: 220,
+    icon: "🌙",
+    rarity: "Incomum",
+    desc: "Quilhões sinuosos que protegem os nós dos dedos e facilitam deflexões de corte.",
+    stats: "+6 ATK · +8 DEF",
+    componentData: {
+      category: "guard",
+      componentKey: "guard_curved",
+      rarity: "Incomum",
+      icon: "🌙",
+      description: "Quilhões sinuosos com deflexão de corte.",
+      statModifier: { damageBonus: 6, defenseBonus: 8 },
+    },
+  },
+  {
+    id: "guard_tsuba_forged",
+    name: "Tsuba Oriental Cinzelada",
+    category: "components",
+    type: "component",
+    costGold: 400,
+    costRubies: 1,
+    icon: "🔘",
+    rarity: "Rara",
+    desc: "Disco octogonal cinzelado em ferro escurecido com abertura de corte.",
+    stats: "+14 AGI · +8 DEF",
+    componentData: {
+      category: "guard",
+      componentKey: "guard_tsuba",
+      rarity: "Rara",
+      icon: "🔘",
+      description: "Disco tradicional de balanceamento para golpes rápidos.",
+      statModifier: { agilityBonus: 14, defenseBonus: 8 },
+    },
+  },
+  {
+    id: "guard_leaf_elven",
+    name: "Guarda em Gavinha Élfica",
+    category: "components",
+    type: "component",
+    costGold: 700,
+    costRubies: 2,
+    icon: "🌿",
+    rarity: "Lendária",
+    desc: "Quilhões moldados como folhas entrelaçadas que absorvem vibrações de impacto.",
+    stats: "+12 ATK · +12 AGI · +12 DEF",
+    componentData: {
+      category: "guard",
+      componentKey: "guard_leaf",
+      rarity: "Lendária",
+      icon: "🌿",
+      description: "Gavinhas florais de prata viva com absorção cinética.",
+      statModifier: { damageBonus: 12, agilityBonus: 12, defenseBonus: 12 },
+    },
+  },
+  {
+    id: "guard_wings_celestial",
+    name: "Guarda de Asas Celestes",
+    category: "components",
+    type: "component",
+    costGold: 1100,
+    costRubies: 4,
+    icon: "🪽",
+    rarity: "Relíquia",
+    desc: "Asas abertas esculpidas em bronze celestial que distribuem o peso da lâmina com perfeição.",
+    stats: "+18 ATK · +15 DEF · +10 DUR",
+    componentData: {
+      category: "guard",
+      componentKey: "guard_wings",
+      rarity: "Relíquia",
+      icon: "🪽",
+      description: "Asas heráldicas de proteção absoluta.",
+      statModifier: { damageBonus: 18, defenseBonus: 15, durabilityBonus: 10 },
+    },
+  },
+
+  // POMOS
+  {
+    id: "pommel_disc_balance",
+    name: "Pomo de Disco Balanceado",
+    category: "components",
+    type: "component",
+    costGold: 90,
+    icon: "💿",
+    rarity: "Comum",
+    desc: "Contrapeso clássico circular chanfrado que equilibra o centro de massa.",
+    stats: "+8 AGI",
+    componentData: {
+      category: "pommel",
+      componentKey: "pommel_disc",
+      rarity: "Comum",
+      icon: "💿",
+      description: "Disco clássico torneado de contrapeso.",
+      statModifier: { agilityBonus: 8 },
+    },
+  },
+  {
+    id: "pommel_crescent_kashira",
+    name: "Pomo Crescente Oriental (Kashira)",
+    category: "components",
+    type: "component",
+    costGold: 240,
+    icon: "🌘",
+    rarity: "Incomum",
+    desc: "Kashira metálico sóbrio que firma o aperto na base da empunhadura.",
+    stats: "+10 AGI · +5 ATK",
+    componentData: {
+      category: "pommel",
+      componentKey: "pommel_crescent",
+      rarity: "Incomum",
+      icon: "🌘",
+      description: "Kashira curvado de ferro temperado.",
+      statModifier: { agilityBonus: 10, damageBonus: 5 },
+    },
+  },
+  {
+    id: "pommel_elven_crystal",
+    name: "Pomo em Gema Élfica Lapidada",
+    category: "components",
+    type: "component",
+    costGold: 600,
+    costRubies: 2,
+    icon: "💎",
+    rarity: "Lendária",
+    desc: "Cristal gota lapidado em engaste floral que canaliza o fluxo de energia da espada.",
+    stats: "+15 AGI · +10 ATK · +8 DEF",
+    componentData: {
+      category: "pommel",
+      componentKey: "pommel_elven",
+      rarity: "Lendária",
+      icon: "💎",
+      description: "Cristal gota lapidado em engaste de prata sagrada.",
+      statModifier: { agilityBonus: 15, damageBonus: 10, defenseBonus: 8 },
+    },
+  },
+
+  // EMPUNHADURAS
+  {
+    id: "wrap_braided_leather",
+    name: "Empunhadura em Couro Trançado",
+    category: "components",
+    type: "component",
+    costGold: 110,
+    icon: "🧶",
+    rarity: "Comum",
+    desc: "Tiras de couro curtido trançadas com firmeza que não escorregam com suor.",
+    stats: "+6 DUR · +6 AGI",
+    componentData: {
+      category: "wrap",
+      componentKey: "wrap_braided",
+      rarity: "Comum",
+      icon: "🧶",
+      description: "Trançado de alta aderência para combate prolongado.",
+      statModifier: { durabilityBonus: 6, agilityBonus: 6 },
+    },
+  },
+  {
+    id: "wrap_tsukamaki_silk",
+    name: "Empunhadura Tsukamaki em Seda",
+    category: "components",
+    type: "component",
+    costGold: 340,
+    costRubies: 1,
+    icon: "🪢",
+    rarity: "Rara",
+    desc: "Cordão de seda vermelha entrelaçado em diamantes sobre base de arraia.",
+    stats: "+16 AGI · +8 ATK",
+    componentData: {
+      category: "wrap",
+      componentKey: "wrap_tsukamaki",
+      rarity: "Rara",
+      icon: "🪢",
+      description: "Trançado geométrico tradicional de seda oriental.",
+      statModifier: { agilityBonus: 16, damageBonus: 8 },
+    },
+  },
+  {
+    id: "wrap_goldwire_royal",
+    name: "Empunhadura em Fio de Ouro",
+    category: "components",
+    type: "component",
+    costGold: 750,
+    costRubies: 2,
+    icon: "👑",
+    rarity: "Lendária",
+    desc: "Espiral contínua de fio de ouro maciço sobre madeira nobre de ébano.",
+    stats: "+14 ATK · +12 DEF · +10 DUR",
+    componentData: {
+      category: "wrap",
+      componentKey: "wrap_goldwire",
+      rarity: "Lendária",
+      icon: "👑",
+      description: "Fio de ouro nobre enrolado com acabamento de corte imperial.",
+      statModifier: { damageBonus: 14, defenseBonus: 12, durabilityBonus: 10 },
+    },
+  },
+
+  // RUNAS FUTHARK
+  {
+    id: "rune_fehu_stone",
+    name: "Pedra Rúnica Fehu (Brasa)",
+    category: "runes",
+    type: "rune",
+    costGold: 320,
+    costRubies: 1,
+    icon: "ᚠ",
+    rarity: "Rara",
+    desc: "Inscrita com a runa da primeira faísca arrancada do sílex. Aumenta a retenção de calor.",
+    stats: "+12 ATK · +8 DUR",
+    componentData: {
+      category: "rune",
+      componentKey: "rune_fehu",
+      rarity: "Rara",
+      icon: "ᚠ",
+      description: "Fehu — O calor da fornalha vibra no gume.",
+      statModifier: { damageBonus: 12, durabilityBonus: 8 },
+    },
+  },
+  {
+    id: "rune_uruz_stone",
+    name: "Pedra Rúnica Uruz (Força Bruta)",
+    category: "runes",
+    type: "rune",
+    costGold: 220,
+    icon: "ᚢ",
+    rarity: "Incomum",
+    desc: "Inscrita com a runa do auroque primitivo. Aumenta o impacto e a massa dos golpes.",
+    stats: "+15 ATK",
+    componentData: {
+      category: "rune",
+      componentKey: "rune_uruz",
+      rarity: "Incomum",
+      icon: "ᚢ",
+      description: "Uruz — Poder de impacto primordial.",
+      statModifier: { damageBonus: 15 },
+    },
+  },
+  {
+    id: "rune_thurisaz_stone",
+    name: "Pedra Rúnica Thurisaz (Trovão)",
+    category: "runes",
+    type: "rune",
+    costGold: 520,
+    costRubies: 2,
+    icon: "ᚦ",
+    rarity: "Épica",
+    desc: "Inscrita com o martelo que estilhaça pedras. Libera centelhas de precisão extrema.",
+    stats: "+22 ATK · +8 AGI",
+    componentData: {
+      category: "rune",
+      componentKey: "rune_thurisaz",
+      rarity: "Épica",
+      icon: "ᚦ",
+      description: "Thurisaz — Centelhas de ressonância no impacto.",
+      statModifier: { damageBonus: 22, agilityBonus: 8 },
+    },
+  },
+  {
+    id: "rune_sowilo_stone",
+    name: "Pedra Rúnica Sowilo (Raio Solar)",
+    category: "runes",
+    type: "rune",
+    costGold: 950,
+    costRubies: 3,
+    icon: "ᛊ",
+    rarity: "Lendária",
+    desc: "Inscrita com a luz invencível que corta as trevas. Dá corte ágil sem atrito.",
+    stats: "+18 ATK · +24 AGI",
+    componentData: {
+      category: "rune",
+      componentKey: "rune_sowilo",
+      rarity: "Lendária",
+      icon: "ᛊ",
+      description: "Sowilo — Gume de luz solar e velocidade estelar.",
+      statModifier: { damageBonus: 18, agilityBonus: 24 },
+    },
+  },
+  {
+    id: "rune_tiwaz_stone",
+    name: "Pedra Rúnica Tiwaz (Vitória)",
+    category: "runes",
+    type: "rune",
+    costGold: 1600,
+    costRubies: 6,
+    icon: "ᛏ",
+    rarity: "Relíquia",
+    desc: "O juramento sagrado dos primeiros ferreiros. Concede integridade inabalável.",
+    stats: "+25 ATK · +20 DEF · +15 DUR",
+    componentData: {
+      category: "rune",
+      componentKey: "rune_tiwaz",
+      rarity: "Relíquia",
+      icon: "ᛏ",
+      description: "Tiwaz — A lâmina nunca curva ou recua.",
+      statModifier: { damageBonus: 25, defenseBonus: 20, durabilityBonus: 15 },
+    },
+  },
+
+  // CRISOL & CATALISADORES
+  {
+    id: "catalyst_astral",
+    name: "Catalisador Astral do Crisol",
+    category: "catalysts",
+    type: "catalyst",
+    costGold: 400,
+    costRubies: 1,
+    icon: "🔮",
+    rarity: "Rara",
+    desc: "Insumo indispensável para estabilizar a fusão de espadas no crisol e elevar a probabilidade de herança mítica.",
+    stats: "+1 Catalisador Astral no Inventário",
+  },
+];
 
 interface Props {
   swords: FinishedSword[];
@@ -29,6 +461,7 @@ interface Props {
   inventory?: PlayerInventory;
   career?: CareerStats;
   onBuyTool?: (toolId: string) => boolean;
+  onBuyShopItem?: (item: ShopPurchaseItem) => boolean;
   onEquipTool?: (toolId: string) => void;
   onSelectPreset?: (design: SwordDesign) => void;
   onUpgrade?: (sword: FinishedSword) => boolean;
@@ -48,6 +481,7 @@ export function GalleryScreen({
   inventory = defaultInventory,
   career,
   onBuyTool,
+  onBuyShopItem,
   onEquipTool,
   onSelectPreset,
   onUpgrade,
@@ -61,6 +495,15 @@ export function GalleryScreen({
   const [inspectRewards, setInspectRewards] = useState(false);
   const [filterRarity, setFilterRarity] = useState<string>("Todas");
   const [filterFamily, setFilterFamily] = useState<string>("Todas");
+
+  // Weapon Comparison State
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareSwordA, setCompareSwordA] = useState<FinishedSword | null>(null);
+  const [compareSwordB, setCompareSwordB] = useState<FinishedSword | null>(null);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+
+  // Medieval Bazaar Category State
+  const [shopCategory, setShopCategory] = useState<"tools" | "materials" | "components" | "runes" | "catalysts">("tools");
 
   // Keep inspected sword in sync when swords array updates in gallery
   useEffect(() => {
@@ -195,7 +638,7 @@ export function GalleryScreen({
       {/* PILLAR 1: ARSENAL */}
       {currentTab === "arsenal" && (
         <div className="mx-auto mt-4 w-full max-w-5xl">
-          {/* Filters Bar */}
+          {/* Filters & Actions Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#1b263b] bg-[#0c121e] p-2.5">
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="font-display text-[0.7rem] uppercase tracking-wider text-slate-400 mr-1">Raridade:</span>
@@ -214,20 +657,37 @@ export function GalleryScreen({
               ))}
             </div>
 
-            <div className="flex items-center gap-2 text-xs">
-              <span className="font-display text-[0.7rem] uppercase tracking-wider text-slate-400">Família:</span>
-              <select
-                value={filterFamily}
-                onChange={(e) => setFilterFamily(e.target.value)}
-                className="rounded border border-border bg-[#141c2c] px-2 py-1 text-xs text-slate-200 focus:outline-hidden"
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display text-[0.7rem] uppercase tracking-wider text-slate-400">Família:</span>
+                <select
+                  value={filterFamily}
+                  onChange={(e) => setFilterFamily(e.target.value)}
+                  className="rounded border border-border bg-[#141c2c] px-2 py-1 text-xs text-slate-200 focus:outline-hidden"
+                >
+                  <option value="Todas">Todas as Famílias</option>
+                  {Object.entries(FAMILIES).map(([id, fam]) => (
+                    <option key={id} value={id}>
+                      {fam.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Button
+                size="sm"
+                variant={compareMode ? "danger" : "secondary"}
+                onClick={() => {
+                  setCompareMode(!compareMode);
+                  if (compareMode) {
+                    setCompareSwordA(null);
+                    setCompareSwordB(null);
+                  }
+                }}
+                className="text-xs font-display font-semibold"
               >
-                <option value="Todas">Todas as Famílias</option>
-                {Object.entries(FAMILIES).map(([id, fam]) => (
-                  <option key={id} value={id}>
-                    {fam.name}
-                  </option>
-                ))}
-              </select>
+                {compareMode ? "✕ Cancelar Comparação" : "⚖️ Comparar Lâminas"}
+              </Button>
             </div>
           </div>
 
@@ -251,6 +711,9 @@ export function GalleryScreen({
               {filteredSwords.map((s) => {
                 const rarity = s.rarity || "Comum";
                 const isBroken = s.structuralState === "broken" || s.quality <= 15;
+                const isSelectedA = compareSwordA?.id === s.id;
+                const isSelectedB = compareSwordB?.id === s.id;
+
                 const rarityStyles: Record<RarityGrade, string> = {
                   Relíquia: "border-rose-500/70 bg-rose-950/25 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.15)]",
                   Lendária: "border-amber-500/70 bg-amber-950/25 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.15)]",
@@ -260,11 +723,33 @@ export function GalleryScreen({
                   Comum: "border-slate-700 bg-slate-900/40 text-slate-400",
                 };
 
+                const cardBorder = isSelectedA
+                  ? "border-amber-400 ring-2 ring-amber-400/60 bg-[#162035]"
+                  : isSelectedB
+                  ? "border-cyan-400 ring-2 ring-cyan-400/60 bg-[#162035]"
+                  : "border-[#202c40] bg-[#0b101a]";
+
                 return (
                   <li
                     key={s.id}
-                    onClick={() => setSelectedSword(s)}
-                    className="group cursor-pointer overflow-hidden rounded-xl border border-[#202c40] bg-[#0b101a] shadow-lg transition-all duration-200 hover:-translate-y-1 hover:border-amber-500/80 hover:shadow-[0_10px_35px_rgba(0,0,0,0.85)]"
+                    onClick={() => {
+                      if (compareMode) {
+                        if (!compareSwordA) {
+                          setCompareSwordA(s);
+                        } else if (compareSwordA.id === s.id) {
+                          setCompareSwordA(null);
+                        } else if (!compareSwordB) {
+                          setCompareSwordB(s);
+                        } else if (compareSwordB.id === s.id) {
+                          setCompareSwordB(null);
+                        } else {
+                          setCompareSwordB(s);
+                        }
+                      } else {
+                        setSelectedSword(s);
+                      }
+                    }}
+                    className={`group cursor-pointer overflow-hidden rounded-xl border shadow-lg transition-all duration-200 hover:-translate-y-1 hover:border-amber-500/80 hover:shadow-[0_10px_35px_rgba(0,0,0,0.85)] ${cardBorder}`}
                   >
                     <Thumb sword={s} />
                     <div className="p-3.5">
@@ -272,9 +757,22 @@ export function GalleryScreen({
                         <span className={`rounded-sm border px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider ${rarityStyles[rarity] || rarityStyles.Comum}`}>
                           {rarity}
                         </span>
-                        <span className="font-display text-xs text-slate-300 tabular-nums">
-                          Q: {s.quality} · {s.grade}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {compareMode && (
+                            <span className={`rounded px-1.5 py-0.2 text-[0.6rem] font-bold uppercase ${
+                              isSelectedA
+                                ? "bg-amber-500 text-black"
+                                : isSelectedB
+                                ? "bg-cyan-500 text-black"
+                                : "bg-black/50 text-slate-400 border border-slate-700"
+                            }`}>
+                              {isSelectedA ? "Slot A" : isSelectedB ? "Slot B" : "+ Comparar"}
+                            </span>
+                          )}
+                          <span className="font-display text-xs text-slate-300 tabular-nums">
+                            Q: {s.quality} · {s.grade}
+                          </span>
+                        </div>
                       </div>
                       <h3 className="mt-2 font-display text-base font-semibold text-fg group-hover:text-amber-200">
                         {s.design.name || "Lâmina Sem Nome"}
@@ -293,7 +791,7 @@ export function GalleryScreen({
                           {isBroken ? "💥 Fratura Estrutural" : FAMILIES[s.design.family || "royal"]?.name || "Aço Nobre"}
                         </span>
                         <span className="text-[0.7rem] font-display text-amber-400/90 group-hover:translate-x-0.5 transition-transform">
-                          Mesa de Inspeção →
+                          {compareMode ? "Selecionar ⚖️" : "Mesa de Inspeção →"}
                         </span>
                       </div>
                     </div>
@@ -301,6 +799,43 @@ export function GalleryScreen({
                 );
               })}
             </ul>
+          )}
+
+          {/* Sticky Comparison Bottom Dock */}
+          {compareMode && (compareSwordA || compareSwordB) && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl rounded-xl border border-amber-500/50 bg-[#0a0f18]/95 px-4 py-3 shadow-2xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 font-display animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`px-2.5 py-1 rounded border ${compareSwordA ? "border-amber-400 bg-amber-500/20 text-amber-200 font-bold" : "border-slate-700 bg-black/40 text-slate-500"}`}>
+                  {compareSwordA ? `A: ${compareSwordA.design.name}` : "Selecione Lâmina A"}
+                </div>
+                <span className="text-slate-400 font-bold">vs</span>
+                <div className={`px-2.5 py-1 rounded border ${compareSwordB ? "border-cyan-400 bg-cyan-500/20 text-cyan-200 font-bold" : "border-slate-700 bg-black/40 text-slate-500"}`}>
+                  {compareSwordB ? `B: ${compareSwordB.design.name}` : "Selecione Lâmina B"}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  disabled={!compareSwordA || !compareSwordB}
+                  onClick={() => setShowCompareModal(true)}
+                  className="bg-amber-500 text-black font-bold hover:bg-amber-400 text-xs disabled:opacity-40"
+                >
+                  ⚖️ Comparar Lado a Lado
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setCompareSwordA(null);
+                    setCompareSwordB(null);
+                    setCompareMode(false);
+                  }}
+                  className="text-xs text-slate-400 hover:text-white"
+                >
+                  ✕ Cancelar
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -527,108 +1062,202 @@ export function GalleryScreen({
         </div>
       )}
 
-      {/* PILLAR 5: OFICINA */}
+      {/* PILLAR 5: OFICINA & MERCADO MEDIEVAL */}
       {currentTab === "oficina" && (
-        <div className="mx-auto mt-4 w-full max-w-5xl">
+        <div className="mx-auto mt-4 w-full max-w-5xl space-y-4">
           <div className="rounded-xl border border-[#1e2a3e] bg-[#0d1320] p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-[#1b263b] pb-3">
               <div>
-                <h2 className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">
-                  Equipamentos da Ferraria Medieval
+                <h2 className="font-display text-base font-bold uppercase tracking-wider text-amber-300">
+                  Mercado & Oficina da Ferraria
                 </h2>
                 <p className="mt-1 text-xs text-slate-400">
-                  Ferramentas de forja adquiridas com ouro e gemas que alteram diretamente a cinética do martelo, rebote da bigorna e velocidade do fogo.
+                  Adquira ferramentas cinéticas, lingotes metalúrgicos nobres, peças de montagem e runas sagradas para seu arsenal.
                 </p>
               </div>
               <div className="flex items-center gap-3 self-start rounded border border-amber-500/30 bg-black/60 px-3 py-1 text-xs font-display sm:self-auto">
                 <span className="font-bold text-amber-300">🪙 {wallet.gold.toLocaleString()}</span>
                 <span className="font-bold text-red-400">💎 {wallet.rubies}</span>
+                <span className="font-bold text-cyan-400">🔷 {wallet.diamonds}</span>
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3">
-              {WORKSHOP_EQUIPMENT.map((tool) => {
-                const isUnlocked = tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id);
-                const canAfford = wallet.gold >= tool.costGold && wallet.rubies >= tool.costRubies;
-                const eq = inventory.equipped;
-                let isEquipped = false;
-                if (tool.id.startsWith("hammer_")) {
-                  isEquipped = (eq?.hammer || "standard") === tool.id.replace("hammer_", "");
-                } else if (tool.id.startsWith("anvil_")) {
-                  isEquipped = (eq?.anvil || "anvil_cast") === tool.id;
-                } else if (tool.id.startsWith("furnace_")) {
-                  isEquipped = (eq?.furnace || "furnace_coal") === tool.id;
-                } else if (tool.id.startsWith("quench_")) {
-                  isEquipped = (eq?.quench || "quench_water") === tool.id;
-                }
+            {/* Sub-category selector */}
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {[
+                { id: "tools" as const, label: "Ferramentas da Forja", icon: "⚒️" },
+                { id: "materials" as const, label: "Lingotes & Metais", icon: "🧱" },
+                { id: "components" as const, label: "Guarnições & Peças", icon: "🛡️" },
+                { id: "runes" as const, label: "Runas Futhark", icon: "ᚠ" },
+                { id: "catalysts" as const, label: "Crisol & Catalisadores", icon: "🔮" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setShopCategory(cat.id)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-display tracking-wider transition-all ${
+                    shopCategory === cat.id
+                      ? "bg-amber-500/20 text-amber-200 border border-amber-500 font-bold shadow-md shadow-amber-950/30"
+                      : "bg-[#0b101a] text-slate-400 border border-[#1b263b] hover:text-slate-200"
+                  }`}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
 
-                return (
-                  <div
-                    key={tool.id}
-                    className={`flex flex-col justify-between rounded-lg border p-3.5 transition-all ${
-                      isEquipped
-                        ? "border-amber-500 bg-[#141b2a] shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                        : "border-[#1b263b] bg-[#0a0f18] hover:border-amber-500/50"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">{tool.icon}</span>
-                          <div>
-                            <h3 className="font-display text-xs font-bold text-slate-200">{tool.name}</h3>
-                            <span className="text-[0.65rem] capitalize text-slate-400">{tool.category}</span>
+            {shopCategory === "tools" ? (
+              <div className="mt-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3">
+                {WORKSHOP_EQUIPMENT.map((tool) => {
+                  const isUnlocked = tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id);
+                  const canAfford = wallet.gold >= tool.costGold && wallet.rubies >= tool.costRubies;
+                  const eq = inventory.equipped;
+                  let isEquipped = false;
+                  if (tool.id.startsWith("hammer_")) {
+                    isEquipped = (eq?.hammer || "standard") === tool.id.replace("hammer_", "");
+                  } else if (tool.id.startsWith("anvil_")) {
+                    isEquipped = (eq?.anvil || "anvil_cast") === tool.id;
+                  } else if (tool.id.startsWith("furnace_")) {
+                    isEquipped = (eq?.furnace || "furnace_coal") === tool.id;
+                  } else if (tool.id.startsWith("quench_")) {
+                    isEquipped = (eq?.quench || "quench_water") === tool.id;
+                  }
+
+                  return (
+                    <div
+                      key={tool.id}
+                      className={`flex flex-col justify-between rounded-lg border p-3.5 transition-all ${
+                        isEquipped
+                          ? "border-amber-500 bg-[#141b2a] shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                          : "border-[#1b263b] bg-[#0a0f18] hover:border-amber-500/50"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{tool.icon}</span>
+                            <div>
+                              <h3 className="font-display text-xs font-bold text-slate-200">{tool.name}</h3>
+                              <span className="text-[0.65rem] capitalize text-slate-400">{tool.category}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {isEquipped && (
+                              <span className="rounded border border-amber-500/60 bg-amber-500/20 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase text-amber-300">
+                                Equipado
+                              </span>
+                            )}
+                            <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
+                              {tool.rarity}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          {isEquipped && (
-                            <span className="rounded border border-amber-500/60 bg-amber-500/20 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase text-amber-300">
-                              Equipado
-                            </span>
-                          )}
-                          <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
-                            {tool.rarity}
-                          </span>
-                        </div>
+                        <p className="mt-2 text-xs font-semibold text-amber-200">{tool.stats}</p>
+                        <p className="mt-1.5 text-[0.72rem] text-slate-400">{tool.description}</p>
                       </div>
-                      <p className="mt-2 text-xs font-semibold text-amber-200">{tool.stats}</p>
-                      <p className="mt-1.5 text-[0.72rem] text-slate-400">{tool.description}</p>
-                    </div>
 
-                    <div className="mt-4 flex items-center justify-between border-t border-[#1b263b] pt-2.5 text-xs">
-                      <span className="font-semibold text-amber-300">
-                        {tool.costGold === 0 ? "Padrão da Oficina" : `${tool.costGold.toLocaleString()} 🪙 ${tool.costRubies ? `+ ${tool.costRubies} 💎` : ""}`}
-                      </span>
-                      {isUnlocked ? (
-                        isEquipped ? (
-                          <span className="text-emerald-400 font-bold text-xs flex items-center gap-1">
-                            ✓ Em Uso
-                          </span>
+                      <div className="mt-4 flex items-center justify-between border-t border-[#1b263b] pt-2.5 text-xs">
+                        <span className="font-semibold text-amber-300">
+                          {tool.costGold === 0 ? "Padrão da Oficina" : `${tool.costGold.toLocaleString()} 🪙 ${tool.costRubies ? `+ ${tool.costRubies} 💎` : ""}`}
+                        </span>
+                        {isUnlocked ? (
+                          isEquipped ? (
+                            <span className="text-emerald-400 font-bold text-xs flex items-center gap-1">
+                              ✓ Em Uso
+                            </span>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => onEquipTool?.(tool.id)}
+                              className="border-amber-500/50 bg-[#121a2c] text-xs font-bold text-amber-200 hover:bg-[#1a253e]"
+                            >
+                              Equipar
+                            </Button>
+                          )
                         ) : (
                           <Button
                             size="sm"
-                            variant="secondary"
-                            onClick={() => onEquipTool?.(tool.id)}
-                            className="border-amber-500/50 bg-[#121a2c] text-xs font-bold text-amber-200 hover:bg-[#1a253e]"
+                            disabled={!canAfford}
+                            onClick={() => onBuyTool?.(tool.id)}
+                            className="bg-amber-600 text-xs font-bold text-stone-950 hover:bg-amber-500 disabled:opacity-50"
                           >
-                            Equipar
+                            Adquirir
                           </Button>
-                        )
-                      ) : (
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3">
+                {BAZAAR_ARTICLES.filter((art) => art.category === shopCategory).map((art) => {
+                  const canAfford = wallet.gold >= art.costGold && (!art.costRubies || wallet.rubies >= art.costRubies);
+                  let ownedCount = 0;
+                  if (art.type === "material") {
+                    ownedCount = inventory.materials?.[art.id] || 0;
+                  } else if (art.type === "catalyst") {
+                    ownedCount = inventory.materials?.catalyst_astral || 0;
+                  } else if (art.type === "component" || art.type === "rune") {
+                    ownedCount = (inventory.components || []).filter((c) => c.componentKey === art.componentData?.componentKey).length;
+                  }
+
+                  return (
+                    <div
+                      key={art.id}
+                      className="flex flex-col justify-between rounded-lg border border-[#1b263b] bg-[#0a0f18] p-3.5 transition-all hover:border-amber-500/50"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{art.icon}</span>
+                            <div>
+                              <h3 className="font-display text-xs font-bold text-slate-200">{art.name}</h3>
+                              <span className="text-[0.65rem] text-slate-400">Possui: {ownedCount}</span>
+                            </div>
+                          </div>
+                          <span className="rounded bg-[#141b2a] px-1.5 py-0.5 text-[0.62rem] font-bold text-amber-300">
+                            {art.rarity}
+                          </span>
+                        </div>
+                        {art.stats && <p className="mt-2 text-xs font-semibold text-amber-200">{art.stats}</p>}
+                        <p className="mt-1.5 text-[0.72rem] text-slate-400">{art.desc}</p>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between border-t border-[#1b263b] pt-2.5 text-xs">
+                        <span className="font-semibold text-amber-300">
+                          {art.costGold.toLocaleString()} 🪙 {art.costRubies ? `+ ${art.costRubies} 💎` : ""}
+                        </span>
                         <Button
                           size="sm"
                           disabled={!canAfford}
-                          onClick={() => onBuyTool?.(tool.id)}
+                          onClick={() => {
+                            onBuyShopItem?.({
+                              id: art.id,
+                              name: art.name,
+                              type: art.type,
+                              costGold: art.costGold,
+                              costRubies: art.costRubies,
+                              quantity: 1,
+                              componentData: art.componentData
+                                ? {
+                                    name: art.name,
+                                    ...art.componentData,
+                                  }
+                                : undefined,
+                            });
+                          }}
                           className="bg-amber-600 text-xs font-bold text-stone-950 hover:bg-amber-500 disabled:opacity-50"
                         >
-                          Adquirir
+                          Comprar
                         </Button>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -705,6 +1334,15 @@ export function GalleryScreen({
           onForgeCore={onForgeCore}
         />
       )}
+
+      {/* PILLAR 5: COMPARADOR REAL DE LÂMINAS */}
+      {showCompareModal && compareSwordA && compareSwordB && (
+        <WeaponComparisonModal
+          swordA={compareSwordA}
+          swordB={compareSwordB}
+          onClose={() => setShowCompareModal(false)}
+        />
+      )}
     </div>
   );
 }
@@ -753,3 +1391,272 @@ function Thumb({ sword }: { sword: FinishedSword }) {
   }, [sword]);
   return <canvas ref={ref} className="h-44 w-full bg-[#0d1220]" />;
 }
+
+function WeaponComparisonModal({
+  swordA,
+  swordB,
+  onClose,
+}: {
+  swordA: FinishedSword;
+  swordB: FinishedSword;
+  onClose: () => void;
+}) {
+  const rarityColors: Record<RarityGrade, string> = {
+    Relíquia: "text-rose-400 border-rose-500/50 bg-rose-950/30",
+    Lendária: "text-amber-400 border-amber-500/50 bg-amber-950/30",
+    Épica: "text-purple-400 border-purple-500/50 bg-purple-950/30",
+    Rara: "text-blue-400 border-blue-500/50 bg-blue-950/30",
+    Incomum: "text-emerald-400 border-emerald-500/50 bg-emerald-950/30",
+    Comum: "text-slate-400 border-slate-700 bg-slate-900/30",
+  };
+
+  const roleIcons: Record<CombatRole, string> = {
+    Ofensiva: "⚔️",
+    Defensiva: "🛡️",
+    Ágil: "⚡",
+    Equilibrada: "⚖️",
+    Excepcional: "👑",
+  };
+
+  const roleA: CombatRole = swordA.combatRole || "Equilibrada";
+  const roleB: CombatRole = swordB.combatRole || "Equilibrada";
+
+  const atkA = swordA.damage ?? 0;
+  const atkB = swordB.damage ?? 0;
+  const defA = swordA.defense ?? 0;
+  const defB = swordB.defense ?? 0;
+  const agiA = swordA.agility ?? 0;
+  const agiB = swordB.agility ?? 0;
+  const durA = swordA.durability ?? 0;
+  const durB = swordB.durability ?? 0;
+  const qA = swordA.quality;
+  const qB = swordB.quality;
+
+  const renderDelta = (valA: number, valB: number) => {
+    const diff = valA - valB;
+    if (diff === 0) return <span className="text-slate-500 text-xs font-mono font-semibold">(=)</span>;
+    if (diff > 0) return <span className="text-emerald-400 text-xs font-mono font-bold">+{diff} (A)</span>;
+    return <span className="text-cyan-400 text-xs font-mono font-bold">+{Math.abs(diff)} (B)</span>;
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in"
+    >
+      <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-amber-500/50 bg-[#0a0f19] shadow-2xl">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-[#1f2b40] bg-[#0d1422] px-6 py-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚖️</span>
+            <div>
+              <h2 className="font-display text-lg font-bold uppercase tracking-wider text-amber-200">
+                Comparador Tático de Lâminas
+              </h2>
+              <p className="text-xs text-slate-400">
+                Análise comparativa de geometria, atributos metalúrgicos, especialização e engastes
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg border border-slate-700 bg-slate-800/80 p-2 text-slate-300 hover:bg-slate-700 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Side by side preview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Slot A */}
+            <div className="rounded-xl border border-amber-500/40 bg-[#0d1320] p-4 flex flex-col">
+              <div className="flex items-center justify-between">
+                <span className="rounded bg-amber-500 px-2 py-0.5 text-[0.65rem] font-bold text-black uppercase">
+                  Slot A
+                </span>
+                <span
+                  className={`rounded border px-2 py-0.5 text-[0.65rem] font-bold uppercase ${
+                    rarityColors[swordA.rarity || "Comum"]
+                  }`}
+                >
+                  {swordA.rarity || "Comum"}
+                </span>
+              </div>
+              <h3 className="mt-2 font-display text-base font-bold text-amber-100">
+                {swordA.design.name || "Lâmina A"}
+              </h3>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="rounded bg-[#131b2e] px-2 py-0.5 text-xs text-amber-300 font-semibold border border-amber-500/30">
+                  {roleIcons[roleA]} Função: {roleA}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {STEELS[swordA.design.steel]?.name || swordA.design.steel}
+                </span>
+              </div>
+              <div className="mt-3 overflow-hidden rounded-lg border border-[#1b263b] bg-[#070b12]">
+                <Thumb sword={swordA} />
+              </div>
+            </div>
+
+            {/* Slot B */}
+            <div className="rounded-xl border border-cyan-500/40 bg-[#0d1320] p-4 flex flex-col">
+              <div className="flex items-center justify-between">
+                <span className="rounded bg-cyan-500 px-2 py-0.5 text-[0.65rem] font-bold text-black uppercase">
+                  Slot B
+                </span>
+                <span
+                  className={`rounded border px-2 py-0.5 text-[0.65rem] font-bold uppercase ${
+                    rarityColors[swordB.rarity || "Comum"]
+                  }`}
+                >
+                  {swordB.rarity || "Comum"}
+                </span>
+              </div>
+              <h3 className="mt-2 font-display text-base font-bold text-cyan-100">
+                {swordB.design.name || "Lâmina B"}
+              </h3>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="rounded bg-[#131b2e] px-2 py-0.5 text-xs text-cyan-300 font-semibold border border-cyan-500/30">
+                  {roleIcons[roleB]} Função: {roleB}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {STEELS[swordB.design.steel]?.name || swordB.design.steel}
+                </span>
+              </div>
+              <div className="mt-3 overflow-hidden rounded-lg border border-[#1b263b] bg-[#070b12]">
+                <Thumb sword={swordB} />
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Attributes Comparison Table */}
+          <div className="rounded-xl border border-[#1d273a] bg-[#090e18] p-4">
+            <h4 className="font-display text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">
+              Métricas de Combate & Forja
+            </h4>
+            <div className="divide-y divide-[#172030] text-xs">
+              <div className="grid grid-cols-4 py-2 font-bold text-slate-400 uppercase text-[0.68rem]">
+                <span>Atributo</span>
+                <span className="text-amber-300">Lâmina A</span>
+                <span className="text-center text-slate-400">Vantagem</span>
+                <span className="text-right text-cyan-300">Lâmina B</span>
+              </div>
+
+              {/* P.ATK */}
+              <div className="grid grid-cols-4 py-2.5 items-center">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  ⚔️ Poder de Ataque (P.ATK)
+                </span>
+                <span className="font-mono font-bold text-amber-200">{atkA}</span>
+                <span className="text-center">{renderDelta(atkA, atkB)}</span>
+                <span className="text-right font-mono font-bold text-cyan-200">{atkB}</span>
+              </div>
+
+              {/* DEF */}
+              <div className="grid grid-cols-4 py-2.5 items-center">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  🛡️ Defesa / Bloqueio (DEF)
+                </span>
+                <span className="font-mono font-bold text-amber-200">{defA}</span>
+                <span className="text-center">{renderDelta(defA, defB)}</span>
+                <span className="text-right font-mono font-bold text-cyan-200">{defB}</span>
+              </div>
+
+              {/* AGI */}
+              <div className="grid grid-cols-4 py-2.5 items-center">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  ⚡ Agilidade / Velocidade (AGI)
+                </span>
+                <span className="font-mono font-bold text-amber-200">{agiA}</span>
+                <span className="text-center">{renderDelta(agiA, agiB)}</span>
+                <span className="text-right font-mono font-bold text-cyan-200">{agiB}</span>
+              </div>
+
+              {/* DUR */}
+              <div className="grid grid-cols-4 py-2.5 items-center">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  🔨 Durabilidade Estrutural (DUR)
+                </span>
+                <span className="font-mono font-bold text-amber-200">{durA}</span>
+                <span className="text-center">{renderDelta(durA, durB)}</span>
+                <span className="text-right font-mono font-bold text-cyan-200">{durB}</span>
+              </div>
+
+              {/* Qualidade */}
+              <div className="grid grid-cols-4 py-2.5 items-center">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  ✨ Grau de Maestria (Qualidade)
+                </span>
+                <span className="font-mono font-bold text-amber-200">{qA}/100 ({swordA.grade})</span>
+                <span className="text-center">{renderDelta(qA, qB)}</span>
+                <span className="text-right font-mono font-bold text-cyan-200">{qB}/100 ({swordB.grade})</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Component slots & Runes summary */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-[#1c2638] bg-[#0c121e] p-3.5 text-xs">
+              <h5 className="font-display font-bold text-amber-300 uppercase text-[0.7rem] mb-2">
+                Peças & Gravuras de A
+              </h5>
+              <div className="space-y-1.5 text-slate-300">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Guarda:</span>
+                  <span>{swordA.installedComponents?.guard?.name || "Original da Forja"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Pomo:</span>
+                  <span>{swordA.installedComponents?.pommel?.name || "Original da Forja"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Empunhadura:</span>
+                  <span>{swordA.installedComponents?.wrap?.name || "Couro Cru"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Runa Incrustada:</span>
+                  <span className="font-bold text-amber-200">{swordA.installedComponents?.rune?.name || (swordA.design.runes ? "Runa Gravada" : "Nenhuma")}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[#1c2638] bg-[#0c121e] p-3.5 text-xs">
+              <h5 className="font-display font-bold text-cyan-300 uppercase text-[0.7rem] mb-2">
+                Peças & Gravuras de B
+              </h5>
+              <div className="space-y-1.5 text-slate-300">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Guarda:</span>
+                  <span>{swordB.installedComponents?.guard?.name || "Original da Forja"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Pomo:</span>
+                  <span>{swordB.installedComponents?.pommel?.name || "Original da Forja"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Empunhadura:</span>
+                  <span>{swordB.installedComponents?.wrap?.name || "Couro Cru"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Runa Incrustada:</span>
+                  <span className="font-bold text-cyan-200">{swordB.installedComponents?.rune?.name || (swordB.design.runes ? "Runa Gravada" : "Nenhuma")}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-end border-t border-[#1f2b40] bg-[#0d1422] px-6 py-3">
+          <Button onClick={onClose} className="bg-amber-600 font-bold text-stone-950 hover:bg-amber-500">
+            Concluir Comparação
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

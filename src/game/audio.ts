@@ -276,18 +276,26 @@ export function playCoinJingle() {
   if (!ctx || !sfx) return;
   const audioCtx = ctx;
   const t = now();
-  // Delicate double chime in high register (C7: 2093Hz, E7: 2637Hz)
-  const freqs = [2093.0, 2637.0];
-  freqs.forEach((freq, idx) => {
-    const delay = idx * 0.055;
+  // Delicate multi-tone coin chime with natural organic pitch jitter (+/- 2.5%)
+  const jitter = 1 + (Math.random() * 0.05 - 0.025);
+  // High register chime pairs: [C7, E7], [E7, G7], or [D7, A7] for organic acoustic variety per strike
+  const pairs = [
+    [2093.0, 2637.0],
+    [2637.0, 3135.96],
+    [2349.32, 3520.0],
+  ];
+  const choice = pairs[Math.floor(Math.random() * pairs.length)];
+  choice.forEach((freq, idx) => {
+    const delay = idx * (0.045 + Math.random() * 0.015);
     const osc = audioCtx.createOscillator();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, t + delay);
-    const g = envGain(0.14, 0.22, 0.003);
+    osc.frequency.setValueAtTime(freq * jitter, t + delay);
+    // Envelope: quick crisp transient attack and pure metallic decay
+    const g = envGain(0.16, 0.2, 0.002);
     if (g) {
       osc.connect(g);
       osc.start(t + delay);
-      osc.stop(t + delay + 0.15);
+      osc.stop(t + delay + 0.17);
     }
   });
 }

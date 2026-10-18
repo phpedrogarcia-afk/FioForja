@@ -302,13 +302,25 @@ export function writeSave(data: SaveData): import("./types.ts").SaveResult {
   }
 
   try {
-    // Preserve current primary state into backup slot before overwriting
+    // Preserve current primary state into backup slot before overwriting, only if valid!
     const existingRaw = storage.getItem(KEY);
     if (existingRaw) {
+      let isExistingValid = false;
       try {
-        storage.setItem(BACKUP_KEY, existingRaw);
+        const parsed = JSON.parse(existingRaw);
+        if (parsed && typeof parsed === "object" && (Array.isArray(parsed.gallery) || parsed.version)) {
+          isExistingValid = true;
+        }
       } catch {
-        /* non-fatal if backup slot is tight */
+        isExistingValid = false;
+      }
+
+      if (isExistingValid) {
+        try {
+          storage.setItem(BACKUP_KEY, existingRaw);
+        } catch {
+          /* non-fatal if backup slot is tight */
+        }
       }
     } else {
       try {

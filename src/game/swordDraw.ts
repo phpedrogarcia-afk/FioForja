@@ -702,7 +702,7 @@ function drawHilt(
   ctx.fillRect(-8, -W * 0.22, 16, W * 0.44);
 
   // Crossguard
-  drawGuard(ctx, design.guard, W, quality);
+  drawGuard(ctx, design.guard, W, quality, design.runes);
 
   // Specialized wrap grip texture and physical material
   drawWrapGrip(ctx, design.wrap, wrapColor, -grip - 6, W, grip, quality);
@@ -896,6 +896,7 @@ function drawGuard(
   id: SwordDesign["guard"],
   W: number,
   quality: number,
+  hasRunes = false,
 ) {
   const isMasterwork = quality >= 88;
   const guardGold = isMasterwork ? "#d4af37" : "#c4b49a";
@@ -916,14 +917,14 @@ function drawGuard(
     ctx.fill();
     ctx.stroke();
 
-    // Central diamond boss with turquoise gem (as in Reference Image 2!)
+    // Central diamond boss with tasteful stone / gold inlay
     ctx.beginPath();
     ctx.moveTo(0, -6);
     ctx.lineTo(6, 0);
     ctx.lineTo(0, 6);
     ctx.lineTo(-6, 0);
     ctx.closePath();
-    ctx.fillStyle = isMasterwork ? "#00f2fe" : "#b09060";
+    ctx.fillStyle = isMasterwork ? (hasRunes ? "#70d6ff" : "#d4af37") : "#b09060";
     ctx.fill();
     ctx.stroke();
   } else if (id === "curved") {
@@ -1020,7 +1021,7 @@ function drawGuard(
     ctx.lineTo(-4, 0);
     ctx.lineTo(0, W * 0.4);
     ctx.lineTo(-4, W * 0.9);
-    ctx.strokeStyle = isMasterwork ? "#00f2fe" : "rgba(80,100,120,0.7)";
+    ctx.strokeStyle = isMasterwork && hasRunes ? "rgba(140,220,255,0.75)" : "rgba(80,100,120,0.7)";
     ctx.lineWidth = 1.6;
     ctx.stroke();
   } else {
@@ -1034,13 +1035,21 @@ function drawGuard(
     ctx.fill();
   }
 
-  // Gemstone sparkle in Masterwork
+  // Gemstone / Boss in Masterwork (Controlled illumination, no neon halation)
   if (isMasterwork && id !== "tsuba" && id !== "imperial") {
     ctx.beginPath();
-    ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = "#00f2fe";
-    ctx.shadowColor = "#00f2fe";
-    ctx.shadowBlur = 8;
+    ctx.arc(0, 0, 3.2, 0, Math.PI * 2);
+    if (hasRunes) {
+      // Ethereal subtle runic spark (restrained, max 2.5px blur)
+      ctx.fillStyle = "rgba(180, 235, 255, 0.9)";
+      ctx.shadowColor = "rgba(100, 200, 240, 0.45)";
+      ctx.shadowBlur = 2.5;
+    } else {
+      // Physical medieval polished boss: garnet cabochon, jade, or brass rosette
+      ctx.fillStyle = id === "leaf" ? "#7ca668" : "#8b1e1e";
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+    }
     ctx.fill();
     ctx.shadowBlur = 0;
   }

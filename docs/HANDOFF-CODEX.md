@@ -1,19 +1,19 @@
 # FioForja — Contrato de Transferência e Handoff para o Codex
-## Guia Definitivo de Continuidade entre Agentes Autônomos (Operação Arsenal Vivo 01.2 Integrity)
+## Guia Definitivo de Continuidade entre Agentes Autônomos (Operação 02: A Forja do Prestígio)
 
 ---
 
 ### 1. ONDE ESTAMOS?
 - **Repositório:** `phpedrogarcia-afk/FioForja`
-- **Branch Ativa:** `antigravity/arsenal-vivo-integrity`
-- **Base de Continuidade:** `antigravity/arsenal-vivo-hardening` (Commit `f63fad12caaf9a1707ef190fb7c6f43b30044743`)
-- **Estado Geral:** O Arsenal Vivo foi consolidado com integridade total de itens, anti-stacking de atributos, persistência com backups atômicos, herança física de núcleos e identidade visual expandida:
-  - **Eliminação de Acúmulo Infinito de Atributos:** Decomposição em camadas (`baseDamage`, `baseDefense`, etc.) e recálculo determinístico via `recalculateSwordStats()`. A substituição de uma peça desinstala e devolve a anterior ao inventário.
-  - **Persistência Segura com Backups Atômicos:** `writeSave()` cria e atualiza um snapshot íntegro em `a-forja-save-backup` antes da sobrescrita e retorna `SaveResult`. `loadSave()` detecta corrupção no save primário e recupera o estado de backup automaticamente.
-  - **Catálogo de Loot Expandido & Zero Duplicatas:** Mais de 10 itens Comuns autênticos adicionados; algoritmo garante 4 itens com chaves de catálogo estritamente distintas em 100% dos drops.
-  - **Identidade Visual Real de Componentes:** Texturas e desenhos procedurais para empunhaduras em `swordDraw.ts` (`dragon_leather`, `tsukamaki`, `goldwire`, `bone`, etc.) e runas nórdicas cinzeladas no sangradouro.
-  - **Herança Física de Núcleos de Fusão:** O Crisol de Fusão extrai `CoreHeritageProfile` (`attackBias`, `defenseBias`, `agilityBias`, `durabilityBias`), transmitindo tendências de combate calibradas para a lâmina forjada na bigorna.
-  - **Economia por Golpes Desacoplada de Setters:** Transação atômica pura `applyStrikeRewardTransaction()` fora dos callbacks de render, com deduplicação e compactação automática do histórico (máximo 200 IDs) para evitar vazamento de memória.
+- **Branch Ativa:** `antigravity/forge-of-prestige-v1`
+- **Base de Continuidade:** `antigravity/arsenal-vivo-integrity` (Commit `cd59d6bddc6c729d95fae80cd1430bc6d2047295`)
+- **Estado Geral:** A Operação 02 consolidou o FioForja com foco total no prestígio, armas extraordinárias, transações puras fail-closed e mercado medieval autêntico:
+  - **Consolidação Transacional Fail-Closed (`src/game/transactions.ts`):** 9 mutações de estado isoladas em funções puras testadas com falha de storage induzida (`QuotaExceededError`). Nenhuma alteração é refletida em memória ou interface sem confirmação de escrita persistente.
+  - **5 Lâminas de Referência Canônicas com Identidade Real:** Padrões em `CANONICAL_PRESETS` cobrindo Medieval Comum (`guarda_medieval`), Damasco (`cimitarra_damasco`), Oriental (`lua_silenciosa`), Élfica (`folha_aereth`) e Meteórica (`queda_asterion`), com zero neon em cruzetas e respeito integral a `docs/canon/estetica.md`.
+  - **Funções de Combate & Especialização (`CombatRole`):** Papéis `Ofensiva`, `Defensiva`, `Ágil`, `Equilibrada` e `Excepcional` com multiplicadores físicos sobre P.ATK, DEF, AGI e DUR.
+  - **Comparador Tático de Lâminas (`WeaponComparisonModal`):** Modal de alta fidelidade para comparação lado a lado de qualquer par de lâminas do Arsenal com visualização das peças instaladas e cálculo de vantagens (+X / +Y).
+  - **Bazar Medieval da Oficina Expandido:** 5 abas ativas para compra com ouro e rubis (Ferramentas, Lingotes, Guarnições, Runas Futhark e Catalisadores).
+  - **Sensorial de Áudio Aprimorado:** Micro-jitter harmônico em `playCoinJingle` (+/- 2.5% de pitch) e fanfares de conclusão de forja.
 
 ---
 
@@ -25,49 +25,40 @@
 ---
 
 ### 3. COMO FUNCIONA A ARQUITETURA?
-1. **Simulação e Física (`src/game/sim.ts`):**
+1. **Transações Puras Fail-Closed (`src/game/transactions.ts`):**
+   - Todas as modificações de Save são executadas deterministicamente: `executeSwordFusionTransaction`, `executeComponentFusionTransaction`, `executeComponentInstallTransaction`, `executeUpgradeSwordTransaction`, `executeShopPurchaseTransaction`, `executeClaimRewardsTransaction`, `executeFinishSwordTransaction` e `executeStrikeRewardTransaction`.
+   - Se `writeSave()` falhar, o estado em memória é descartado e o backup em `a-forja-save-backup` permanece intacto.
+2. **Simulação e Física (`src/game/sim.ts`, `src/game/catalog.ts`):**
    - Estado de forja (`SimState`) com calor, estresse, trincas, zonas de impacto (`base`, `mid`, `tip`), `PhysicalBladeProfile` e suporte a `activeCore`.
-   - `finishSword()` herda linhagem genética do núcleo (`fusionHistory`, `inheritedPerks`, `bonusQuality`, `heritage`), gera `pendingRewards` deterministicamente e executa `recalculateSwordStats()`.
-2. **Renderização Visual (`src/game/ForgeCanvas.tsx`, `src/game/swordDraw.ts`):**
+   - `finishSword()` herda linhagem genética do núcleo (`fusionHistory`, `inheritedPerks`, `bonusQuality`, `heritage`), determina `combatRole` e executa `recalculateSwordStats()`.
+3. **Renderização Visual (`src/game/ForgeCanvas.tsx`, `src/game/swordDraw.ts`):**
    - Canvas 2D em 60 FPS com interpolação suave.
-   - Deformação plástica contínua da lâmina orientada pelo perfil físico.
-   - Entalhe chanfrado em baixo-relevo de runas sem neon artificial.
-   - `drawWrapGrip()` renderiza texturas procedurais táteis para cada material de empunhadura.
-3. **Economia e Drops (`src/game/loot.ts`, `src/game/catalog.ts`):**
-   - Tabelas de loot com pesos calibrados por Rank de forja e semente Mulberry32 determinística gerada por hash de `forgeRunId`.
-   - Idempotência transacional via `claimedForgeRewardIds` para impedir recolhe duplicado.
-4. **Crisol de Fusão (`src/game/fusion.ts`, `src/game/screens/FusionStationScreen.tsx`):**
-   - Valida 4 itens elegíveis sem repetições, mesma categoria e sem lâminas quebradas.
-   - Três tiers de resultado: Refinado, Superior (+1 rank) e Excepcional (+2 ranks).
-   - Espadas geram `FusionCore` com perfil de herança para forjamento manual na bigorna.
-5. **Persistência (`src/game/save.ts`):**
-   - Save v5 em `localStorage` (`a-forja-save`) com backup atômico em `a-forja-save-backup`.
-   - Tratamento de `QuotaExceededError` e recuperação automática em caso de corrupção.
+   - Texturas táteis para empunhaduras e runas Elder Futhark talhadas em baixo-relevo chanfrado no sangradouro.
+   - Restrição estrita de neon cyan: lâminas físicas usam cabochões de granada e latão na cruzeta; apenas armas ativamente rúnicas exibem ressonância estelar sutil.
+4. **Bazar e Galeria (`src/game/screens/GalleryScreen.tsx`):**
+   - 7 pilares navegáveis: Arsenal, Compêndio, Componentes, Runas, Oficina, Crisol de Fusão e Legado.
+   - Modo de seleção comparativa na Galeria com dock inferior e modal dedicado `WeaponComparisonModal`.
 
 ---
 
-### 4. O QUE ESTÁ ERRADO OU INCOMPLETO? (Dívidas Técnicas Conhecidas)
-- **Telas Mobile Estreitas:** Em aparelhos ultra-estreitos (< 360px), inspecionar se a barra superior de recursos mantém legibilidade confortável.
-- **Sistema de Combate Futuro:** Os atributos `P.ATK`, `DEF`, `AGI` e `DUR` estão completamente modelados e persistidos, mas o jogo atualmente é focado no ciclo da forja e coleção na Galeria. Um sistema de testes de corte/alvo ou arena é candidato para expansão posterior.
-- **Áudio no Safari/iOS:** A Web Audio API requer toque inicial do usuário para destravar o contexto (`unlockAudio`). Já implementado, mas exige manutenção de boas práticas em novos botões.
+### 4. O QUE ESTÁ COMPROVADO POR TESTES E EVIDÊNCIAS?
+- **TypeScript:** 0 erros (`npm run typecheck`).
+- **Testes Automatizados:** 102 testes em 25 suites 100% aprovados (`npm test`).
+- **Build de Produção:** Concluído com sucesso (`npm run build`).
+- **Evidências Visuais Capturadas:**
+  - `prestige-01-canonical-5-weapons-gallery.png`: Galeria com as 5 armas canônicas e botões de inspeção e comparação.
+  - `prestige-02-velvet-inspection-damascus.png`: Inspeção em veludo da Cimitarra de Damasco (ondas moiré e granada).
+  - `prestige-03-velvet-inspection-asterion.png`: Inspeção em veludo da Queda de Asterion (aço meteórico e asas).
+  - `prestige-04-weapon-comparison-modal.png`: Comparador Tático lado a lado com deltas matemáticos de ATK/DEF/AGI/DUR.
+  - `prestige-05-medieval-bazaar-expanded.png`: Bazar medieval na Oficina com peças e guarnições.
+  - `prestige-06-bazaar-runes-futhark.png`: Bazar medieval exibindo as Runas Futhark disponíveis.
 
 ---
 
-### 5. O QUE DEVE SER FEITO DEPOIS? (Próximos Passos para o Codex)
-1. **Entregas Desta Missão (CONCLUÍDAS, VERIFICADAS E PUBLICADAS):**
-   - [x] Correção P0 de acúmulo infinito de atributos com `recalculateSwordStats()` e devolução de peças anteriores ao inventário.
-   - [x] Correção P0 de persistência com `SaveResult`, backup atômico em `a-forja-save-backup`, tratamento de quota e recuperação automática em `loadSave()`.
-   - [x] Expansão P1 de catálogo com >= 10 itens Comuns e garantia de 4 itens estritamente sem duplicatas.
-   - [x] Implementação P1 de identidade visual procedural de empunhaduras (`dragon_leather`, `tsukamaki`, `goldwire`, etc.) e runas no sangradouro.
-   - [x] Implementação P1 de herança física em `FusionCore` com divergência de combate na forja.
-   - [x] Desacoplamento P1 da economia de golpes via `applyStrikeRewardTransaction` puro com compactação a 200 IDs.
-   - [x] Suíte de 96 testes automatizados com 100% de aprovação (0 falhas) e TypeScript estrito (0 erros).
-   - [x] 5 evidências visuais capturadas em `public/game/evidence/` e pasta de artefatos.
-
-2. **Oportunidades Recomendadas para a Próxima Missão do Codex:**
-   - [ ] Implementar minigame de teste de corte no tatame / porco de madeira na Galeria para colocar os atributos `P.ATK`, `DEF`, `AGI` e `DUR` à prova interativamente.
-   - [ ] Sistema de contratos e encomendas de nobres / guilda com prazo e requisitos específicos de aço, formato e runas.
-   - [ ] Efeitos visuais adicionais de transmutação com partículas de brasas orbitais no Crisol de Fusão.
+### 5. PRÓXIMOS PASSOS SUGERIDOS PARA O CODEX
+1. **Minigame de Corte na Galeria / Pátio de Treino:** Teste de corte em tatame (tameshigiri) ou poste de madeira para colocar à prova de forma jogável os atributos `P.ATK`, `DEF`, `AGI` e `DUR`.
+2. **Sistema de Encomendas da Guilda / Nobreza:** Pedidos com requisitos específicos de aço, formato e tempo limite, recompensando com títulos e moedas.
+3. **Efeitos Adicionais de Transmutações no Crisol:** Partículas orbitais de brasas quentes durante a animação de fusão.
 
 ---
 

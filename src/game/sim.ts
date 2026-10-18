@@ -548,6 +548,7 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     baseDefense: attrs.defense,
     baseAgility: attrs.agility,
     baseDurability: attrs.durability,
+    combatRole: attrs.combatRole,
     damage: attrs.damage,
     defense: attrs.defense,
     agility: attrs.agility,

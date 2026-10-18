@@ -52,7 +52,29 @@ Este registro separa decisões de produto aprovadas de hipóteses e comportament
 
 ---
 
-## 3. Hipóteses em Avaliação Técnica (Provisórias)
+## 3. Decisões Aprovadas — Operação 02: A Forja do Prestígio
+
+### FIOFORJA-TRANSACTIONS-001: Arquitetura Pura de Transações Fail-Closed
+- **Status:** **APROVADA E CANÔNICA.**
+- **Isolamento de Mutação:** Todas as 9 operações de modificação de estado do jogo (fusão de espadas, fusão de componentes, montagem de peças, refino, compras de ferramentas e artigos no bazar, claim de recompensas, acabamento de forja e recompensas por golpe) são executadas por funções puras em `src/game/transactions.ts`.
+- **Invariante de Persistência:** A memória e a interface só são atualizadas após confirmação de gravação física em `writeSave(nextSave).ok === true`.
+- **Comportamento em Falha de Armazenamento:** Em caso de `QuotaExceededError` ou erro de disco, a transação aborta sem perda de dados, o backup permanece preservado e o usuário recebe feedback visual via toast contextual.
+
+### FIOFORJA-ROLES-001: Especialização Tática e Funções de Combate (CombatRole)
+- **Status:** **APROVADA E CANÔNICA.**
+- Cada espada recebe uma das 5 funções de combate (`Ofensiva`, `Defensiva`, `Ágil`, `Equilibrada`, `Excepcional`) com base em sua silhueta, aço, proporção geométrica e linhagem.
+- As funções de combate aplicam multiplicadores físicos calculados deterministicamente em `calculateSwordAttributes` sem apagar os atributos metalúrgicos intrínsecos.
+
+### FIOFORJA-PRESTIGE-001: 5 Lâminas de Referência e Bazar da Ferraria
+- **Status:** **APROVADA E CANÔNICA.**
+- **Armas Canônicas:** `guarda_medieval`, `cimitarra_damasco`, `lua_silenciosa`, `folha_aereth` e `queda_asterion` servem como padrões de teste de fidelidade estética, sem neon nas cruzetas e com incisões rúnicas autênticas.
+- **Bazar Medieval:** O jogador adquire ativamente ferramentas, lingotes, peças e runas Futhark no mercado da ferraria, expandindo as opções de forja além do RNG de drops.
+- **Comparador Tático:** Comparação lado a lado com deltas matemáticos em modal dedicado na Galeria.
+
+---
+
+## 4. Hipóteses em Avaliação Técnica (Provisórias)
 - **Fórmulas exatas de herança de afixos na fusão:** Percentual de transferência entre 15% e 35% por traço compartilhado.
 - **Preços dinâmicos na loja da oficina:** Custos de materiais raros atrelados a conquistas do Legado.
 - **Taxa de drop de Relíquias:** Fixada provisoriamente em 0.2% a 0.5% em forjas Rank S com aço especial.
+

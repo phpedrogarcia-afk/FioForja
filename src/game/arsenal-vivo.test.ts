@@ -677,12 +677,12 @@ describe("Arsenal Vivo 01.2 — Item Integrity, Component Identity & System Hard
     const finishedAgi = finishSword(simAgi, TEST_DESIGN);
 
     assert.ok(
-      finishedOff.damage > finishedAgi.damage,
+      (finishedOff.damage ?? 0) > (finishedAgi.damage ?? 0),
       `Finished weapon from offensive core must have higher damage (${finishedOff.damage}) than from agile core (${finishedAgi.damage})`,
     );
 
     assert.ok(
-      finishedAgi.agility > finishedOff.agility,
+      (finishedAgi.agility ?? 0) > (finishedOff.agility ?? 0),
       `Finished weapon from agile core must have higher agility (${finishedAgi.agility}) than from offensive core (${finishedOff.agility})`,
     );
   });
