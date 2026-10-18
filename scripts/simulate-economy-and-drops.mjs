@@ -100,8 +100,8 @@ console.log(`- Sem catalisador: ${noCatRate}% (${compFusionStats.withoutCatalyst
 console.log(`- Com catalisador: ${catRate}% (${compFusionStats.withCatalyst.upgrades}/${compFusionStats.withCatalyst.attempts}), Fragmentos concedidos: ${compFusionStats.withCatalyst.fragments}`);
 
 const swordFusionStats = {
-  withoutCatalyst: { attempts: 0, upgrades: 0, fragments: 0 },
-  withCatalyst: { attempts: 0, upgrades: 0, fragments: 0 },
+  withoutCatalyst: { attempts: 0, refined: 0, superior: 0, exceptional: 0, fragments: 0 },
+  withCatalyst: { attempts: 0, refined: 0, superior: 0, exceptional: 0, fragments: 0 },
 };
 
 const mockSword = (rarity, q, id) => ({
@@ -140,20 +140,30 @@ for (let i = 0; i < 2500; i++) {
   ];
   const outNoCat = fuseSwords(swords, { useCatalyst: false, seed: i * 41 });
   swordFusionStats.withoutCatalyst.attempts++;
-  if (outNoCat.upgradedRarity) swordFusionStats.withoutCatalyst.upgrades++;
+  if (outNoCat.tierJump === "exceptional") swordFusionStats.withoutCatalyst.exceptional++;
+  else if (outNoCat.tierJump === "superior") swordFusionStats.withoutCatalyst.superior++;
+  else swordFusionStats.withoutCatalyst.refined++;
   swordFusionStats.withoutCatalyst.fragments += outNoCat.fragmentsAwarded;
 
   const outCat = fuseSwords(swords, { useCatalyst: true, seed: i * 41 });
   swordFusionStats.withCatalyst.attempts++;
-  if (outCat.upgradedRarity) swordFusionStats.withCatalyst.upgrades++;
+  if (outCat.tierJump === "exceptional") swordFusionStats.withCatalyst.exceptional++;
+  else if (outCat.tierJump === "superior") swordFusionStats.withCatalyst.superior++;
+  else swordFusionStats.withCatalyst.refined++;
   swordFusionStats.withCatalyst.fragments += outCat.fragmentsAwarded;
 }
 
-const noCatSwordRate = ((swordFusionStats.withoutCatalyst.upgrades / swordFusionStats.withoutCatalyst.attempts) * 100).toFixed(1);
-const catSwordRate = ((swordFusionStats.withCatalyst.upgrades / swordFusionStats.withCatalyst.attempts) * 100).toFixed(1);
-console.log(`Taxa de Oportunidade Superior de Espadas (Rara -> Épica):`);
-console.log(`- Sem catalisador: ${noCatSwordRate}% (${swordFusionStats.withoutCatalyst.upgrades}/${swordFusionStats.withoutCatalyst.attempts}), Fragmentos: ${swordFusionStats.withoutCatalyst.fragments}`);
-console.log(`- Com catalisador: ${catSwordRate}% (${swordFusionStats.withCatalyst.upgrades}/${swordFusionStats.withCatalyst.attempts}), Fragmentos: ${swordFusionStats.withCatalyst.fragments}`);
+const noCatSuperiorRate = ((swordFusionStats.withoutCatalyst.superior / swordFusionStats.withoutCatalyst.attempts) * 100).toFixed(1);
+const noCatExceptionalRate = ((swordFusionStats.withoutCatalyst.exceptional / swordFusionStats.withoutCatalyst.attempts) * 100).toFixed(1);
+const noCatRefinedRate = ((swordFusionStats.withoutCatalyst.refined / swordFusionStats.withoutCatalyst.attempts) * 100).toFixed(1);
+
+const catSuperiorRate = ((swordFusionStats.withCatalyst.superior / swordFusionStats.withCatalyst.attempts) * 100).toFixed(1);
+const catExceptionalRate = ((swordFusionStats.withCatalyst.exceptional / swordFusionStats.withCatalyst.attempts) * 100).toFixed(1);
+const catRefinedRate = ((swordFusionStats.withCatalyst.refined / swordFusionStats.withCatalyst.attempts) * 100).toFixed(1);
+
+console.log(`Distribuição de Oportunidades do Crisol (4x Raras):`);
+console.log(`- Sem catalisador: Refinado=${noCatRefinedRate}%, Superior(+1)=${noCatSuperiorRate}%, Excepcional(+2 Lendária)=${noCatExceptionalRate}%, Fragmentos=${swordFusionStats.withoutCatalyst.fragments}`);
+console.log(`- Com Catalisador Astral: Refinado=${catRefinedRate}%, Superior(+1)=${catSuperiorRate}%, Excepcional(+2 Lendária)=${catExceptionalRate}%, Fragmentos=${swordFusionStats.withCatalyst.fragments}`);
 
 // 3. SIMULAÇÃO DE 20.000 GOLPES E CIRCULAÇÃO DE OURO
 console.log("\n[3/3] Simulando 20.000 golpes e balanço econômico...");
@@ -209,9 +219,9 @@ const report = `# RELATÓRIO ESTATÍSTICO MONTE CARLO — ECONOMIA & LOOT (ARSEN
 - **Sem Catalisador Astral:** Taxa de Sucesso = **${noCatRate}%** | Fragmentos de Origem Concedidos = **${compFusionStats.withoutCatalyst.fragments}**
 - **Com Catalisador Astral:** Taxa de Sucesso = **${catRate}%** (+${(Number(catRate) - Number(noCatRate)).toFixed(1)}% boost) | Fragmentos = **${compFusionStats.withCatalyst.fragments}**
 
-### 2.2 Fusão de Espadas (Rara -> Épica)
-- **Sem Catalisador Astral:** Taxa de Oportunidade Superior = **${noCatSwordRate}%** | Fragmentos = **${swordFusionStats.withoutCatalyst.fragments}**
-- **Com Catalisador Astral:** Taxa de Oportunidade Superior = **${catSwordRate}%** (+${(Number(catSwordRate) - Number(noCatSwordRate)).toFixed(1)}% boost) | Fragmentos = **${swordFusionStats.withCatalyst.fragments}**
+### 2.2 Fusão de Espadas (4x Raras)
+- **Sem Catalisador Astral:** Refinado = **${noCatRefinedRate}%** | Superior (+1 Épica) = **${noCatSuperiorRate}%** | Salto Excepcional (+2 Lendária) = **${noCatExceptionalRate}%** | Fragmentos = **${swordFusionStats.withoutCatalyst.fragments}**
+- **Com Catalisador Astral:** Refinado = **${catRefinedRate}%** | Superior (+1 Épica) = **${catSuperiorRate}%** | Salto Excepcional (+2 Lendária) = **${catExceptionalRate}%** | Fragmentos = **${swordFusionStats.withCatalyst.fragments}**
 
 ---
 

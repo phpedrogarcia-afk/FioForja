@@ -42,7 +42,7 @@ export const defaultInventory: PlayerInventory = {
     damascus_billet: 0,
     starmetal_ore: 0,
     fusion_fragment: 0,
-    catalyst_crystal: 0,
+    catalyst_astral: 0,
     scrap: 0,
     refined_iron: 1,
   },
@@ -71,6 +71,7 @@ export const defaultSaveData: SaveData = {
   muted: false,
   shake: true,
   claimedForgeRewardIds: [],
+  claimedStrikeRewardIds: [],
 };
 
 const defaults = defaultSaveData;
@@ -83,8 +84,8 @@ export function migrateSave(raw: any): SaveData {
   const rawGallery: FinishedSword[] = Array.isArray(raw.gallery) ? raw.gallery : [];
   const seenIds = new Set<string>();
 
-  // Support expanded gallery up to 120 swords without silent truncation
-  const gallery = rawGallery.slice(0, 120).map((sword) => {
+  // Full gallery preservation without silent truncation
+  const gallery = rawGallery.map((sword) => {
     let id = typeof sword.id === "string" && sword.id.trim().length > 0 ? sword.id : generateUniqueId("sword");
     if (seenIds.has(id)) {
       id = generateUniqueId("sword");
@@ -103,6 +104,10 @@ export function migrateSave(raw: any): SaveData {
       quality: Number.isFinite(sword.quality) ? sword.quality : 50,
       affixes: Array.isArray(sword.affixes) ? sword.affixes : (Array.isArray(sword.perks) ? [...sword.perks] : []),
       forgeRunId: typeof sword.forgeRunId === "string" ? sword.forgeRunId : generateUniqueId("run"),
+      pendingRewards: sword.pendingRewards,
+      claimedRewards: sword.claimedRewards,
+      installedComponents: sword.installedComponents,
+      fusionHistory: sword.fusionHistory,
     };
   });
 
@@ -149,6 +154,13 @@ export function migrateSave(raw: any): SaveData {
 
   // Inventory persistence with defaults ensured
   const rawInv = raw.inventory || {};
+  const rawMaterials = { ...(rawInv.materials || {}) };
+  // Migrate legacy catalyst_crystal into canonical catalyst_astral
+  if (typeof rawMaterials.catalyst_crystal === "number" && rawMaterials.catalyst_crystal > 0) {
+    rawMaterials.catalyst_astral = (rawMaterials.catalyst_astral || 0) + rawMaterials.catalyst_crystal;
+    delete rawMaterials.catalyst_crystal;
+  }
+
   const inventory: PlayerInventory = {
     unlockedProfiles: Array.isArray(rawInv.unlockedProfiles) && rawInv.unlockedProfiles.length > 0
       ? Array.from(new Set([...defaultInventory.unlockedProfiles, ...rawInv.unlockedProfiles]))
@@ -173,7 +185,7 @@ export function migrateSave(raw: any): SaveData {
       : [...defaultInventory.unlockedTools],
     materials: {
       ...defaultInventory.materials,
-      ...(rawInv.materials || {}),
+      ...rawMaterials,
     },
     fusionCores: Array.isArray(rawInv.fusionCores) ? rawInv.fusionCores : [],
     components: Array.isArray(rawInv.components) ? rawInv.components : [],
@@ -189,6 +201,10 @@ export function migrateSave(raw: any): SaveData {
     ? raw.claimedForgeRewardIds
     : [];
 
+  const claimedStrikeRewardIds: string[] = Array.isArray(raw.claimedStrikeRewardIds)
+    ? raw.claimedStrikeRewardIds
+    : [];
+
   return {
     version: VERSION,
     gallery,
@@ -199,6 +215,7 @@ export function migrateSave(raw: any): SaveData {
     muted: Boolean(raw.muted),
     shake: raw.shake !== undefined ? Boolean(raw.shake) : true,
     claimedForgeRewardIds,
+    claimedStrikeRewardIds,
   };
 }
 

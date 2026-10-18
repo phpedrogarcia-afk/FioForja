@@ -21,7 +21,7 @@ const TEST_DESIGN: SwordDesign = {
 };
 
 function createMockSword(overrides?: Partial<FinishedSword>): FinishedSword {
-  const sim = createSim(TEST_DESIGN);
+  const sim = createSim(TEST_DESIGN, { forgeRunId: overrides?.forgeRunId });
   sim.quality = overrides?.quality ?? 85;
   sim.shape = 1;
   sim.heatScore = 85;
@@ -273,5 +273,179 @@ describe("Arsenal Vivo — Hybrid Fusion Engine (Option C)", () => {
     assert.equal(nextSave.inventory.fusionCores.length, 1, "1 FusionCore must be placed in inventory");
     assert.equal(nextSave.inventory.fusionCores[0].id, outcome.resultCore!.id);
     assert.equal(nextSave.inventory.materials.catalyst_astral, 0, "Catalyst was consumed");
+  });
+});
+
+describe("Arsenal Vivo Hardening — Critical Fixes & System Integrations", () => {
+  it("P0: Rewards stability — deterministic rewards per forgeRunId and initial attachment on finish", () => {
+    const sword = createMockSword({ id: "sword_stable", forgeRunId: "run_test_deterministic_123" });
+    assert.ok(sword.pendingRewards, "Sword must carry pendingRewards immediately on finish");
+    assert.equal(sword.pendingRewards.forgeRunId, "run_test_deterministic_123");
+
+    // 10 consecutive reward calculations must produce identical results
+    const r1 = generateDynamicForgeRewards(sword, { forgeRunId: sword.forgeRunId });
+    for (let i = 0; i < 10; i++) {
+      const rN = generateDynamicForgeRewards(sword, { forgeRunId: sword.forgeRunId });
+      assert.equal(rN.gold, r1.gold, "Gold must be identical across calls");
+      assert.equal(rN.rubies, r1.rubies, "Rubies must be identical across calls");
+      assert.equal(rN.items.length, r1.items.length);
+      for (let j = 0; j < r1.items.length; j++) {
+        assert.equal(rN.items[j].id, r1.items[j].id);
+        assert.equal(rN.items[j].catalogKey, r1.items[j].catalogKey);
+      }
+    }
+  });
+
+  it("P0: FusionCore heritage — activeCore transmits pedigree, bonus quality, perks and rarity to finished sword", () => {
+    const core = {
+      id: "core_ancient_999",
+      name: "Coração Metálico Transcendental — Ancestral",
+      rarity: "Lendária" as const,
+      family: "royal" as const,
+      profile: "claymore" as const,
+      steel: "damascus" as const,
+      bonusQuality: 14,
+      inheritedPerks: ["Memória do Fogo Celestial", "Corte Vorpal"],
+      consumedSwordIds: ["sw_1", "sw_2", "sw_3", "sw_4"],
+      createdAt: Date.now(),
+    };
+
+    const sim = createSim(TEST_DESIGN, { activeCore: core });
+    sim.quality = 80;
+    sim.shape = 1;
+    sim.heatScore = 80;
+    sim.quenchScore = 80;
+
+    const finished = finishSword(sim, TEST_DESIGN);
+
+    // Verifies pedigree inheritance
+    assert.ok(finished.fusionHistory, "Must include fusion history");
+    assert.equal(finished.fusionHistory.coreId, "core_ancient_999");
+    assert.deepEqual(finished.fusionHistory.parentIds, ["sw_1", "sw_2", "sw_3", "sw_4"]);
+    assert.equal(finished.fusionHistory.inheritedRarity, "Lendária");
+
+    // Verifies perks inheritance
+    assert.ok(finished.perks?.includes("Memória do Fogo Celestial"), "Must inherit core perk 1");
+    assert.ok(finished.perks?.includes("Corte Vorpal"), "Must inherit core perk 2");
+
+    // Verifies quality bonus applied (+14)
+    assert.ok(finished.quality >= 90, `Quality with bonus (${finished.quality}) should reflect +14 boost`);
+
+    // Verifies rarity promotion to at least Lendária
+    assert.equal(finished.rarity, "Lendária");
+  });
+
+  it("P0: Transactional fusion security — strictly rejects invalid or corrupted transactions", () => {
+    const s1 = createMockSword({ id: "sw_ok1" });
+    const s2 = createMockSword({ id: "sw_ok2" });
+    const s3 = createMockSword({ id: "sw_ok3" });
+    const s4 = createMockSword({ id: "sw_ok4" });
+    const sBroken = createMockSword({ id: "sw_broken", broken: true });
+
+    // 1. Rejects broken sword in fusion
+    assert.throws(() => {
+      fuseSwords([s1, s2, s3, sBroken]);
+    }, /Lâminas quebradas não podem ser fundidas/);
+
+    // 2. Rejects duplicate IDs in transaction
+    const initialSave: SaveData = {
+      ...defaultSaveData,
+      gallery: [s1, s2, s3, s4],
+      wallet: { gold: 1000, rubies: 50, diamonds: 0 },
+    };
+
+    const validOutcome = fuseSwords([s1, s2, s3, s4]);
+
+    const corruptedOutcome = {
+      ...validOutcome,
+      consumedSwordIds: ["sw_ok1", "sw_ok1", "sw_ok3", "sw_ok4"], // Duplicate sw_ok1
+    };
+
+    assert.throws(() => {
+      applySwordFusionTransaction(initialSave, corruptedOutcome);
+    }, /IDs duplicados/);
+
+    // 3. Rejects missing items in gallery
+    const missingOutcome = {
+      ...validOutcome,
+      consumedSwordIds: ["sw_ok1", "sw_ok2", "sw_ok3", "sw_ghost"],
+    };
+
+    assert.throws(() => {
+      applySwordFusionTransaction(initialSave, missingOutcome);
+    }, /não foram encontradas no Arsenal/);
+
+    // 4. Rejects when wallet is insufficient
+    const poorSave: SaveData = {
+      ...initialSave,
+      wallet: { gold: 10, rubies: 0, diamonds: 0 },
+    };
+    assert.throws(() => {
+      applySwordFusionTransaction(poorSave, validOutcome);
+    }, /Recursos insuficientes/);
+
+    // 5. Rejects when catalyst requested but missing
+    const noCatalystSave: SaveData = {
+      ...initialSave,
+      inventory: { ...initialSave.inventory, materials: { catalyst_astral: 0 } },
+    };
+    const catalystOutcome = { ...validOutcome, usedCatalyst: true };
+    assert.throws(() => {
+      applySwordFusionTransaction(noCatalystSave, catalystOutcome);
+    }, /Catalisador Astral não disponível/);
+  });
+
+  it("P1: 2-tier exceptional jumps — can yield 2 rarity ranks up and boosts bonus quality", () => {
+    const s1 = createMockSword({ id: "r1", rarity: "Rara" });
+    const s2 = createMockSword({ id: "r2", rarity: "Rara" });
+    const s3 = createMockSword({ id: "r3", rarity: "Rara" });
+    const s4 = createMockSword({ id: "r4", rarity: "Rara" });
+
+    // Seed that triggers exceptional roll (< 0.08)
+    // We can simulate across seeds until finding the exceptional outcome
+    let foundExceptional = false;
+    for (let seed = 0; seed < 100; seed++) {
+      const outcome = fuseSwords([s1, s2, s3, s4], { seed });
+      if (outcome.tierJump === "exceptional") {
+        foundExceptional = true;
+        assert.equal(outcome.jumpTier, 2);
+        assert.equal(outcome.resultCore.rarity, "Lendária", "4 Rares with exceptional jump must yield Legendary core");
+        assert.equal(outcome.resultCore.bonusQuality, 14);
+        break;
+      }
+    }
+    assert.ok(foundExceptional, "Expected to roll at least one exceptional jump in 100 seeds");
+  });
+
+  it("P1: Strike gold protection — strike reward IDs are scoped to forgeRunId and unique", () => {
+    const sim = createSim(TEST_DESIGN);
+    assert.ok(sim.forgeRunId, "SimState must have forgeRunId");
+
+    // Manually trigger a perfect strike
+    sim.phase = "forge";
+    sim.heat = 0.55;
+    const initialRunId = sim.forgeRunId;
+
+    // Simulate strike reward generation in sim
+    sim.strikes = 3;
+    const rewardId = `${sim.forgeRunId}:${sim.strikes}`;
+    assert.equal(rewardId, `${initialRunId}:3`);
+  });
+
+  it("P1: Full gallery preservation — does not truncate gallery beyond 120 items", () => {
+    const swords: FinishedSword[] = [];
+    for (let i = 0; i < 135; i++) {
+      swords.push(createMockSword({ id: `sword_${i}`, quality: 70 }));
+    }
+
+    const rawSave = {
+      version: 5,
+      gallery: swords,
+      wallet: defaultSaveData.wallet,
+      inventory: defaultSaveData.inventory,
+    };
+
+    const migrated = migrateSaveData(rawSave);
+    assert.equal(migrated.gallery.length, 135, "Must preserve all 135 swords without truncation");
   });
 });

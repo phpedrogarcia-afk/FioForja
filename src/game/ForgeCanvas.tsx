@@ -3,7 +3,7 @@ import type { MutableRefObject } from "react";
 import { drawSheetFrame, type GameImages } from "./assets";
 import { createSim, stepSim, type SimInput } from "./sim";
 import { drawFinishedSword } from "./swordDraw";
-import type { ForgePhase, HudSnapshot, PlayerInventory, SimState, SwordDesign } from "./types";
+import type { ForgePhase, FusionCore, HudSnapshot, PlayerInventory, SimState, SwordDesign } from "./types";
 import { playClang, playCoinJingle, playCrack, playHiss, playPull, playRuneHum, playShatter, playWhoosh } from "./audio";
 
 const VW = 1280;
@@ -70,6 +70,7 @@ interface Props {
   onStrikeReward?: (reward: { amount: number; id: string }) => void;
   inputRef: MutableRefObject<SimInput>;
   inventory?: PlayerInventory;
+  activeCore?: FusionCore | null;
 }
 
 export function ForgeCanvas({
@@ -82,6 +83,7 @@ export function ForgeCanvas({
   onStrikeReward,
   inputRef,
   inventory,
+  activeCore,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -96,6 +98,7 @@ export function ForgeCanvas({
     const sim = createSim(design, {
       hammer: inventory?.equipped?.hammer,
       equippedGear: inventory?.equipped,
+      activeCore,
     });
     const sparks: Spark[] = [];
     const steams: SteamParticle[] = [];

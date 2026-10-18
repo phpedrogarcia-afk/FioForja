@@ -1,6 +1,6 @@
 # RELATÓRIO ESTATÍSTICO MONTE CARLO — ECONOMIA & LOOT (ARSENAL VIVO)
 
-**Data de Execução:** 2026-10-18T13:41:48.852Z  
+**Data de Execução:** 2026-10-18T16:17:50.615Z  
 **Amostras Testadas:** 10.000 drops dinâmicos, 5.000 fusões de crisol, 20.000 golpes na bigorna  
 **Status:** TOTALMENTE CONVERGENTE E EQUILIBRADO
 
@@ -22,15 +22,15 @@
 
 ### 2.1 Fusão de Componentes (Incomum -> Rara)
 - **Sem Catalisador Astral:** Taxa de Sucesso = **53.5%** | Fragmentos de Origem Concedidos = **2326**
-- **Com Catalisador Astral:** Taxa de Sucesso = **70.5%** (+17.0% boost) | Fragmentos = **1476**
+- **Com Catalisador Astral:** Taxa de Sucesso = **67.6%** (+14.1% boost) | Fragmentos = **1620**
 
-### 2.2 Fusão de Espadas (Rara -> Épica)
-- **Sem Catalisador Astral:** Taxa de Oportunidade Superior = **41.7%** | Fragmentos = **7290**
-- **Com Catalisador Astral:** Taxa de Oportunidade Superior = **56.9%** (+15.2% boost) | Fragmentos = **5390**
+### 2.2 Fusão de Espadas (4x Raras)
+- **Sem Catalisador Astral:** Refinado = **50.6%** | Superior (+1 Épica) = **42.2%** | Salto Excepcional (+2 Lendária) = **7.2%** | Fragmentos = **6325**
+- **Com Catalisador Astral:** Refinado = **35.4%** | Superior (+1 Épica) = **51.6%** | Salto Excepcional (+2 Lendária) = **13.0%** | Fragmentos = **4430**
 
 ---
 
 ## 3. Economia de Golpes em Tempo Real (20.000 Golpes)
-- **Ouro Total Acumulado:** 67316 🪙
-- **Média por Golpe:** 3.37 🪙
+- **Ouro Total Acumulado:** 67113 🪙
+- **Média por Golpe:** 3.36 🪙
 - **Equilíbrio:** Uma forja média de 25 golpes produz entre 65 e 110 moedas de ouro diretas na bigorna, cobrindo o custo de forja básico ou financiando melhorias graduais na oficina.

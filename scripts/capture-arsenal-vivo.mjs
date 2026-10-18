@@ -239,12 +239,18 @@ async function run() {
   console.log(`Captured: ${shotArsenal}`);
   if (existsSync(brainDir)) copyFileSync(shotArsenal, join(brainDir, "arsenal-vivo-01-arsenal-cards.png"));
 
-  // 2. Open inspection table for Lâmina das Estrelas and capture Rewards screen
+  // 2. Open inspection table for Lâmina das Estrelas
   console.log("Opening inspection for Lâmina das Estrelas...");
   const starSword = page.locator("h3", { hasText: "Lâmina das Estrelas" });
   if (await starSword.isVisible()) {
     await starSword.click();
     await page.waitForTimeout(600);
+
+    // Capture Workbench Mounting view with components
+    const shotWorkbench = join(outDir, "arsenal-vivo-04-workbench-mounting.png");
+    await page.screenshot({ path: shotWorkbench });
+    console.log(`Captured: ${shotWorkbench}`);
+    if (existsSync(brainDir)) copyFileSync(shotWorkbench, join(brainDir, "arsenal-vivo-04-workbench-mounting.png"));
 
     console.log("Clicking Reivindicar Recompensas...");
     const rewardsBtn = page.getByRole("button", { name: /reivindicar recompensas/i });
@@ -272,6 +278,22 @@ async function run() {
   if (await fusionTab.isVisible()) {
     await fusionTab.click();
     await page.waitForTimeout(600);
+
+    // Select the 4 available swords to populate the crucible slots and reveal canonical live odds
+    const swordCards = page.locator(".cursor-pointer", { hasText: "Qualidade:" });
+    const count = await swordCards.count();
+    console.log(`Selecting ${Math.min(4, count)} swords in Crisol...`);
+    for (let i = 0; i < Math.min(4, count); i++) {
+      await swordCards.nth(i).click();
+      await page.waitForTimeout(150);
+    }
+
+    // Toggle Catalyst Astral checkbox
+    const catalystCheckbox = page.locator("input[type='checkbox']");
+    if (await catalystCheckbox.isVisible()) {
+      await catalystCheckbox.check();
+      await page.waitForTimeout(300);
+    }
 
     const shotFusao = join(outDir, "arsenal-vivo-02-crisol-fusao.png");
     await page.screenshot({ path: shotFusao });

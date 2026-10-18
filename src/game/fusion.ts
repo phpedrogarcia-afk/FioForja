@@ -15,6 +15,8 @@ export interface ComponentFusionOutcome {
   success: boolean;
   resultComponent: InventoryComponent;
   upgradedRarity: boolean;
+  tierJump?: "refined" | "superior" | "exceptional";
+  jumpTier?: number;
   fragmentsAwarded: number;
   consumedIds: string[];
   goldCost: number;
@@ -25,6 +27,8 @@ export interface SwordFusionOutcome {
   success: boolean;
   resultCore: FusionCore;
   upgradedRarity: boolean;
+  tierJump?: "refined" | "superior" | "exceptional";
+  jumpTier?: number;
   fragmentsAwarded: number;
   consumedSwordIds: string[];
   goldCost: number;
@@ -32,7 +36,7 @@ export interface SwordFusionOutcome {
   usedCatalyst: boolean;
 }
 
-const RARITY_RANK_VALUES: Record<RarityGrade, number> = {
+export const RARITY_RANK_VALUES: Record<RarityGrade, number> = {
   Comum: 1,
   Incomum: 2,
   Rara: 3,
@@ -41,7 +45,7 @@ const RARITY_RANK_VALUES: Record<RarityGrade, number> = {
   Relíquia: 6,
 };
 
-const RANK_VALUE_TO_RARITY: Record<number, RarityGrade> = {
+export const RANK_VALUE_TO_RARITY: Record<number, RarityGrade> = {
   1: "Comum",
   2: "Incomum",
   3: "Rara",
@@ -49,6 +53,97 @@ const RANK_VALUE_TO_RARITY: Record<number, RarityGrade> = {
   5: "Lendária",
   6: "Relíquia",
 };
+
+/**
+ * Retorna as probabilidades canônicas exatas da Fusão (Refinado, +1 Superior, +2 Excepcional)
+ * conforme a especificação em docs/canon/fusao-hibrida.md.
+ */
+export function getFusionOdds(
+  rarity: RarityGrade,
+  mode: "swords" | "components",
+  useCatalyst = false,
+): { refined: number; superior: number; exceptional: number } {
+  let superior = 0;
+  let exceptional = 0;
+
+  if (mode === "swords") {
+    switch (rarity) {
+      case "Comum":
+        superior = 0.60;
+        exceptional = 0;
+        break;
+      case "Incomum":
+        superior = 0.48;
+        exceptional = 0.07;
+        break;
+      case "Rara":
+        superior = 0.42;
+        exceptional = 0.08;
+        break;
+      case "Épica":
+        superior = 0.43;
+        exceptional = 0.05;
+        break;
+      case "Lendária":
+        superior = 0.15;
+        exceptional = 0;
+        break;
+      case "Relíquia":
+        superior = 0;
+        exceptional = 0;
+        break;
+    }
+  } else {
+    // Components
+    switch (rarity) {
+      case "Comum":
+        superior = 0.60;
+        exceptional = 0;
+        break;
+      case "Incomum":
+        superior = 0.50;
+        exceptional = 0.05;
+        break;
+      case "Rara":
+        superior = 0.42;
+        exceptional = 0.08;
+        break;
+      case "Épica":
+        superior = 0.40;
+        exceptional = 0.05;
+        break;
+      case "Lendária":
+        superior = 0.15;
+        exceptional = 0;
+        break;
+      case "Relíquia":
+        superior = 0;
+        exceptional = 0;
+        break;
+    }
+  }
+
+  let refined = Math.max(0, 1 - superior - exceptional);
+
+  if (useCatalyst) {
+    if (exceptional > 0) {
+      const shift = Math.min(refined, 0.15);
+      refined -= shift;
+      superior += shift * (10 / 15);
+      exceptional += shift * (5 / 15);
+    } else if (superior > 0) {
+      const shift = Math.min(refined, 0.15);
+      refined -= shift;
+      superior += shift;
+    }
+  }
+
+  return {
+    refined: Math.round(refined * 100) / 100,
+    superior: Math.round(superior * 100) / 100,
+    exceptional: Math.round(exceptional * 100) / 100,
+  };
+}
 
 /**
  * 1. FUSÃO DE COMPONENTES
@@ -84,34 +179,40 @@ export function fuseComponents(
   };
   const goldCost = goldCosts[baseRarity];
 
-  // Probabilidade de Upgrade
-  let upgradeChance = 0.5;
-  if (baseRarity === "Comum") upgradeChance = 0.65;
-  else if (baseRarity === "Incomum") upgradeChance = 0.55;
-  else if (baseRarity === "Rara") upgradeChance = 0.42;
-  else if (baseRarity === "Épica") upgradeChance = 0.35;
-  else if (baseRarity === "Lendária") upgradeChance = 0.15;
+  // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
+  const odds = getFusionOdds(baseRarity, "components", usedCatalyst);
+  const roll = rng();
 
-  if (usedCatalyst) {
-    upgradeChance += 0.18; // Catalisador de fusão aumenta a chance
+  let tierJump: "refined" | "superior" | "exceptional" = "refined";
+  let jumpTier = 0;
+  let finalRank = avgRarityRank;
+
+  if (roll < odds.exceptional) {
+    tierJump = "exceptional";
+    jumpTier = 2;
+    finalRank = Math.min(6, avgRarityRank + 2);
+  } else if (roll < odds.exceptional + odds.superior) {
+    tierJump = "superior";
+    jumpTier = 1;
+    finalRank = Math.min(6, avgRarityRank + 1);
+  } else {
+    tierJump = "refined";
+    jumpTier = 0;
+    finalRank = avgRarityRank;
   }
 
-  const roll = rng();
-  const upgradedRarity = roll < upgradeChance;
-  let finalRarity: RarityGrade = baseRarity;
+  const upgradedRarity = jumpTier > 0;
+  const finalRarity: RarityGrade = RANK_VALUE_TO_RARITY[finalRank];
 
   let fragmentsAwarded = 0;
-  if (upgradedRarity) {
-    const nextRank = Math.min(6, avgRarityRank + 1);
-    finalRarity = RANK_VALUE_TO_RARITY[nextRank];
-  } else {
+  if (!upgradedRarity) {
     // Bad-luck protection: concede fragmentos de fusão
     fragmentsAwarded = baseRarity === "Comum" ? 1 : baseRarity === "Incomum" ? 2 : baseRarity === "Rara" ? 3 : 5;
   }
 
   // Gera componente aprimorado
   const primaryItem = items[0];
-  const namePrefix = upgradedRarity ? "Mestre" : "Refinado";
+  const namePrefix = tierJump === "exceptional" ? "Excepcional" : tierJump === "superior" ? "Mestre" : "Refinado";
   const resultName = `${primaryItem.name} (${namePrefix} [${finalRarity}])`;
 
   // Calcula bônus acumulado
@@ -120,7 +221,7 @@ export function fuseComponents(
   const baseAgilityBonus = Math.max(...items.map((it) => it.statModifier?.agilityBonus || 0));
   const baseDurabilityBonus = Math.max(...items.map((it) => it.statModifier?.durabilityBonus || 0));
 
-  const tierMultiplier = upgradedRarity ? 1.5 : 1.2;
+  const tierMultiplier = tierJump === "exceptional" ? 2.0 : tierJump === "superior" ? 1.5 : 1.2;
 
   const resultComponent: InventoryComponent = {
     id: generateUniqueId(`comp_${primaryItem.componentKey}`),
@@ -129,12 +230,12 @@ export function fuseComponents(
     componentKey: primaryItem.componentKey,
     rarity: finalRarity,
     icon: primaryItem.icon,
-    description: `Componente transmutado no Crisol de Fusão. Concentração pura de liga e equilíbrio artesanal.`,
+    description: `Componente transmutado no Crisol de Fusão (${namePrefix}). Concentração pura de liga e equilíbrio artesanal.`,
     statModifier: {
-      damageBonus: baseDamageBonus > 0 ? Math.round(baseDamageBonus * tierMultiplier) + 2 : undefined,
-      defenseBonus: baseDefenseBonus > 0 ? Math.round(baseDefenseBonus * tierMultiplier) + 2 : undefined,
-      agilityBonus: baseAgilityBonus > 0 ? Math.round(baseAgilityBonus * tierMultiplier) + 2 : undefined,
-      durabilityBonus: baseDurabilityBonus > 0 ? Math.round(baseDurabilityBonus * tierMultiplier) + 2 : undefined,
+      damageBonus: baseDamageBonus > 0 ? Math.round(baseDamageBonus * tierMultiplier) + (jumpTier * 2 + 2) : undefined,
+      defenseBonus: baseDefenseBonus > 0 ? Math.round(baseDefenseBonus * tierMultiplier) + (jumpTier * 2 + 2) : undefined,
+      agilityBonus: baseAgilityBonus > 0 ? Math.round(baseAgilityBonus * tierMultiplier) + (jumpTier * 2 + 2) : undefined,
+      durabilityBonus: baseDurabilityBonus > 0 ? Math.round(baseDurabilityBonus * tierMultiplier) + (jumpTier * 2 + 2) : undefined,
     },
     acquiredAt: Date.now(),
   };
@@ -143,6 +244,8 @@ export function fuseComponents(
     success: true,
     resultComponent,
     upgradedRarity,
+    tierJump,
+    jumpTier,
     fragmentsAwarded,
     consumedIds: items.map((it) => it.id),
     goldCost,
@@ -188,27 +291,33 @@ export function fuseSwords(
   };
   const { gold: goldCost, rubies: rubiesCost } = costs[baseRarity];
 
-  // Probabilidade de Oportunidade Superior
-  let upgradeChance = 0.45;
-  if (baseRarity === "Comum") upgradeChance = 0.60;
-  else if (baseRarity === "Incomum") upgradeChance = 0.50;
-  else if (baseRarity === "Rara") upgradeChance = 0.42;
-  else if (baseRarity === "Épica") upgradeChance = 0.40;
-  else if (baseRarity === "Lendária") upgradeChance = 0.10;
+  // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
+  const odds = getFusionOdds(baseRarity, "swords", usedCatalyst);
+  const roll = rng();
 
-  if (usedCatalyst) {
-    upgradeChance += 0.15;
+  let tierJump: "refined" | "superior" | "exceptional" = "refined";
+  let jumpTier = 0;
+  let finalRank = avgRarityRank;
+
+  if (roll < odds.exceptional) {
+    tierJump = "exceptional";
+    jumpTier = 2;
+    finalRank = Math.min(6, avgRarityRank + 2);
+  } else if (roll < odds.exceptional + odds.superior) {
+    tierJump = "superior";
+    jumpTier = 1;
+    finalRank = Math.min(6, avgRarityRank + 1);
+  } else {
+    tierJump = "refined";
+    jumpTier = 0;
+    finalRank = avgRarityRank;
   }
 
-  const roll = rng();
-  const upgradedRarity = roll < upgradeChance;
-  let finalRarity: RarityGrade = baseRarity;
-  let fragmentsAwarded = 0;
+  const upgradedRarity = jumpTier > 0;
+  const finalRarity: RarityGrade = RANK_VALUE_TO_RARITY[finalRank];
 
-  if (upgradedRarity) {
-    const nextRank = Math.min(6, avgRarityRank + 1);
-    finalRarity = RANK_VALUE_TO_RARITY[nextRank];
-  } else {
+  let fragmentsAwarded = 0;
+  if (!upgradedRarity) {
     // Bad-luck protection
     fragmentsAwarded = baseRarity === "Comum" ? 2 : baseRarity === "Incomum" ? 3 : baseRarity === "Rara" ? 5 : 8;
   }
@@ -232,14 +341,17 @@ export function fuseSwords(
     Relíquia: "Origem Arcaica Primordial",
   };
 
+  const bonusQuality = tierJump === "exceptional" ? 14 : tierJump === "superior" ? 8 : 4;
+  const jumpLabel = tierJump === "exceptional" ? " [Salto Excepcional +2]" : "";
+
   const resultCore: FusionCore = {
     id: generateUniqueId("core"),
-    name: `${coreTitles[finalRarity]} — ${bestSword.design.name || "Heroica"}`,
+    name: `${coreTitles[finalRarity]}${jumpLabel} — ${bestSword.design.name || "Heroica"}`,
     rarity: finalRarity,
     family: targetFamily,
     profile: targetProfile,
     steel: targetSteel,
-    bonusQuality: upgradedRarity ? 8 : 4,
+    bonusQuality,
     inheritedPerks,
     consumedSwordIds: swords.map((s) => s.id),
     createdAt: Date.now(),
@@ -249,6 +361,8 @@ export function fuseSwords(
     success: true,
     resultCore,
     upgradedRarity,
+    tierJump,
+    jumpTier,
     fragmentsAwarded,
     consumedSwordIds: swords.map((s) => s.id),
     goldCost,
@@ -258,15 +372,79 @@ export function fuseSwords(
 }
 
 /**
+ * Validação prévia de integridade atômica para fusão de componentes
+ */
+export function validateComponentFusionTransaction(
+  save: SaveData,
+  outcome: ComponentFusionOutcome,
+): void {
+  if (!outcome || !Array.isArray(outcome.consumedIds) || outcome.consumedIds.length !== 4) {
+    throw new Error("Transação inválida: A fusão exige exatamente 4 IDs de componentes consumidos.");
+  }
+  if (new Set(outcome.consumedIds).size !== 4) {
+    throw new Error("Transação inválida: IDs duplicados detectados entre os componentes consumidos.");
+  }
+  const existingComponents = save.inventory.components || [];
+  const found = outcome.consumedIds.map((id) => existingComponents.find((c) => c.id === id));
+  if (found.some((c) => !c)) {
+    throw new Error("Transação inválida: Um ou mais componentes selecionados não existem no inventário.");
+  }
+  const category = found[0]!.category;
+  if (!found.every((c) => c!.category === category)) {
+    throw new Error("Transação inválida: Componentes consumidos devem pertencer à mesma categoria.");
+  }
+  if (save.wallet.gold < outcome.goldCost) {
+    throw new Error("Ouro insuficiente para pagar a taxa do Crisol.");
+  }
+  if (outcome.usedCatalyst && (save.inventory.materials?.catalyst_astral || 0) < 1) {
+    throw new Error("Transação inválida: Catalisador Astral não disponível no inventário.");
+  }
+  if (existingComponents.some((c) => c.id === outcome.resultComponent.id)) {
+    throw new Error("Transação inválida: Resultado de fusão já existente no inventário.");
+  }
+}
+
+/**
+ * Validação prévia de integridade atômica para fusão de espadas
+ */
+export function validateSwordFusionTransaction(
+  save: SaveData,
+  outcome: SwordFusionOutcome,
+): void {
+  if (!outcome || !Array.isArray(outcome.consumedSwordIds) || outcome.consumedSwordIds.length !== 4) {
+    throw new Error("Transação inválida: A fusão exige exatamente 4 IDs de espadas consumidas.");
+  }
+  if (new Set(outcome.consumedSwordIds).size !== 4) {
+    throw new Error("Transação inválida: IDs duplicados detectados entre as espadas consumidas.");
+  }
+  const existingSwords = save.gallery || [];
+  const found = outcome.consumedSwordIds.map((id) => existingSwords.find((s) => s.id === id));
+  if (found.some((s) => !s)) {
+    throw new Error("Transação inválida: Uma ou mais espadas selecionadas não foram encontradas no Arsenal.");
+  }
+  if (found.some((s) => s!.broken || s!.structuralState === "broken")) {
+    throw new Error("Transação inválida: Lâminas quebradas não podem ser fundidas no Crisol.");
+  }
+  if (save.wallet.gold < outcome.goldCost || save.wallet.rubies < outcome.rubiesCost) {
+    throw new Error("Recursos insuficientes para pagar a transmutação do Crisol.");
+  }
+  if (outcome.usedCatalyst && (save.inventory.materials?.catalyst_astral || 0) < 1) {
+    throw new Error("Transação inválida: Catalisador Astral não disponível no inventário.");
+  }
+  const existingCores = save.inventory.fusionCores || [];
+  if (existingCores.some((c) => c.id === outcome.resultCore.id)) {
+    throw new Error("Transação inválida: Núcleo de fusão já existente no inventário.");
+  }
+}
+
+/**
  * Aplica a transação de fusão de componentes atomicamente sobre o estado de Save
  */
 export function applyComponentFusionTransaction(
   save: SaveData,
   outcome: ComponentFusionOutcome,
 ): SaveData {
-  if (save.wallet.gold < outcome.goldCost) {
-    throw new Error("Ouro insuficiente para pagar a taxa do Crisol.");
-  }
+  validateComponentFusionTransaction(save, outcome);
 
   const nextComponents = save.inventory.components.filter(
     (c) => !outcome.consumedIds.includes(c.id),
@@ -274,7 +452,7 @@ export function applyComponentFusionTransaction(
   nextComponents.push(outcome.resultComponent);
 
   const nextMaterials = { ...save.inventory.materials };
-  if (outcome.usedCatalyst && (nextMaterials.catalyst_astral || 0) > 0) {
+  if (outcome.usedCatalyst) {
     nextMaterials.catalyst_astral = Math.max(0, (nextMaterials.catalyst_astral || 0) - 1);
   }
   if (outcome.fragmentsAwarded > 0) {
@@ -302,9 +480,7 @@ export function applySwordFusionTransaction(
   save: SaveData,
   outcome: SwordFusionOutcome,
 ): SaveData {
-  if (save.wallet.gold < outcome.goldCost || save.wallet.rubies < outcome.rubiesCost) {
-    throw new Error("Recursos insuficientes para pagar a transmutação do Crisol.");
-  }
+  validateSwordFusionTransaction(save, outcome);
 
   const nextGallery = save.gallery.filter(
     (s) => !outcome.consumedSwordIds.includes(s.id),
@@ -313,7 +489,7 @@ export function applySwordFusionTransaction(
   const nextFusionCores = [...(save.inventory.fusionCores || []), outcome.resultCore];
 
   const nextMaterials = { ...save.inventory.materials };
-  if (outcome.usedCatalyst && (nextMaterials.catalyst_astral || 0) > 0) {
+  if (outcome.usedCatalyst) {
     nextMaterials.catalyst_astral = Math.max(0, (nextMaterials.catalyst_astral || 0) - 1);
   }
   if (outcome.fragmentsAwarded > 0) {

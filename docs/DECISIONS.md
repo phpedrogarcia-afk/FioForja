@@ -54,7 +54,15 @@ Este registro separa decisões de produto aprovadas de hipóteses e comportament
 ### FIOFORJA-SAVE-001: Persistência v5 e Armazenamento do Arsenal
 - Save migrado para a versão 5 (`VERSION = 5`).
 - Identificadores de armas migrados para geração universal resistente a colisões (`crypto.randomUUID()` ou gerador não-colidente `sword_${timestamp}_${nanoId}`).
-- Capacidade do Arsenal expandida para além de 48 slots sem descarte silencioso de armas forjadas.
+- Capacidade do Arsenal expandida para além de 48 slots sem descarte silencioso de armas forjadas (remoção de truncamento em 120 e garantia de preservação íntegra de toda a coleção do jogador).
+
+### FIOFORJA-HARDENING-001: Integridade Transacional, Pedigree de Fusão e Bancada de Montagem
+- **Recompensas Imutáveis na Forja:** As recompensas da celebração são geradas deterministicamente uma única vez dentro de `finishSword()`, atreladas a `sword.pendingRewards` e validadas por `SaveData.claimedForgeRewardIds`. Reroll exploit via reload ou reabertura de modal eliminado.
+- **Herança Ativa do FusionCore:** O núcleo de fusão selecionado no inventário é transmitido ativamente para a simulação na bigorna (`activeCore` em `createSim()`), aplicando piso de raridade, bônus aditivo de qualidade (`bonusQuality`), herança de perks ancestrais (`inheritedPerks`) e linhagem histórica (`FusionHistory`), sendo consumido atomicamente na conclusão.
+- **Transações Atômicas de Fusão:** Implementadas `validateComponentFusionTransaction` e `validateSwordFusionTransaction`, exigindo 4 itens únicos, mesma categoria, integridade física (recusa estrita de lâminas quebradas) e saldo suficiente de catalisadores e moedas antes de qualquer alteração de estado.
+- **Salto Excepcional de 2 Tiers:** Implementados 3 patamares canônicos de fusão (Refinado, Superior +1 e Excepcional +2, e.g. 4 Raras -> Lendária) com probabilidades alinhadas a `docs/canon/fusao-hibrida.md` e exibição reativa em tempo real na interface do Crisol.
+- **Deduplicação de Ouro por Golpe:** Identificadores únicos com escopo da rodada `${forgeRunId}:${strikeIndex}` e persistência em `claimedStrikeRewardIds`.
+- **Bancada de Montagem e Personalização:** Integração direta na tela de inspeção em veludo (`RevealScreen.tsx`), permitindo instalar componentes e runas avulsas com atualização em tempo real da geometria renderizada no canvas e recálculo dos atributos de combate.
 
 ---
 

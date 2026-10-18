@@ -1,7 +1,8 @@
 import { STEELS, calculateSwordAttributes, gradeFor, rarityFor } from "./catalog.ts";
-import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, HammerType, PhysicalBladeProfile, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, FusionCore, HammerType, PhysicalBladeProfile, SimState, StrikeKind, SwordDesign } from "./types.ts";
 import { generateUniqueId } from "./save.ts";
 import { generateDynamicForgeRewards } from "./loot.ts";
+import { RARITY_RANK_VALUES } from "./fusion.ts";
 
 export interface SimInput {
   charging: boolean;
@@ -25,7 +26,12 @@ export interface SimEvent {
 
 export function createSim(
   design: SwordDesign,
-  options?: { hammer?: HammerType; equippedGear?: EquippedWorkshopGear },
+  options?: {
+    hammer?: HammerType;
+    equippedGear?: EquippedWorkshopGear;
+    activeCore?: FusionCore | null;
+    forgeRunId?: string;
+  },
 ): SimState {
   const steel = STEELS[design.steel];
   const equippedGear: EquippedWorkshopGear = options?.equippedGear ?? {
@@ -35,6 +41,8 @@ export function createSim(
     quench: "quench_water",
   };
   const activeHammer = options?.hammer ?? equippedGear.hammer ?? "standard";
+  const forgeRunId = options?.forgeRunId || generateUniqueId("run");
+  const activeCore = options?.activeCore ?? null;
 
   const initialProfile: PhysicalBladeProfile = {
     baseWidth: 0.16,
@@ -80,6 +88,8 @@ export function createSim(
     activeHammer,
     equippedGear,
     history: [],
+    forgeRunId,
+    activeCore,
   };
 }
 
@@ -430,7 +440,7 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
       amount: goldGain,
       kind,
       strikeIndex: s.strikes,
-      id: `strike_${s.strikes}_${goldGain}`,
+      id: `${s.forgeRunId || "run"}:${s.strikes}`,
     };
     event.goldReward = { amount: goldGain, text: `+${goldGain} 🪙` };
   } else {
@@ -440,13 +450,34 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
 
 export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
   recomputeQuality(s, design);
-  const q = Math.round(s.quality);
+  let q = Math.round(s.quality);
+
+  // Bonus quality from Fusion Core
+  if (s.activeCore && s.activeCore.bonusQuality) {
+    q = clamp(q + s.activeCore.bonusQuality, 4, 100);
+  }
+
   const grade = gradeFor(q);
-  const rarity = rarityFor(design, q);
+  let rarity = rarityFor(design, q);
+
+  // Core rarity inheritance
+  if (s.activeCore && s.activeCore.rarity) {
+    const coreRank = RARITY_RANK_VALUES[s.activeCore.rarity] || 1;
+    const swordRank = RARITY_RANK_VALUES[rarity] || 1;
+    if (coreRank > swordRank) {
+      rarity = s.activeCore.rarity;
+    }
+  }
+
   const heatScore = Math.round(s.heatScore);
   const forgeScore = Math.round(clamp(s.shape * 100 - s.warp * 38, 0, 100));
   const quenchScore = Math.round(s.quenchScore);
   const attrs = calculateSwordAttributes(design, q, s.warp, heatScore, forgeScore, quenchScore);
+
+  // Inherited perks from Fusion Core
+  if (s.activeCore && Array.isArray(s.activeCore.inheritedPerks) && s.activeCore.inheritedPerks.length > 0) {
+    attrs.perks.push(...s.activeCore.inheritedPerks);
+  }
 
   // Additional perks based on multi-zone harmony and tool mastery
   if (s.zoneProgress.base >= 2 && s.zoneProgress.mid >= 2 && s.zoneProgress.tip >= 2) {
@@ -471,7 +502,19 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     attrs.durability = Math.min(100, attrs.durability + 10);
   }
 
-  return {
+  const forgeRunId = s.forgeRunId || generateUniqueId("run");
+  const fusionHistory = s.activeCore
+    ? {
+        parentIds: s.activeCore.consumedSwordIds,
+        coreName: s.activeCore.name,
+        date: Date.now(),
+        inheritedPerks: s.activeCore.inheritedPerks,
+        coreId: s.activeCore.id,
+        inheritedRarity: s.activeCore.rarity,
+      }
+    : undefined;
+
+  const resultSword: FinishedSword = {
     id: generateUniqueId("sword"),
     design,
     quality: q,
@@ -490,13 +533,19 @@ export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
     flaws: attrs.flaws,
     perks: attrs.perks,
     affixes: [...attrs.perks],
-    forgeRunId: generateUniqueId("run"),
+    forgeRunId,
+    fusionHistory,
     structuralState: s.structuralState,
     broken: s.broken,
     cracks: s.cracks,
     physicalProfile: { ...s.physicalProfile },
     history: s.history,
   };
+
+  // Pre-generate deterministic rewards tied strictly to this forgeRunId
+  resultSword.pendingRewards = generateDynamicForgeRewards(resultSword, { forgeRunId });
+
+  return resultSword;
 }
 
 export function generateForgeRewards(

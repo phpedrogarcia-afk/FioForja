@@ -103,12 +103,12 @@ export const LOOT_CATALOG: LootTableItem[] = [
     value: 35,
   },
   {
-    catalogKey: "catalyst_crystal",
-    name: "Catalisador de Transmutação",
+    catalogKey: "catalyst_astral",
+    name: "Catalisador Astral",
     category: "fusion",
     rarity: "Rara",
     icon: "🔮",
-    description: "Reagente alquímico que potencializa as chances de transmutação superior no Crisol de Fusão.",
+    description: "Reagente alquímico primordial que potencializa as chances de transmutação superior e saltos excepcionais no Crisol de Fusão.",
     baseQuantity: 1,
     value: 150,
   },
@@ -302,12 +302,22 @@ export function pickRarityForSlot(tier: "S" | "A" | "B" | "C" | "BROKEN", rng: (
   return "Comum";
 }
 
+function hashStringToSeed(str: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
 export function generateDynamicForgeRewards(
   sword: FinishedSword,
   options?: { seed?: number; forgeRunId?: string },
 ): ForgeRewardsData {
-  const rng = createRng(options?.seed);
-  const forgeRunId = options?.forgeRunId || generateUniqueId("run");
+  const forgeRunId = options?.forgeRunId || sword.forgeRunId || generateUniqueId("run");
+  const effectiveSeed = options?.seed !== undefined ? options.seed : hashStringToSeed(forgeRunId);
+  const rng = createRng(effectiveSeed);
   const isBroken = sword.broken || sword.structuralState === "broken";
   const tier = getRankTier(sword.quality, isBroken);
 
@@ -364,7 +374,7 @@ export function generateDynamicForgeRewards(
     pickedKeys.add(itemTemplate.catalogKey);
 
     drawnItems.push({
-      id: generateUniqueId(`item_${itemTemplate.catalogKey}`),
+      id: `${forgeRunId}_slot_${i}_${itemTemplate.catalogKey}`,
       catalogKey: itemTemplate.catalogKey,
       name: itemTemplate.name,
       type: itemTemplate.category === "material" ? "Material Raro" : itemTemplate.category === "rune" ? "Runa Sagrada" : itemTemplate.category === "fusion" ? "Crisol & Fusão" : "Componente de Forja",

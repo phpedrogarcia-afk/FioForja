@@ -108,8 +108,13 @@ export interface FinishedSword {
     coreName: string;
     date: number;
     inheritedPerks: string[];
+    coreId?: string;
+    inheritedRarity?: RarityGrade;
   };
   forgeRunId?: string;
+  pendingRewards?: ForgeRewardsData;
+  claimedRewards?: boolean;
+  installedComponents?: Record<string, InventoryComponent>;
   structuralState?: StructuralState;
   broken?: boolean;
   cracks?: number;
@@ -172,6 +177,8 @@ export interface SimState {
   equippedGear: EquippedWorkshopGear;
   history: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
   strikeReward?: { amount: number; kind: StrikeKind; strikeIndex: number; id: string } | null;
+  forgeRunId?: string;
+  activeCore?: FusionCore | null;
 }
 
 export interface HudSnapshot {
@@ -313,4 +320,5 @@ export interface SaveData {
   muted: boolean;
   shake: boolean;
   claimedForgeRewardIds: string[];
+  claimedStrikeRewardIds: string[];
 }

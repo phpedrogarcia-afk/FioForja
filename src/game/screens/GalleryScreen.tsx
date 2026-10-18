@@ -34,6 +34,7 @@ interface Props {
   onApplyComponentFusion?: (outcome: ComponentFusionOutcome) => void;
   onApplySwordFusion?: (outcome: SwordFusionOutcome) => void;
   onForgeCore?: (core: FusionCore) => void;
+  onInstallComponent?: (swordId: string, componentId: string) => boolean;
 }
 
 type GalleryTab = "arsenal" | "compendio" | "componentes" | "runas" | "oficina" | "fusao" | "legado";
@@ -52,6 +53,7 @@ export function GalleryScreen({
   onApplyComponentFusion,
   onApplySwordFusion,
   onForgeCore,
+  onInstallComponent,
 }: Props) {
   const [currentTab, setCurrentTab] = useState<GalleryTab>("arsenal");
   const [selectedSword, setSelectedSword] = useState<FinishedSword | null>(null);
@@ -64,7 +66,7 @@ export function GalleryScreen({
       return (
         <RewardsScreen
           sword={selectedSword}
-          rewards={generateForgeRewards(selectedSword)}
+          rewards={selectedSword.pendingRewards || generateForgeRewards(selectedSword, { forgeRunId: selectedSword.forgeRunId })}
           onClaim={() => setInspectRewards(false)}
           onGallery={() => {
             setInspectRewards(false);
@@ -82,6 +84,7 @@ export function GalleryScreen({
         onGallery={() => setSelectedSword(null)}
         onTitle={onBack}
         wallet={wallet}
+        inventory={inventory}
         onUpgrade={(s) => {
           if (!onUpgrade) return false;
           const ok = onUpgrade(s);
@@ -96,6 +99,15 @@ export function GalleryScreen({
                   }
                 : null,
             );
+          }
+          return ok;
+        }}
+        onInstallComponent={(swordId, compId) => {
+          if (!onInstallComponent) return false;
+          const ok = onInstallComponent(swordId, compId);
+          if (ok) {
+            const updated = swords.find((s) => s.id === swordId);
+            if (updated) setSelectedSword({ ...updated });
           }
           return ok;
         }}

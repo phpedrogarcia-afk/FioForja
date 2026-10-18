@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { drawFinishedSword } from "../swordDraw";
-import type { FinishedSword, PlayerWallet } from "../types";
+import type { FinishedSword, PlayerInventory, PlayerWallet } from "../types";
 import { PROFILES, STEELS, WRAPS, GUARDS, POMMELS } from "../catalog";
-import { defaultWallet } from "../save";
+import { defaultInventory, defaultWallet } from "../save";
 
 interface Props {
   sword: FinishedSword;
@@ -12,7 +12,9 @@ interface Props {
   onGallery: () => void;
   onTitle: () => void;
   wallet?: PlayerWallet;
+  inventory?: PlayerInventory;
   onUpgrade?: (sword: FinishedSword) => boolean;
+  onInstallComponent?: (swordId: string, componentId: string) => boolean;
 }
 
 export function RevealScreen({
@@ -22,7 +24,9 @@ export function RevealScreen({
   onGallery,
   onTitle,
   wallet = defaultWallet,
+  inventory = defaultInventory,
   onUpgrade,
+  onInstallComponent,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lightOffset, setLightOffset] = useState(0.5);
@@ -283,6 +287,72 @@ export function RevealScreen({
               >
                 {isMaxUpgraded ? "✓ LIMITE DE AFIAÇÃO ATINGIDO (+3)" : "⚒️ AFIAR & AJUSTAR EMPUNHADURA"}
               </Button>
+            </div>
+
+            {/* BANCADA DE MONTAGEM DE COMPONENTES */}
+            <div className="rounded-lg border border-cyan-700/50 bg-[#0e1628] p-3 shadow-lg">
+              <div className="flex items-center justify-between">
+                <span className="font-display text-xs font-bold uppercase tracking-wider text-cyan-300">
+                  Montagem de Peças & Componentes
+                </span>
+                <span className="rounded bg-black/40 px-2 py-0.5 text-[0.65rem] font-bold text-cyan-200">
+                  {(inventory?.components || []).length} no inventário
+                </span>
+              </div>
+              <p className="mt-1 text-[0.7rem] text-slate-300">
+                Instale guardas, pomos, empunhaduras ou runas para alterar a geometria visual da espada e aprimorar seus atributos de combate.
+              </p>
+
+              {(inventory?.components || []).length > 0 ? (
+                <div className="mt-2.5 max-h-48 space-y-2 overflow-y-auto pr-1">
+                  {(inventory?.components || []).map((comp) => {
+                    const bonusText = [
+                      comp.statModifier?.damageBonus ? `+${comp.statModifier.damageBonus} ATK` : null,
+                      comp.statModifier?.defenseBonus ? `+${comp.statModifier.defenseBonus} DEF` : null,
+                      comp.statModifier?.agilityBonus ? `+${comp.statModifier.agilityBonus} AGI` : null,
+                      comp.statModifier?.durabilityBonus ? `+${comp.statModifier.durabilityBonus} DUR` : null,
+                    ].filter(Boolean).join(" · ");
+
+                    return (
+                      <div
+                        key={comp.id}
+                        className="flex items-center justify-between gap-2 rounded border border-cyan-900/60 bg-black/40 p-2 text-xs"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span>{comp.icon || "🛡️"}</span>
+                            <span className="font-display font-semibold text-cyan-100 truncate">{comp.name}</span>
+                            <span className="rounded bg-black/60 px-1 py-0.2 text-[0.6rem] text-cyan-400 shrink-0">
+                              {comp.rarity}
+                            </span>
+                          </div>
+                          {bonusText && (
+                            <p className="mt-0.5 text-[0.65rem] text-emerald-400 font-semibold">{bonusText}</p>
+                          )}
+                        </div>
+                        <Button
+                          size="sm"
+                          className="h-7 shrink-0 bg-cyan-600 hover:bg-cyan-500 text-black font-display text-[0.68rem] font-bold"
+                          onClick={() => {
+                            if (!onInstallComponent) return;
+                            const ok = onInstallComponent(currentSword.id, comp.id);
+                            if (ok) {
+                              setUpgradeFeedback(`Componente "${comp.name}" instalado na arma!`);
+                              window.setTimeout(() => setUpgradeFeedback(null), 3500);
+                            }
+                          }}
+                        >
+                          Instalar
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="mt-2 text-center text-[0.68rem] text-slate-500 italic">
+                  Nenhum componente avulso no inventário. Obtenha-os através de forja e do Crisol de Fusão.
+                </p>
+              )}
             </div>
 
             {/* Perks Section */}

@@ -4,6 +4,9 @@ import type { FinishedSword, FusionCore, InventoryComponent, PlayerInventory, Pl
 import {
   fuseComponents,
   fuseSwords,
+  getFusionOdds,
+  RARITY_RANK_VALUES,
+  RANK_VALUE_TO_RARITY,
   type ComponentFusionOutcome,
   type SwordFusionOutcome,
 } from "../fusion.ts";
@@ -127,9 +130,19 @@ export function FusionStationScreen({
     }, 850);
   };
 
-  const catalystCount = (inventory.materials?.catalyst_astral || 0) + (inventory.materials?.catalyst_crystal || 0);
+  const catalystCount = inventory.materials?.catalyst_astral || 0;
   const hasCatalysts = catalystCount > 0;
   const fusionFragments = inventory.materials?.fusion_fragment || 0;
+
+  // Calculate live base rarity and canonical fusion odds
+  const rarities: RarityGrade[] = mode === "swords"
+    ? selectedSwords.map((s) => s.rarity || "Comum")
+    : selectedComponents.map((c) => c.rarity);
+  const avgRarityRank = rarities.length === 4
+    ? Math.round(rarities.reduce((acc, r) => acc + (RARITY_RANK_VALUES[r] || 1), 0) / 4)
+    : 1;
+  const baseRarity: RarityGrade = RANK_VALUE_TO_RARITY[avgRarityRank] || "Comum";
+  const liveOdds = getFusionOdds(baseRarity, mode, useCatalyst && hasCatalysts);
 
   return (
     <div className="mx-auto mt-4 w-full max-w-5xl space-y-6">
@@ -200,7 +213,11 @@ export function FusionStationScreen({
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
               <span className="font-display text-[0.68rem] uppercase tracking-widest text-amber-400">
-                {lastSwordResult.upgradedRarity ? "✨ TRANSMUTAÇÃO SUPERIOR!" : "⚡ NÚCLEO CONDENSADO"}
+                {lastSwordResult.tierJump === "exceptional"
+                  ? "🌟 TRANSMUTAÇÃO EXCEPCIONAL (+2 NÍVEIS)!"
+                  : lastSwordResult.tierJump === "superior"
+                    ? "✨ TRANSMUTAÇÃO SUPERIOR (+1 NÍVEL)!"
+                    : "⚡ NÚCLEO CONDENSADO (MESMO NÍVEL APRIMORADO)"}
               </span>
               <h3 className="mt-1 font-display text-lg font-bold text-amber-100">
                 {lastSwordResult.resultCore.name}
@@ -243,7 +260,11 @@ export function FusionStationScreen({
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
               <span className="font-display text-[0.68rem] uppercase tracking-widest text-cyan-400">
-                {lastCompResult.upgradedRarity ? "✨ COMPONENTE MESTRE FORJADO!" : "⚡ COMPONENTE REFINADO"}
+                {lastCompResult.tierJump === "exceptional"
+                  ? "🌟 COMPONENTE EXCEPCIONAL (+2 NÍVEIS)!"
+                  : lastCompResult.tierJump === "superior"
+                    ? "✨ COMPONENTE MESTRE (+1 NÍVEL)!"
+                    : "⚡ COMPONENTE REFINADO"}
               </span>
               <h3 className="mt-1 font-display text-lg font-bold text-cyan-100">
                 {lastCompResult.resultComponent.name}
@@ -334,6 +355,26 @@ export function FusionStationScreen({
           })}
         </div>
 
+        {/* Live Canonical Odds Readout */}
+        {((mode === "swords" && selectedSwords.length === 4) || (mode === "components" && selectedComponents.length === 4)) && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-900/50 bg-black/60 p-3 font-display text-xs">
+            <span className="text-slate-400">Probabilidades Canônicas:</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-amber-200">
+                ⚡ Mesmo Tier ({baseRarity} Refinado): <strong>{Math.round(liveOdds.refined * 100)}%</strong>
+              </span>
+              <span className="text-emerald-300">
+                ✨ Salto Superior (+1 Tier): <strong>{Math.round(liveOdds.superior * 100)}%</strong>
+              </span>
+              {liveOdds.exceptional > 0 && (
+                <span className="text-purple-300 font-bold animate-pulse">
+                  🌟 Salto Excepcional (+2 Tiers): <strong>{Math.round(liveOdds.exceptional * 100)}%</strong>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Catalyst Enhancer Checkbox */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-stone-800/80 pt-4">
           <label className="flex items-center gap-2 cursor-pointer text-xs font-display text-slate-300">
@@ -344,7 +385,7 @@ export function FusionStationScreen({
               onChange={(e) => setUseCatalyst(e.target.checked)}
               className="size-4 rounded border-amber-600 accent-amber-500"
             />
-            <span>Usar Catalisador de Transmutação (+18% chance de upgrade)</span>
+            <span>Usar Catalisador Astral (Potencializa chances de Salto Superior e Excepcional)</span>
             {!hasCatalysts && <span className="text-[0.68rem] text-stone-500">(Nenhum em estoque)</span>}
           </label>
 
