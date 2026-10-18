@@ -1,0 +1,699 @@
+{
+  "schema": 1,
+  "experiment": "M02-weapon-dna",
+  "description": "Weapon DNA visual evidence matrices A-G rendered by the transpiled game renderers",
+  "generatedAt": "2026-10-18T20:20:22.744Z",
+  "renderMode": "dna",
+  "dnaReady": true,
+  "dnaError": null,
+  "dnaDetails": {
+    "genomeExports": [
+      "FAMILY_GRAMMAR",
+      "deriveWeaponVisualGenome",
+      "qualityTier",
+      "visualIdentityKey",
+      "weaponVisualSeed"
+    ],
+    "rendererExports": [
+      "bandPath",
+      "bladePointAt",
+      "clearWeaponGeometryCache",
+      "drawWeaponFromSword",
+      "drawWeaponGenome",
+      "fitWeaponViewport",
+      "lerp",
+      "prepareFromGenome",
+      "prepareWeapon",
+      "weaponGenomeFor",
+      "weaponGeometryCacheSize",
+      "weaponSeedFor",
+      "weaponVisualBounds",
+      "weaponVisualSignature"
+    ]
+  },
+  "labUrl": "http://127.0.0.1:50703/",
+  "bootMs": 1126,
+  "captureMs": 3448,
+  "build": {
+    "hash": "c59ae4f7a68b3149cfdf6f51ade1d8eed55eb76f06ad1c1c19099d8e9194dedb",
+    "builtAt": "2026-10-18T20:20:18.918Z",
+    "moduleCount": 12,
+    "entries": [
+      "src/game/types.ts",
+      "src/game/catalog.ts",
+      "src/game/swordDraw.ts",
+      "src/game/visuals/geometry.ts",
+      "src/game/visuals/materials.ts",
+      "src/game/visuals/math.ts",
+      "src/game/visuals/ornamentation.ts",
+      "src/game/visuals/qualityMarks.ts",
+      "src/game/visuals/rendererAdapter.ts",
+      "src/game/visuals/types.ts",
+      "src/game/visuals/weaponGenome.ts",
+      "src/game/visuals/weaponRenderer.ts"
+    ],
+    "outDir": ".build"
+  },
+  "browser": {
+    "name": "chromium",
+    "version": "149.0.7827.55",
+    "executable": "C:\\Users\\phped\\AppData\\Local\\ms-playwright\\chromium-1228\\chrome-win64\\chrome.exe",
+    "headless": true,
+    "viewport": {
+      "width": 2200,
+      "height": 1700
+    },
+    "deviceScaleFactor": 1
+  },
+  "captureCommand": "node experiments/M02-weapon-dna/capture.mjs --mode=dna",
+  "matrices": [
+    {
+      "id": "A",
+      "title": "MATRIX A · Families",
+      "subtitle": "One representative weapon per family — same quality band (86), 9 families",
+      "file": "evidence/A.png",
+      "width": 1428,
+      "height": 1392,
+      "bytes": 235754,
+      "renderer": "dna",
+      "inkRatio": 0.7962,
+      "itemCount": 9,
+      "items": [
+        {
+          "label": "Ferro do Ferreiro",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 255,
+            "h": 755
+          },
+          "scale": 0.386,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Aço do Reino",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 210,
+            "h": 751
+          },
+          "scale": 0.388,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Damasco",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 255,
+            "h": 762
+          },
+          "scale": 0.382,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Oriental",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 132,
+            "h": 728
+          },
+          "scale": 0.4,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Élfica",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 199,
+            "h": 758
+          },
+          "scale": 0.384,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Rúnica",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 189,
+            "h": 755
+          },
+          "scale": 0.386,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Meteórica",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 207,
+            "h": 752
+          },
+          "scale": 0.388,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Imperial",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 234,
+            "h": 762
+          },
+          "scale": 0.382,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Antiga / Relíquia",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 189,
+            "h": 761
+          },
+          "scale": 0.383,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "B",
+      "title": "MATRIX B · Quality",
+      "subtitle": "The same border sword forged at quality 35 (Defeituosa), 68 (Boa) and 96 (Obra-prima)",
+      "file": "evidence/B.png",
+      "width": 1428,
+      "height": 626,
+      "bytes": 121865,
+      "renderer": "dna",
+      "inkRatio": 0.7011,
+      "itemCount": 3,
+      "items": [
+        {
+          "label": "Qualidade 35 · Defeituosa",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 206,
+            "h": 761
+          },
+          "scale": 0.469,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Qualidade 68 · Boa",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 215,
+            "h": 753
+          },
+          "scale": 0.474,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Qualidade 96 · Obra-prima",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 219,
+            "h": 753
+          },
+          "scale": 0.474,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "C",
+      "title": "MATRIX C · Individuality",
+      "subtitle": "Same damascus family, six identities — differing components, weights and forge history",
+      "file": "evidence/C.png",
+      "width": 1428,
+      "height": 974,
+      "bytes": 198437,
+      "renderer": "dna",
+      "inkRatio": 0.7625,
+      "itemCount": 6,
+      "items": [
+        {
+          "label": "Cimitarra do Crepúsculo",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 243,
+            "h": 768
+          },
+          "scale": 0.379,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lâmina da Maré",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 247,
+            "h": 750
+          },
+          "scale": 0.389,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Gume do Falcão",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 251,
+            "h": 775
+          },
+          "scale": 0.376,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Cimitarra das Dunas",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 161,
+            "h": 733
+          },
+          "scale": 0.398,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Gume do Juramento",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 237,
+            "h": 765
+          },
+          "scale": 0.381,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Cimitarra Noturna",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 243,
+            "h": 765
+          },
+          "scale": 0.381,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "D",
+      "title": "MATRIX D · Components",
+      "subtitle": "One blade genome (same forge, steel and length) with six guard / grip / pommel combinations",
+      "file": "evidence/D.png",
+      "width": 1428,
+      "height": 974,
+      "bytes": 172724,
+      "renderer": "dna",
+      "inkRatio": 0.7628,
+      "itemCount": 6,
+      "items": [
+        {
+          "label": "Cruz Clássica",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 219,
+            "h": 743
+          },
+          "scale": 0.392,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Curvada",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 229,
+            "h": 757
+          },
+          "scale": 0.385,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Disco Oriental (Tsuba)",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 138,
+            "h": 720
+          },
+          "scale": 0.405,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha Élfica",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 238,
+            "h": 748
+          },
+          "scale": 0.39,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Asas",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 236,
+            "h": 775
+          },
+          "scale": 0.376,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Rúnica Austera",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 221,
+            "h": 779
+          },
+          "scale": 0.374,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "E",
+      "title": "MATRIX E · Attributes",
+      "subtitle": "Offensive / defensive / agile weapons — attributes and geometry must stay coherent",
+      "file": "evidence/E.png",
+      "width": 1428,
+      "height": 626,
+      "bytes": 112215,
+      "renderer": "dna",
+      "inkRatio": 0.7009,
+      "itemCount": 3,
+      "items": [
+        {
+          "label": "Ofensiva · P.ATK 92",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 209,
+            "h": 737
+          },
+          "scale": 0.485,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Defensiva · DEF 94",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 221,
+            "h": 776
+          },
+          "scale": 0.46,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Ágil · AGI 95",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 149,
+            "h": 735
+          },
+          "scale": 0.486,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "F",
+      "title": "MATRIX F · Scale",
+      "subtitle": "Same weapon at card (~180 px), inspection (~420 px), presentation (~900 px) — 1:1 scale, shared baseline",
+      "file": "evidence/F.png",
+      "width": 1044,
+      "height": 1556,
+      "bytes": 303507,
+      "renderer": "dna",
+      "inkRatio": 0.7364,
+      "itemCount": 3,
+      "items": [
+        {
+          "label": "CARD · 180 px",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 72,
+            "h": 242
+          },
+          "scale": 1,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "INSPECTION · 420 px",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 170,
+            "h": 563
+          },
+          "scale": 1,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "PRESENTATION · 900 px",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 364,
+            "h": 1212
+          },
+          "scale": 1,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "G",
+      "title": "MATRIX G · Legacy vs DNA",
+      "subtitle": "The five canonical hero weapons — legacy swordDraw.ts (top) vs Weapon DNA renderer (bottom)",
+      "file": "evidence/G.png",
+      "width": 1500,
+      "height": 1022,
+      "bytes": 219085,
+      "renderer": "mixed",
+      "inkRatio": 0.7005,
+      "itemCount": 10,
+      "items": [
+        {
+          "label": "Guarda da Fronteira",
+          "mode": "legacy",
+          "missing": false,
+          "bbox": {
+            "w": 94,
+            "h": 643
+          },
+          "scale": 0.488,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Cimitarra de Damasco",
+          "mode": "legacy",
+          "missing": false,
+          "bbox": {
+            "w": 99,
+            "h": 613
+          },
+          "scale": 0.512,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lua Silenciosa",
+          "mode": "legacy",
+          "missing": false,
+          "bbox": {
+            "w": 86,
+            "h": 711
+          },
+          "scale": 0.442,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha de Aereth",
+          "mode": "legacy",
+          "missing": false,
+          "bbox": {
+            "w": 94,
+            "h": 677
+          },
+          "scale": 0.464,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Queda de Asterion",
+          "mode": "legacy",
+          "missing": false,
+          "bbox": {
+            "w": 92,
+            "h": 702
+          },
+          "scale": 0.447,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Guarda da Fronteira",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 227,
+            "h": 752
+          },
+          "scale": 0.418,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Cimitarra de Damasco",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 239,
+            "h": 759
+          },
+          "scale": 0.414,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Lua Silenciosa",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 133,
+            "h": 718
+          },
+          "scale": 0.437,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Folha de Aereth",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 202,
+            "h": 748
+          },
+          "scale": 0.42,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        },
+        {
+          "label": "Queda de Asterion",
+          "mode": "dna",
+          "missing": false,
+          "bbox": {
+            "w": 199,
+            "h": 752
+          },
+          "scale": 0.418,
+          "clipped": false,
+          "fitted": false,
+          "error": null
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "warnings": [],
+  "pageErrors": [],
+  "consoleErrors": []
+}

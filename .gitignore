@@ -16,3 +16,4 @@ dist/
 AGENTS.md
 AGENTS.project.md
 .node_modules.lock
+experiments/M02-weapon-dna/.build/

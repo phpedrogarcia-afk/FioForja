@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>M02 · Weapon DNA Lab</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101216;
+        --panel: #171a20;
+        --border: #2a303b;
+        --text: #e9edf5;
+        --muted: #98a3b5;
+        --accent: #7fb4ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(1200px 700px at 50% -10%, #1b2029 0%, var(--bg) 55%);
+        color: var(--text);
+        font: 14px/1.45 "Segoe UI", system-ui, -apple-system, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 18px;
+      }
+      header#hud {
+        width: min(100%, 1600px);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      header#hud h1 {
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin: 0 12px 0 0;
+        font-weight: 650;
+      }
+      header#hud .spacer { flex: 1 1 20px; }
+      #matrices { display: flex; flex-wrap: wrap; gap: 6px; }
+      button {
+        background: var(--panel);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 6px 11px;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      button:hover { border-color: #46536a; }
+      button.active { border-color: var(--accent); color: var(--accent); }
+      #canvas-wrap {
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: auto;
+        max-width: 100%;
+        background: var(--bg);
+        box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
+      }
+      canvas#matrix-canvas { display: block; }
+      footer#status {
+        width: min(100%, 1600px);
+        color: var(--muted);
+        font-size: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+      }
+      footer#status code { color: #c6d4ea; }
+      .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+      .dot.ok { background: #57d68a; }
+      .dot.warn { background: #e6b450; }
+      .dot.err { background: #e5645f; }
+    </style>
+  </head>
+  <body>
+    <header id="hud">
+      <h1>M02 · Weapon DNA Lab</h1>
+      <div id="matrices"></div>
+      <div class="spacer"></div>
+      <button id="mode-toggle" title="Toggle between the legacy sword renderer and the Weapon DNA renderer">mode: —</button>
+    </header>
+    <div id="canvas-wrap"><canvas id="matrix-canvas" width="1440" height="900"></canvas></div>
+    <footer id="status">
+      <span><span id="engine-dot" class="dot warn"></span><span id="engine-label">loading…</span></span>
+      <span>build <code id="build-hash">—</code></span>
+      <span>renderer <code id="renderer-label">—</code></span>
+      <span id="matrix-meta"></span>
+    </footer>
+    <script type="module" src="./lab.js"></script>
+  </body>
+</html>
