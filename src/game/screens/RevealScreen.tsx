@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { drawFinishedSword } from "../swordDraw";
+import { isWeaponDnaEnabled } from "../visuals/rendererAdapter";
+import { drawWeaponGenome, fitWeaponViewport, weaponGenomeFor } from "../visuals/weaponRenderer";
 import type { FinishedSword, PlayerInventory, PlayerWallet } from "../types";
 import { PROFILES, STEELS, WRAPS, GUARDS, POMMELS } from "../catalog";
 import { defaultInventory, defaultWallet } from "../save";
@@ -93,6 +95,16 @@ export function RevealScreen({
 
     // Draw the sword vertically on velvet (as in Reference Image 3)
     const swordLen = Math.min(w * 0.86, h * 0.86);
+    if (isWeaponDnaEnabled() && !isBroken) {
+      const genome = weaponGenomeFor(currentSword);
+      drawWeaponGenome(ctx, genome, fitWeaponViewport(genome, w, h, -Math.PI / 2), {
+        lightOffset,
+        runicCharge: currentSword.rarity === "Relíquia" || currentSword.rarity === "Lendária" ? 0.55 : 0.25,
+      });
+      canvas.dataset.renderer = "dna";
+      return;
+    }
+    canvas.dataset.renderer = "legacy";
     drawFinishedSword(ctx, currentSword.design, w / 2, h * 0.88, swordLen, {
       angle: -Math.PI / 2, // Vertical presentation
       assembled: !isBroken,

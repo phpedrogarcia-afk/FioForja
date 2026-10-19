@@ -1,3 +1,6 @@
+/** Shared emergency-recovery threshold and bazaar price for one basic iron ingot. */
+export const BASIC_IRON_RECOVERY_COST = 50;
+
 import type { SteelId } from "./types.ts";
 
 export interface CanonicalMaterialInfo {

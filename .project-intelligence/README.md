@@ -8,4 +8,4 @@ Registre somente aprendizados reutilizáveis, pequenos e ligados a evidência. U
 - `decisions/`: decisões duráveis além do registro curto em `docs/DECISIONS.md`.
 - `experiments/`: hipótese, baseline, procedimento, resultado e interpretação de experiências.
 
-As pastas ainda não contêm aprendizados registrados. A orientação do projeto está em [`docs/AI-START-HERE.md`](../docs/AI-START-HERE.md).
+Registros desta integração: [identidade física](scars/CODEX05-physical-event-identity.md) e [identidade do cache visual](scars/CODEX05-visual-cache-identity.md). A orientação do projeto está em [`docs/AI-START-HERE.md`](../docs/AI-START-HERE.md).

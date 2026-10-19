@@ -1,0 +1,299 @@
+{
+  "mission": "FIOFORJA-CODEX05",
+  "runtimeUnchangedAcrossSelectedProofs": true,
+  "browserCoverage": "A-H PASS across explicitly indexed runs; failed earlier runs preserved",
+  "selectedCases": {
+    "G": {
+      "status": "PASS",
+      "provenance": "FIXTURE_24_SWORDS_REAL_GALLERY_AND_COMPARATOR_UI",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "G-fixture-24-dna-gallery",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/G-fixture-24-dna-gallery.png",
+          "sha256": "8ee4166bdc125f8232fca452beffd73d5e378ab05db8510bff6dc4e45810e3c0"
+        },
+        {
+          "name": "G-two-distinct-fixture-swords-comparator",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/G-two-distinct-fixture-swords-comparator.png",
+          "sha256": "c0d65e1a8f2e8210c6dc425e6857437a25aae97a491e3ea8cb015c18b0d831a5"
+        }
+      ]
+    },
+    "A": {
+      "status": "PASS",
+      "provenance": "REAL_UI_FRESH_CONTEXT_NO_GAMEPLAY_FIXTURE",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "A-prepared-heat",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/A-prepared-heat.png",
+          "sha256": "9968d3be631187deba3dea4299e0e15a522cfe558e0332ff34e86d49dd69bc13"
+        },
+        {
+          "name": "A-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/A-quench-before-input.png",
+          "sha256": "96200879f2ba7416ec225b0d8137f465b70f5745b7fd584404a580657b670bb3"
+        },
+        {
+          "name": "A-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/A-finished-reveal.png",
+          "sha256": "879bed90b232e6bb549afa003827d1dea83cc8a986535ece1b17e8b4bbeec2e8"
+        },
+        {
+          "name": "A-E-real-sword-dna-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/A-E-real-sword-dna-reveal.png",
+          "sha256": "879bed90b232e6bb549afa003827d1dea83cc8a986535ece1b17e8b4bbeec2e8"
+        },
+        {
+          "name": "A-claimed-rewards",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/A-claimed-rewards.png",
+          "sha256": "567ab08f3f21112571c3e7171a9702eaecc0723391680bd117c3ef1e19f13eee"
+        },
+        {
+          "name": "E-real-sword-before",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/E-real-sword-before.png",
+          "sha256": "eb2faee9eb4de4b88c507fe3d919f91f5ef071ccb7e0b35b49676727450e2702"
+        },
+        {
+          "name": "E-real-sword-reloaded",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/E-real-sword-reloaded.png",
+          "sha256": "eb2faee9eb4de4b88c507fe3d919f91f5ef071ccb7e0b35b49676727450e2702"
+        },
+        {
+          "name": "F-before-component",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/F-before-component.png",
+          "sha256": "eb2faee9eb4de4b88c507fe3d919f91f5ef071ccb7e0b35b49676727450e2702"
+        },
+        {
+          "name": "F-after-component",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/F-after-component.png",
+          "sha256": "1c94fcd712c1c041be36413460f2085b929154f57622345d8ba01d7aeccb6c35"
+        },
+        {
+          "name": "F-component-after-reload",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/F-component-after-reload.png",
+          "sha256": "1c94fcd712c1c041be36413460f2085b929154f57622345d8ba01d7aeccb6c35"
+        }
+      ]
+    },
+    "C": {
+      "status": "PASS",
+      "provenance": "FIXTURE_BANKRUPT_INPUT_REAL_TRAINING_UI",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "C-training-cancel-no-free-scrap",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-cancel-no-free-scrap.png",
+          "sha256": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9"
+        },
+        {
+          "name": "C-training-1-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-1-quench-before-input.png",
+          "sha256": "638dbef346bb7a3c8476673352d09c35e505ed706507d910ad11618ebac6b04c"
+        },
+        {
+          "name": "C-training-1-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-1-finished-reveal.png",
+          "sha256": "185c1cf4168dcc5964bdb986acc1ff0382887cb6d930525333426762814be1c8"
+        },
+        {
+          "name": "C-training-2-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-2-quench-before-input.png",
+          "sha256": "36393d18777f1d0610af1ed2d3da30cd4ba170ae97f06f33e6a69065c8022667"
+        },
+        {
+          "name": "C-training-2-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-2-finished-reveal.png",
+          "sha256": "1f9c7a8bd1920cbe7ee0731e51447ef39659627a0bb0fba71570000ea0d3eea3"
+        },
+        {
+          "name": "C-training-3-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-3-quench-before-input.png",
+          "sha256": "a1d4bcec71162ea1938b8ae3d26b6a21e74b6934f1e1315ea36e2572dc70eeac"
+        },
+        {
+          "name": "C-training-3-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-training-3-finished-reveal.png",
+          "sha256": "d6efc34f85ce6e4204ab615653c07fdb1636283e55b98a751360065d90a56862"
+        },
+        {
+          "name": "C-bounded-recovery-one-iron",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/C-bounded-recovery-one-iron.png",
+          "sha256": "b7c4a38abd0bf8f9b007e4c99264f29936a138264206212f800b30a0d8647d1a"
+        }
+      ]
+    },
+    "B": {
+      "status": "PASS",
+      "provenance": "FIXTURE_FOUR_DONORS_UI_FUSION_AND_MANUAL_CORE_FORGE",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "B-fixture-four-donors-selected",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/B-fixture-four-donors-selected.png",
+          "sha256": "308f1b400eaa6f1c63d02d26724c977de972a620cb791c811c4865693f4faf5e"
+        },
+        {
+          "name": "B-core-created-no-final-sword",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/B-core-created-no-final-sword.png",
+          "sha256": "fd0f792581e0846b32ca9c33d63d2b55e342e5af424101d1f3f80a9eecf74833"
+        },
+        {
+          "name": "B-manual-core-forge-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/B-manual-core-forge-quench-before-input.png",
+          "sha256": "a115c415e93d463441cb4c5740760b3a950e23bf9bf5ac3e00ef8504b33e7522"
+        },
+        {
+          "name": "B-manual-core-forge-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/B-manual-core-forge-finished-reveal.png",
+          "sha256": "14f6171030dcb053f9076a5272c86e676dfd583451429622c4ec0d351df6e582"
+        }
+      ]
+    },
+    "E": {
+      "status": "PASS",
+      "provenance": "FIXTURE_OLD_SAVE_DNA_LOAD_AND_RELOAD",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "E-fixture-old-save-dna",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/E-fixture-old-save-dna.png",
+          "sha256": "67b63ac99833a6df250ba3a521598c31aa3f3967a0a0d30926cd4f4b9ad264bc"
+        },
+        {
+          "name": "E-fixture-old-save-reloaded",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/E-fixture-old-save-reloaded.png",
+          "sha256": "67b63ac99833a6df250ba3a521598c31aa3f3967a0a0d30926cd4f4b9ad264bc"
+        }
+      ]
+    },
+    "F": {
+      "status": "PASS",
+      "provenance": "REAL_UI_COMPONENT_SUBCASE_RESULT",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": []
+    },
+    "H": {
+      "status": "PASS",
+      "provenance": "REAL_UI_LEGACY_EXPLICIT_URL_OVERRIDES_STORED_DNA",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "H-legacy-regular-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-legacy-regular-quench-before-input.png",
+          "sha256": "7d1544900ad4b3e1cd205e412713b35036e431e7851ace8e28da277c62f67d9d"
+        },
+        {
+          "name": "H-legacy-regular-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-legacy-regular-finished-reveal.png",
+          "sha256": "8b7a03dc5697bda9039e945de20a0eed83124e4f20f9a4bc06f3033585e60bc1"
+        },
+        {
+          "name": "H-explicit-legacy-real-sword",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-explicit-legacy-real-sword.png",
+          "sha256": "8b7a03dc5697bda9039e945de20a0eed83124e4f20f9a4bc06f3033585e60bc1"
+        },
+        {
+          "name": "H-legacy-real-arsenal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-legacy-real-arsenal.png",
+          "sha256": "a8452630196061dc8ca1b8a7eb896a1cc4b122e9b52a4d924342156e6fcd39a5"
+        },
+        {
+          "name": "H-fixture-24-explicit-legacy-gallery",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-fixture-24-explicit-legacy-gallery.png",
+          "sha256": "c5b5fe733865b42dcbcc61dbaf9d05168f38a2e0ecff8ad29c107b07f74aee5c"
+        },
+        {
+          "name": "H-fixture-two-swords-legacy-comparator",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/H-fixture-two-swords-legacy-comparator.png",
+          "sha256": "b94fd222620bd41305216cb9d32f9a8e7852181b854f48490dbb5a33e054d031"
+        }
+      ]
+    },
+    "D": {
+      "status": "PASS",
+      "provenance": "REAL_UI_CHECKPOINT_AND_RELOAD_FRESH_CONTEXT",
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/report.json",
+      "runtimeMatchesCurrent": true,
+      "captures": [
+        {
+          "name": "D-before-reload-last-checkpoint",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-before-reload-last-checkpoint.png",
+          "sha256": "c7564d1edac1ba5f5772c9cd3dc92ec6a62229156386ca030b14ae34422d5a35"
+        },
+        {
+          "name": "D-recovery-modal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-recovery-modal.png",
+          "sha256": "3b1b427d5623d7030858fcbe6ce32072c80b1ac3d203505e7b457bcebbee73b5"
+        },
+        {
+          "name": "D-restored-physical-state",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-restored-physical-state.png",
+          "sha256": "2e00e0e74f7d672b5b885825d425d655cfba448ffa50769acaa24b39967dd4ff"
+        },
+        {
+          "name": "D-after-resume-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-after-resume-quench-before-input.png",
+          "sha256": "dc3df7060ae9ec18e92524d4b05d89ec090358c40f61d51f8173789f6903d3fa"
+        },
+        {
+          "name": "D-after-resume-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-after-resume-finished-reveal.png",
+          "sha256": "c4fa48b0856760fc1ca69497c434ab5a5a63d7bd5f5df8e9556159b1da7106aa"
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/report.json",
+      "status": "FAIL",
+      "runtimeMatchesCurrent": true
+    },
+    {
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-41-36-919Z/report.json",
+      "status": "PASS",
+      "runtimeMatchesCurrent": true
+    },
+    {
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-45-16-687Z/report.json",
+      "status": "FAIL",
+      "runtimeMatchesCurrent": true
+    },
+    {
+      "report": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/report.json",
+      "status": "PASS",
+      "runtimeMatchesCurrent": true
+    }
+  ],
+  "visualManifest": "experiments/M03-cross-agent-integration/evidence/visual-proof-2026-10-19T02-44-34-466Z/manifest.json",
+  "visualCache": "PASS",
+  "visualParity": "PARITY_APPROX",
+  "tests": {
+    "scripts": {
+      "discovered": 197,
+      "pass": 190,
+      "fail": 0,
+      "skip": 7
+    },
+    "typescript": {
+      "discovered": 207,
+      "pass": 207,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "limits": [
+    "Cases with prepared saves are fixtures, not organic career progression.",
+    "Large local traces are ignored; reports, screenshots and videos are versioned.",
+    "Raster parity is exact against repeated direct drawing, not against every first readback."
+  ]
+}

@@ -1,0 +1,96 @@
+
+> lint
+> eslint .
+
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\.build\src\game\swordDraw.js
+  82:94  warning  'physicalProfile' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\.build\src\game\visuals\geometry.js
+  676:38  warning  'T' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\.build\src\game\visuals\ornamentation.js
+  29:10  warning  'fillColorOf' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\.build\src\game\visuals\weaponGenome.js
+  384:11  warning  'wrap' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  387:11  warning  'tierIdx' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\.build\src\game\visuals\weaponRenderer.js
+  168:10  warning  'outlineHalfHeight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M02-weapon-dna\lab.js
+  283:12  warning  'err' is defined but never used                                          @typescript-eslint/no-unused-vars
+  433:36  warning  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\capture-diversity-and-gameplay.mjs
+  202:11  warning  'royalFam' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\simulate-economy-and-drops.mjs
+  1:39  warning  'getRankTier' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  1:52  warning  'LOOT_CATALOG' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  3:10  warning  'calculateSwordAttributes' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\simulate-economy-progression.mjs
+   2:27  warning  'defaultInventory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   2:45  warning  'defaultWallet' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   2:60  warning  'defaultCareer' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  11:21  warning  'finishSword' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\GameApp.tsx
+  35:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\arsenal-vivo.test.ts
+  8:50  warning  'PlayerInventory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  8:67  warning  'PlayerWallet' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  8:94  warning  'FusionCore' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\prestige-transactions.test.ts
+    5:3   warning  'executeComponentFusionTransaction' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    7:3   warning  'executeUpgradeSwordTransaction' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   10:3   warning  'executeFinishSwordTransaction' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   11:3   warning  'executeStrikeRewardTransaction' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   16:10  warning  'createSim' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   17:50  warning  'FusionCore' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+  365:11  warning  'statsElv' is assigned a value but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\screens\FusionStationScreen.tsx
+  3:42  warning  'InventoryComponent' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\screens\GalleryScreen.tsx
+  51:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\sim.test.ts
+  233:23  warning  'defaultWallet' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  233:38  warning  'defaultInventory' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  233:56  warning  'defaultCareer' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\swordDraw.ts
+  113:92  warning  'physicalProfile' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\geometry.test.ts
+  34:7  warning  'EPS' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  35:7  warning  'TAU' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\geometry.ts
+  788:73  warning  'T' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\ornamentation.ts
+  22:15  warning  'Pt' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+  25:3   warning  'alloyPaint' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  49:10  warning  'fillColorOf' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\weaponGenome.ts
+  657:9  warning  'wrap' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  660:9  warning  'tierIdx' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\weaponRenderer.ts
+   17:10  warning  'clamp' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  268:10  warning  'outlineHalfHeight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\lib\auth\use-current-user.ts
+  59:3  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/rules-of-hooks')
+
+✖ 44 problems (0 errors, 44 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

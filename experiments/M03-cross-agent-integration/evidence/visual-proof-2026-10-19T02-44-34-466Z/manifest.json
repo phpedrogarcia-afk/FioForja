@@ -1,0 +1,1036 @@
+{
+  "schema": 1,
+  "experiment": "M03-cross-agent-integration",
+  "protocol": "same-fixtures-donor-current-flushed-canvas-v2",
+  "generatedAt": "2026-10-19T02:45:01.839Z",
+  "donorCommit": "a2fa0025a2e6755c78c42777b3abd1fec4e5572d",
+  "donorBuild": {
+    "schema": 1,
+    "builtAt": "2026-10-18T21:42:35.237Z",
+    "builtMs": 400,
+    "sourceRoot": "C:\\Users\\phped\\AppData\\Local\\Temp\\fioforja-codex05-donor-0663-a2fa",
+    "outDir": ".build",
+    "hash": "1bec6a443a9a8751a28cbce2467817734d62803809c96829d61f84859f2bd275",
+    "entries": [
+      "src/game/types.ts",
+      "src/game/catalog.ts",
+      "src/game/swordDraw.ts",
+      "src/game/visuals/geometry.ts",
+      "src/game/visuals/materials.ts",
+      "src/game/visuals/math.ts",
+      "src/game/visuals/ornamentation.ts",
+      "src/game/visuals/qualityMarks.ts",
+      "src/game/visuals/rendererAdapter.ts",
+      "src/game/visuals/types.ts",
+      "src/game/visuals/weaponGenome.ts",
+      "src/game/visuals/weaponRenderer.ts"
+    ],
+    "missingModules": [],
+    "files": [
+      {
+        "path": "src/game/catalog.js",
+        "bytes": 26847,
+        "sha256": "f2e630d8cfa00764abfa4ee9794124006db3960d46baa2f9fd9f860b954ede47"
+      },
+      {
+        "path": "src/game/swordDraw.js",
+        "bytes": 41290,
+        "sha256": "c94cfa79ace4c94beb9e21581a47d88a6a195fbf91ccb8b153030358a321ac93"
+      },
+      {
+        "path": "src/game/types.js",
+        "bytes": 11,
+        "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      {
+        "path": "src/game/visuals/geometry.js",
+        "bytes": 50822,
+        "sha256": "767c3e7d7663e0a4c0884304247a51a02a4e24b81aeef3b053716056d52aea9a"
+      },
+      {
+        "path": "src/game/visuals/materials.js",
+        "bytes": 75479,
+        "sha256": "de2d5000b0acea88c73ecc17857be168f6ae318b60663d7d7f3837fe93c955df"
+      },
+      {
+        "path": "src/game/visuals/math.js",
+        "bytes": 2081,
+        "sha256": "cd3fad11c2f03f8727d07dde93a8c6a6dc8df86cc72388d76239ee83c8996de1"
+      },
+      {
+        "path": "src/game/visuals/ornamentation.js",
+        "bytes": 34678,
+        "sha256": "75a8bf4e31a44899f23434194d34d478366a233516abdae2448906bb2d6c901d"
+      },
+      {
+        "path": "src/game/visuals/qualityMarks.js",
+        "bytes": 27077,
+        "sha256": "1b6c1a1afb78ffb0f81a2de85a107f76b56ccd25afce0782a3af210b30493d8c"
+      },
+      {
+        "path": "src/game/visuals/rendererAdapter.js",
+        "bytes": 4881,
+        "sha256": "66611d7b9b8b37593eff91fd1a41b3118a7791aa4cf89817a8f2503b678b1259"
+      },
+      {
+        "path": "src/game/visuals/types.js",
+        "bytes": 613,
+        "sha256": "cf8edfd235eb954934056eb62bb2c461e3aacb04b4541a30e2663ae64d513247"
+      },
+      {
+        "path": "src/game/visuals/weaponGenome.js",
+        "bytes": 34751,
+        "sha256": "99c88c3e71e6cb9c4f1930dafd55b00654bac6df125a93a3526b0564e23562c3"
+      },
+      {
+        "path": "src/game/visuals/weaponRenderer.js",
+        "bytes": 16789,
+        "sha256": "c416cf1964d8759ffffdb8d811b10b0e375f1a24deee0a2f55d0f68642617c37"
+      }
+    ],
+    "moduleCount": 12
+  },
+  "currentBuild": {
+    "schema": 1,
+    "builtAt": "2026-10-19T02:44:34.461Z",
+    "builtMs": 355,
+    "sourceRoot": "C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja",
+    "outDir": ".build",
+    "hash": "c72fce679cad957e7b969a0b06421b684e82cf1fc82915b3cabe4a2ccacce7f3",
+    "entries": [
+      "src/game/types.ts",
+      "src/game/catalog.ts",
+      "src/game/swordDraw.ts",
+      "src/game/visuals/geometry.ts",
+      "src/game/visuals/materials.ts",
+      "src/game/visuals/math.ts",
+      "src/game/visuals/ornamentation.ts",
+      "src/game/visuals/qualityMarks.ts",
+      "src/game/visuals/rendererAdapter.ts",
+      "src/game/visuals/thumbnailCache.ts",
+      "src/game/visuals/types.ts",
+      "src/game/visuals/weaponGenome.ts",
+      "src/game/visuals/weaponRenderer.ts"
+    ],
+    "missingModules": [],
+    "files": [
+      {
+        "path": "src/game/catalog.js",
+        "bytes": 27024,
+        "sha256": "f79ce328ee972123f51a75904534f1993ca64c44cda4c85d59231e2df8d9123d"
+      },
+      {
+        "path": "src/game/swordDraw.js",
+        "bytes": 41290,
+        "sha256": "c94cfa79ace4c94beb9e21581a47d88a6a195fbf91ccb8b153030358a321ac93"
+      },
+      {
+        "path": "src/game/types.js",
+        "bytes": 11,
+        "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      {
+        "path": "src/game/visuals/geometry.js",
+        "bytes": 50822,
+        "sha256": "767c3e7d7663e0a4c0884304247a51a02a4e24b81aeef3b053716056d52aea9a"
+      },
+      {
+        "path": "src/game/visuals/materials.js",
+        "bytes": 75542,
+        "sha256": "87b027ba4799e1e7a77f51d36d79b04168938fcb476c3bbdcca3813de9adaa7d"
+      },
+      {
+        "path": "src/game/visuals/math.js",
+        "bytes": 2081,
+        "sha256": "cd3fad11c2f03f8727d07dde93a8c6a6dc8df86cc72388d76239ee83c8996de1"
+      },
+      {
+        "path": "src/game/visuals/ornamentation.js",
+        "bytes": 34678,
+        "sha256": "75a8bf4e31a44899f23434194d34d478366a233516abdae2448906bb2d6c901d"
+      },
+      {
+        "path": "src/game/visuals/qualityMarks.js",
+        "bytes": 27077,
+        "sha256": "1b6c1a1afb78ffb0f81a2de85a107f76b56ccd25afce0782a3af210b30493d8c"
+      },
+      {
+        "path": "src/game/visuals/rendererAdapter.js",
+        "bytes": 5051,
+        "sha256": "b879380dbf7a9a6691d059739d1981160ee8198a371f2c9d30b447a6766c0561"
+      },
+      {
+        "path": "src/game/visuals/thumbnailCache.js",
+        "bytes": 2244,
+        "sha256": "cd26f3a350a92aaa9bcb2190cf7ea6a8a53a83fef4307863cd426ab782cfc356"
+      },
+      {
+        "path": "src/game/visuals/types.js",
+        "bytes": 613,
+        "sha256": "cf8edfd235eb954934056eb62bb2c461e3aacb04b4541a30e2663ae64d513247"
+      },
+      {
+        "path": "src/game/visuals/weaponGenome.js",
+        "bytes": 35314,
+        "sha256": "8683a1b5dc43f66a3ee9ddda36d23650272c1b77ea632e7f1f0d395489eafce6"
+      },
+      {
+        "path": "src/game/visuals/weaponRenderer.js",
+        "bytes": 15003,
+        "sha256": "e281b70851d5f86c1ea1582150e7fcdaf99458699e4bc1035354a5299e721f62"
+      }
+    ],
+    "moduleCount": 13
+  },
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+    "cpuCount": 12,
+    "totalMemoryGiB": 15.927818298339844,
+    "chromium": "149.0.7827.55",
+    "executable": "C:\\Users\\phped\\AppData\\Local\\ms-playwright\\chromium-1228\\chrome-win64\\chrome.exe",
+    "headless": true,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "m03-visual-cimitarra_damasco",
+      "presetId": "cimitarra_damasco",
+      "design": {
+        "name": "Cimitarra de Damasco",
+        "family": "damascus",
+        "profile": "falchion",
+        "steel": "damascus",
+        "wrap": "braided",
+        "guard": "curved",
+        "pommel": "disc",
+        "inscription": "DAMASCUS",
+        "runes": false,
+        "length": 1.02
+      },
+      "quality": 96,
+      "grade": "Obra-prima",
+      "heatScore": 96,
+      "forgeScore": 96,
+      "quenchScore": 96,
+      "warp": 0.015,
+      "cracks": 0,
+      "structuralState": "stable",
+      "createdAt": 1,
+      "damage": 357,
+      "defense": 185,
+      "agility": 87,
+      "durability": 100,
+      "flaws": [],
+      "perks": [
+        "Gume de Obra-prima: Corte sem atrito",
+        "Dobra Perfeita: Elasticidade superior",
+        "Martensita Pura: Retenção eterna de fio",
+        "Alinhamento Perfeito: Centro de massa ideal"
+      ],
+      "combatRole": "Ofensiva",
+      "baseDamage": 357,
+      "baseDefense": 185,
+      "baseAgility": 87,
+      "baseDurability": 100
+    },
+    {
+      "id": "m03-visual-lua_silenciosa",
+      "presetId": "lua_silenciosa",
+      "design": {
+        "name": "Lua Silenciosa",
+        "family": "oriental",
+        "profile": "katana",
+        "steel": "blacksteel",
+        "wrap": "tsukamaki",
+        "guard": "tsuba",
+        "pommel": "crescent",
+        "inscription": "SHINSOKU",
+        "runes": false,
+        "length": 1.08
+      },
+      "quality": 96,
+      "grade": "Obra-prima",
+      "heatScore": 96,
+      "forgeScore": 96,
+      "quenchScore": 96,
+      "warp": 0.015,
+      "cracks": 0,
+      "structuralState": "stable",
+      "createdAt": 1,
+      "damage": 265,
+      "defense": 147,
+      "agility": 133,
+      "durability": 92,
+      "flaws": [],
+      "perks": [
+        "Gume de Obra-prima: Corte sem atrito",
+        "Coração de Grafite: Retenção extrema de fio navalha",
+        "Martensita Pura: Retenção eterna de fio",
+        "Alinhamento Perfeito: Centro de massa ideal"
+      ],
+      "combatRole": "Ágil",
+      "baseDamage": 265,
+      "baseDefense": 147,
+      "baseAgility": 133,
+      "baseDurability": 92
+    },
+    {
+      "id": "m03-visual-queda_asterion",
+      "presetId": "queda_asterion",
+      "design": {
+        "name": "Queda de Asterion",
+        "family": "meteor",
+        "profile": "saber",
+        "steel": "meteor",
+        "wrap": "goldwire",
+        "guard": "wings",
+        "pommel": "sphere",
+        "inscription": "ASTERION",
+        "runes": true,
+        "length": 1.06
+      },
+      "quality": 96,
+      "grade": "Obra-prima",
+      "heatScore": 96,
+      "forgeScore": 96,
+      "quenchScore": 96,
+      "warp": 0.015,
+      "cracks": 0,
+      "structuralState": "stable",
+      "createdAt": 1,
+      "damage": 322,
+      "defense": 186,
+      "agility": 119,
+      "durability": 100,
+      "flaws": [],
+      "perks": [
+        "Gume de Obra-prima: Corte sem atrito",
+        "Ressonância Rúnica: Lâmina desperta",
+        "Pó Meteórico: Dureza estelar",
+        "Martensita Pura: Retenção eterna de fio",
+        "Alinhamento Perfeito: Centro de massa ideal"
+      ],
+      "combatRole": "Excepcional",
+      "baseDamage": 322,
+      "baseDefense": 186,
+      "baseAgility": 119,
+      "baseDurability": 100
+    }
+  ],
+  "images": [
+    {
+      "file": "visual-pair-cimitarra_damasco.png",
+      "width": 1000,
+      "height": 800,
+      "bytes": 173989,
+      "sha256": "118a3e79d87c472ebbe72f675edb617223d391dd0c2cfd79fdaf8c247af0f7aa"
+    },
+    {
+      "file": "visual-pair-lua_silenciosa.png",
+      "width": 1000,
+      "height": 800,
+      "bytes": 116590,
+      "sha256": "5d334329cb0331e69b5ab4924b0e8242b62e15b56ea6feaeb8c3b477d48943ec"
+    },
+    {
+      "file": "visual-pair-queda_asterion.png",
+      "width": 1000,
+      "height": 800,
+      "bytes": 143718,
+      "sha256": "dafe15cc98f0648bd403632b415f5a9032a5b3eebca1aa59be3dd135538ee4f8"
+    }
+  ],
+  "parity": [
+    {
+      "preset": "cimitarra_damasco",
+      "dpr": 1,
+      "phase": "cold",
+      "pixels": 64000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 6,
+        "changedRatio": 0.00009375,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "cimitarra_damasco",
+      "dpr": 1,
+      "phase": "warm",
+      "pixels": 64000,
+      "changedPixels": 6,
+      "changedRatio": 0.00009375,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 6,
+        "changedRatio": 0.00009375,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    },
+    {
+      "preset": "lua_silenciosa",
+      "dpr": 1,
+      "phase": "cold",
+      "pixels": 64000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 1,
+        "changedRatio": 0.000015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "lua_silenciosa",
+      "dpr": 1,
+      "phase": "warm",
+      "pixels": 64000,
+      "changedPixels": 1,
+      "changedRatio": 0.000015625,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 1,
+        "changedRatio": 0.000015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    },
+    {
+      "preset": "queda_asterion",
+      "dpr": 1,
+      "phase": "cold",
+      "pixels": 64000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 1,
+        "changedRatio": 0.000015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "queda_asterion",
+      "dpr": 1,
+      "phase": "warm",
+      "pixels": 64000,
+      "changedPixels": 1,
+      "changedRatio": 0.000015625,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 64000,
+        "changedPixels": 1,
+        "changedRatio": 0.000015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 64000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    },
+    {
+      "preset": "cimitarra_damasco",
+      "dpr": 2,
+      "phase": "cold",
+      "pixels": 256000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 5,
+        "changedRatio": 0.00001953125,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "cimitarra_damasco",
+      "dpr": 2,
+      "phase": "warm",
+      "pixels": 256000,
+      "changedPixels": 5,
+      "changedRatio": 0.00001953125,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 5,
+        "changedRatio": 0.00001953125,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    },
+    {
+      "preset": "lua_silenciosa",
+      "dpr": 2,
+      "phase": "cold",
+      "pixels": 256000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 40,
+        "changedRatio": 0.00015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "lua_silenciosa",
+      "dpr": 2,
+      "phase": "warm",
+      "pixels": 256000,
+      "changedPixels": 40,
+      "changedRatio": 0.00015625,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 40,
+        "changedRatio": 0.00015625,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    },
+    {
+      "preset": "queda_asterion",
+      "dpr": 2,
+      "phase": "cold",
+      "pixels": 256000,
+      "changedPixels": 0,
+      "changedRatio": 0,
+      "maxChannelDelta": 0,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 7,
+        "changedRatio": 0.00002734375,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "EXACT"
+    },
+    {
+      "preset": "queda_asterion",
+      "dpr": 2,
+      "phase": "warm",
+      "pixels": 256000,
+      "changedPixels": 7,
+      "changedRatio": 0.00002734375,
+      "maxChannelDelta": 1,
+      "directRepeatControl": {
+        "pixels": 256000,
+        "changedPixels": 7,
+        "changedRatio": 0.00002734375,
+        "maxChannelDelta": 1
+      },
+      "cachedVsRepeat": {
+        "pixels": 256000,
+        "changedPixels": 0,
+        "changedRatio": 0,
+        "maxChannelDelta": 0
+      },
+      "status": "PARITY_APPROX"
+    }
+  ],
+  "invalidations": [
+    {
+      "inputChanged": "genome",
+      "cacheHit": false,
+      "stats": {
+        "entries": 2,
+        "bytes": 512000,
+        "hits": 1,
+        "misses": 2
+      }
+    },
+    {
+      "inputChanged": "width",
+      "cacheHit": false,
+      "stats": {
+        "entries": 3,
+        "bytes": 769280,
+        "hits": 1,
+        "misses": 3
+      }
+    },
+    {
+      "inputChanged": "height",
+      "cacheHit": false,
+      "stats": {
+        "entries": 4,
+        "bytes": 1028480,
+        "hits": 1,
+        "misses": 4
+      }
+    },
+    {
+      "inputChanged": "DPR",
+      "cacheHit": false,
+      "stats": {
+        "entries": 5,
+        "bytes": 2052480,
+        "hits": 1,
+        "misses": 5
+      }
+    },
+    {
+      "inputChanged": "restore-original",
+      "cacheHit": true,
+      "pixelDifference": {
+        "pixels": 64000,
+        "changedPixels": 6,
+        "changedRatio": 0.00009375,
+        "maxChannelDelta": 1
+      }
+    }
+  ],
+  "lru": {
+    "entryBound": {
+      "entries": 96,
+      "bytes": 393216,
+      "hits": 0,
+      "misses": 97
+    },
+    "memoryBound": {
+      "entries": 1,
+      "bytes": 20480000,
+      "hits": 0,
+      "misses": 2
+    }
+  },
+  "benchmark": {
+    "unit": "ms per 24-weapon repaint plus full 1400x900 RGBA readback",
+    "warmupIterationsPerArm": 5,
+    "iterationOrder": [
+      "donorDirect",
+      "currentDirect",
+      "coldRaster",
+      "warmRaster",
+      "currentDirectRepeat"
+    ],
+    "canvas": {
+      "width": 1400,
+      "height": 900,
+      "dpr": 1
+    },
+    "card": {
+      "width": 220,
+      "height": 210
+    },
+    "fixtureCount": 24,
+    "samplesPerArm": 60,
+    "cacheGeometry": "warm",
+    "contextAttributes": {
+      "alpha": true,
+      "colorSpace": "srgb",
+      "colorType": "unorm8",
+      "desynchronized": false,
+      "toneMapping": {
+        "mode": "standard"
+      },
+      "willReadFrequently": false
+    },
+    "metrics": {
+      "donorDirect": {
+        "n": 60,
+        "meanMs": 103.18666666708887,
+        "p50Ms": 102.40000000596046,
+        "p95Ms": 110.5,
+        "minMs": 98.79999999701977,
+        "maxMs": 113.69999999552965,
+        "totalMs": 6191.200000025332,
+        "rawMs": [
+          102.5,
+          103.60000000149012,
+          108.40000000596046,
+          102.60000000149012,
+          101.39999999850988,
+          102.5,
+          102.29999999701977,
+          110.5,
+          105,
+          109.80000000447035,
+          101.79999999701977,
+          113.69999999552965,
+          102.29999999701977,
+          106,
+          101.10000000149012,
+          104.40000000596046,
+          103.5,
+          100.89999999850988,
+          104.29999999701977,
+          101,
+          103.29999999701977,
+          101.80000000447035,
+          99.89999999850988,
+          102.79999999701977,
+          100.10000000149012,
+          106.30000000447035,
+          100.80000000447035,
+          100.60000000149012,
+          101.89999999850988,
+          101.10000000149012,
+          108.79999999701977,
+          102.40000000596046,
+          100.80000000447035,
+          101.29999999701977,
+          103.39999999850988,
+          104.10000000149012,
+          101,
+          106.30000000447035,
+          100.20000000298023,
+          100.19999999552965,
+          103.30000000447035,
+          105.20000000298023,
+          110.70000000298023,
+          100.89999999850988,
+          102.5,
+          103.39999999850988,
+          99.79999999701977,
+          103,
+          101,
+          100.79999999701977,
+          102.89999999850988,
+          98.79999999701977,
+          111.89999999850988,
+          100.20000000298023,
+          102.70000000298023,
+          100.60000000149012,
+          100.60000000149012,
+          101,
+          100.30000000447035,
+          106.89999999850988
+        ]
+      },
+      "currentDirect": {
+        "n": 60,
+        "meanMs": 102.1699999999255,
+        "p50Ms": 100.39999999850988,
+        "p95Ms": 110.40000000596046,
+        "minMs": 98.70000000298023,
+        "maxMs": 115.70000000298023,
+        "totalMs": 6130.19999999553,
+        "rawMs": [
+          101.89999999850988,
+          100.79999999701977,
+          115.70000000298023,
+          100.69999999552965,
+          101.79999999701977,
+          104,
+          99,
+          109.29999999701977,
+          100.30000000447035,
+          110.5,
+          99.29999999701977,
+          113.20000000298023,
+          99.70000000298023,
+          99.20000000298023,
+          100.80000000447035,
+          100.79999999701977,
+          102,
+          99.29999999701977,
+          106.90000000596046,
+          98.79999999701977,
+          99.89999999850988,
+          99.29999999701977,
+          99.39999999850988,
+          106.10000000149012,
+          99.39999999850988,
+          99.79999999701977,
+          100.29999999701977,
+          99.59999999403954,
+          106.70000000298023,
+          99.19999999552965,
+          100.69999999552965,
+          102,
+          99.89999999850988,
+          102.60000000149012,
+          98.90000000596046,
+          109,
+          100.10000000149012,
+          102,
+          99.70000000298023,
+          101.30000000447035,
+          105,
+          110.40000000596046,
+          99.89999999850988,
+          100.10000000149012,
+          99.80000000447035,
+          105.79999999701977,
+          99.10000000149012,
+          99.5,
+          100.39999999850988,
+          100.80000000447035,
+          105.5,
+          98.70000000298023,
+          99.70000000298023,
+          108.09999999403954,
+          99.39999999850988,
+          101.89999999850988,
+          101.70000000298023,
+          105.89999999850988,
+          99.69999999552965,
+          98.89999999850988
+        ]
+      },
+      "coldRaster": {
+        "n": 60,
+        "meanMs": 155.34833333405356,
+        "p50Ms": 155.09999999403954,
+        "p95Ms": 165.40000000596046,
+        "minMs": 146.39999999850988,
+        "maxMs": 182.70000000298023,
+        "totalMs": 9320.900000043213,
+        "rawMs": [
+          156.70000000298023,
+          159.60000000149012,
+          157.79999999701977,
+          153.90000000596046,
+          161.10000000149012,
+          157.30000000447035,
+          152.40000000596046,
+          153.39999999850988,
+          160.69999999552965,
+          151.80000000447035,
+          151.10000000149012,
+          158,
+          156.5,
+          149.89999999850988,
+          155.90000000596046,
+          155.10000000149012,
+          153.30000000447035,
+          149,
+          146.39999999850988,
+          149.40000000596046,
+          159.80000000447035,
+          156,
+          149.10000000149012,
+          157.5,
+          156.70000000298023,
+          156.20000000298023,
+          159.10000000149012,
+          147.10000000149012,
+          148.39999999850988,
+          149.20000000298023,
+          155.60000000149012,
+          165.40000000596046,
+          146.39999999850988,
+          167,
+          154,
+          158.20000000298023,
+          155.09999999403954,
+          149.59999999403954,
+          156.19999999552965,
+          153.19999999552965,
+          158,
+          182.70000000298023,
+          149.29999999701977,
+          156.79999999701977,
+          153.69999999552965,
+          151.30000000447035,
+          153.60000000149012,
+          151.70000000298023,
+          157.5,
+          153.39999999850988,
+          149.10000000149012,
+          155.09999999403954,
+          155.79999999701977,
+          160.60000000149012,
+          150.60000000149012,
+          166.80000000447035,
+          150.39999999850988,
+          154.80000000447035,
+          164,
+          156.60000000149012
+        ]
+      },
+      "warmRaster": {
+        "n": 60,
+        "meanMs": 12.619999999180436,
+        "p50Ms": 12.5,
+        "p95Ms": 14.5,
+        "minMs": 11.199999995529652,
+        "maxMs": 15.299999997019768,
+        "totalMs": 757.1999999508262,
+        "rawMs": [
+          11.299999997019768,
+          13.200000002980232,
+          11.5,
+          13.300000004470348,
+          12.5,
+          12.299999997019768,
+          12.200000002980232,
+          11.799999997019768,
+          11.399999998509884,
+          12,
+          14.5,
+          11.899999998509884,
+          14.099999994039536,
+          13.299999997019768,
+          13,
+          11.699999995529652,
+          12.5,
+          12.700000002980232,
+          11.399999998509884,
+          14,
+          11.600000001490116,
+          11.5,
+          11.899999998509884,
+          13.100000001490116,
+          13.5,
+          13.199999995529652,
+          12.5,
+          12.5,
+          12,
+          14.5,
+          11.699999995529652,
+          12.599999994039536,
+          11.800000004470348,
+          11.199999995529652,
+          11.299999997019768,
+          13,
+          13.600000001490116,
+          13.399999998509884,
+          12.200000002980232,
+          12.5,
+          14.799999997019768,
+          15.299999997019768,
+          12.600000001490116,
+          13,
+          12.100000001490116,
+          12.799999997019768,
+          13.799999997019768,
+          11.799999997019768,
+          11.600000001490116,
+          12.100000001490116,
+          12,
+          14.600000001490116,
+          12.5,
+          11.899999998509884,
+          13.199999995529652,
+          12.199999995529652,
+          12.299999997019768,
+          12.100000001490116,
+          13.5,
+          12.799999997019768
+        ]
+      }
+    },
+    "checksum": 0,
+    "currentDirectRepeatControl": {
+      "pixels": 1260000,
+      "changedPixels": 62774,
+      "changedRatio": 0.04982063492063492,
+      "maxChannelDelta": 69
+    },
+    "currentDirectVsColdPixels": {
+      "pixels": 1260000,
+      "changedPixels": 62854,
+      "changedRatio": 0.04988412698412698,
+      "maxChannelDelta": 69
+    },
+    "currentDirectVsWarmPixels": {
+      "pixels": 1260000,
+      "changedPixels": 62854,
+      "changedRatio": 0.04988412698412698,
+      "maxChannelDelta": 69
+    }
+  },
+  "cacheStatus": "PASS",
+  "parityStatus": "PARITY_APPROX",
+  "parityEnvelope": {
+    "maximumChannelDelta": 1,
+    "cachedVsContemporaryDirectMustBeExact": true,
+    "meaning": "EXACT reports zero differences. PARITY_APPROX preserves nonzero differences within one channel level AND exact parity against a contemporary repeated direct draw. Direct-repeat drift is reported. Human acceptance remains separate."
+  },
+  "visualStatus": "CAPTURED_FOR_HUMAN_REVIEW",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "hardwareConcurrency": 12
+  },
+  "pageErrors": [],
+  "limits": [
+    "Synthetic fixtures are not gameplay evidence.",
+    "Pixel parity tests DPR 1 and 2 at integer dimensions.",
+    "Timing includes full RGBA readback and allocation; it is not first paint, presented frame rate or device reliability.",
+    "Visual comparisons include the intentional stable-seed change and require human aesthetic review.",
+    "Historical M02 evidence and the frozen donor build were not overwritten."
+  ]
+}

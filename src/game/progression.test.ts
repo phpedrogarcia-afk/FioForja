@@ -1,4 +1,5 @@
 import { describe, it } from "node:test";
+import { playForgeAttempt } from "./forge-test-helpers.ts";
 import assert from "node:assert/strict";
 import {
   executeStartForgeTransaction,
@@ -112,9 +113,8 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
     assert.ok(res1.save.activeForgeAttempt);
 
     // Finishing the forge does NOT consume another ingot
-    const sim = createSim(ironDesign, { forgeRunId: res1.save.activeForgeAttempt?.forgeRunId });
-    sim.quality = 85;
-    const resFinish = executeFinishSwordTransaction(res1.save, sim, ironDesign);
+    const played = playForgeAttempt(res1.save);
+    const resFinish = executeFinishSwordTransaction(played.save, played.sim, ironDesign);
     assert.equal(resFinish.success, true);
     assert.equal(resFinish.save.inventory.materials.iron_ingot, initialIron - 1, "Must not double charge on finish");
     assert.equal(resFinish.save.activeForgeAttempt, null, "Attempt must be cleared");
@@ -170,6 +170,9 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
       claimed: false,
     };
 
+    const storedSword = finishSword(createSim(CANONICAL_PRESETS[0].design, { forgeRunId: runId }), CANONICAL_PRESETS[0].design);
+    storedSword.pendingRewards = rewards;
+    save.gallery = [storedSword];
     // First claim
     const res1 = executeClaimRewardsTransaction(save, rewards);
     assert.equal(res1.success, true);
@@ -253,9 +256,8 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
     assert.equal(startRes.success, true);
 
     // Finish forge with activeCore
-    const sim = createSim(design, { activeCore: testCore });
-    sim.quality = 98;
-    const finishRes = executeFinishSwordTransaction(startRes.save, sim, design);
+    const played = playForgeAttempt(startRes.save);
+    const finishRes = executeFinishSwordTransaction(played.save, played.sim, design);
     assert.equal(finishRes.success, true);
 
     // Core is now consumed and removed from inventory
@@ -317,10 +319,9 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
     const { mockStorage } = setupMockStorage();
     const save = structuredClone(defaultSaveData);
     const design = CANONICAL_PRESETS[0].design;
-    const sim = createSim(design);
-    sim.shape = 1;
-    sim.heatScore = 95;
-    sim.quenchScore = 95;
+    const started = executeStartForgeTransaction(save, design);
+    const played = playForgeAttempt(started.save);
+    const sim = played.sim;
 
     // Simulate quota exceeded error on storage write
     mockStorage.setItem = () => {
@@ -329,7 +330,7 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
       throw err;
     };
 
-    const res = executeFinishSwordTransaction(save, sim, design);
+    const res = executeFinishSwordTransaction(played.save, sim, design);
     assert.equal(res.success, false, "Must fail closed on write failure");
     assert.equal(res.code, "QUOTA_EXCEEDED");
     assert.ok(res.uncommittedSave, "Must preserve uncommittedSave payload for retry");
@@ -356,9 +357,8 @@ describe("Operação 03: O Ciclo do Ferreiro — Testes Adversariais de Progress
     assert.equal(startRes.save.inventory.materials.iron_ingot, initialIron, "0 iron consumed in training");
 
     // Finish sword in training
-    const sim = createSim(design);
-    sim.quality = 99;
-    const finishRes = executeFinishSwordTransaction(startRes.save, sim, design);
+    const played = playForgeAttempt(startRes.save);
+    const finishRes = executeFinishSwordTransaction(played.save, played.sim, played.save.activeForgeAttempt!.design);
     assert.equal(finishRes.success, true);
 
     const sword = finishRes.payload!;

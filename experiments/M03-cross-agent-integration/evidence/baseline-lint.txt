@@ -1,0 +1,56 @@
+
+> lint
+> eslint .
+
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\capture-diversity-and-gameplay.mjs
+  202:11  warning  'royalFam' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\simulate-economy-and-drops.mjs
+  1:39  warning  'getRankTier' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  1:52  warning  'LOOT_CATALOG' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  3:10  warning  'calculateSwordAttributes' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\scripts\simulate-economy-progression.mjs
+   2:27  warning  'defaultInventory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   2:45  warning  'defaultWallet' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   2:60  warning  'defaultCareer' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  11:21  warning  'finishSword' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\GameApp.tsx
+  36:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\arsenal-vivo.test.ts
+  8:50  warning  'PlayerInventory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  8:67  warning  'PlayerWallet' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  8:94  warning  'FusionCore' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\prestige-transactions.test.ts
+    5:3   warning  'executeComponentFusionTransaction' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    7:3   warning  'executeUpgradeSwordTransaction' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   10:3   warning  'executeFinishSwordTransaction' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   11:3   warning  'executeStrikeRewardTransaction' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   16:10  warning  'createSim' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   17:50  warning  'FusionCore' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+  363:11  warning  'statsElv' is assigned a value but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\screens\FusionStationScreen.tsx
+  3:42  warning  'InventoryComponent' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\screens\GalleryScreen.tsx
+  48:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\sim.test.ts
+  233:23  warning  'defaultWallet' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  233:38  warning  'defaultInventory' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  233:56  warning  'defaultCareer' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\swordDraw.ts
+  113:92  warning  'physicalProfile' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\lib\auth\use-current-user.ts
+  59:3  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/rules-of-hooks')
+
+✖ 26 problems (0 errors, 26 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

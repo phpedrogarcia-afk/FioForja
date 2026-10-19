@@ -24,7 +24,7 @@ describe("FioForja Simulator Core & Physical Metallurgy", () => {
     const initialShape = sim.shape;
     sim.charging = true;
     const strikeTime = 1.1;
-    sim.force = 0.62 + Math.sin(strikeTime * 0.85) * 0.11;
+    sim.force = 0.62 + Math.sin((sim.elapsedTime + .05) * 0.85) * 0.11;
     const ev = stepSim(sim, 0.05, { action: false, charging: false, reheat: false }, DEFAULT_DESIGN, strikeTime);
 
     assert.equal(ev.kind, "perfect");

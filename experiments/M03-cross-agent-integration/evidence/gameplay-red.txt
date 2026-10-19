@@ -1,0 +1,116 @@
+▶ Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Treino & Anti-Softlock
+  ✔ 1. P0 — Modo Treino: Rejeita ouro por golpe e zera economia de simulação (4.9617ms)
+  ✔ 2. P0 — Modo Treino: Conclusão isola estatísticas de carreira e salva em trainingGallery (1.0156ms)
+  ✔ 3. P0 — Armas de treino e armas entregues são bloqueadas no Crisol de Fusão (0.803ms)
+  ✔ 4. P0 — Ciclo de Vida: Impede iniciar nova forja com tentativa ativa (0.9257ms)
+  ✔ 5. P0 — Política Justa de Cancelamento: 100% de reembolso antes do golpe, sucata após primeiro golpe (0.7502ms)
+  ✔ 6. P0 — Identidade Consistente: forgeRunId preservado entre transação, simulação e lâmina final (0.8599ms)
+  ✔ 7. P0 — Encomenda do Capitão Valerius: Forjável legitimamente com combatRole Defensiva (0.6352ms)
+  ✔ 8. P1 — Verdadeiro Anti-Softlock: Treino de aprendiz com Q>=50 gera sucata para recomeçar carreira (1.0098ms)
+  ✔ 9. P1 — Gating da Metalurgia: Impede craft de aços raros em design livre sem prestígio ou núcleo (0.3356ms)
+✔ Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Treino & Anti-Softlock (12.614ms)
+▶ Operação 05: regressões de integridade reproduzidas antes do reparo
+  ✖ rejeita prêmio sem tentativa e IDs de execução estranhos (1.6803ms)
+  ✖ rejeita conclusão fora da tentativa e antes da têmpera (0.8416ms)
+  ✖ cancelamento de treino após golpe não concede sucata (0.5473ms)
+  ✖ conta também o golpe físico que fratura a lâmina (0.28ms)
+✖ Operação 05: regressões de integridade reproduzidas antes do reparo (3.6297ms)
+ℹ tests 13
+ℹ suites 2
+ℹ pass 9
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153.7146
+
+✖ failing tests:
+
+test at src\game\lifecycle-proof.test.ts:460:3
+✖ rejeita prêmio sem tentativa e IDs de execução estranhos (1.6803ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:462:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at node:internal/test_runner/test:1887:71
+      at node:internal/per_context/primordials:504:82
+      at new Promise (<anonymous>)
+      at new SafePromise (node:internal/per_context/primordials:478:3)
+      at node:internal/per_context/primordials:504:9
+      at Array.map (<anonymous>) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\game\lifecycle-proof.test.ts:464:3
+✖ rejeita conclusão fora da tentativa e antes da têmpera (0.8416ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:469:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Suite.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1889:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\game\lifecycle-proof.test.ts:472:3
+✖ cancelamento de treino após golpe não concede sucata (0.5473ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:477:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Suite.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\game\lifecycle-proof.test.ts:480:3
+✖ conta também o golpe físico que fratura a lâmina (0.28ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:487:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Suite.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

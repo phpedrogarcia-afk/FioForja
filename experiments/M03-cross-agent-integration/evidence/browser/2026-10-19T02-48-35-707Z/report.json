@@ -1,0 +1,1352 @@
+{
+  "mission": "FIOFORJA-CODEX05-BROWSER",
+  "status": "PASS",
+  "startedAt": "2026-10-19T02:48:36.720Z",
+  "url": "http://127.0.0.1:8947/",
+  "root": "C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja",
+  "browserExecutable": "C:\\Users\\phped\\AppData\\Local\\ms-playwright\\chromium-1228\\chrome-win64\\chrome.exe",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "sourcesBefore": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "package.json": "b25dae0b5819b10d84a15fdfc8ae35f6f7e177a971c0245c7217bf3d03bd30d7",
+    "src/game/ForgeCanvas.tsx": "c5da5fdf1a4c37dacbd34414122dc5e20b71901582999daf9b7a693750d26067",
+    "src/game/GameApp.tsx": "93043949eeca49767c4cc7b89279177a050955d46f6a6b8987a0a48883b9d78d",
+    "src/game/arsenal-vivo.test.ts": "4543b6aefe764e527a00d5732f68320e9a28e0c0bc547bdc6fdd1d63800a9598",
+    "src/game/assets.ts": "f95d6d90755c7ad1e8cf151be86d55f3fcd0ca7414da51a8b75e548b8a12a4bf",
+    "src/game/audio.ts": "e0681e28f67c3c9b324db9d01ef53755479328fbb90e64f417a0044147b252a3",
+    "src/game/blueprints.ts": "bb670728d5a2f5503b8b06e950814a9ac356b3c03c00b4d31f3c9058fb7bea00",
+    "src/game/catalog.ts": "6247c33b8932e70c6644be25148aff812bb2627d101191967ce7a3db768d1d56",
+    "src/game/commissions.ts": "10c0f2f584ae7fb4c5b3167ed9019b67dc3665bd32a858357970ccdb5a549786",
+    "src/game/forge-test-helpers.ts": "29c9eb8d585dfb63c6a1d9914d320a48d1c37f626300380e16577ceca0036d93",
+    "src/game/fusion.ts": "a9dee081ef3ff876d7441e19a1b981556c9813237379687d6341c42f734ecd98",
+    "src/game/lifecycle-proof.test.ts": "4b5e7e5f459883007da4481c7ae831325f0e2109be3c0ba269b6e8aec5717cea",
+    "src/game/loot.ts": "d71182d54ba7c20f2fed3cdb7c95263cd7e7bb9145f6a60e06fb45b6359d721a",
+    "src/game/materials.ts": "dcd4205e7bb348c01896b12a68ab2adef537b07b106f630ecb52b504c4e93af0",
+    "src/game/prestige-transactions.test.ts": "1ac505b26f7b864c48aa388b5aab9cfe4f6135545810f4f9d77084ead9695182",
+    "src/game/progression.test.ts": "74153cccd28a7abc34bef1048c5912ea355e22df35547fefaeb7e644e4e270ec",
+    "src/game/save.ts": "eb2fa2ffddbf4a694d730a921ab23ee5c5d28f117b67ca29ea5328d5f8a34652",
+    "src/game/screens/DesignScreen.tsx": "a23ca9e37e2e7b6fe953252c623c0f89535b92b63f711731bf6238cae4ff8f6a",
+    "src/game/screens/ForgeHud.tsx": "05bcf6de96605d442e20513d411c8de1cc10b877ab925d3013c855f14ed2b890",
+    "src/game/screens/FusionStationScreen.tsx": "c54270aa8fd58415462efaed624ff4d3eaec30088e3a198fc76faa82b5ad41a8",
+    "src/game/screens/GalleryScreen.tsx": "c76d50b729d577532a551bfc7e233f6214572aa152204e17ce586ba8e08b96d4",
+    "src/game/screens/RevealScreen.tsx": "f8d9f444829d05779888c545f6cfaecb156e63ad5ed7ac8164bb309223444bf5",
+    "src/game/screens/RewardsScreen.tsx": "a5a565d6ee9dfc73896e4af596747ee3b3f09d933050862c532c58521ab4cc1d",
+    "src/game/screens/TitleScreen.tsx": "3c5be1edf823e332b0c163e1989146646e19d096ceb7e3c3a2c9c8c71e69aeea",
+    "src/game/sim.test.ts": "5eba66d1f43133841c7d462d0c6e9b99159f84d5427a4f334a539a07373e03ca",
+    "src/game/sim.ts": "45f54c45d41e1cd359a4764dccbc2b3f2a57de3de1b38ae6c13dd98a1820a3a2",
+    "src/game/swordDraw.ts": "2cebf3afcb6c4deaabd75aab22eccbbc8d3cde93f7d815cbc8c9b407c5346a59",
+    "src/game/transactions.ts": "29197272d83bfe49f30f5ff242bbd22c6a1e9bc4d3e8769126b9e746e6b2db94",
+    "src/game/types.ts": "2d6b0fdfcce3015156420b3fa7a1e4ace91f6ed1dac5228f040489dd7ea7b6e5",
+    "src/game/visuals/dna-integration.test.ts": "50511c23d6a6de4eb4db861760de091ee0b9c59b6c5c7cfab828043ca45d99c5",
+    "src/game/visuals/geometry.test.ts": "b32ea6ee464f1e49f9718b96686d1c8b8200a4008388f91decd7d1d67ade72ec",
+    "src/game/visuals/geometry.ts": "e4b860078e54ee8ae8921f1d6e3b5a73a43762995a39259315332ed5297c1013",
+    "src/game/visuals/materials.ts": "6c53082268084180bc910bdec0934b9e04f4f7d2dcc910fe6f2b83c782829825",
+    "src/game/visuals/math.ts": "342051d3d8f07a0969a33074732442cda1f2e3ca2a02cfd64e72a2c1b0a18419",
+    "src/game/visuals/ornamentation.ts": "1505499427b96c5ecd1e9d212f30c9958b06021dd9e1656ade0fda6d7647d8c4",
+    "src/game/visuals/qualityMarks.ts": "dbaaae248fddd6172b924c043608ea9181563e52da7b1dbfe2c91b35b14b915a",
+    "src/game/visuals/refinements.test.ts": "113a6f1096d61af5c3b1541a8bda7f18823fa9ff7f0bdcd1a6cceb97143bb11f",
+    "src/game/visuals/renderer-adapter.test.ts": "e55fb3232a479b68e38eb7cde5e399b47c4cee87012a9521c058e160137a7adf",
+    "src/game/visuals/renderer-cache.test.ts": "be570b07138d644dce028e2c522db308a12d7d90d35b1978545c7c5927fa3fe4",
+    "src/game/visuals/rendererAdapter.ts": "6fbc097b1b1cd8ea93072fc5085fd6277b2dbd9f07216c02b77e50f467f3abc6",
+    "src/game/visuals/thumbnailCache.ts": "6bf293b335560a344f8b259591ff1918cf28eaf5f4630566420cec1cb9d61b3d",
+    "src/game/visuals/types.ts": "5c46e2756ab604380e4f3853aa3acce1728909513183239c368ff88ac918fc5f",
+    "src/game/visuals/weaponGenome.test.ts": "2856d5236c4033c9bff390f02068e1e77a780aa4a390f3b56d4e1ddf4927f7ca",
+    "src/game/visuals/weaponGenome.ts": "1bb56527522753a5c659c7cd2d81717625d71b5715ecb3d6aa64bd9f091b0ff5",
+    "src/game/visuals/weaponRenderer.ts": "da6b811def4a69775363c408adee8bf924ad102c6cb603c13014611ece511fa8",
+    "src/routes/index.tsx": "2c6e1f5f4c3e591e5aac1e7a50523ac974de64fbf3befcf9c7ac286a9b6dc558",
+    "vite.config.ts": "eb5334e0c70efe08217898d90e5313cf44ef4850189ed752c2c9b5c73db2f1af"
+  },
+  "cases": [
+    {
+      "id": "D",
+      "provenance": "REAL_UI_CHECKPOINT_AND_RELOAD_FRESH_CONTEXT",
+      "status": "PASS",
+      "startedAt": "2026-10-19T02:48:37.222Z",
+      "observations": [
+        {
+          "savedAttempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 2,
+            "snapshot": {
+              "version": 1,
+              "revision": 9,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 4.752699999994043,
+                "phase": "forge",
+                "heat": 0.7473531999990456,
+                "heatScore": 72.64592592557273,
+                "shape": 0.48,
+                "physicalProfile": {
+                  "baseWidth": 0.36,
+                  "midWidth": 0.37250000000000005,
+                  "tipWidth": 0.16,
+                  "distalTaper": 0.08,
+                  "fullerDepth": 0.22499999999999998,
+                  "bevelSharpness": 0.2375,
+                  "hammerMarksCount": 2
+                },
+                "quality": 44.755022222137455,
+                "warp": 0,
+                "strikes": 2,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.533957097433251,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.28,
+                "targetZone": "mid",
+                "zoneProgress": {
+                  "base": 1,
+                  "mid": 1,
+                  "tip": 0
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378125673
+          },
+          "checkpointBeforePagehide": {
+            "version": 1,
+            "revision": 9,
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "state": {
+              "elapsedTime": 4.752699999994043,
+              "phase": "forge",
+              "heat": 0.7473531999990456,
+              "heatScore": 72.64592592557273,
+              "shape": 0.48,
+              "physicalProfile": {
+                "baseWidth": 0.36,
+                "midWidth": 0.37250000000000005,
+                "tipWidth": 0.16,
+                "distalTaper": 0.08,
+                "fullerDepth": 0.22499999999999998,
+                "bevelSharpness": 0.2375,
+                "hammerMarksCount": 2
+              },
+              "quality": 44.755022222137455,
+              "warp": 0,
+              "strikes": 2,
+              "maxStrikes": 8,
+              "force": 0,
+              "charging": false,
+              "sweetCenter": 0.533957097433251,
+              "sweetWidth": 0.22,
+              "quenchFill": 0,
+              "quenching": false,
+              "quenchScore": 0,
+              "reheating": false,
+              "done": false,
+              "integrity": 100,
+              "cracks": 0,
+              "structuralState": "stable",
+              "broken": false,
+              "runicCharge": 0.28,
+              "targetZone": "mid",
+              "zoneProgress": {
+                "base": 1,
+                "mid": 1,
+                "tip": 0
+              },
+              "activeHammer": "standard",
+              "equippedGear": {
+                "hammer": "standard",
+                "anvil": "anvil_cast",
+                "furnace": "furnace_coal",
+                "quench": "quench_water"
+              },
+              "history": [
+                {
+                  "strike": 1,
+                  "kind": "perfect",
+                  "force": 0.6298840000000002,
+                  "inHeat": true,
+                  "zone": "base"
+                },
+                {
+                  "strike": 2,
+                  "kind": "perfect",
+                  "force": 0.5708840000000002,
+                  "inHeat": true,
+                  "zone": "mid"
+                }
+              ],
+              "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+              "activeCore": null,
+              "isTraining": false
+            }
+          },
+          "recoveredCheckpoint": {
+            "version": 1,
+            "revision": 10,
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "state": {
+              "elapsedTime": 5.253299999994047,
+              "phase": "forge",
+              "heat": 0.7283303999990455,
+              "heatScore": 72.64592592557273,
+              "shape": 0.48,
+              "physicalProfile": {
+                "baseWidth": 0.36,
+                "midWidth": 0.37250000000000005,
+                "tipWidth": 0.16,
+                "distalTaper": 0.08,
+                "fullerDepth": 0.22499999999999998,
+                "bevelSharpness": 0.2375,
+                "hammerMarksCount": 2
+              },
+              "quality": 44.755022222137455,
+              "warp": 0,
+              "strikes": 2,
+              "maxStrikes": 8,
+              "force": 0,
+              "charging": false,
+              "sweetCenter": 0.5133407290318277,
+              "sweetWidth": 0.22,
+              "quenchFill": 0,
+              "quenching": false,
+              "quenchScore": 0,
+              "reheating": false,
+              "done": false,
+              "integrity": 100,
+              "cracks": 0,
+              "structuralState": "stable",
+              "broken": false,
+              "runicCharge": 0.28,
+              "targetZone": "mid",
+              "zoneProgress": {
+                "base": 1,
+                "mid": 1,
+                "tip": 0
+              },
+              "activeHammer": "standard",
+              "equippedGear": {
+                "hammer": "standard",
+                "anvil": "anvil_cast",
+                "furnace": "furnace_coal",
+                "quench": "quench_water"
+              },
+              "history": [
+                {
+                  "strike": 1,
+                  "kind": "perfect",
+                  "force": 0.6298840000000002,
+                  "inHeat": true,
+                  "zone": "base"
+                },
+                {
+                  "strike": 2,
+                  "kind": "perfect",
+                  "force": 0.5708840000000002,
+                  "inHeat": true,
+                  "zone": "mid"
+                }
+              ],
+              "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+              "activeCore": null,
+              "isTraining": false
+            }
+          },
+          "restoredHud": {
+            "phase": "forge",
+            "heat": 73,
+            "shape": 48,
+            "integrity": 100,
+            "strikes": 2,
+            "force": 0,
+            "center": 0.512037
+          },
+          "claim": "The last persisted checkpoint is restored; no promise about unsaved intermediate animation frames."
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "forge",
+            "heat": 69,
+            "shape": 64,
+            "integrity": 100,
+            "strikes": 3,
+            "force": 0,
+            "center": 0.525918
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 3,
+            "snapshot": {
+              "version": 1,
+              "revision": 12,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 6.1680999999940465,
+                "phase": "forge",
+                "heat": 0.6935679999990432,
+                "heatScore": 72.64592592557273,
+                "shape": 0.64,
+                "physicalProfile": {
+                  "baseWidth": 0.36,
+                  "midWidth": 0.37250000000000005,
+                  "tipWidth": 0.385,
+                  "distalTaper": 0.3175,
+                  "fullerDepth": 0.22499999999999998,
+                  "bevelSharpness": 0.4375,
+                  "hammerMarksCount": 3
+                },
+                "quality": 51.79502222213746,
+                "warp": 0,
+                "strikes": 3,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.5251188169073031,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.28,
+                "targetZone": "tip",
+                "zoneProgress": {
+                  "base": 1,
+                  "mid": 1,
+                  "tip": 1
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378127943
+          },
+          "wallet": {
+            "gold": 878,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "forge",
+            "heat": 67,
+            "shape": 80,
+            "integrity": 100,
+            "strikes": 4,
+            "force": 0,
+            "center": 0.564419
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 4,
+            "snapshot": {
+              "version": 1,
+              "revision": 14,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 6.751899999994045,
+                "phase": "forge",
+                "heat": 0.6713835999990417,
+                "heatScore": 72.64592592557273,
+                "shape": 0.8,
+                "physicalProfile": {
+                  "baseWidth": 0.56,
+                  "midWidth": 0.37250000000000005,
+                  "tipWidth": 0.385,
+                  "distalTaper": 0.3175,
+                  "fullerDepth": 0.22499999999999998,
+                  "bevelSharpness": 0.525,
+                  "hammerMarksCount": 4
+                },
+                "quality": 58.83502222213746,
+                "warp": 0,
+                "strikes": 4,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.5630614853033339,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.28,
+                "targetZone": "base",
+                "zoneProgress": {
+                  "base": 2,
+                  "mid": 1,
+                  "tip": 1
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 4,
+                    "kind": "perfect",
+                    "force": 0.5508240000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378128526
+          },
+          "wallet": {
+            "gold": 890,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "forge",
+            "heat": 65,
+            "shape": 96,
+            "integrity": 100,
+            "strikes": 5,
+            "force": 0,
+            "center": 0.622554
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 5,
+            "snapshot": {
+              "version": 1,
+              "revision": 16,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 7.4027999999940395,
+                "phase": "forge",
+                "heat": 0.6466493999990401,
+                "heatScore": 72.64592592557273,
+                "shape": 0.9600000000000001,
+                "physicalProfile": {
+                  "baseWidth": 0.56,
+                  "midWidth": 0.5850000000000001,
+                  "tipWidth": 0.385,
+                  "distalTaper": 0.3175,
+                  "fullerDepth": 0.44999999999999996,
+                  "bevelSharpness": 0.675,
+                  "hammerMarksCount": 5
+                },
+                "quality": 65.87502222213746,
+                "warp": 0,
+                "strikes": 5,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.6210114019584935,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.56,
+                "targetZone": "mid",
+                "zoneProgress": {
+                  "base": 2,
+                  "mid": 2,
+                  "tip": 1
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 4,
+                    "kind": "perfect",
+                    "force": 0.5508240000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 5,
+                    "kind": "perfect",
+                    "force": 0.6495900000000001,
+                    "inHeat": true,
+                    "zone": "mid"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378129176
+          },
+          "wallet": {
+            "gold": 902,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "forge",
+            "heat": 62,
+            "shape": 100,
+            "integrity": 100,
+            "strikes": 6,
+            "force": 0,
+            "center": 0.6850879999999999
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 6,
+            "snapshot": {
+              "version": 1,
+              "revision": 18,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 8.103299999994038,
+                "phase": "forge",
+                "heat": 0.6200303999990386,
+                "heatScore": 72.64592592557273,
+                "shape": 1,
+                "physicalProfile": {
+                  "baseWidth": 0.56,
+                  "midWidth": 0.5850000000000001,
+                  "tipWidth": 0.61,
+                  "distalTaper": 0.5549999999999999,
+                  "fullerDepth": 0.44999999999999996,
+                  "bevelSharpness": 0.875,
+                  "hammerMarksCount": 6
+                },
+                "quality": 67.63502222213745,
+                "warp": 0,
+                "strikes": 6,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.6825294154846104,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.56,
+                "targetZone": "tip",
+                "zoneProgress": {
+                  "base": 2,
+                  "mid": 2,
+                  "tip": 2
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 4,
+                    "kind": "perfect",
+                    "force": 0.5508240000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 5,
+                    "kind": "perfect",
+                    "force": 0.6495900000000001,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 6,
+                    "kind": "perfect",
+                    "force": 0.7087080000000006,
+                    "inHeat": true,
+                    "zone": "tip"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378129877
+          },
+          "wallet": {
+            "gold": 914,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "forge",
+            "heat": 59,
+            "shape": 100,
+            "integrity": 100,
+            "strikes": 7,
+            "force": 0,
+            "center": 0.723085
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 7,
+            "snapshot": {
+              "version": 1,
+              "revision": 20,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 8.78729999999404,
+                "phase": "forge",
+                "heat": 0.5940383999990373,
+                "heatScore": 72.64592592557273,
+                "shape": 1,
+                "physicalProfile": {
+                  "baseWidth": 0.76,
+                  "midWidth": 0.5850000000000001,
+                  "tipWidth": 0.61,
+                  "distalTaper": 0.5549999999999999,
+                  "fullerDepth": 0.44999999999999996,
+                  "bevelSharpness": 0.9625,
+                  "hammerMarksCount": 7
+                },
+                "quality": 67.63502222213745,
+                "warp": 0,
+                "strikes": 7,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.7219570526372439,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.56,
+                "targetZone": "base",
+                "zoneProgress": {
+                  "base": 3,
+                  "mid": 2,
+                  "tip": 2
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 4,
+                    "kind": "perfect",
+                    "force": 0.5508240000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 5,
+                    "kind": "perfect",
+                    "force": 0.6495900000000001,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 6,
+                    "kind": "perfect",
+                    "force": 0.7087080000000006,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 7,
+                    "kind": "perfect",
+                    "force": 0.7085899999999999,
+                    "inHeat": true,
+                    "zone": "base"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378130561
+          },
+          "wallet": {
+            "gold": 922,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        },
+        {
+          "step": "D-after-resume-physical-strike",
+          "hud": {
+            "phase": "quench",
+            "heat": 56,
+            "shape": 100,
+            "integrity": 100,
+            "strikes": null,
+            "force": null,
+            "center": null
+          },
+          "attempt": {
+            "attemptId": "attempt_dc62d480-ad37-464a-99ad-ed0073d37fa3",
+            "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+            "design": {
+              "name": "Guarda da Fronteira",
+              "family": "iron",
+              "profile": "long",
+              "steel": "iron",
+              "wrap": "leather",
+              "guard": "cross",
+              "pommel": "disc",
+              "inscription": "VIGILIS",
+              "runes": false,
+              "length": 0.95
+            },
+            "isTraining": false,
+            "materialConsumed": {
+              "key": "iron_ingot",
+              "name": "Lingote de Ferro Batido",
+              "quantity": 1
+            },
+            "activeCoreId": null,
+            "startedAt": 1792378120875,
+            "status": "ACTIVE",
+            "strikesCount": 8,
+            "snapshot": {
+              "version": 1,
+              "revision": 22,
+              "design": {
+                "name": "Guarda da Fronteira",
+                "family": "iron",
+                "profile": "long",
+                "steel": "iron",
+                "wrap": "leather",
+                "guard": "cross",
+                "pommel": "disc",
+                "inscription": "VIGILIS",
+                "runes": false,
+                "length": 0.95
+              },
+              "state": {
+                "elapsedTime": 9.554799999994035,
+                "phase": "quench",
+                "heat": 0.5648733999990363,
+                "heatScore": 72.64592592557273,
+                "shape": 1,
+                "physicalProfile": {
+                  "baseWidth": 0.76,
+                  "midWidth": 0.7975000000000001,
+                  "tipWidth": 0.61,
+                  "distalTaper": 0.5549999999999999,
+                  "fullerDepth": 0.6749999999999999,
+                  "bevelSharpness": 1,
+                  "hammerMarksCount": 8
+                },
+                "quality": 67.63502222213745,
+                "warp": 0,
+                "strikes": 8,
+                "maxStrikes": 8,
+                "force": 0,
+                "charging": false,
+                "sweetCenter": 0.7260849578351468,
+                "sweetWidth": 0.22,
+                "quenchFill": 0,
+                "quenching": false,
+                "quenchScore": 0,
+                "reheating": false,
+                "done": false,
+                "integrity": 100,
+                "cracks": 0,
+                "structuralState": "stable",
+                "broken": false,
+                "runicCharge": 0.8400000000000001,
+                "targetZone": "mid",
+                "zoneProgress": {
+                  "base": 3,
+                  "mid": 3,
+                  "tip": 2
+                },
+                "activeHammer": "standard",
+                "equippedGear": {
+                  "hammer": "standard",
+                  "anvil": "anvil_cast",
+                  "furnace": "furnace_coal",
+                  "quench": "quench_water"
+                },
+                "history": [
+                  {
+                    "strike": 1,
+                    "kind": "perfect",
+                    "force": 0.6298840000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 2,
+                    "kind": "perfect",
+                    "force": 0.5708840000000002,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 3,
+                    "kind": "perfect",
+                    "force": 0.511766,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 4,
+                    "kind": "perfect",
+                    "force": 0.5508240000000002,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 5,
+                    "kind": "perfect",
+                    "force": 0.6495900000000001,
+                    "inHeat": true,
+                    "zone": "mid"
+                  },
+                  {
+                    "strike": 6,
+                    "kind": "perfect",
+                    "force": 0.7087080000000006,
+                    "inHeat": true,
+                    "zone": "tip"
+                  },
+                  {
+                    "strike": 7,
+                    "kind": "perfect",
+                    "force": 0.7085899999999999,
+                    "inHeat": true,
+                    "zone": "base"
+                  },
+                  {
+                    "strike": 8,
+                    "kind": "perfect",
+                    "force": 0.7282959999999995,
+                    "inHeat": true,
+                    "zone": "mid"
+                  }
+                ],
+                "forgeRunId": "run_51f3d750-e068-42c9-ae9c-7682b2af51ba",
+                "activeCore": null,
+                "isTraining": false
+              }
+            },
+            "lastStrikeAt": 1792378131328
+          },
+          "wallet": {
+            "gold": 930,
+            "rubies": 35,
+            "diamonds": 20
+          }
+        }
+      ],
+      "captures": [
+        {
+          "name": "D-before-reload-last-checkpoint",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-before-reload-last-checkpoint.png",
+          "sha256": "c7564d1edac1ba5f5772c9cd3dc92ec6a62229156386ca030b14ae34422d5a35"
+        },
+        {
+          "name": "D-recovery-modal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-recovery-modal.png",
+          "sha256": "3b1b427d5623d7030858fcbe6ce32072c80b1ac3d203505e7b457bcebbee73b5"
+        },
+        {
+          "name": "D-restored-physical-state",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-restored-physical-state.png",
+          "sha256": "2e00e0e74f7d672b5b885825d425d655cfba448ffa50769acaa24b39967dd4ff"
+        },
+        {
+          "name": "D-after-resume-quench-before-input",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-after-resume-quench-before-input.png",
+          "sha256": "dc3df7060ae9ec18e92524d4b05d89ec090358c40f61d51f8173789f6903d3fa"
+        },
+        {
+          "name": "D-after-resume-finished-reveal",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-19T02-48-35-707Z/D-after-resume-finished-reveal.png",
+          "sha256": "c4fa48b0856760fc1ca69497c434ab5a5a63d7bd5f5df8e9556159b1da7106aa"
+        }
+      ],
+      "pageErrors": [],
+      "finishedAt": "2026-10-19T02:48:59.879Z"
+    }
+  ],
+  "evidenceEnvelope": "UI inputs drive each forge. Fixture setup, pure genome reads and save observations are explicitly recorded; no fixture output counts as a naturally earned input.",
+  "browserVersion": "149.0.7827.55",
+  "sourcesAfter": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "package.json": "b25dae0b5819b10d84a15fdfc8ae35f6f7e177a971c0245c7217bf3d03bd30d7",
+    "src/game/ForgeCanvas.tsx": "c5da5fdf1a4c37dacbd34414122dc5e20b71901582999daf9b7a693750d26067",
+    "src/game/GameApp.tsx": "93043949eeca49767c4cc7b89279177a050955d46f6a6b8987a0a48883b9d78d",
+    "src/game/arsenal-vivo.test.ts": "4543b6aefe764e527a00d5732f68320e9a28e0c0bc547bdc6fdd1d63800a9598",
+    "src/game/assets.ts": "f95d6d90755c7ad1e8cf151be86d55f3fcd0ca7414da51a8b75e548b8a12a4bf",
+    "src/game/audio.ts": "e0681e28f67c3c9b324db9d01ef53755479328fbb90e64f417a0044147b252a3",
+    "src/game/blueprints.ts": "bb670728d5a2f5503b8b06e950814a9ac356b3c03c00b4d31f3c9058fb7bea00",
+    "src/game/catalog.ts": "6247c33b8932e70c6644be25148aff812bb2627d101191967ce7a3db768d1d56",
+    "src/game/commissions.ts": "10c0f2f584ae7fb4c5b3167ed9019b67dc3665bd32a858357970ccdb5a549786",
+    "src/game/forge-test-helpers.ts": "29c9eb8d585dfb63c6a1d9914d320a48d1c37f626300380e16577ceca0036d93",
+    "src/game/fusion.ts": "a9dee081ef3ff876d7441e19a1b981556c9813237379687d6341c42f734ecd98",
+    "src/game/lifecycle-proof.test.ts": "4b5e7e5f459883007da4481c7ae831325f0e2109be3c0ba269b6e8aec5717cea",
+    "src/game/loot.ts": "d71182d54ba7c20f2fed3cdb7c95263cd7e7bb9145f6a60e06fb45b6359d721a",
+    "src/game/materials.ts": "dcd4205e7bb348c01896b12a68ab2adef537b07b106f630ecb52b504c4e93af0",
+    "src/game/prestige-transactions.test.ts": "1ac505b26f7b864c48aa388b5aab9cfe4f6135545810f4f9d77084ead9695182",
+    "src/game/progression.test.ts": "74153cccd28a7abc34bef1048c5912ea355e22df35547fefaeb7e644e4e270ec",
+    "src/game/save.ts": "eb2fa2ffddbf4a694d730a921ab23ee5c5d28f117b67ca29ea5328d5f8a34652",
+    "src/game/screens/DesignScreen.tsx": "a23ca9e37e2e7b6fe953252c623c0f89535b92b63f711731bf6238cae4ff8f6a",
+    "src/game/screens/ForgeHud.tsx": "05bcf6de96605d442e20513d411c8de1cc10b877ab925d3013c855f14ed2b890",
+    "src/game/screens/FusionStationScreen.tsx": "c54270aa8fd58415462efaed624ff4d3eaec30088e3a198fc76faa82b5ad41a8",
+    "src/game/screens/GalleryScreen.tsx": "c76d50b729d577532a551bfc7e233f6214572aa152204e17ce586ba8e08b96d4",
+    "src/game/screens/RevealScreen.tsx": "f8d9f444829d05779888c545f6cfaecb156e63ad5ed7ac8164bb309223444bf5",
+    "src/game/screens/RewardsScreen.tsx": "a5a565d6ee9dfc73896e4af596747ee3b3f09d933050862c532c58521ab4cc1d",
+    "src/game/screens/TitleScreen.tsx": "3c5be1edf823e332b0c163e1989146646e19d096ceb7e3c3a2c9c8c71e69aeea",
+    "src/game/sim.test.ts": "5eba66d1f43133841c7d462d0c6e9b99159f84d5427a4f334a539a07373e03ca",
+    "src/game/sim.ts": "45f54c45d41e1cd359a4764dccbc2b3f2a57de3de1b38ae6c13dd98a1820a3a2",
+    "src/game/swordDraw.ts": "2cebf3afcb6c4deaabd75aab22eccbbc8d3cde93f7d815cbc8c9b407c5346a59",
+    "src/game/transactions.ts": "29197272d83bfe49f30f5ff242bbd22c6a1e9bc4d3e8769126b9e746e6b2db94",
+    "src/game/types.ts": "2d6b0fdfcce3015156420b3fa7a1e4ace91f6ed1dac5228f040489dd7ea7b6e5",
+    "src/game/visuals/dna-integration.test.ts": "50511c23d6a6de4eb4db861760de091ee0b9c59b6c5c7cfab828043ca45d99c5",
+    "src/game/visuals/geometry.test.ts": "b32ea6ee464f1e49f9718b96686d1c8b8200a4008388f91decd7d1d67ade72ec",
+    "src/game/visuals/geometry.ts": "e4b860078e54ee8ae8921f1d6e3b5a73a43762995a39259315332ed5297c1013",
+    "src/game/visuals/materials.ts": "6c53082268084180bc910bdec0934b9e04f4f7d2dcc910fe6f2b83c782829825",
+    "src/game/visuals/math.ts": "342051d3d8f07a0969a33074732442cda1f2e3ca2a02cfd64e72a2c1b0a18419",
+    "src/game/visuals/ornamentation.ts": "1505499427b96c5ecd1e9d212f30c9958b06021dd9e1656ade0fda6d7647d8c4",
+    "src/game/visuals/qualityMarks.ts": "dbaaae248fddd6172b924c043608ea9181563e52da7b1dbfe2c91b35b14b915a",
+    "src/game/visuals/refinements.test.ts": "113a6f1096d61af5c3b1541a8bda7f18823fa9ff7f0bdcd1a6cceb97143bb11f",
+    "src/game/visuals/renderer-adapter.test.ts": "e55fb3232a479b68e38eb7cde5e399b47c4cee87012a9521c058e160137a7adf",
+    "src/game/visuals/renderer-cache.test.ts": "be570b07138d644dce028e2c522db308a12d7d90d35b1978545c7c5927fa3fe4",
+    "src/game/visuals/rendererAdapter.ts": "6fbc097b1b1cd8ea93072fc5085fd6277b2dbd9f07216c02b77e50f467f3abc6",
+    "src/game/visuals/thumbnailCache.ts": "6bf293b335560a344f8b259591ff1918cf28eaf5f4630566420cec1cb9d61b3d",
+    "src/game/visuals/types.ts": "5c46e2756ab604380e4f3853aa3acce1728909513183239c368ff88ac918fc5f",
+    "src/game/visuals/weaponGenome.test.ts": "2856d5236c4033c9bff390f02068e1e77a780aa4a390f3b56d4e1ddf4927f7ca",
+    "src/game/visuals/weaponGenome.ts": "1bb56527522753a5c659c7cd2d81717625d71b5715ecb3d6aa64bd9f091b0ff5",
+    "src/game/visuals/weaponRenderer.ts": "da6b811def4a69775363c408adee8bf924ad102c6cb603c13014611ece511fa8",
+    "src/routes/index.tsx": "2c6e1f5f4c3e591e5aac1e7a50523ac974de64fbf3befcf9c7ac286a9b6dc558",
+    "vite.config.ts": "eb5334e0c70efe08217898d90e5313cf44ef4850189ed752c2c9b5c73db2f1af"
+  },
+  "finishedAt": "2026-10-19T02:49:00.080Z",
+  "artifactHashes": {
+    "D-after-resume-finished-reveal.png": "c4fa48b0856760fc1ca69497c434ab5a5a63d7bd5f5df8e9556159b1da7106aa",
+    "D-after-resume-quench-before-input.png": "dc3df7060ae9ec18e92524d4b05d89ec090358c40f61d51f8173789f6903d3fa",
+    "D-before-reload-last-checkpoint.png": "c7564d1edac1ba5f5772c9cd3dc92ec6a62229156386ca030b14ae34422d5a35",
+    "D-recovery-modal.png": "3b1b427d5623d7030858fcbe6ce32072c80b1ac3d203505e7b457bcebbee73b5",
+    "D-restored-physical-state.png": "2e00e0e74f7d672b5b885825d425d655cfba448ffa50769acaa24b39967dd4ff",
+    "D-trace.zip": "8bb9bfab23337dc4f632b6f2146e63796b76ef5b21a6a99405b90b1d5187d717"
+  }
+}

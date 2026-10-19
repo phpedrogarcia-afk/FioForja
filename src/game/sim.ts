@@ -1,5 +1,5 @@
-import { STEELS, calculateSwordAttributes, gradeFor, rarityFor, recalculateSwordStats } from "./catalog.ts";
-import type { EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeZone, FusionCore, HammerType, PhysicalBladeProfile, PlayerWallet, SimState, StrikeKind, SwordDesign } from "./types.ts";
+import { FAMILIES, GUARDS, POMMELS, PROFILES, STEELS, WRAPS, calculateSwordAttributes, gradeFor, rarityFor, recalculateSwordStats } from "./catalog.ts";
+import type { ActiveForgeAttempt, EquippedWorkshopGear, FinishedSword, ForgeSnapshot, ForgeRewardsData, ForgeZone, FusionCore, HammerType, PhysicalBladeProfile, PlayerWallet, SimState, StrikeKind, SwordDesign } from "./types.ts";
 import { generateUniqueId } from "./save.ts";
 import { generateDynamicForgeRewards } from "./loot.ts";
 import { RARITY_RANK_VALUES } from "./fusion.ts";
@@ -56,6 +56,7 @@ export function createSim(
   };
 
   return {
+    elapsedTime: 0,
     phase: "heat",
     heat: 0.1,
     heatScore: 0,
@@ -117,10 +118,11 @@ export function stepSim(
   dt: number,
   input: SimInput,
   design: SwordDesign,
-  time: number,
+  _time: number,
 ): SimEvent {
   const event: SimEvent = {};
   if (s.done) return event;
+  s.elapsedTime += dt;
 
   s.strikeAnim = Math.max(0, s.strikeAnim - dt);
   s.sparkAnim = Math.max(0, s.sparkAnim - dt);
@@ -173,7 +175,7 @@ export function stepSim(
       s.lastMessage = `Equipado: ${hammerNames[s.activeHammer]}.`;
     }
 
-    s.sweetCenter = 0.62 + Math.sin(time * 0.85) * 0.11;
+    s.sweetCenter = 0.62 + Math.sin(s.elapsedTime * 0.85) * 0.11;
     const hammerWidthBonus = s.activeHammer === "precision" ? 0.03 : s.activeHammer === "sledge" ? -0.02 : 0;
     const anvilBonus = s.equippedGear?.anvil === "anvil_master" ? 0.025 : 0;
     s.sweetWidth = Math.max(0.06, steel.sweetWidth + hammerWidthBonus + anvilBonus);
@@ -209,6 +211,9 @@ export function stepSim(
       s.strikeKind = kind;
       s.strikeAnim = 0.38;
       s.sparkAnim = 0.42;
+
+      event.kind = kind;
+      event.force = usedForce;
 
       // Event SFX handling
       if (s.broken) {
@@ -398,6 +403,12 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
     }
   }
 
+  // Every physical strike, including the final fracture, has one sequence number.
+  s.strikes += 1;
+  s.strikeReward = null;
+  s.integrity = clamp(s.integrity, 0, 100);
+  s.warp = clamp(s.warp, 0, 1);
+
   // Check cracking and failure
   if (s.integrity <= 0 || (s.cracks >= 2 && (isCold || kind === "hard"))) {
     s.broken = true;
@@ -423,31 +434,77 @@ function applyStrike(s: SimState, kind: StrikeKind, design: SwordDesign, event: 
   }
 
   s.shape = clamp(s.shape + shapeGain, 0, 1);
-  s.strikes += 1;
   s.warp = clamp(s.warp, 0, 1);
 
-  // Real-time Strike Economy (+3 good, +8 perfect, +12 master) — Treinamento não gera ouro
-  let goldGain = 0;
-  if (!isCold && !s.broken && !s.isTraining) {
-    if (kind === "perfect") {
-      const isMasterStrike = s.activeHammer === "precision" || s.targetZone === "tip" || Math.abs(s.heat - (steel.heatMin + steel.heatMax) / 2) < 0.05;
-      goldGain = isMasterStrike ? 12 : 8;
-    } else if (kind === "good") {
-      goldGain = 3;
-    }
-  }
-
+  const goldGain = strikeGoldReward(s, design);
   if (goldGain > 0) {
-    s.strikeReward = {
-      amount: goldGain,
-      kind,
-      strikeIndex: s.strikes,
-      id: `${s.forgeRunId || "run"}:${s.strikes}`,
-    };
+    s.strikeReward = { amount: goldGain, kind, strikeIndex: s.strikes, id: `${s.forgeRunId}:${s.strikes}` };
     event.goldReward = { amount: goldGain, text: `+${goldGain} 🪙` };
-  } else {
-    s.strikeReward = null;
   }
+}
+
+export function strikeGoldReward(s: Pick<SimState, "history" | "heat" | "activeHammer" | "targetZone" | "broken" | "isTraining">, design: SwordDesign): number {
+  const last = s.history.at(-1);
+  const steel = STEELS[design.steel];
+  if (!last || s.broken || s.isTraining || s.heat < steel.heatMin - .04) return 0;
+  if (last.kind === "perfect") {
+    return s.activeHammer === "precision" || s.targetZone === "tip" || Math.abs(s.heat - (steel.heatMin + steel.heatMax) / 2) < .05 ? 12 : 8;
+  }
+  return last.kind === "good" ? 3 : 0;
+}
+
+/** Physical checkpoint only; particles, drawing frames and audio never enter the save. */
+export function createForgeSnapshot(sim: SimState, design: SwordDesign, revision: number): ForgeSnapshot {
+  const { strikeAnim: _strikeAnim, sparkAnim: _sparkAnim, strikeKind: _strikeKind, lastMessage: _lastMessage,
+    quenchSteam: _quenchSteam, strikeReward: _strikeReward, ...state } = sim;
+  return structuredClone({ version: 1, revision, design, state });
+}
+
+export function sameForgeValue(a: unknown, b: unknown): boolean {
+  const canonical = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, canonical(v)]));
+    return value;
+  };
+  return JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+}
+
+export function isSwordDesignValid(value: unknown): value is SwordDesign {
+  const design = value as SwordDesign | undefined;
+  return Boolean(design && typeof design.name === "string" && typeof design.inscription === "string" && typeof design.runes === "boolean" && Number.isFinite(design.length) && design.length > 0 && PROFILES[design.profile] && STEELS[design.steel] && WRAPS[design.wrap] && GUARDS[design.guard] && POMMELS[design.pommel] && (design.family === undefined || FAMILIES[design.family]));
+}
+
+export function isFusionCoreValid(core: FusionCore): boolean {
+  if (!core || typeof core.id !== "string" || !core.id || typeof core.name !== "string" || !FAMILIES[core.family] || !PROFILES[core.profile] || !STEELS[core.steel] || !RARITY_RANK_VALUES[core.rarity] || !Number.isFinite(core.bonusQuality) || !Array.isArray(core.inheritedPerks) || !core.inheritedPerks.every(p => typeof p === "string") || !Array.isArray(core.consumedSwordIds) || core.consumedSwordIds.length !== 4 || new Set(core.consumedSwordIds).size !== 4) return false;
+  return !core.heritage || [core.heritage.attackBias, core.heritage.defenseBias, core.heritage.agilityBias, core.heritage.durabilityBias, core.heritage.runicAffinity].every(Number.isFinite);
+}
+
+export function isForgeSnapshotValid(value: unknown): value is ForgeSnapshot {
+  const snap = value as ForgeSnapshot | undefined;
+  if (!snap || snap.version !== 1 || !Number.isSafeInteger(snap.revision) || snap.revision < 0 || !isSwordDesignValid(snap.design)) return false;
+  const s = snap.state;
+  if (!s || !s.forgeRunId || !["heat", "forge", "quench"].includes(s.phase) || typeof s.isTraining !== "boolean") return false;
+  const range = (n: unknown, lo: number, hi: number) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
+  if (![s.elapsedTime, s.heat, s.heatScore, s.shape, s.quality, s.warp, s.force, s.sweetCenter, s.sweetWidth, s.quenchFill, s.quenchScore, s.runicCharge, s.integrity, s.cracks].every(Number.isFinite)) return false;
+  if (!range(s.elapsedTime, 0, Number.MAX_SAFE_INTEGER) || !range(s.heat, 0, 1) || !range(s.shape, 0, 1) || !range(s.warp, 0, 1) || !range(s.integrity, 0, 100) || !range(s.force, 0, 1) || !range(s.quenchFill, 0, 1) || !range(s.quality, 0, 100) || !range(s.heatScore, 0, 100) || !range(s.quenchScore, 0, 100) || !range(s.runicCharge, 0, 1) || !range(s.cracks, 0, 2)) return false;
+  if (!Number.isInteger(s.strikes) || s.strikes < 0 || s.strikes > 8 || s.maxStrikes !== 8 || !Array.isArray(s.history) || s.history.length !== s.strikes) return false;
+  if (!s.history.every((h, i) => h.strike === i + 1 && ["weak", "good", "perfect", "hard"].includes(h.kind) && range(h.force, 0, 1) && typeof h.inHeat === "boolean" && ["base", "mid", "tip"].includes(h.zone || ""))) return false;
+  if (!s.physicalProfile || ![s.physicalProfile.baseWidth, s.physicalProfile.midWidth, s.physicalProfile.tipWidth, s.physicalProfile.distalTaper, s.physicalProfile.fullerDepth, s.physicalProfile.bevelSharpness, s.physicalProfile.hammerMarksCount].every(Number.isFinite) || !Object.entries(s.physicalProfile).every(([k, v]) => range(v, 0, k === "hammerMarksCount" ? 8 : 1)) || s.physicalProfile.hammerMarksCount !== s.strikes) return false;
+  if (!s.zoneProgress || !["base", "mid", "tip"].every(z => Number.isInteger(s.zoneProgress[z as ForgeZone]) && s.zoneProgress[z as ForgeZone] >= 0) || Object.values(s.zoneProgress).reduce((a, b) => a + b, 0) !== s.strikes) return false;
+  if (!["base", "mid", "tip"].includes(s.targetZone) || !["standard", "precision", "sledge"].includes(s.activeHammer) || !s.equippedGear) return false;
+  if (!["anvil_cast", "anvil_master"].includes(s.equippedGear.anvil) || !["furnace_coal", "furnace_bluefire"].includes(s.equippedGear.furnace) || !["quench_water", "quench_oil"].includes(s.equippedGear.quench)) return false;
+  if (![s.charging, s.quenching, s.reheating, s.done, s.broken].every(v => typeof v === "boolean")) return false;
+  if (!["stable", "deformed", "damaged", "cracked", "broken"].includes(s.structuralState)) return false;
+  if (s.broken && (!s.done || s.structuralState !== "broken" || s.strikes < 1)) return false;
+  if (s.done && !s.broken && (s.phase !== "quench" || s.strikes !== 8 || s.quenchScore < 12)) return false;
+  if (s.phase === "heat" && s.strikes !== 0 || s.phase === "quench" && s.strikes !== 8) return false;
+  if (s.isTraining && s.activeCore || s.activeCore && !isFusionCoreValid(s.activeCore)) return false;
+  return true;
+}
+
+export function restoreForgeSnapshot(snapshot: ForgeSnapshot): SimState | null {
+  if (!isForgeSnapshotValid(snapshot)) return null;
+  return { ...structuredClone(snapshot.state), strikeAnim: 0, sparkAnim: 0, strikeKind: null, strikeReward: null, quenchSteam: 0, lastMessage: "Retomando o último ponto salvo da forja." };
 }
 
 export function finishSword(s: SimState, design: SwordDesign): FinishedSword {
@@ -594,14 +651,17 @@ export function applyStrikeRewardTransaction(
   currentSave: {
     wallet?: PlayerWallet;
     claimedStrikeRewardIds?: string[];
+    activeForgeAttempt?: ActiveForgeAttempt | null;
   },
   reward: { amount: number; id: string; strikeIndex?: number },
-  _activeForgeRunId?: string,
+  activeForgeRunId?: string,
 ): StrikeRewardTransactionResult {
   const currentWallet = currentSave.wallet || { gold: 0, rubies: 0, diamonds: 0 };
   const claimedStrikes = currentSave.claimedStrikeRewardIds || [];
 
-  if (!reward || !reward.id || typeof reward.id !== "string" || reward.amount <= 0 || claimedStrikes.includes(reward.id)) {
+  const attempt = currentSave.activeForgeAttempt;
+  const expectedId = attempt ? `${attempt.forgeRunId}:${attempt.strikesCount + 1}` : "";
+  if (!attempt || attempt.isTraining || !["PREPARED", "ACTIVE"].includes(attempt.status) || activeForgeRunId !== attempt.forgeRunId || !reward || !Number.isFinite(reward.amount) || ![3, 8, 12].includes(reward.amount) || reward.id !== expectedId || claimedStrikes.includes(reward.id)) {
     return {
       applied: false,
       wallet: currentWallet,

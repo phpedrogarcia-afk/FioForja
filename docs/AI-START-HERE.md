@@ -8,7 +8,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 
 1. [Constituição](CONSTITUTION.md): missão, princípios de design (*The Weapon is the Hero*, *The Player Forges the Trophy*) e sinais de falha.
 2. [Estado Atual do Projeto](PROJECT-STATE.md): estado real, evidências comprovadas do commit mais recente, o que existe e lacunas conhecidas.
-3. [Invariantes](INVARIANTS.md): 12 regras inegociáveis que nenhuma alteração de código ou agente pode violar.
+3. [Invariantes](INVARIANTS.md): 12 regras de produto e integridade que nenhuma alteração de código ou agente pode violar.
 4. [Registro de Decisões](DECISIONS.md): decisões canônicas aprovadas (incluindo `FIOFORJA-FUSION-001`), hipóteses e itens em avaliação.
 5. [Glossário](GLOSSARY.md): termos canônicos de produto e seus correspondentes exatos no código TypeScript.
 6. [Handoff para o Codex](HANDOFF-CODEX.md): contrato completo de transição e continuidade entre agentes de IA.
@@ -31,6 +31,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 - [Persistência v5 e Migração](specs/save-persistence-v5.md): schema v5, migração retrocompatível de v1–v4, idempotência transacional e capacidade do Arsenal.
 - [Assinaturas de Áudio Procedural](specs/audio-signatures.md): síntese procedural via Web Audio API para moedas, fanfarras de loot e crisol.
 - [Modelo de Identidade das Armas](specs/weapon-identity-model.md): características das famílias e anatomia das armas.
+- [Weapon Visual DNA](specs/weapon-visual-dna.md): contrato do motor opt-in; correções de integração na seção inicial.
 - [Estado da Lâmina Terminada](specs/finished-weapon-state.md): preservação de empenamento, trincas e marcas de martelamento.
 
 ---
@@ -42,11 +43,13 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
   - `blueprints.ts`: máquina de estados (6 estados explícitos de projetos) e critérios de desbloqueio.
   - `commissions.ts`: catálogo de encomendas da guilda e validação estrita de critérios de entrega (incluindo papel Defensiva do Capitão Valerius).
   - `transactions.ts`: executores de transações atômicas fail-closed (ciclo de vida de tentativas, cancelamento justo, fusão, forja, compra, entrega, refino).
-  - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas, cálculo de atributos e isolamento hermético de treino.
+  - `sim.ts`: física de deformação multi-zona, termodinâmica, trincas, atributos e snapshots físicos versionados. O isolamento econômico do treino é aplicado pelas transações.
   - `ForgeCanvas.tsx`: cena da forja com tenazes, martelo, bigorna, fornalha, têmpera e rastreamento de tentativas ativas.
-  - `swordDraw.ts`: renderizador paramétrico de lâminas, guardas, cabos, pomos e incisões rúnicas.
+  - `swordDraw.ts`: renderizador legado, ainda padrão; `visuals/`: Weapon DNA opt-in para armas acabadas, cache geométrico e miniaturas. A bigorna mantém seu renderizador físico.
   - `save.ts`: persistência com backup atômico, retry seguro, sanitização, migração de saves e segregação de `trainingGallery`.
   - `loot.ts`: motor dinâmico de drops e tabelas de recompensas ponderadas.
   - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C) com blindagem contra armas de treino e encomendas.
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
-- Testes automatizados executam via `npm test` (126 testes em 27 suites, 0 falhas) e `npm run typecheck` (0 erros). Não presuma funcionalidade sem verificação real.
+- A evidência desta branch, com contagens e limites, está no [relatório da Operação Codex 05](../experiments/M03-cross-agent-integration/README.md). Testes de API, cenários preparados e partidas reais têm escopos distintos.
+- [Handoff DeepSeek](HANDOFF-DEEPSEEK-WEAPON-DNA.md) e [laboratório M02](../experiments/M02-weapon-dna/README.md) preservam a entrega do doador; não são o estado atual da integração.
+- Implementação atual e direção futura permanecem distintas; os thresholds de notas do código não substituem os thresholds estéticos da Bíblia.

@@ -271,7 +271,9 @@ describe("Operação 02: A Forja do Prestígio — Transações Fail-Closed & Be
       loreSnippet: "Lenda viva",
     };
 
-    const result = executeClaimRewardsTransaction(currentSave, rewards as any, sword);
+    sword.forgeRunId = "prestige_claim";
+    sword.pendingRewards = { ...rewards, forgeRunId: sword.forgeRunId, scorePercent: 96 };
+    const result = executeClaimRewardsTransaction(currentSave, sword.pendingRewards, sword);
     assert.equal(result.success, false, "Reward claim must fail closed on storage failure");
 
     mockStorage.setItem = (key: string, val: string) => {

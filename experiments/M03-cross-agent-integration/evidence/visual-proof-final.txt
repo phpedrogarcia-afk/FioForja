@@ -1,0 +1,11 @@
+[visual-proof] cache FAIL; parity FAIL; 12 pixel comparisons; 3 visual pairs -> C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\experiments\M03-cross-agent-integration\evidence\visual-proof-2026-10-19T02-42-36-108Z
+[visual-proof] cimitarra_damasco DPR1 warm: 6/64000 pixels changed; max channel delta 1; direct-repeat {"pixels":64000,"changedPixels":6,"changedRatio":0.00009375,"maxChannelDelta":1}
+[visual-proof] lua_silenciosa DPR1 warm: 1/64000 pixels changed; max channel delta 1; direct-repeat {"pixels":64000,"changedPixels":1,"changedRatio":0.000015625,"maxChannelDelta":1}
+[visual-proof] queda_asterion DPR1 warm: 1/64000 pixels changed; max channel delta 1; direct-repeat {"pixels":64000,"changedPixels":1,"changedRatio":0.000015625,"maxChannelDelta":1}
+[visual-proof] cimitarra_damasco DPR2 warm: 5/256000 pixels changed; max channel delta 1; direct-repeat {"pixels":256000,"changedPixels":5,"changedRatio":0.00001953125,"maxChannelDelta":1}
+[visual-proof] lua_silenciosa DPR2 warm: 40/256000 pixels changed; max channel delta 1; direct-repeat {"pixels":256000,"changedPixels":40,"changedRatio":0.00015625,"maxChannelDelta":1}
+[visual-proof] queda_asterion DPR2 warm: 7/256000 pixels changed; max channel delta 1; direct-repeat {"pixels":256000,"changedPixels":7,"changedRatio":0.00002734375,"maxChannelDelta":1}
+[visual-proof] donorDirect: mean 103.40ms p95 110.00ms (draw+readback)
+[visual-proof] currentDirect: mean 102.17ms p95 110.80ms (draw+readback)
+[visual-proof] coldRaster: mean 157.72ms p95 164.70ms (draw+readback)
+[visual-proof] warmRaster: mean 12.76ms p95 14.40ms (draw+readback)

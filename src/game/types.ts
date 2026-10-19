@@ -153,6 +153,7 @@ export interface EquippedWorkshopGear {
 }
 
 export interface SimState {
+  elapsedTime: number;
   phase: ForgePhase;
   heat: number;
   heatScore: number;
@@ -301,6 +302,15 @@ export interface PlayerWallet {
 
 export type ForgeAttemptStatus = "PREPARED" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "FAILED";
 
+export type ForgePhysicalState = Omit<SimState, "strikeAnim" | "sparkAnim" | "strikeKind" | "lastMessage" | "quenchSteam" | "strikeReward">;
+
+export interface ForgeSnapshot {
+  version: 1;
+  revision: number;
+  design: SwordDesign;
+  state: ForgePhysicalState;
+}
+
 export interface ActiveForgeAttempt {
   attemptId: string;
   forgeRunId: string;
@@ -312,6 +322,7 @@ export interface ActiveForgeAttempt {
   startedAt: number;
   strikesCount: number;
   lastStrikeAt?: number;
+  snapshot?: ForgeSnapshot;
 }
 
 export interface BlacksmithCommission {

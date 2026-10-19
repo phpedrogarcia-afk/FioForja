@@ -1,0 +1,528 @@
+{
+  "mission": "FIOFORJA-CODEX05-BROWSER",
+  "status": "FAIL",
+  "startedAt": "2026-10-18T21:53:31.598Z",
+  "url": "http://127.0.0.1:8947/",
+  "root": "C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja",
+  "browserExecutable": "C:\\Users\\phped\\AppData\\Local\\ms-playwright\\chromium-1228\\chrome-win64\\chrome.exe",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "sourcesBefore": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "package.json": "b25dae0b5819b10d84a15fdfc8ae35f6f7e177a971c0245c7217bf3d03bd30d7",
+    "src/game/ForgeCanvas.tsx": "c5da5fdf1a4c37dacbd34414122dc5e20b71901582999daf9b7a693750d26067",
+    "src/game/GameApp.tsx": "93043949eeca49767c4cc7b89279177a050955d46f6a6b8987a0a48883b9d78d",
+    "src/game/arsenal-vivo.test.ts": "4543b6aefe764e527a00d5732f68320e9a28e0c0bc547bdc6fdd1d63800a9598",
+    "src/game/assets.ts": "f95d6d90755c7ad1e8cf151be86d55f3fcd0ca7414da51a8b75e548b8a12a4bf",
+    "src/game/audio.ts": "e0681e28f67c3c9b324db9d01ef53755479328fbb90e64f417a0044147b252a3",
+    "src/game/blueprints.ts": "bb670728d5a2f5503b8b06e950814a9ac356b3c03c00b4d31f3c9058fb7bea00",
+    "src/game/catalog.ts": "6247c33b8932e70c6644be25148aff812bb2627d101191967ce7a3db768d1d56",
+    "src/game/commissions.ts": "10c0f2f584ae7fb4c5b3167ed9019b67dc3665bd32a858357970ccdb5a549786",
+    "src/game/forge-test-helpers.ts": "29c9eb8d585dfb63c6a1d9914d320a48d1c37f626300380e16577ceca0036d93",
+    "src/game/fusion.ts": "a9dee081ef3ff876d7441e19a1b981556c9813237379687d6341c42f734ecd98",
+    "src/game/lifecycle-proof.test.ts": "4b5e7e5f459883007da4481c7ae831325f0e2109be3c0ba269b6e8aec5717cea",
+    "src/game/loot.ts": "d71182d54ba7c20f2fed3cdb7c95263cd7e7bb9145f6a60e06fb45b6359d721a",
+    "src/game/materials.ts": "dcd4205e7bb348c01896b12a68ab2adef537b07b106f630ecb52b504c4e93af0",
+    "src/game/prestige-transactions.test.ts": "1ac505b26f7b864c48aa388b5aab9cfe4f6135545810f4f9d77084ead9695182",
+    "src/game/progression.test.ts": "74153cccd28a7abc34bef1048c5912ea355e22df35547fefaeb7e644e4e270ec",
+    "src/game/save.ts": "eb2fa2ffddbf4a694d730a921ab23ee5c5d28f117b67ca29ea5328d5f8a34652",
+    "src/game/screens/DesignScreen.tsx": "a23ca9e37e2e7b6fe953252c623c0f89535b92b63f711731bf6238cae4ff8f6a",
+    "src/game/screens/ForgeHud.tsx": "05bcf6de96605d442e20513d411c8de1cc10b877ab925d3013c855f14ed2b890",
+    "src/game/screens/FusionStationScreen.tsx": "c54270aa8fd58415462efaed624ff4d3eaec30088e3a198fc76faa82b5ad41a8",
+    "src/game/screens/GalleryScreen.tsx": "c76d50b729d577532a551bfc7e233f6214572aa152204e17ce586ba8e08b96d4",
+    "src/game/screens/RevealScreen.tsx": "f8d9f444829d05779888c545f6cfaecb156e63ad5ed7ac8164bb309223444bf5",
+    "src/game/screens/RewardsScreen.tsx": "a5a565d6ee9dfc73896e4af596747ee3b3f09d933050862c532c58521ab4cc1d",
+    "src/game/screens/TitleScreen.tsx": "3c5be1edf823e332b0c163e1989146646e19d096ceb7e3c3a2c9c8c71e69aeea",
+    "src/game/sim.test.ts": "5eba66d1f43133841c7d462d0c6e9b99159f84d5427a4f334a539a07373e03ca",
+    "src/game/sim.ts": "45f54c45d41e1cd359a4764dccbc2b3f2a57de3de1b38ae6c13dd98a1820a3a2",
+    "src/game/swordDraw.ts": "2cebf3afcb6c4deaabd75aab22eccbbc8d3cde93f7d815cbc8c9b407c5346a59",
+    "src/game/transactions.ts": "29197272d83bfe49f30f5ff242bbd22c6a1e9bc4d3e8769126b9e746e6b2db94",
+    "src/game/types.ts": "2d6b0fdfcce3015156420b3fa7a1e4ace91f6ed1dac5228f040489dd7ea7b6e5",
+    "src/game/visuals/dna-integration.test.ts": "50511c23d6a6de4eb4db861760de091ee0b9c59b6c5c7cfab828043ca45d99c5",
+    "src/game/visuals/geometry.test.ts": "b32ea6ee464f1e49f9718b96686d1c8b8200a4008388f91decd7d1d67ade72ec",
+    "src/game/visuals/geometry.ts": "e4b860078e54ee8ae8921f1d6e3b5a73a43762995a39259315332ed5297c1013",
+    "src/game/visuals/materials.ts": "6c53082268084180bc910bdec0934b9e04f4f7d2dcc910fe6f2b83c782829825",
+    "src/game/visuals/math.ts": "342051d3d8f07a0969a33074732442cda1f2e3ca2a02cfd64e72a2c1b0a18419",
+    "src/game/visuals/ornamentation.ts": "1505499427b96c5ecd1e9d212f30c9958b06021dd9e1656ade0fda6d7647d8c4",
+    "src/game/visuals/qualityMarks.ts": "dbaaae248fddd6172b924c043608ea9181563e52da7b1dbfe2c91b35b14b915a",
+    "src/game/visuals/refinements.test.ts": "113a6f1096d61af5c3b1541a8bda7f18823fa9ff7f0bdcd1a6cceb97143bb11f",
+    "src/game/visuals/renderer-adapter.test.ts": "e55fb3232a479b68e38eb7cde5e399b47c4cee87012a9521c058e160137a7adf",
+    "src/game/visuals/renderer-cache.test.ts": "be570b07138d644dce028e2c522db308a12d7d90d35b1978545c7c5927fa3fe4",
+    "src/game/visuals/rendererAdapter.ts": "6fbc097b1b1cd8ea93072fc5085fd6277b2dbd9f07216c02b77e50f467f3abc6",
+    "src/game/visuals/thumbnailCache.ts": "6bf293b335560a344f8b259591ff1918cf28eaf5f4630566420cec1cb9d61b3d",
+    "src/game/visuals/types.ts": "5c46e2756ab604380e4f3853aa3acce1728909513183239c368ff88ac918fc5f",
+    "src/game/visuals/weaponGenome.test.ts": "2856d5236c4033c9bff390f02068e1e77a780aa4a390f3b56d4e1ddf4927f7ca",
+    "src/game/visuals/weaponGenome.ts": "1bb56527522753a5c659c7cd2d81717625d71b5715ecb3d6aa64bd9f091b0ff5",
+    "src/game/visuals/weaponRenderer.ts": "da6b811def4a69775363c408adee8bf924ad102c6cb603c13014611ece511fa8",
+    "src/routes/index.tsx": "2c6e1f5f4c3e591e5aac1e7a50523ac974de64fbf3befcf9c7ac286a9b6dc558",
+    "vite.config.ts": "eb5334e0c70efe08217898d90e5313cf44ef4850189ed752c2c9b5c73db2f1af"
+  },
+  "cases": [
+    {
+      "id": "A",
+      "provenance": "REAL_UI_FRESH_CONTEXT_NO_GAMEPLAY_FIXTURE",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:53:31.962Z",
+      "observations": [],
+      "captures": [
+        {
+          "name": "A-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/A-failure.png",
+          "sha256": "b0a4c688908e0739ce18c59c711e918e4bcfe3506ce65e1a7bfbe2e83f0a591f"
+        }
+      ],
+      "error": {
+        "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Guarda da Fronteira.*Medieval/ })\u001b[22m\n",
+        "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Guarda da Fronteira.*Medieval/ })\u001b[22m\n\n    at enterForge (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:411:77)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:146:7\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:144:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:08.252Z"
+    },
+    {
+      "id": "C",
+      "provenance": "FIXTURE_BANKRUPT_INPUT_REAL_TRAINING_UI",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:08.264Z",
+      "observations": [
+        {
+          "setup": "FIXTURE_LOCALSTORAGE_BEFORE_FORGE",
+          "fixture": "bankrupt"
+        }
+      ],
+      "captures": [
+        {
+          "name": "C-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/C-failure.png",
+          "sha256": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9"
+        }
+      ],
+      "error": {
+        "message": "page.reload: Protocol error (Page.reload): Not attached to an active page\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n",
+        "stack": "page.reload: Protocol error (Page.reload): Not attached to an active page\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n\n    at open (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:133:18)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:209:20\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:208:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:09.977Z"
+    },
+    {
+      "id": "D",
+      "provenance": "REAL_UI_CHECKPOINT_AND_RELOAD_FRESH_CONTEXT",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:09.987Z",
+      "observations": [],
+      "captures": [
+        {
+          "name": "D-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/D-failure.png",
+          "sha256": "b0a4c688908e0739ce18c59c711e918e4bcfe3506ce65e1a7bfbe2e83f0a591f"
+        }
+      ],
+      "error": {
+        "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Guarda da Fronteira.*Medieval/ })\u001b[22m\n",
+        "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Guarda da Fronteira.*Medieval/ })\u001b[22m\n\n    at enterForge (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:411:77)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:248:7\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:246:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:45.363Z"
+    },
+    {
+      "id": "B",
+      "provenance": "FIXTURE_FOUR_DONORS_UI_FUSION_AND_MANUAL_CORE_FORGE",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:45.373Z",
+      "observations": [],
+      "captures": [
+        {
+          "name": "B-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/B-failure.png",
+          "sha256": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9"
+        }
+      ],
+      "error": {
+        "message": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+        "stack": "page.evaluate: Execution context was destroyed, most likely because of a navigation\n    at seedFixture (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:516:14)\n    at open (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:129:15)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:286:20\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:285:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:47.029Z"
+    },
+    {
+      "id": "E",
+      "provenance": "FIXTURE_OLD_SAVE_DNA_LOAD_AND_RELOAD",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:47.039Z",
+      "observations": [],
+      "captures": [
+        {
+          "name": "E-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/E-failure.png",
+          "sha256": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9"
+        }
+      ],
+      "error": {
+        "message": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+        "stack": "page.evaluate: Execution context was destroyed, most likely because of a navigation\n    at seedFixture (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:516:14)\n    at open (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:129:15)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:312:20\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:311:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:48.658Z"
+    },
+    {
+      "id": "F",
+      "provenance": "REAL_UI_COMPONENT_SUBCASE_RESULT",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:48.666Z",
+      "observations": [],
+      "captures": [],
+      "error": {
+        "message": "See A case: real sword component/reload subcase did not pass.",
+        "stack": "AssertionError [ERR_ASSERTION]: See A case: real sword component/reload subcase did not pass.\n    at file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:324:7\n    at caseRun (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:97:17)\n    at run (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:322:11)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "finishedAt": "2026-10-18T21:54:48.667Z"
+    },
+    {
+      "id": "G",
+      "provenance": "FIXTURE_24_SWORDS_REAL_GALLERY_AND_COMPARATOR_UI",
+      "status": "PASS",
+      "startedAt": "2026-10-18T21:54:48.676Z",
+      "observations": [
+        {
+          "setup": "FIXTURE_LOCALSTORAGE_BEFORE_FORGE",
+          "fixture": "gallery-24"
+        },
+        {
+          "mountMs": 1284.856700000004,
+          "canvases": [
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "998d233399f3a8f56593e530214ab72bbc122cf14193dcbfa00c37f07d1312a2"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "d31c50c54051563ff04000e20b810b83a70d319d624ee6e3994dea4a8a3e38d2"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "e481bf67ab7d4672df73ed0615231eea931807589dd9074b78256d5d5018b3e4"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "8ca84911d77534482c0f6aa1aee18e021186d70cd45ac511b53c5b1137591204"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "3fa606e7db4ef6f3b151fade8d0bd12a7c3367120f67ec90c8946ce38def4342"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "131934a88b0f470014bb2a4010212b4da6b29e9dddf214b1ee564dc203217715"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "49c21537ed07821803b783bf5caba6e909b68984714e75d52d50c5f04a112aad"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "49ae7830ab78ecf57e6c0d2ba7d6bdbfb31c1b8cbb5391344b2720b200c38c4f"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "85d0c9e27aeed142e5ccb4d11c839ee367eefa57705234d8ea5dcf7afba30e34"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "94cd42f9678a117c51c53fbf33363a5112f26e88231f7ee54dc0c490dbd0de9e"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "7f52d7696fb581eb0abef15bfa13d3341688a09c2e91e2c46d8bd21b4518ce8a"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "caf0f9e31bef50f868c7a4ab6f6965eec73ee7c60482cfbf0bb4cfa756b687c8"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "fb572135c8eb0d95f5dd56f88b7d3b4961314c4f4484cdff618abf71dd9684ad"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "4f7c170a3808b577111d7125c7e834e7b9998c22e51415c872e7bbb356e3df38"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "7581fe1df680ef3c6292ade90f4700205f47ffbb390077367e1e4ca85c324e3d"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "e11623759d0592b3d5c3e466145fd4ea2c84c226f04f04e7a08ba72350c936ac"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "9e99ff7177ddd8a43262006ab3244271c8a922a03b40593bd553cbb2b15e1dc1"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "e5fe348a47537f5dd04fa480236111c42043f0bff4836242f9206d854ad6b2d5"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "f32aa693886b5e768fb9630c31221431970286e1b9f8a4d248e092560ee4c03b"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "480686ea14938731d25ab6304667b7a58a5c7e1f96043bd36b88f9a58c180362"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "cf16f853a05dbc3adac310b448dc7072b04bf700ada70a4fb2706abaab533881"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "d489ce16020e9ca0cd622f27ba922c3ef6f7ed30e9c9a4e5cac89efe878b66da"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "9242c2cced4e5be3b36b331227fbb0a78dbb09ef147cc384e818ebacbbb888e5"
+            },
+            {
+              "renderer": "dna",
+              "width": 329,
+              "height": 176,
+              "sha256": "b02ccf22d65663a2ad51228f81691d0c2eb1e7a0715532d10a8edda2697b6c5b"
+            }
+          ],
+          "rafIntervals": {
+            "metric": "rAF scheduling interval ms",
+            "n": 60,
+            "mean": 16.675000000000004,
+            "p95": 16.800000000000182,
+            "raw": [
+              16.299999999999955,
+              16.59999999999991,
+              16.700000000000273,
+              16.59999999999991,
+              16.699999999999818,
+              16.700000000000273,
+              16.699999999999818,
+              16.800000000000182,
+              16.5,
+              16.799999999999727,
+              16.700000000000273,
+              16.59999999999991,
+              16.699999999999818,
+              16.700000000000273,
+              16.699999999999818,
+              16.700000000000273,
+              16.59999999999991,
+              16.699999999999818,
+              16.700000000000273,
+              16.699999999999818,
+              16.59999999999991,
+              16.800000000000182,
+              16.59999999999991,
+              16.699999999999818,
+              16.700000000000273,
+              16.699999999999818,
+              16.700000000000273,
+              16.59999999999991,
+              16.799999999999727,
+              16.700000000000273,
+              16.59999999999991,
+              16.59999999999991,
+              16.800000000000182,
+              16.699999999999818,
+              16.700000000000273,
+              16.59999999999991,
+              16.699999999999818,
+              16.700000000000273,
+              16.699999999999818,
+              16.699999999999818,
+              16.600000000000364,
+              16.699999999999818,
+              16.59999999999991,
+              16.700000000000273,
+              16.799999999999727,
+              16.59999999999991,
+              16.700000000000273,
+              16.799999999999727,
+              16.700000000000273,
+              16.59999999999991,
+              16.59999999999991,
+              16.800000000000182,
+              16.59999999999991,
+              16.699999999999818,
+              16.800000000000182,
+              16.699999999999818,
+              16.600000000000364,
+              16.699999999999818,
+              16.699999999999818,
+              16.600000000000364
+            ]
+          },
+          "comparatorModes": [
+            "dna",
+            "dna"
+          ],
+          "performanceEnvelope": "One UI gallery mount plus browser frame intervals, not the isolated Canvas benchmark or reliability proof."
+        }
+      ],
+      "captures": [
+        {
+          "name": "G-fixture-24-dna-gallery",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/G-fixture-24-dna-gallery.png",
+          "sha256": "8ee4166bdc125f8232fca452beffd73d5e378ab05db8510bff6dc4e45810e3c0"
+        },
+        {
+          "name": "G-two-distinct-fixture-swords-comparator",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/G-two-distinct-fixture-swords-comparator.png",
+          "sha256": "c0d65e1a8f2e8210c6dc425e6857437a25aae97a491e3ea8cb015c18b0d831a5"
+        }
+      ],
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:53.326Z"
+    },
+    {
+      "id": "H",
+      "provenance": "REAL_UI_LEGACY_EXPLICIT_URL_OVERRIDES_STORED_DNA",
+      "status": "FAIL",
+      "startedAt": "2026-10-18T21:54:53.335Z",
+      "observations": [],
+      "captures": [
+        {
+          "name": "H-failure",
+          "path": "experiments/M03-cross-agent-integration/evidence/browser/2026-10-18T21-53-30-669Z/H-failure.png",
+          "sha256": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9"
+        }
+      ],
+      "error": {
+        "message": "page.reload: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n",
+        "stack": "page.reload: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n\n    at open (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:133:18)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:353:20\n    at async caseRun (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:97:11)\n    at async run (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\browser-proof.mjs:352:5)\n    at async file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/experiments/M03-cross-agent-integration/browser-proof.mjs:64:3"
+      },
+      "bodyOnFailure": "OFICINA DE FORJA MEDIEVAL\n\nFIOFORJA\n\nAqui, você não encontra espadas lendárias em baús. Cada gume, têmpera e runa nascem do calor da fornalha e da precisão do seu martelo sobre a bigorna.\n\nENTRAR NA FORJA\nARSENAL DO FERREIRO",
+      "pageErrors": [],
+      "finishedAt": "2026-10-18T21:54:54.815Z"
+    }
+  ],
+  "evidenceEnvelope": "UI inputs drive each forge. Fixture setup, pure genome reads and save observations are explicitly recorded; no fixture output counts as a naturally earned input.",
+  "browserVersion": "149.0.7827.55",
+  "sourcesAfter": {
+    "package-lock.json": "ae89b51739b3e32edfb994b01bbe63406bff4bc580a97be98845da23290de90a",
+    "package.json": "b25dae0b5819b10d84a15fdfc8ae35f6f7e177a971c0245c7217bf3d03bd30d7",
+    "src/game/ForgeCanvas.tsx": "c5da5fdf1a4c37dacbd34414122dc5e20b71901582999daf9b7a693750d26067",
+    "src/game/GameApp.tsx": "93043949eeca49767c4cc7b89279177a050955d46f6a6b8987a0a48883b9d78d",
+    "src/game/arsenal-vivo.test.ts": "4543b6aefe764e527a00d5732f68320e9a28e0c0bc547bdc6fdd1d63800a9598",
+    "src/game/assets.ts": "f95d6d90755c7ad1e8cf151be86d55f3fcd0ca7414da51a8b75e548b8a12a4bf",
+    "src/game/audio.ts": "e0681e28f67c3c9b324db9d01ef53755479328fbb90e64f417a0044147b252a3",
+    "src/game/blueprints.ts": "bb670728d5a2f5503b8b06e950814a9ac356b3c03c00b4d31f3c9058fb7bea00",
+    "src/game/catalog.ts": "6247c33b8932e70c6644be25148aff812bb2627d101191967ce7a3db768d1d56",
+    "src/game/commissions.ts": "10c0f2f584ae7fb4c5b3167ed9019b67dc3665bd32a858357970ccdb5a549786",
+    "src/game/forge-test-helpers.ts": "29c9eb8d585dfb63c6a1d9914d320a48d1c37f626300380e16577ceca0036d93",
+    "src/game/fusion.ts": "a9dee081ef3ff876d7441e19a1b981556c9813237379687d6341c42f734ecd98",
+    "src/game/lifecycle-proof.test.ts": "4b5e7e5f459883007da4481c7ae831325f0e2109be3c0ba269b6e8aec5717cea",
+    "src/game/loot.ts": "d71182d54ba7c20f2fed3cdb7c95263cd7e7bb9145f6a60e06fb45b6359d721a",
+    "src/game/materials.ts": "dcd4205e7bb348c01896b12a68ab2adef537b07b106f630ecb52b504c4e93af0",
+    "src/game/prestige-transactions.test.ts": "1ac505b26f7b864c48aa388b5aab9cfe4f6135545810f4f9d77084ead9695182",
+    "src/game/progression.test.ts": "74153cccd28a7abc34bef1048c5912ea355e22df35547fefaeb7e644e4e270ec",
+    "src/game/save.ts": "eb2fa2ffddbf4a694d730a921ab23ee5c5d28f117b67ca29ea5328d5f8a34652",
+    "src/game/screens/DesignScreen.tsx": "a23ca9e37e2e7b6fe953252c623c0f89535b92b63f711731bf6238cae4ff8f6a",
+    "src/game/screens/ForgeHud.tsx": "05bcf6de96605d442e20513d411c8de1cc10b877ab925d3013c855f14ed2b890",
+    "src/game/screens/FusionStationScreen.tsx": "c54270aa8fd58415462efaed624ff4d3eaec30088e3a198fc76faa82b5ad41a8",
+    "src/game/screens/GalleryScreen.tsx": "c76d50b729d577532a551bfc7e233f6214572aa152204e17ce586ba8e08b96d4",
+    "src/game/screens/RevealScreen.tsx": "f8d9f444829d05779888c545f6cfaecb156e63ad5ed7ac8164bb309223444bf5",
+    "src/game/screens/RewardsScreen.tsx": "a5a565d6ee9dfc73896e4af596747ee3b3f09d933050862c532c58521ab4cc1d",
+    "src/game/screens/TitleScreen.tsx": "3c5be1edf823e332b0c163e1989146646e19d096ceb7e3c3a2c9c8c71e69aeea",
+    "src/game/sim.test.ts": "5eba66d1f43133841c7d462d0c6e9b99159f84d5427a4f334a539a07373e03ca",
+    "src/game/sim.ts": "45f54c45d41e1cd359a4764dccbc2b3f2a57de3de1b38ae6c13dd98a1820a3a2",
+    "src/game/swordDraw.ts": "2cebf3afcb6c4deaabd75aab22eccbbc8d3cde93f7d815cbc8c9b407c5346a59",
+    "src/game/transactions.ts": "29197272d83bfe49f30f5ff242bbd22c6a1e9bc4d3e8769126b9e746e6b2db94",
+    "src/game/types.ts": "2d6b0fdfcce3015156420b3fa7a1e4ace91f6ed1dac5228f040489dd7ea7b6e5",
+    "src/game/visuals/dna-integration.test.ts": "50511c23d6a6de4eb4db861760de091ee0b9c59b6c5c7cfab828043ca45d99c5",
+    "src/game/visuals/geometry.test.ts": "b32ea6ee464f1e49f9718b96686d1c8b8200a4008388f91decd7d1d67ade72ec",
+    "src/game/visuals/geometry.ts": "e4b860078e54ee8ae8921f1d6e3b5a73a43762995a39259315332ed5297c1013",
+    "src/game/visuals/materials.ts": "6c53082268084180bc910bdec0934b9e04f4f7d2dcc910fe6f2b83c782829825",
+    "src/game/visuals/math.ts": "342051d3d8f07a0969a33074732442cda1f2e3ca2a02cfd64e72a2c1b0a18419",
+    "src/game/visuals/ornamentation.ts": "1505499427b96c5ecd1e9d212f30c9958b06021dd9e1656ade0fda6d7647d8c4",
+    "src/game/visuals/qualityMarks.ts": "dbaaae248fddd6172b924c043608ea9181563e52da7b1dbfe2c91b35b14b915a",
+    "src/game/visuals/refinements.test.ts": "113a6f1096d61af5c3b1541a8bda7f18823fa9ff7f0bdcd1a6cceb97143bb11f",
+    "src/game/visuals/renderer-adapter.test.ts": "e55fb3232a479b68e38eb7cde5e399b47c4cee87012a9521c058e160137a7adf",
+    "src/game/visuals/renderer-cache.test.ts": "be570b07138d644dce028e2c522db308a12d7d90d35b1978545c7c5927fa3fe4",
+    "src/game/visuals/rendererAdapter.ts": "6fbc097b1b1cd8ea93072fc5085fd6277b2dbd9f07216c02b77e50f467f3abc6",
+    "src/game/visuals/thumbnailCache.ts": "6bf293b335560a344f8b259591ff1918cf28eaf5f4630566420cec1cb9d61b3d",
+    "src/game/visuals/types.ts": "5c46e2756ab604380e4f3853aa3acce1728909513183239c368ff88ac918fc5f",
+    "src/game/visuals/weaponGenome.test.ts": "2856d5236c4033c9bff390f02068e1e77a780aa4a390f3b56d4e1ddf4927f7ca",
+    "src/game/visuals/weaponGenome.ts": "1bb56527522753a5c659c7cd2d81717625d71b5715ecb3d6aa64bd9f091b0ff5",
+    "src/game/visuals/weaponRenderer.ts": "da6b811def4a69775363c408adee8bf924ad102c6cb603c13014611ece511fa8",
+    "src/routes/index.tsx": "2c6e1f5f4c3e591e5aac1e7a50523ac974de64fbf3befcf9c7ac286a9b6dc558",
+    "vite.config.ts": "eb5334e0c70efe08217898d90e5313cf44ef4850189ed752c2c9b5c73db2f1af"
+  },
+  "finishedAt": "2026-10-18T21:54:55.017Z",
+  "artifactHashes": {
+    "A-failure.png": "b0a4c688908e0739ce18c59c711e918e4bcfe3506ce65e1a7bfbe2e83f0a591f",
+    "A-trace.zip": "78c2524757f651de48054226c779218903e50cd92d6782ddcb419f3fee4dc6d2",
+    "B-failure.png": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9",
+    "B-trace.zip": "19dc1fceb9a9924a069e687aaaa5998489b4ececc45b0d9b321fdefab3f1a398",
+    "C-failure.png": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9",
+    "C-trace.zip": "e12d1649324cca7e0f263bba1d7ed38f26cd6aa5749633ebbba677346b4416e8",
+    "D-failure.png": "b0a4c688908e0739ce18c59c711e918e4bcfe3506ce65e1a7bfbe2e83f0a591f",
+    "D-trace.zip": "c723c00c81659c7cd6b1880180876a0f91fc42cf6370dc0f476bfb430ce2e5da",
+    "E-failure.png": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9",
+    "E-trace.zip": "662d32d812da7409caa4dfd9683c7e9fe0b3a713998c282cf76217fada39ebf1",
+    "G-fixture-24-dna-gallery.png": "8ee4166bdc125f8232fca452beffd73d5e378ab05db8510bff6dc4e45810e3c0",
+    "G-trace.zip": "789ed10a103d3983cdf7645521dc5a0299800cd2d3ddd5b73e507daacde3f418",
+    "G-two-distinct-fixture-swords-comparator.png": "c0d65e1a8f2e8210c6dc425e6857437a25aae97a491e3ea8cb015c18b0d831a5",
+    "H-failure.png": "51d516015d2f35db630705924f81a75ffcedea64e2f3e256db66339e09370be9",
+    "H-trace.zip": "7c8be6a754da97cf8e31b9bd998f94e275e69bd9a08b2aac916726e931288168"
+  }
+}

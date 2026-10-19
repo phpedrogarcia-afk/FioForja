@@ -1,0 +1,43 @@
+[browser-proof] A REAL_UI_FRESH_CONTEXT_NO_GAMEPLAY_FIXTURE
+23:45:18 [vite] (ssr) connected.
+[browser-proof] C FIXTURE_BANKRUPT_INPUT_REAL_TRAINING_UI
+[browser-proof] D REAL_UI_CHECKPOINT_AND_RELOAD_FRESH_CONTEXT
+23:47:01 [vite] (client) hmr update /src/styles.css?direct
+[browser-proof] B FIXTURE_FOUR_DONORS_UI_FUSION_AND_MANUAL_CORE_FORGE
+[browser-proof] E FIXTURE_OLD_SAVE_DNA_LOAD_AND_RELOAD
+[browser-proof] F REAL_UI_COMPONENT_SUBCASE_RESULT
+[browser-proof] H REAL_UI_LEGACY_EXPLICIT_URL_OVERRIDES_STORED_DNA
+{
+  "status": "FAIL",
+  "report": "C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\evidence\\browser\\2026-10-19T02-45-16-687Z\\report.json",
+  "cases": [
+    {
+      "id": "A",
+      "status": "PASS"
+    },
+    {
+      "id": "C",
+      "status": "PASS"
+    },
+    {
+      "id": "D",
+      "status": "FAIL"
+    },
+    {
+      "id": "B",
+      "status": "PASS"
+    },
+    {
+      "id": "E",
+      "status": "PASS"
+    },
+    {
+      "id": "F",
+      "status": "PASS"
+    },
+    {
+      "id": "H",
+      "status": "PASS"
+    }
+  ]
+}

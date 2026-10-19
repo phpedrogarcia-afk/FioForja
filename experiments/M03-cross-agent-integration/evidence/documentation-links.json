@@ -1,0 +1,18 @@
+{
+  "scope": [
+    "docs/AI-START-HERE.md",
+    "docs/PROJECT-STATE.md",
+    "docs/HANDOFF-CODEX.md",
+    "docs/DECISIONS.md",
+    "docs/HANDOFF-DEEPSEEK-WEAPON-DNA.md",
+    "docs/specs/weapon-visual-dna.md",
+    "experiments/M02-weapon-dna/README.md",
+    "experiments/M03-cross-agent-integration/README.md",
+    ".project-intelligence/README.md",
+    ".project-intelligence/scars/CODEX05-physical-event-identity.md",
+    ".project-intelligence/scars/CODEX05-visual-cache-identity.md"
+  ],
+  "linksChecked": 72,
+  "broken": [],
+  "status": "PASS"
+}

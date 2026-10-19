@@ -1,0 +1,11 @@
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\weaponGenome.ts
+  657:9  warning  'wrap' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  660:9  warning  'tierIdx' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\phped\.codex\worktrees\cross-agent-integration-v1\FioForja\src\game\visuals\weaponRenderer.ts
+   17:10  warning  'clamp' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  268:10  warning  'outlineHalfHeight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 4 problems (0 errors, 4 warnings)
+

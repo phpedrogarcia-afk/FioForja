@@ -1,10 +1,12 @@
 # Registro de Decisões Canônicas & Governança — FioForja
 
 Este documento é a fonte de autoridade para decisões arquiteturais, de produto e regras econômicas do projeto FioForja.
-Todas as decisões contêm taxonomia estrita de governança:
+Os registros distinguem origem da decisão e alcance da evidência. Tags das Operações 01–04 são históricas; não provam o estado atual. A auditoria Codex 05 encontrou contraexemplos de golpe, núcleo, finalização, recuperação e treino. Evidência vigente: [relatório](../experiments/M03-cross-agent-integration/README.md).
+
+Taxonomia:
 - `[USER-APPROVED]`: Diretiva explícita ou mandato aprovado pelo usuário.
 - `[AGENT-IMPLEMENTED]`: Decisão técnica estruturada pelo agente para cumprir as diretivas canônicas.
-- `[VERIFIED]`: Validada por testes unitários adversariais e evidências reais em runtime.
+- `[VERIFIED]`: Validada no envelope de evidência indicado; teste de função, fixture e navegador têm escopos separados.
 - `[PROPOSED]`: Hipótese ou melhoria em avaliação para próximas ofensivas.
 - `[UNKNOWN]`: Estado legado pendente de triagem.
 
@@ -41,7 +43,7 @@ Todas as decisões contêm taxonomia estrita de governança:
 ## 3. Decisões Canônicas — Operação 02: A Forja do Prestígio
 
 ### FIOFORJA-TRANSACTIONS-001: Arquitetura Fail-Closed Transacional Pura `[USER-APPROVED]` `[VERIFIED]`
-- Todas as mutações de jogo (fusões, montagens, compras no bazar, refinos, entregas) são puras e atômicas em `src/game/transactions.ts`.
+- As transações em `src/game/transactions.ts` constroem o próximo estado e tentam persistir antes de retorná-lo à interface. Executam I/O; não são funções puras.
 - Qualquer falha de I/O de armazenamento aborta imediatamente a operação sem alterar a carteira, inventário ou arsenal do jogador.
 
 ### FIOFORJA-PRESTIGE-001: 5 Lâminas de Referência e Bazar da Ferraria `[USER-APPROVED]` `[VERIFIED]`
@@ -91,7 +93,7 @@ Todas as decisões contêm taxonomia estrita de governança:
   - `executeStartForgeTransaction` rejeita categoricamente o início de uma nova forja caso `save.activeAttempt` já exista e esteja em andamento (`ATTEMPT_ALREADY_ACTIVE`).
   - Tentativas canceladas ou completadas não podem ser canceladas novamente (`ATTEMPT_NOT_ACTIVE`).
 - **Identidade Estrita de Execução (`forgeRunId`):**
-  - O `forgeRunId` gerado em `executeStartForgeTransaction` é propagado pelo Canvas, associado ao simulador `createSim`, e impresso na lâmina final `FinishedSword.forgeRunId`, garantindo rastreabilidade unívoca contra duplicatas ou injeções.
+  - O `forgeRunId` gerado em `executeStartForgeTransaction` é propagado pelo Canvas, associado ao simulador `createSim`, e impresso na lâmina final `FinishedSword.forgeRunId`, fornecendo identidade de correlação. O vínculo transacional e a rejeição de duplicatas foram reforçados na Operação Codex 05; o ID isolado não prova integridade.
 - **Política Justa de Cancelamento (`executeCancelForgeTransaction`):**
   - **Em `PREPARED` (0 golpes):** O artesão desiste antes de bater no metal; 100% do lingote de metal consumido é estornado ao inventário (`refundedMaterial: true`).
   - **Em `ACTIVE` (≥1 golpe):** O lingote já foi deformado pelo martelo. Não há devolução do lingote de metal nobre, mas o ferreiro recolhe +1x sucata (`scrap`) de salvamento para reciclagem (`salvageScrap: 1`).
@@ -122,7 +124,21 @@ Todas as decisões contêm taxonomia estrita de governança:
 
 ---
 
-## 6. Hipóteses em Avaliação Técnica (Provisórias)
+## 6. Integração Codex 05
+
+### FIOFORJA-CHECKPOINT-001 `[AGENT-IMPLEMENTED]`
+
+Uma ocorrência física usa uma transação única: checkpoint validado, sequência, contador e prêmio calculado pelo estado. A conclusão deriva do snapshot final confirmado e verifica tentativa/run/projeto/núcleo. Retomada é do último checkpoint, com até 1 s de recuo térmico/carga. Tentativas legadas sem snapshot são canceláveis; não recebem progresso inventado. Testes e provas: [rastreabilidade](../experiments/M03-cross-agent-integration/README.md).
+
+### FIOFORJA-TRAINING-002 `[AGENT-IMPLEMENTED]`
+
+Refina a exceção de limalha de TRAINING-001, preservando sua intenção humana de recuperação: treino íntegro Q≥50 concede 1 sucata somente enquanto `needsTrainingRecovery` for verdadeiro (ouro abaixo do lingote básico, sem ferro/aço utilizável, sucata<2). Cancelar treino não concede sucata. Escolha técnica desta integração, não novo balanceamento aprovado pelo usuário. Nova insolvência pode habilitar ajuda novamente.
+
+### FIOFORJA-DNA-001 `[AGENT-IMPLEMENTED]`
+
+Integração seletiva, legado padrão, URL válida com precedência, cache completo e miniaturas rasterizadas limitadas. Refinamentos Damasco/Oriental/Meteórica são **AGENT-DESIGNED** e aguardam aceitação humana. Contrato atual na [especificação visual](specs/weapon-visual-dna.md); a forja física não foi migrada.
+
+## 7. Hipóteses em Avaliação Técnica (Provisórias)
 
 - **[PROPOSED] Fórmulas Dinâmicas de Encomendas:** Geração procedural de encomendas semanais da guilda de acordo com o renome do artesão.
 - **[PROPOSED] Afiação em Pedra d'Água:** Mini-jogo opcional no acabamento para extrair gume supremo (+3% a +5% P.ATK).

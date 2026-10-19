@@ -16,3 +16,6 @@ dist/
 AGENTS.md
 AGENTS.project.md
 .node_modules.lock
+
+experiments/M02-weapon-dna/.build/
+experiments/M03-cross-agent-integration/evidence/browser/**/*-trace.zip

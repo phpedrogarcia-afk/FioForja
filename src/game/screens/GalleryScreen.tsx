@@ -13,6 +13,9 @@ import {
   recalculateSwordStats,
 } from "../catalog";
 import { drawFinishedSword } from "../swordDraw";
+import { BASIC_IRON_RECOVERY_COST } from "../materials";
+import { isWeaponDnaEnabled } from "../visuals/rendererAdapter";
+import { drawWeaponThumbnail } from "../visuals/thumbnailCache";
 import type { BlacksmithCommission, CareerStats, CombatRole, FinishedSword, PlayerInventory, PlayerWallet, RarityGrade, SwordDesign } from "../types";
 import { RevealScreen } from "./RevealScreen";
 import { RewardsScreen } from "./RewardsScreen";
@@ -52,7 +55,7 @@ export const BAZAAR_ARTICLES: ShopArticle[] = [
     name: "Lingote de Ferro Forjado",
     category: "materials",
     type: "material",
-    costGold: 50,
+    costGold: BASIC_IRON_RECOVERY_COST,
     icon: "🧱",
     rarity: "Comum",
     desc: "Massa sólida de ferro maleável tradicional para forjamento básico.",
@@ -1562,6 +1565,13 @@ function Thumb({ sword }: { sword: FinishedSword }) {
     ctx.fillRect(0, 0, w, h);
 
     const isBroken = sword.structuralState === "broken" || sword.quality <= 15;
+    if (isWeaponDnaEnabled() && !isBroken) {
+      const { cacheHit } = drawWeaponThumbnail(ctx, sword, w, h, dpr);
+      canvas.dataset.thumbnailCache = cacheHit ? "hit" : "miss";
+      canvas.dataset.renderer = "dna";
+      return;
+    }
+    canvas.dataset.renderer = "legacy";
     drawFinishedSword(ctx, sword.design, w / 2, h * 0.58, Math.min(w, h) * 0.92, {
       assembled: !isBroken,
       quality: sword.quality,

@@ -1,73 +1,43 @@
-# Estado Atual do Projeto — FioForja
+# Estado do projeto — integração Codex 05
 
-**Data da Atualização:** 18 de Outubro de 2026  
-**Branch de Trabalho:** `antigravity/forge-lifecycle-proof-v1`  
-**Base Canônica de Continuidade:** `antigravity/blacksmith-progression-v1` (`6e3920d4a8a92bca0b4d6f238d6232d3645a6b6c`)  
-**Missão Concluída:** Operação 04: A Prova da Forja — Recuperação do Ciclo de Vida, Progressão Econômica Real e Handoff para o Codex  
-**Registros Históricos:** Arquivados em [`docs/historical/`](historical/)
+**Data:** 18/10/2026. **Branch experimental:** `codex/cross-agent-integration-v1`.
 
----
+## Identidade e fontes
 
-## 1. FATOS COMPROVADOS (KNOWN & VERIFIED)
+- Repositório: `phpedrogarcia-afk/FioForja`.
+- Base de gameplay: `antigravity/forge-lifecycle-proof-v1` em `0663f4e52522643ab0d296f7f3e8cd083373df3e`.
+- Doador visual: `deepseek/weapon-dna-engine-v1` em `a2fa0025a2e6755c78c42777b3abd1fec4e5572d`.
+- Ancestral comum: `6e3920d4a8a92bca0b4d6f238d6232d3645a6b6c`. O doador visual antecedia correções de gameplay; seus módulos foram transplantados seletivamente.
+- `main` não é esta integração. Checkouts preexistentes são preservados. SHAs e evidência de publicação constam no [relatório](../experiments/M03-cross-agent-integration/README.md).
 
-### A. Ciclo de Vida da Tentativa de Forja & Política Justa de Cancelamento (`src/game/transactions.ts`, `src/game/types.ts`)
-- **Máquina de Estados de 4 Fases:** `ForgeAttemptStatus = "PREPARED" | "ACTIVE" | "COMPLETED" | "CANCELLED"`.
-- **Prevenção Fail-Closed de Tentativas Simultâneas:** `executeStartForgeTransaction` rejeita categoricamente o início de uma nova forja caso `activeAttempt` já exista e esteja ativa (`ATTEMPT_ALREADY_ACTIVE`).
-- **Identidade Estrita de Execução (`forgeRunId`):** O ID da tentativa é emitido na largada, passado ao simulador, ao canvas e impresso indelevelmente em `FinishedSword.forgeRunId`.
-- **Política Justa de Cancelamento (`executeCancelForgeTransaction`):**
-  - Fase `PREPARED` (0 golpes): Desistência limpa — 100% de devolução do lingote de metal consumido.
-  - Fase `ACTIVE` (≥1 golpe): Metal deformado — 0 devolução do lingote, mas +1x sucata (`scrap`) de salvamento para reciclagem.
-  - Tentativas canceladas ou completadas são imutáveis e rejeitam novo cancelamento (`ATTEMPT_NOT_ACTIVE`).
-- **Modal de Recuperação de Tentativa Ativa:** Ao recarregar com uma tentativa pendente em disco, `GameApp.tsx` apresenta um modal contextual permitindo `[🔨 Continuar Forja]` ou `[❌ Cancelar / Abandonar]`.
+## Implementação atual
 
-### B. Isolamento Estrito do Modo Treino & Galeria Segregada
-- **Economia e Carreira 100% Blindadas:**
-  - Golpes em modo treino rejeitam qualquer crédito de ouro (`TRAINING_MODE_NO_GOLD`).
-  - Término da forja em treino zera o objeto de recompensa (0 cartas, 0 ouro, 0 rubis, 0 diamantes).
-  - Estatísticas de carreira, maestria e contadores de raridade não sofrem qualquer incremento.
-- **Galeria Segregada (`trainingGallery`):** Lâminas de treino são gravadas estritamente em `trainingGallery` do save, mantendo o Arsenal canônico livre de artefatos de teste.
-- **Rejeição Categórica no Crisol e Encomendas:**
-  - `validateSwordFusionTransaction` e `fuseSwords` impedem o consumo de armas de treino (`isTraining`) e armas entregues à guilda (`commissionDelivered`).
-  - `isSwordEligibleForCommission` invalida qualquer espada com `isTraining: true`.
+| Área | Estado observado nesta branch |
+|---|---|
+| Golpe físico | Um checkpoint transacional une sequência, contador, estado e ouro derivado. Callback independente não paga; replay confirmado é NOOP. O golpe fatal também conta. |
+| Forja com núcleo | Mesmo início transacional: valida projeto/núcleo, reserva metal, persiste tentativa. A conclusão consome o núcleo uma vez e preserva herança. Fusão continua exigindo forja manual. |
+| Recuperação | Snapshot físico v1 preserva metalurgia, relógio, equipamentos e núcleo. Retoma o último ponto confirmado; carga/calor podem recuar até 1 s de simulação ativa. Falha de gravação pausa a física e permite repetir o mesmo ponto. |
+| Tentativa antiga | Save sem snapshot físico compatível continua carregável; a UI oferece cancelamento e política de insumos, sem inventar progresso metalúrgico. |
+| Finalização | Exige tentativa ativa, run, projeto, núcleo, contador e estado final iguais ao checkpoint confirmado. Arma e recompensas partem desse estado. |
+| Cancelamento | Regular antes de golpe devolve metal; após golpe recupera 1 sucata. Treino não concede sucata por cancelamento. |
+| Treino | Sem ouro, drops, moedas especiais, carreira, fusão ou encomendas. Conclusão íntegra Q≥50 concede 1 sucata somente se ouro<50, sem ferro/aço utilizável e sucata<2. Custo básico compartilhado com o Bazar. |
+| Weapon DNA | Opt-in por URL/storage em Arsenal, revelação, comparador e inspeção. Legado permanece padrão e fallback. O desenho físico da bigorna não foi migrado para DNA. |
+| Cache visual | Geometria por chave estrutural completa; miniaturas por genoma/dimensões/DPR, LRU96/32MiB. Instalação real preserva lâmina e altera montagem. |
+| Arte | Três refinamentos do agente: Damasco, Oriental e Meteórica. Comparação com doador e aceitação humana são coisas distintas. |
 
-### C. Recuperação de Limalha Anti-Softlock por Mérito Técnico
-- Ao completar uma sessão de treino com qualidade $\ge 50$, o ferreiro recolhe +1x sucata (`scrap`) de limalhas da bigorna.
-- 2 sessões de treino bem-sucedidas = 2x sucata $\rightarrow$ 1x lingote de ferro na bancada da Oficina via `executeRecycleScrapTransaction`.
-- O jogador novato ou falido possui caminho de ascensão econômica puramente baseado em habilidade manual, sem risco de exploração monetária rápida.
+## Evidência desta rodada
 
-### D. Bloqueio Metalúrgico de Projetos Customizados (`src/game/screens/DesignScreen.tsx`)
-- O construtor livre de design impede a forja de aços nobres (`damascus`, `blacksteel`, `elven_silver`, `meteor`, `ancient_alloy`) se o jogador não tiver o tier de maestria correspondente em `career.unlockedTiers`.
-- O botão de forja real é desabilitado com aviso claro `🔒 Metalurgia Bloqueada: requer maestria em X para forjar`. O treino de oficina permanece disponível para aprendizado da temperatura.
+- `npm test`: 404 testes descobertos em dois processos; **397 pass, 0 fail, 7 skip**. Os 207 testes TypeScript incluem gameplay, visuais e bibliotecas; não somar novamente os subtotais focados.
+- `npm run typecheck`: exit 0.
+- `npm run lint`: exit 0, **0 erros / 44 avisos**; baseline de gameplay tinha 26 avisos.
+- `npm run build`: exit 0. Migração externa não executada: `DATABASE_URL` ausente.
+- Provas de navegador, imagens e benchmark: ver [relatório e matriz de rastreabilidade](../experiments/M03-cross-agent-integration/README.md), que registra o resultado de cada caso e os hashes de fonte.
 
-### E. Atribuição Legítima de Papel Defensivo & Encomenda do Capitão Valerius
-- `calculateSwordAttributes` confere organicamente `combatRole: "Defensiva"` a espadas de ferro com cruzeta (`guard: "cross"`) ou perfil curto/longo, atingindo DEF $\ge 50$.
-- A primeira encomenda da guilda (`comm_guard_captain`) pode ser concluída com materiais da largada sem injeção de mocks ou cheats.
+## Limites e desconhecidos
 
-### F. Gating Real de Insumos e Consumo Atômico de Metais (`src/game/materials.ts`)
-- 7 chaves canônicas de metais (`iron_ingot`, `steel_ingot`, `damascus_billet`, `blacksteel_chunk`, `elven_silver_ingot`, `starmetal_ore`, `ancient_relic_shard`).
-- Forja regular debita 1x metal base correspondente (`executeStartForgeTransaction`); falta de material bloqueia a forja (`INSUFFICIENT_MATERIALS`).
-
-### G. Compêndio de Projetos & Encomendas da Guilda
-- 6 estados canônicos de blueprints (`locked`, `known`, `discovered`, `ready`, `crafted`, `mastered`).
-- Encomendas de Capitão Valerius, Comandante Kael e Lord Alistair com validação matemática e etiquetagem permanente.
-
-### H. Métricas Técnicas e Verificação
-- **TypeScript:** 0 erros (`npm run typecheck` código 0).
-- **Testes Automatizados:** 126 testes em 27 suites, 0 falhas (`npm test`), incluindo os 9 testes de integração e invariantes de ciclo de vida em `src/game/lifecycle-proof.test.ts`.
-- **Linter:** 0 erros (`npm run lint` código 0).
-- **Build de Produção:** Concluído com sucesso (`npm run build`).
-- **Evidências Visuais Capturadas via Playwright:**
-  - `proof-01-recovery-modal-active-attempt.png`: Modal de recuperação de tentativa ativa ao recarregar a tela com opções de continuar ou cancelar.
-  - `proof-02-cancel-fair-scrap-salvage.png`: Política justa de cancelamento após golpes desferidos concedendo +1x sucata de salvamento.
-  - `proof-03-metallurgy-gating-custom.png`: Banner de metalurgia bloqueada na tela de Design impedindo forja de aço nobre sem maestria.
-  - `proof-04-valerius-commission-defensive.png`: Encomenda do Capitão Valerius com espada de ferro Defensiva legítima pronta para entrega.
-  - `proof-05-commission-delivered-rewards.png`: Conclusão da entrega da encomenda com payout de 350 ouro, 5 rubis e 2x lingotes de aço.
-
----
-
-## 2. INVARIANTES ATIVOS
-1. **The Weapon is the Hero. The Player Forges the Trophy.**
-2. **Fail-Closed Persistence:** Nenhuma alteração de estado avança na UI sem confirmação de persistência em disco.
-3. **Materials Matter:** Metais são necessários para forjas regulares; o estoque é debitado atomicamente.
-4. **Anti-Softlock:** O jogador iniciante ou falido nunca fica impossibilitado de forjar.
-5. **Isolamento de Branches:** Todo o trabalho foi realizado na branch `antigravity/blacksmith-progression-v1`. A branch `main` nunca é modificada diretamente.
+- Persistência local não é servidor de autoridade e não impede edição manual do próprio storage. Escrita concorrente entre abas não é comprovada.
+- Cada checkpoint serializa o save completo; custo de I/O com arsenais muito grandes ainda não medido sistematicamente.
+- Auxílio de treino pode reaparecer após nova insolvência real. É rota intencional de retorno, não quota vitalícia nem prova de balanceamento longo.
+- Testes e fixtures não equivalem a progressão orgânica completa. Um percurso bem-sucedido não prova confiabilidade em todos os dispositivos.
+- DNA não é aparência aprovada final; desempenho móvel e avaliação humana dos três refinamentos continuam pendentes.
+- [Bíblia Estética](canon/estetica.md), [Galeria](canon/galeria.md) e [decisões humanas](DECISIONS.md) continuam fontes de produto. Thresholds estéticos são direção; thresholds do código descrevem implementação e não foram reconciliados silenciosamente.

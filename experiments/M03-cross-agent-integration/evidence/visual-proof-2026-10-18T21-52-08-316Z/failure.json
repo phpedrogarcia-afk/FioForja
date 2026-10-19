@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "error": "page.evaluate: Error: Raster pixel mismatch: cimitarra_damasco DPR1 warm: {\"pixels\":64000,\"changedPixels\":6,\"maxChannelDelta\":1}\n    at check (eval at evaluate (:311:30), <anonymous>:11:65)\n    at browserProof (eval at evaluate (:311:30), <anonymous>:79:9)\n    at async <anonymous>:337:30\n    at runProof (C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M03-cross-agent-integration\\visual-proof.mjs:263:31)",
+  "pageErrors": [],
+  "donorHash": "1bec6a443a9a8751a28cbce2467817734d62803809c96829d61f84859f2bd275",
+  "currentHash": "c72fce679cad957e7b969a0b06421b684e82cf1fc82915b3cabe4a2ccacce7f3"
+}

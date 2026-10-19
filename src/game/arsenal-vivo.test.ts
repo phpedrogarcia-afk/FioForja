@@ -687,43 +687,20 @@ describe("Arsenal Vivo 01.2 — Item Integrity, Component Identity & System Hard
     );
   });
 
-  it("P1: Strike Economy Transaction — guarantees idempotency and memory compaction without React setter side-effects", () => {
+  it("P1: legacy strike helper rejects detached, foreign, non-finite and replayed payments", () => {
     const initialSave = {
       wallet: { gold: 500, rubies: 10, diamonds: 2 },
-      claimedStrikeRewardIds: ["old_strike_1"],
+      claimedStrikeRewardIds: Array.from({ length: 220 }, (_, i) => `old:${i}`),
+      activeForgeAttempt: { attemptId: "a", forgeRunId: "run_alpha", status: "PREPARED" as const, design: TEST_DESIGN, isTraining: false, strikesCount: 0, startedAt: 1 },
     };
-
-    // 1. Valid strike reward application
-    const res1 = applyStrikeRewardTransaction(initialSave, { amount: 75, id: "run_alpha:strike_2" });
-    assert.equal(res1.applied, true);
-    assert.equal(res1.wallet.gold, 575);
-    assert.ok(res1.claimedStrikeRewardIds.includes("run_alpha:strike_2"));
-
-    // 2. Duplicate reward rejection (idempotency)
-    const res2 = applyStrikeRewardTransaction(
-      { wallet: res1.wallet, claimedStrikeRewardIds: res1.claimedStrikeRewardIds },
-      { amount: 75, id: "run_alpha:strike_2" },
-    );
-    assert.equal(res2.applied, false);
-    assert.equal(res2.wallet.gold, 575, "Gold must not increase on duplicate reward invocation");
-
-    // 3. Compact history when over 200 items to avoid memory leaks
-    let state = {
-      wallet: { gold: 1000, rubies: 0, diamonds: 0 },
-      claimedStrikeRewardIds: [] as string[],
-    };
-
-    for (let i = 0; i < 260; i++) {
-      const res = applyStrikeRewardTransaction(state, { amount: 1, id: `bulk_strike_${i}` });
-      state = {
-        wallet: res.wallet,
-        claimedStrikeRewardIds: res.claimedStrikeRewardIds,
-      };
-    }
-
-    assert.equal(state.wallet.gold, 1260);
-    assert.equal(state.claimedStrikeRewardIds.length, 200, "Claimed strike reward history must be compacted to 200 items");
-    assert.ok(state.claimedStrikeRewardIds.includes("bulk_strike_259"));
-    assert.ok(!state.claimedStrikeRewardIds.includes("bulk_strike_0"), "Oldest items should be pruned");
+    assert.equal(applyStrikeRewardTransaction({ wallet: initialSave.wallet }, { amount: 12, id: "run_alpha:1" }, "run_alpha").applied, false);
+    for (const amount of [NaN, Infinity, -1, 75]) assert.equal(applyStrikeRewardTransaction(initialSave, { amount, id: "run_alpha:1" }, "run_alpha").applied, false);
+    assert.equal(applyStrikeRewardTransaction(initialSave, { amount: 12, id: "foreign:1" }, "run_alpha").applied, false);
+    const result = applyStrikeRewardTransaction(initialSave, { amount: 12, id: "run_alpha:1" }, "run_alpha");
+    assert.equal(result.applied, true);
+    assert.equal(result.wallet.gold, 512);
+    assert.equal(result.claimedStrikeRewardIds.length, 200);
+    const replayState = { ...initialSave, ...result, activeForgeAttempt: { ...initialSave.activeForgeAttempt, strikesCount: 1 } };
+    assert.equal(applyStrikeRewardTransaction(replayState, { amount: 12, id: "run_alpha:1" }, "run_alpha").applied, false);
   });
 });

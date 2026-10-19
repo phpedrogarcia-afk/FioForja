@@ -1,0 +1,94 @@
+▶ DNA with real component installation
+  ✔ guard transaction changes its slot without rerolling forged blade, surface or maker mark (8.0392ms)
+  ✔ wrap transaction changes its slot without rerolling forged blade, surface or maker mark (1.6388ms)
+  ✔ pommel transaction changes its slot without rerolling forged blade, surface or maker mark (1.6037ms)
+  ✔ rune transaction changes its slot without rerolling forged blade, surface or maker mark (1.6181ms)
+  ✔ resolves inventory keys even when an older save retains the original design (0.518ms)
+  ✔ rejects component keys that only share an archetype prefix (0.4562ms)
+  ✔ immutable forge outcomes still distinguish the seed while display metadata does not (0.4801ms)
+✔ DNA with real component installation (16.1379ms)
+▶ DNA legacy save compatibility
+  ✔ loads an old sword, renders pure geometry and survives real save/reload without adding DNA fields (14.1226ms)
+✔ DNA legacy save compatibility (14.387ms)
+▶ geometry determinism
+  ✔ the same genome always produces byte-identical geometry (48.2019ms)
+  ✔ different genomes produce different silhouettes (25.4475ms)
+✔ geometry determinism (75.2937ms)
+▶ hero weapon geometry
+  ✔ every canonical hero at every quality tier satisfies all invariants (79.3494ms)
+✔ hero weapon geometry (79.6183ms)
+▶ property sweep: 520 generated genomes
+  ✔ every generated genome passes all geometry invariants (587.3731ms)
+✔ property sweep: 520 generated genomes (587.5519ms)
+▶ renderer mode URL and storage precedence
+  ✔ URL legacy / stored dna selects legacy (84.7242ms)
+  ✔ URL classic / stored dna selects legacy (4.2195ms)
+  ✔ URL dna / stored legacy selects dna (3.6013ms)
+  ✔ URL weapon-dna / stored legacy selects dna (2.5193ms)
+  ✔ URL weapondna / stored legacy selects dna (2.4045ms)
+  ✔ URL LEGACY / stored DNA selects legacy (2.5243ms)
+  ✔ URL DNA / stored classic selects dna (2.3438ms)
+  ✔ URL null / stored dna selects dna (2.8905ms)
+  ✔ URL invalid / stored dna selects dna (2.5241ms)
+  ✔ URL null / stored legacy selects legacy (4.4106ms)
+  ✔ URL null / stored invalid selects legacy (2.379ms)
+  ✔ URL null / stored null selects legacy (1.6264ms)
+  ✔ unavailable storage (getter) uses the default (2.1748ms)
+  ✔ explicit URL works with unavailable storage (getter) (2.1324ms)
+  ✔ unavailable storage (read) uses the default (2.0702ms)
+  ✔ explicit URL works with unavailable storage (read) (2.5592ms)
+✔ renderer mode URL and storage precedence (127.1434ms)
+▶ geometry cache semantic identity
+  ✔ warm cache respects equal-length edge profiles (30.2997ms)
+  ✔ warm cache respects equal-length spine profiles (12.0129ms)
+  ✔ warm cache respects equal-length tip profiles (8.6732ms)
+  ✔ warm cache respects equal-length guard archetypes (5.2484ms)
+  ✔ warm cache respects equal-length pommel archetypes (6.7387ms)
+  ✔ warm cache respects ridge enabled (5.9892ms)
+  ✔ warm cache respects guard plating carried by geometry (4.142ms)
+  ✔ does not quantise distinct inputs before nonlinear geometry construction (6.0419ms)
+  ✔ keeps every geometry after cache clearing and bounded eviction (118.4889ms)
+✔ geometry cache semantic identity (199.4272ms)
+▶ genome determinism
+  ✔ same FinishedSword produces a deeply identical genome across calls (5.8683ms)
+  ✔ structurally identical but distinct design objects produce identical genomes (0.9224ms)
+  ✔ JSON serialize/parse round-trips without numeric drift (3.373ms)
+  ✔ genome seed is the stable identity hash (raw design, not component-resolved) (0.6403ms)
+  ✔ every hero weapon gets a distinct seed (0.3581ms)
+✔ genome determinism (12.7367ms)
+▶ genome variation
+  ✔ quality changes the genome (0.9278ms)
+  ✔ warp and cracks reshape the quality record (0.5839ms)
+  ✔ quench execution (persisted forge history) changes the warp response (0.3025ms)
+  ✔ physical blade profile drives the silhouette (0.4797ms)
+  ✔ steel, family, profile and length are part of the visual identity (1.2947ms)
+  ✔ different weapon ids never share a genome (0.3448ms)
+✔ genome variation (4.4734ms)
+▶ legacy swords missing optional fields
+  ✔ derives a complete genome from a bare design (no stats, history or profile) (0.742ms)
+  ✔ falls back to the royal grammar when design.family is absent (0.253ms)
+  ✔ uses only persisted physical outcomes, not the raw strike log (0.5469ms)
+✔ legacy swords missing optional fields (1.7774ms)
+▶ documented numeric ranges
+  ✔ all numeric fields are finite and inside the documented ranges (20.4051ms)
+  ✔ qualityTier follows the documented grade thresholds (0.1568ms)
+✔ documented numeric ranges (20.7224ms)
+▶ component isolation
+  ✔ swapping the installed guard changes only the mount (and visible identity) (0.5367ms)
+  ✔ swapping the installed wrap changes only mount.grip (0.2701ms)
+  ✔ swapping the installed pommel changes only mount.pommel (0.2656ms)
+  ✔ an unknown component key is ignored instead of corrupting the mount (0.6953ms)
+  ✔ installing a rarer component only perturbs provenance.componentRarity (0.3184ms)
+✔ component isolation (2.3211ms)
+▶ deterministic primitives
+  ✔ hashString is deterministic, unsigned and collision-free on the fixture set (0.5486ms)
+  ✔ makeRng is reproducible and stays in [0, 1) (0.55ms)
+✔ deterministic primitives (1.2281ms)
+ℹ tests 60
+ℹ suites 13
+ℹ pass 60
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 930.9891

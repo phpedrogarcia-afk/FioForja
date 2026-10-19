@@ -1,6 +1,10 @@
 import { describe, it } from "node:test";
+import { playForgeAttempt } from "./forge-test-helpers.ts";
 import assert from "node:assert/strict";
 import {
+  executeForgeCheckpointTransaction,
+  executeClaimRewardsTransaction,
+  needsTrainingRecovery,
   executeStartForgeTransaction,
   executeCancelForgeTransaction,
   executeFinishSwordTransaction,
@@ -10,15 +14,18 @@ import {
   executeRecycleScrapTransaction,
 } from "./transactions.ts";
 import {
+  loadSave,
+  writeSave,
+  migrateSave,
   defaultSaveData,
   defaultInventory,
   defaultCareer,
 } from "./save.ts";
 import { CANONICAL_PRESETS, calculateSwordAttributes } from "./catalog.ts";
-import { createSim, stepSim, finishSword, type SimInput } from "./sim.ts";
+import { createForgeSnapshot, restoreForgeSnapshot, isForgeSnapshotValid, sameForgeValue, createSim, stepSim, finishSword, type SimInput } from "./sim.ts";
 import { isSwordEligibleForCommission, DEFAULT_COMMISSIONS } from "./commissions.ts";
 import { fuseSwords, validateSwordFusionTransaction } from "./fusion.ts";
-import type { FinishedSword, SaveData, SwordDesign } from "./types.ts";
+import type { FinishedSword, FusionCore, SaveData, SwordDesign } from "./types.ts";
 
 describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Treino & Anti-Softlock", () => {
   const setupMockStorage = () => {
@@ -104,9 +111,9 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     const startRes = executeStartForgeTransaction(initialSave, design, { isTraining: true });
     assert.equal(startRes.success, true);
 
-    const sim = createSim(design, { isTraining: true });
-    sim.quality = 98; // Would be a masterpiece if real
-    const finishRes = executeFinishSwordTransaction(startRes.save, sim, design);
+    const played = playForgeAttempt(startRes.save);
+    const sim = played.sim;
+    const finishRes = executeFinishSwordTransaction(played.save, sim, played.save.activeForgeAttempt!.design);
     assert.equal(finishRes.success, true);
 
     const sword = finishRes.payload!;
@@ -258,8 +265,7 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     assert.equal(startResB.success, true);
 
     // Record a strike on the anvil
-    const strikeRes = executeRecordStrikeTransaction(startResB.save);
-    assert.equal(strikeRes.success, true);
+    const strikeRes = playForgeAttempt(startResB.save, { stopAfterStrikes: 1 });
     assert.equal(strikeRes.save.activeForgeAttempt?.status, "ACTIVE");
     assert.equal(strikeRes.save.activeForgeAttempt?.strikesCount, 1);
 
@@ -284,13 +290,11 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     assert.ok(attempt.forgeRunId);
 
     // Create sim passing the exact forgeRunId from the active attempt
-    const sim = createSim(design, {
-      forgeRunId: attempt.forgeRunId,
-      isTraining: attempt.isTraining,
-    });
+    const played = playForgeAttempt(startRes.save);
+    const sim = played.sim;
     assert.equal(sim.forgeRunId, attempt.forgeRunId);
 
-    const finishRes = executeFinishSwordTransaction(startRes.save, sim, design);
+    const finishRes = executeFinishSwordTransaction(played.save, sim, design);
     assert.equal(finishRes.success, true);
     assert.equal(finishRes.payload!.forgeRunId, attempt.forgeRunId, "O forgeRunId da arma deve ser idêntico ao da tentativa");
   });
@@ -373,11 +377,8 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     // Session 1: Practice forge with good quality (Q >= 50)
     const start1 = executeStartForgeTransaction(destituteSave, design, { isTraining: true });
     assert.equal(start1.success, true);
-    const sim1 = createSim(design, { isTraining: true });
-    sim1.heatScore = 80;
-    sim1.shape = 0.75;
-    sim1.quenchScore = 80;
-    const finish1 = executeFinishSwordTransaction(start1.save, sim1, design);
+    const played1 = playForgeAttempt(start1.save);
+    const finish1 = executeFinishSwordTransaction(played1.save, played1.sim, design);
     assert.equal(finish1.success, true);
     assert.ok(finish1.payload!.quality >= 50, `Quality must be >= 50 (got ${finish1.payload!.quality})`);
     assert.equal(finish1.save.inventory.materials.scrap, 1, "Sessão 1 de treino (Q>=50) rende 1x sucata de limalhas");
@@ -385,11 +386,8 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     // Session 2: Practice forge with good quality (Q >= 50)
     const start2 = executeStartForgeTransaction(finish1.save, design, { isTraining: true });
     assert.equal(start2.success, true);
-    const sim2 = createSim(design, { isTraining: true });
-    sim2.heatScore = 85;
-    sim2.shape = 0.8;
-    sim2.quenchScore = 80;
-    const finish2 = executeFinishSwordTransaction(start2.save, sim2, design);
+    const played2 = playForgeAttempt(start2.save);
+    const finish2 = executeFinishSwordTransaction(played2.save, played2.sim, design);
     assert.equal(finish2.success, true);
     assert.ok(finish2.payload!.quality >= 50);
     assert.equal(finish2.save.inventory.materials.scrap, 2, "Sessão 2 de treino rende mais 1x sucata (total 2)");
@@ -445,5 +443,328 @@ describe("Operação 04: A Prova da Forja — Ciclo de Vida, Isolamento do Trein
     };
     const masterMeteorRes = executeStartForgeTransaction(masterSave, meteorCustomDesign);
     assert.equal(masterMeteorRes.success, true, "Ferreiro com Obra-prima desbloqueia metalurgia meteórica");
+  });
+});
+
+
+describe("Operação 05: regressões de integridade reproduzidas antes do reparo", () => {
+  function setup() {
+    const store = new Map<string, string>();
+    const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => { store.set(k, v); }, removeItem: (k: string) => { store.delete(k); } };
+    (globalThis as any).localStorage = storage;
+    (globalThis as any).window = { localStorage: storage };
+    return structuredClone(defaultSaveData);
+  }
+  it("rejeita prêmio sem tentativa e IDs de execução estranhos", () => {
+    const save = setup();
+    assert.equal(executeStrikeRewardTransaction(save, { id: "foreign:1", amount: 12 }).success, false);
+  });
+  it("rejeita conclusão fora da tentativa e antes da têmpera", () => {
+    const save = setup();
+    const design = CANONICAL_PRESETS[0].design;
+    const start = executeStartForgeTransaction(save, design);
+    const foreign = createSim(design, { forgeRunId: "foreign" });
+    assert.equal(executeFinishSwordTransaction(start.save, foreign, design).success, false);
+    assert.equal(executeFinishSwordTransaction(save, foreign, design).success, false);
+  });
+  it("cancelamento de treino após golpe não concede sucata", () => {
+    const save = setup();
+    const start = executeStartForgeTransaction(save, CANONICAL_PRESETS[0].design, { isTraining: true });
+    const struck = playForgeAttempt(start.save, { stopAfterStrikes: 1 });
+    const cancel = executeCancelForgeTransaction(struck.save);
+    assert.equal(cancel.payload?.scrapAwarded, 0);
+    assert.equal(cancel.save.inventory.materials.scrap, 0);
+  });
+  it("conta também o golpe físico que fratura a lâmina", () => {
+    setup();
+    const design = CANONICAL_PRESETS[0].design;
+    const sim = createSim(design);
+    sim.phase = "forge"; sim.heat = .08; sim.integrity = 1; sim.charging = true; sim.force = 1;
+    const event = stepSim(sim, .016, { charging: false, action: false, reheat: false }, design, 0);
+    assert.equal(sim.broken, true);
+    assert.equal(sim.strikes, 1);
+    assert.equal(event.kind, "hard");
+  });
+});
+
+
+describe("Operação 05: um único ciclo físico, econômico e recuperável", () => {
+  const design = CANONICAL_PRESETS[0].design;
+  function setup() {
+    const store = new Map<string, string>();
+    let fail = false;
+    const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => { if (fail) throw new Error("disk unavailable"); store.set(k, v); }, removeItem: (k: string) => { store.delete(k); } };
+    (globalThis as any).localStorage = storage;
+    (globalThis as any).window = { localStorage: storage };
+    return { save: structuredClone(defaultSaveData), storage, fail: (value: boolean) => { fail = value; } };
+  }
+  const coreFixture = (): FusionCore => ({ id: "core_real", name: "Núcleo — Guarda Herdada", family: design.family!, profile: design.profile, steel: design.steel, rarity: "Épica", bonusQuality: 0, inheritedPerks: ["Herança de teste"], consumedSwordIds: ["a", "b", "c", "d"], createdAt: 1, heritage: { attackBias: 18, defenseBias: 0, agilityBias: 0, durabilityBias: 0, runicAffinity: 0, dominantFamily: design.family!, dominantSteel: design.steel } });
+
+  it("golpe premiado grava contador, perfil e +12 ouro uma vez, inclusive após reload", () => {
+    const { save } = setup();
+    const start = executeStartForgeTransaction(save, design);
+    const played = playForgeAttempt(start.save, { stopAfterStrikes: 1 });
+    assert.equal(played.save.activeForgeAttempt!.strikesCount, 1);
+    assert.equal(played.save.activeForgeAttempt!.snapshot!.state.physicalProfile.hammerMarksCount, 1);
+    assert.equal(played.save.wallet.gold, save.wallet.gold + 12);
+    const checkpoint = played.save.activeForgeAttempt!.snapshot!;
+    const loaded = loadSave();
+    const repeated = executeForgeCheckpointTransaction(loaded, checkpoint);
+    assert.equal(repeated.success, true);
+    assert.equal(repeated.code, "CHECKPOINT_ALREADY_APPLIED");
+    assert.deepEqual(repeated.save, loaded);
+    const twice = playForgeAttempt(repeated.save, { stopAfterStrikes: 2 });
+    const delayed = executeForgeCheckpointTransaction(twice.save, checkpoint);
+    assert.equal(delayed.success, true);
+    assert.deepEqual(delayed.save, twice.save);
+  });
+
+  it("golpe sem prêmio e golpe de treino contam uma vez sem ouro", () => {
+    const { save } = setup();
+    for (const isTraining of [false, true]) {
+      const start = executeStartForgeTransaction(save, design, { isTraining });
+      const played = playForgeAttempt(start.save, { stopAfterStrikes: 1, poor: true });
+      assert.equal(played.save.activeForgeAttempt!.strikesCount, 1);
+      assert.equal(played.save.wallet.gold, save.wallet.gold);
+    }
+  });
+
+  it("callbacks antigos não pagam nem incrementam, e valores não finitos são rejeitados", () => {
+    const { save } = setup();
+    const started = executeStartForgeTransaction(save, design).save;
+    assert.equal(executeRecordStrikeTransaction(started).success, false);
+    for (const amount of [12, NaN, Infinity, -1]) {
+      const result = executeStrikeRewardTransaction(started, { amount, id: `${started.activeForgeAttempt!.forgeRunId}:1` });
+      assert.equal(result.success, false);
+      assert.deepEqual(result.save, started);
+    }
+  });
+
+  it("checkpoint de outro run/projeto, conflito e salto de sequência falham sem mutar estado", () => {
+    const { save } = setup();
+    const started = executeStartForgeTransaction(save, design).save;
+    const original = started.activeForgeAttempt!.snapshot!;
+    const variants = [
+      { ...structuredClone(original), revision: 1, state: { ...original.state, forgeRunId: "foreign" } },
+      { ...structuredClone(original), revision: 1, design: { ...original.design, name: "Outro projeto" } },
+      { ...structuredClone(original), revision: 2 },
+      { ...structuredClone(original), state: { ...original.state, heat: .2 } },
+    ];
+    for (const snapshot of variants) {
+      const result = executeForgeCheckpointTransaction(started, snapshot);
+      assert.equal(result.success, false, JSON.stringify(snapshot));
+      assert.deepEqual(result.save, started);
+    }
+    const played = playForgeAttempt(started, { stopAfterStrikes: 2 });
+    const jumped = structuredClone(played.save.activeForgeAttempt!.snapshot!); jumped.revision = 1;
+    assert.equal(executeForgeCheckpointTransaction(started, jumped).success, false, "two strikes cannot be submitted as one occurrence");
+  });
+
+  it("roundtrip preserva metalurgia, equipamentos, relógio e próximo passo independentemente do tempo da página", () => {
+    const { save } = setup();
+    save.inventory.equipped = { hammer: "precision", anvil: "anvil_master", furnace: "furnace_bluefire", quench: "quench_oil" };
+    save.inventory.unlockedTools.push("hammer_precision");
+    const start = executeStartForgeTransaction(save, design);
+    const played = playForgeAttempt(start.save, { stopAfterStrikes: 3 });
+    const checkpoint = played.save.activeForgeAttempt!.snapshot!;
+    const restored = restoreForgeSnapshot(JSON.parse(JSON.stringify(checkpoint)))!;
+    assert.equal(restored.strikes, 3);
+    assert.equal(restored.equippedGear.anvil, "anvil_master");
+    assert.equal(restored.activeHammer, "precision");
+    assert.deepEqual(restored.physicalProfile, played.sim.physicalProfile);
+    assert.deepEqual(restored.zoneProgress, played.sim.zoneProgress);
+    assert.equal(restored.integrity, played.sim.integrity);
+    assert.equal(restored.heat, played.sim.heat);
+    assert.equal(restored.elapsedTime, played.sim.elapsedTime);
+    assert.equal("sparkAnim" in checkpoint.state, false);
+    const original = restoreForgeSnapshot(checkpoint)!;
+    const input = { charging: true, action: false, reheat: false };
+    stepSim(original, .05, input, design, 1);
+    stepSim(restored, .05, input, design, 100000);
+    assert.ok(sameForgeValue(createForgeSnapshot(original, design, 99), createForgeSnapshot(restored, design, 99)));
+    const quench = playForgeAttempt(played.save, { stopAfterStrikes: 8 });
+    const resumedQuench = restoreForgeSnapshot(quench.save.activeForgeAttempt!.snapshot!)!;
+    assert.equal(resumedQuench.phase, "quench");
+    assert.equal(resumedQuench.strikes, 8);
+  });
+
+  it("snapshots truncados, não finitos, desconhecidos ou done sem execução elegível não são restauráveis", () => {
+    const { save } = setup();
+    const snapshot = executeStartForgeTransaction(save, design).payload!.snapshot!;
+    assert.equal(isForgeSnapshotValid({ ...snapshot, version: 2 }), false);
+    assert.equal(isForgeSnapshotValid({ ...snapshot, state: { ...snapshot.state, heat: NaN } }), false);
+    assert.equal(isForgeSnapshotValid({ ...snapshot, state: { ...snapshot.state, done: true } }), false);
+    assert.equal(restoreForgeSnapshot({ ...snapshot, version: 2 } as any), null);
+    const missingProfile = structuredClone(snapshot); delete (missingProfile.state.physicalProfile as any).midWidth;
+    assert.equal(isForgeSnapshotValid(missingProfile), false);
+    const badDesign = structuredClone(snapshot); badDesign.design.length = NaN;
+    assert.equal(isForgeSnapshotValid(badDesign), false);
+  });
+
+  it("finish exige done confirmado e identidade de projeto/run/treino/núcleo/estado físico", () => {
+    const { save } = setup();
+    const played = playForgeAttempt(executeStartForgeTransaction(save, design).save);
+    const mutations = [
+      { ...played.sim, done: false },
+      { ...played.sim, forgeRunId: "foreign" },
+      { ...played.sim, isTraining: true },
+      { ...played.sim, activeCore: coreFixture() },
+      { ...played.sim, heat: .12 },
+      { ...played.sim, integrity: NaN },
+    ];
+    for (const sim of mutations) assert.equal(executeFinishSwordTransaction(played.save, sim, design).success, false);
+    assert.equal(executeFinishSwordTransaction(played.save, played.sim, { ...design, inscription: "ADULTERADO" }).success, false);
+    const corruptCount = structuredClone(played.save); corruptCount.activeForgeAttempt!.strikesCount = 0;
+    assert.equal(executeFinishSwordTransaction(corruptCount, played.sim, design).success, false);
+    const finished = executeFinishSwordTransaction(played.save, played.sim, design);
+    assert.equal(finished.success, true);
+    assert.equal(finished.payload!.forgeRunId, played.save.activeForgeAttempt!.forgeRunId);
+    const repeat = executeFinishSwordTransaction(finished.save, played.sim, design);
+    assert.equal(repeat.success, false);
+    assert.equal(repeat.save.gallery.length, 1);
+    assert.equal(executeStrikeRewardTransaction(finished.save, { id: `${finished.payload!.forgeRunId}:9`, amount: 12 }).success, false);
+  });
+
+  it("núcleo valida design/material/tentativa antes do início e transmite herança em forja manual", () => {
+    const { save, fail } = setup();
+    const core = coreFixture(); save.inventory.fusionCores = [core];
+    fail(true);
+    const failedStart = executeStartForgeTransaction(save, design, { activeCoreId: core.id });
+    assert.equal(failedStart.success, false);
+    assert.equal(failedStart.save, save);
+    assert.equal(failedStart.save.activeForgeAttempt, null);
+    assert.equal(failedStart.save.inventory.materials.iron_ingot, 8);
+    fail(false);
+    assert.equal(executeStartForgeTransaction(save, design, { activeCoreId: "missing" }).success, false);
+    assert.equal(executeStartForgeTransaction(save, { ...design, profile: "katana" }, { activeCoreId: core.id }).code, "CORE_DESIGN_MISMATCH");
+    const empty = structuredClone(save); empty.inventory.materials = { iron_ingot: 0 };
+    assert.equal(executeStartForgeTransaction(empty, design, { activeCoreId: core.id }).code, "INSUFFICIENT_MATERIALS");
+    const start = executeStartForgeTransaction(save, design, { activeCoreId: core.id });
+    assert.equal(start.success, true);
+    assert.equal(start.save.inventory.materials.iron_ingot, 7);
+    assert.equal(start.payload!.snapshot!.state.activeCore!.id, core.id);
+    assert.equal(executeStartForgeTransaction(start.save, design, { activeCoreId: core.id }).code, "ATTEMPT_ALREADY_ACTIVE");
+    const played = playForgeAttempt(start.save);
+    const missingCore = structuredClone(played.save); missingCore.inventory.fusionCores = [];
+    assert.equal(executeFinishSwordTransaction(missingCore, played.sim, design).code, "CORE_NOT_FOUND");
+    const finished = executeFinishSwordTransaction(played.save, played.sim, design);
+    assert.equal(finished.success, true);
+    assert.equal(finished.save.inventory.fusionCores.length, 0);
+    assert.equal(finished.save.inventory.materials.iron_ingot, 7);
+    assert.equal(finished.payload!.fusionHistory!.coreId, core.id);
+    assert.ok(finished.payload!.perks!.includes("Herança de teste"));
+    const noCore = finishSword({ ...played.sim, activeCore: null }, design);
+    assert.equal(finished.payload!.baseDamage, noCore.baseDamage! + 18);
+    assert.equal(executeFinishSwordTransaction(finished.save, played.sim, design).success, false);
+  });
+
+  it("treino canônico força ferro, ignora núcleo e preserva inventário e herança alheia", () => {
+    const { save } = setup(); const core = coreFixture(); save.inventory.fusionCores = [core];
+    const start = executeStartForgeTransaction(save, { ...design, steel: "meteor" }, { isTraining: true, activeCoreId: core.id });
+    assert.equal(start.success, true);
+    assert.equal(start.payload!.design.steel, "iron");
+    assert.equal(start.payload!.activeCoreId, null);
+    assert.equal(start.payload!.snapshot!.state.activeCore, null);
+    const played = playForgeAttempt(start.save);
+    const finished = executeFinishSwordTransaction(played.save, played.sim, start.payload!.design);
+    assert.equal(finished.success, true);
+    assert.deepEqual(finished.save.inventory.fusionCores, [core]);
+    assert.equal(finished.payload!.fusionHistory, undefined);
+  });
+
+  it("ajuda de treino depende da rota básica acessível; metal raro bloqueado não cancela ajuda", () => {
+    const cases: Array<{ gold: number; materials: Record<string, number>; want: number }> = [
+      { gold: 50, materials: { iron_ingot: 0 }, want: 0 },
+      { gold: 0, materials: { iron_ingot: 1 }, want: 0 },
+      { gold: 0, materials: { steel: 1 }, want: 0 },
+      { gold: 0, materials: { iron: 1 }, want: 0 },
+      { gold: 0, materials: { scrap: 2 }, want: 2 },
+      { gold: 49, materials: { iron_ingot: 0, scrap: 0 }, want: 1 },
+      { gold: 0, materials: { starmetal_ore: 5, scrap: 0 }, want: 1 },
+    ];
+    for (const c of cases) {
+      const { save } = setup(); save.wallet.gold = c.gold; save.inventory.materials = c.materials;
+      const played = playForgeAttempt(executeStartForgeTransaction(save, design, { isTraining: true }).save);
+      const result = executeFinishSwordTransaction(played.save, played.sim, design);
+      assert.equal(result.success, true);
+      assert.equal(result.save.inventory.materials.scrap || 0, c.want, JSON.stringify(c));
+      assert.deepEqual(result.save.career, save.career);
+    }
+  });
+
+  it("treinos repetidos ficam em 2 sucatas e reciclagem interrompe ajuda enquanto houver ferro", () => {
+    const ctx = setup(); let save = ctx.save; save.wallet.gold = 0; save.inventory.materials = { scrap: 0 };
+    for (let i = 0; i < 4; i++) {
+      const played = playForgeAttempt(executeStartForgeTransaction(save, design, { isTraining: true }).save);
+      save = executeFinishSwordTransaction(played.save, played.sim, design).save;
+    }
+    assert.equal(save.inventory.materials.scrap, 2);
+    assert.equal(needsTrainingRecovery(save), false);
+    const recycled = executeRecycleScrapTransaction(save);
+    assert.equal(recycled.save.inventory.materials.iron_ingot, 1);
+    assert.equal(needsTrainingRecovery(recycled.save), false);
+    assert.equal(executeStartForgeTransaction(recycled.save, design).success, true);
+  });
+
+  it("falhas consecutivas de treino não geram carreira ou sucata e treino continua livre", () => {
+    const { save } = setup(); save.wallet.gold = 0; save.inventory.materials = { scrap: 0 };
+    let current = save;
+    for (let i = 0; i < 3; i++) {
+      const played = playForgeAttempt(executeStartForgeTransaction(current, design, { isTraining: true }).save, { poor: true });
+      const result = executeFinishSwordTransaction(played.save, played.sim, design);
+      assert.equal(result.success, true);
+      assert.ok(result.payload!.quality < 50 || result.payload!.broken);
+      assert.equal(result.save.inventory.materials.scrap, 0);
+      assert.deepEqual(result.save.career, save.career);
+      current = result.save;
+    }
+    assert.equal(executeStartForgeTransaction(current, design, { isTraining: true }).success, true);
+  });
+
+  it("falha ao gravar golpe mantém carteira/estado; repetir o mesmo checkpoint só paga uma vez", () => {
+    const ctx = setup(); const initial = executeStartForgeTransaction(ctx.save, design).save;
+    const first = playForgeAttempt(initial, { stopAfterStrikes: 1 });
+    const pending = structuredClone(first.save.activeForgeAttempt!.snapshot!); pending.revision = 1;
+    writeSave(initial); ctx.fail(true);
+    const failed = executeForgeCheckpointTransaction(initial, pending);
+    assert.equal(failed.success, false);
+    assert.equal(failed.save, initial);
+    assert.equal(initial.activeForgeAttempt!.strikesCount, 0);
+    assert.equal(initial.wallet.gold, ctx.save.wallet.gold);
+    ctx.fail(false);
+    const retry = executeForgeCheckpointTransaction(failed.save, pending);
+    assert.equal(retry.success, true);
+    assert.equal(retry.save.activeForgeAttempt!.strikesCount, 1);
+    assert.equal(retry.save.wallet.gold, initial.wallet.gold + 12);
+    assert.deepEqual(executeForgeCheckpointTransaction(retry.save, pending).save, retry.save);
+  });
+
+  it("claim treino adulterado e claim regular com payload alterado não geram ouro nem drops", () => {
+    const { save } = setup();
+    const trained = playForgeAttempt(executeStartForgeTransaction(save, design, { isTraining: true }).save);
+    const training = executeFinishSwordTransaction(trained.save, trained.sim, design);
+    const forgedPayload = { ...training.payload!.pendingRewards!, gold: 500, rubies: 20, items: [] };
+    assert.equal(executeClaimRewardsTransaction(training.save, forgedPayload, training.payload).success, false);
+    const real = playForgeAttempt(executeStartForgeTransaction(save, design).save);
+    const finished = executeFinishSwordTransaction(real.save, real.sim, design);
+    const canonical = finished.payload!.pendingRewards!;
+    assert.equal(executeClaimRewardsTransaction(finished.save, { ...canonical, gold: canonical.gold + 1 }, finished.payload).success, false);
+    const claimed = executeClaimRewardsTransaction(finished.save, canonical, finished.payload);
+    assert.equal(claimed.success, true);
+    assert.equal(executeClaimRewardsTransaction(claimed.save, canonical, finished.payload).code, "ALREADY_CLAIMED");
+  });
+
+  it("save legado conserva armas e tentativa sem inventar snapshot físico", () => {
+    const { save } = setup();
+    const sword = finishSword(createSim(design), design); save.gallery = [sword];
+    const started = executeStartForgeTransaction(save, design).save;
+    delete started.activeForgeAttempt!.snapshot;
+    const loaded = migrateSave(JSON.parse(JSON.stringify(started)));
+    assert.equal(loaded.gallery[0].id, sword.id);
+    assert.equal(loaded.activeForgeAttempt!.snapshot, undefined);
+    assert.equal(executeForgeCheckpointTransaction(loaded, {} as any).success, false);
+    const cancel = executeCancelForgeTransaction(loaded);
+    assert.equal(cancel.payload!.refundedMaterial, true);
+    assert.equal(cancel.save.inventory.materials.iron_ingot, 8);
   });
 });

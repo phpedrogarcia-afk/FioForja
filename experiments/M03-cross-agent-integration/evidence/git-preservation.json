@@ -1,0 +1,27 @@
+{
+  "remote": "https://github.com/phpedrogarcia-afk/FioForja.git",
+  "localMain": "4a1cd01c269277df76f0b593657144ee5dce28cd",
+  "remoteMain": "0ab93c7e51bcfa25b9aebcf7d5c86f5509963cd7",
+  "integrationBranch": "codex/cross-agent-integration-v1",
+  "baseHead": "0663f4e52522643ab0d296f7f3e8cd083373df3e",
+  "worktrees": [
+    {
+      "path": "C:/Users/phped/Documents/FioForja",
+      "branch": "antigravity/forge-lifecycle-proof-v1",
+      "head": "0663f4e52522643ab0d296f7f3e8cd083373df3e",
+      "status": ""
+    },
+    {
+      "path": "C:/Users/phped/Documents/FioForja-DeepSeek",
+      "branch": "deepseek/weapon-dna-engine-v1",
+      "head": "a2fa0025a2e6755c78c42777b3abd1fec4e5572d",
+      "status": ""
+    },
+    {
+      "path": "C:/Users/phped/Documents/FioForja-M03-bootstrap",
+      "branch": "fiobase/m03-professional-bootstrap",
+      "head": "a953224300255528fc6d58c3c6b41802d84765e2",
+      "status": ""
+    }
+  ]
+}

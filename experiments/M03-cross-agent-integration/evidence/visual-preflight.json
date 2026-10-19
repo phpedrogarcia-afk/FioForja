@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "status": "READY",
+  "checkedAt": "2026-10-18T21:51:03.222Z",
+  "donorRoot": "C:\\Users\\phped\\AppData\\Local\\Temp\\fioforja-codex05-donor-0663-a2fa",
+  "donorLab": "C:\\Users\\phped\\AppData\\Local\\Temp\\fioforja-codex05-donor-0663-a2fa\\experiments\\M02-weapon-dna",
+  "donorCommit": "a2fa0025a2e6755c78c42777b3abd1fec4e5572d",
+  "donorBuild": {
+    "schema": 1,
+    "builtAt": "2026-10-18T21:42:35.237Z",
+    "builtMs": 400,
+    "sourceRoot": "C:\\Users\\phped\\AppData\\Local\\Temp\\fioforja-codex05-donor-0663-a2fa",
+    "outDir": ".build",
+    "hash": "1bec6a443a9a8751a28cbce2467817734d62803809c96829d61f84859f2bd275",
+    "entries": [
+      "src/game/types.ts",
+      "src/game/catalog.ts",
+      "src/game/swordDraw.ts",
+      "src/game/visuals/geometry.ts",
+      "src/game/visuals/materials.ts",
+      "src/game/visuals/math.ts",
+      "src/game/visuals/ornamentation.ts",
+      "src/game/visuals/qualityMarks.ts",
+      "src/game/visuals/rendererAdapter.ts",
+      "src/game/visuals/types.ts",
+      "src/game/visuals/weaponGenome.ts",
+      "src/game/visuals/weaponRenderer.ts"
+    ],
+    "missingModules": [],
+    "files": [
+      {
+        "path": "src/game/catalog.js",
+        "bytes": 26847,
+        "sha256": "f2e630d8cfa00764abfa4ee9794124006db3960d46baa2f9fd9f860b954ede47"
+      },
+      {
+        "path": "src/game/swordDraw.js",
+        "bytes": 41290,
+        "sha256": "c94cfa79ace4c94beb9e21581a47d88a6a195fbf91ccb8b153030358a321ac93"
+      },
+      {
+        "path": "src/game/types.js",
+        "bytes": 11,
+        "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      {
+        "path": "src/game/visuals/geometry.js",
+        "bytes": 50822,
+        "sha256": "767c3e7d7663e0a4c0884304247a51a02a4e24b81aeef3b053716056d52aea9a"
+      },
+      {
+        "path": "src/game/visuals/materials.js",
+        "bytes": 75479,
+        "sha256": "de2d5000b0acea88c73ecc17857be168f6ae318b60663d7d7f3837fe93c955df"
+      },
+      {
+        "path": "src/game/visuals/math.js",
+        "bytes": 2081,
+        "sha256": "cd3fad11c2f03f8727d07dde93a8c6a6dc8df86cc72388d76239ee83c8996de1"
+      },
+      {
+        "path": "src/game/visuals/ornamentation.js",
+        "bytes": 34678,
+        "sha256": "75a8bf4e31a44899f23434194d34d478366a233516abdae2448906bb2d6c901d"
+      },
+      {
+        "path": "src/game/visuals/qualityMarks.js",
+        "bytes": 27077,
+        "sha256": "1b6c1a1afb78ffb0f81a2de85a107f76b56ccd25afce0782a3af210b30493d8c"
+      },
+      {
+        "path": "src/game/visuals/rendererAdapter.js",
+        "bytes": 4881,
+        "sha256": "66611d7b9b8b37593eff91fd1a41b3118a7791aa4cf89817a8f2503b678b1259"
+      },
+      {
+        "path": "src/game/visuals/types.js",
+        "bytes": 613,
+        "sha256": "cf8edfd235eb954934056eb62bb2c461e3aacb04b4541a30e2663ae64d513247"
+      },
+      {
+        "path": "src/game/visuals/weaponGenome.js",
+        "bytes": 34751,
+        "sha256": "99c88c3e71e6cb9c4f1930dafd55b00654bac6df125a93a3526b0564e23562c3"
+      },
+      {
+        "path": "src/game/visuals/weaponRenderer.js",
+        "bytes": 16789,
+        "sha256": "c416cf1964d8759ffffdb8d811b10b0e375f1a24deee0a2f55d0f68642617c37"
+      }
+    ],
+    "moduleCount": 12
+  },
+  "currentLab": "C:\\Users\\phped\\.codex\\worktrees\\cross-agent-integration-v1\\FioForja\\experiments\\M02-weapon-dna",
+  "executable": "C:\\Users\\phped\\AppData\\Local\\ms-playwright\\chromium-1228\\chrome-win64\\chrome.exe",
+  "presets": [
+    "cimitarra_damasco",
+    "lua_silenciosa",
+    "queda_asterion"
+  ],
+  "fixtureQuality": 96,
+  "fixtureScores": 96,
+  "finalRunExecuted": false,
+  "outputs": "Only M03 evidence; ignored current lab .build is regenerated for the final run"
+}

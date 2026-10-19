@@ -4,6 +4,7 @@ import type {
   CareerStats,
   FinishedSword,
   ForgeRewardsData,
+  ForgeSnapshot,
   FusionCore,
   InventoryComponent,
   PlayerInventory,
@@ -12,7 +13,7 @@ import type {
   SimState,
   SwordDesign,
 } from "./types.ts";
-import { writeSave, defaultWallet, defaultInventory, defaultCareer, generateUniqueId } from "./save.ts";
+import { writeSave, defaultWallet, defaultInventory, defaultCareer, defaultEquippedGear, generateUniqueId } from "./save.ts";
 import { recalculateSwordStats, CANONICAL_PRESETS } from "./catalog.ts";
 import {
   applyComponentFusionTransaction,
@@ -22,8 +23,9 @@ import {
   type ComponentFusionOutcome,
   type SwordFusionOutcome,
 } from "./fusion.ts";
-import { finishSword, applyStrikeRewardTransaction } from "./sim.ts";
+import { createSim, createForgeSnapshot, finishSword, isForgeSnapshotValid, isFusionCoreValid, isSwordDesignValid, restoreForgeSnapshot, sameForgeValue, strikeGoldReward } from "./sim.ts";
 import {
+  BASIC_IRON_RECOVERY_COST,
   addMaterialStock,
   deductMaterialStock,
   getMaterialStock,
@@ -392,8 +394,14 @@ export function executeClaimRewardsTransaction(
 ): TransactionExecutionResult {
   const currentWallet = currentSave.wallet || defaultWallet;
   const currentInventory = currentSave.inventory || defaultInventory;
-  const runId = rewards.forgeRunId || (finishedSword ? finishedSword.forgeRunId : null);
+  const runId = rewards.forgeRunId || finishedSword?.forgeRunId;
   const claimedRuns = currentSave.claimedForgeRewardIds || [];
+  const storedSword = runId ? currentSave.gallery.find(s => s.forgeRunId === runId) : null;
+  const reject = (code: string): TransactionExecutionResult => ({ success: false, save: currentSave, code, error: "Recompensa sem lâmina econômica correspondente ou payload incompatível." });
+  if (finishedSword?.isTraining || currentSave.trainingGallery?.some(s => s.forgeRunId === runId)) return reject("TRAINING_MODE_NO_REWARDS");
+  if (!storedSword || storedSword.isTraining || storedSword.broken || finishedSword && finishedSword.id !== storedSword.id) return reject("REWARD_SWORD_NOT_FOUND");
+  const canonicalRewards = storedSword.pendingRewards;
+  if (!canonicalRewards || !sameForgeValue(rewards, canonicalRewards) || ![rewards.gold, rewards.rubies, rewards.diamonds].every(v => Number.isFinite(v) && v >= 0) || !rewards.items.every(i => i.quantity === undefined || Number.isSafeInteger(i.quantity) && i.quantity > 0)) return reject("INVALID_REWARD_PAYLOAD");
 
   if (runId && claimedRuns.includes(runId)) {
     return {
@@ -474,9 +482,21 @@ export function executeFinishSwordTransaction(
   sim: SimState,
   design: SwordDesign,
 ): TransactionExecutionResult<FinishedSword> {
-  const sword = finishSword(sim, design);
   const attempt = currentSave.activeForgeAttempt;
-  const isTraining = Boolean(attempt?.isTraining || sim.isTraining);
+  const reject = (code: string): TransactionExecutionResult<FinishedSword> => ({ success: false, save: currentSave, code, error: "A conclusão não corresponde ao último estado físico confirmado desta tentativa." });
+  if (!attempt || attempt.status !== "ACTIVE") return reject("ATTEMPT_NOT_ACTIVE");
+  const snapshot = attempt.snapshot;
+  if (!isForgeSnapshotValid(snapshot) || !sim.done || !snapshot.state.done || attempt.strikesCount !== snapshot.state.strikes) return reject("FORGE_NOT_COMPLETE");
+  if (sim.forgeRunId !== attempt.forgeRunId || !sameForgeValue(design, attempt.design) || sim.isTraining !== attempt.isTraining || !sameForgeValue(createForgeSnapshot(sim, design, snapshot.revision), snapshot)) return reject("ATTEMPT_MISMATCH");
+  if ((sim.activeCore?.id || null) !== (attempt.activeCoreId || null)) return reject("CORE_MISMATCH");
+  const core = attempt.activeCoreId ? currentSave.inventory.fusionCores.find(c => c.id === attempt.activeCoreId) : null;
+  if (attempt.activeCoreId && (!core || !sameForgeValue(core, snapshot.state.activeCore))) return reject("CORE_NOT_FOUND");
+  if ([...currentSave.gallery, ...(currentSave.trainingGallery || [])].some(s => s.forgeRunId === attempt.forgeRunId)) return reject("ALREADY_COMPLETED");
+  const canonicalSim = restoreForgeSnapshot(snapshot)!;
+  const sword = finishSword(canonicalSim, attempt.design);
+  sword.id = `sword_${attempt.forgeRunId}`;
+  if (![sword.quality, sword.heatScore, sword.forgeScore, sword.quenchScore, sword.warp, sword.baseDamage, sword.baseDefense, sword.baseAgility, sword.baseDurability, sword.damage, sword.defense, sword.agility, sword.durability].every(Number.isFinite)) return reject("INVALID_FORGE_RESULT");
+  const isTraining = attempt.isTraining;
 
   if (isTraining) {
     sword.value = 0;
@@ -504,9 +524,10 @@ export function executeFinishSwordTransaction(
   if (sim.broken && !isTraining) {
     nextMaterials.scrap = (nextMaterials.scrap || 0) + 2;
   }
-  // 2. Training mode filings/trimmings: apprentice completing practice sword with Q >= 50 gets +1 scrap
-  // (2 treinos bem-sucedidos = 2 sucatas = 1 lingote de ferro reciclado na oficina)
-  if (isTraining && !sim.broken && sword.quality >= 50) {
+  // 2. Emergency training recovery: unbroken Q >= 50 yields +1 scrap only while
+  // needsTrainingRecovery holds (gold < basic iron price, no iron/steel and scrap < 2).
+  // Two eligible successes recover one ingot; training cannot stockpile beyond 2 scrap.
+  if (isTraining && !sim.broken && sword.quality >= 50 && needsTrainingRecovery(currentSave)) {
     nextMaterials.scrap = (nextMaterials.scrap || 0) + 1;
   }
 
@@ -594,101 +615,50 @@ export function executeFinishSwordTransaction(
   };
 }
 
-/**
- * 8. Strike Reward Transaction: Credits gold per strike, checks forgeRunId lifecycle, and compacts history.
- * Isolado no modo treino: rejeita concessão de ouro.
- */
-export function executeStrikeRewardTransaction(
-  currentSave: SaveData,
-  reward: { amount: number; id: string },
-): TransactionExecutionResult {
-  if (currentSave.activeForgeAttempt?.isTraining) {
-    return {
-      success: false,
-      save: currentSave,
-      error: "Modo Treino não gera recompensas financeiras por golpes.",
-      code: "TRAINING_MODE_NO_GOLD",
-    };
-  }
-
-  const tx = applyStrikeRewardTransaction(currentSave, reward);
-  if (!tx.applied) {
-    return {
-      success: false,
-      save: currentSave,
-      error: "Recompensa de golpe inválida ou já creditada.",
-      code: "STRIKE_REWARD_REJECTED",
-    };
-  }
-
-  const nextAttempt = currentSave.activeForgeAttempt
-    ? {
-        ...currentSave.activeForgeAttempt,
-        status: "ACTIVE" as const,
-        strikesCount: (currentSave.activeForgeAttempt.strikesCount || 0) + 1,
-        lastStrikeAt: Date.now(),
-      }
-    : null;
-
-  const nextSave: SaveData = {
-    ...currentSave,
-    wallet: tx.wallet,
-    claimedStrikeRewardIds: tx.claimedStrikeRewardIds,
-    activeForgeAttempt: nextAttempt,
-  };
-
-  const writeRes = writeSave(nextSave);
-  if (!writeRes.ok) {
-    return {
-      success: false,
-      save: currentSave,
-      error: writeRes.error || "Falha ao gravar ouro do golpe no armazenamento.",
-      code: writeRes.code || "PERSISTENCE_FAILED",
-    };
-  }
-
-  return {
-    success: true,
-    save: nextSave,
-  };
+/** Emergency recovery stops as soon as an ordinary forge is accessible. Rare locked metals do not count. */
+export function needsTrainingRecovery(save: SaveData): boolean {
+  const materials = save.inventory.materials;
+  return save.wallet.gold < BASIC_IRON_RECOVERY_COST && getMaterialStock(materials, "iron_ingot") < 1 && getMaterialStock(materials, "steel_ingot") < 1 && (materials.scrap || 0) < 2;
 }
 
-/**
- * Registra um golpe no ciclo de vida da tentativa ativa (transição PREPARED -> ACTIVE e contador)
- * Utilizado para golpes em treino ou sem premiação direta de ouro.
- */
+/** One physical checkpoint atomically binds strike identity, physical state, count and gold. */
+export function executeForgeCheckpointTransaction(currentSave: SaveData, snapshot: ForgeSnapshot): TransactionExecutionResult<ActiveForgeAttempt> {
+  const attempt = currentSave.activeForgeAttempt;
+  const reject = (code: string): TransactionExecutionResult<ActiveForgeAttempt> => ({ success: false, save: currentSave, code, error: "Checkpoint de forja incompatível com a tentativa ativa." });
+  if (!attempt || !["PREPARED", "ACTIVE"].includes(attempt.status)) return reject("ATTEMPT_NOT_ACTIVE");
+  if (!isForgeSnapshotValid(snapshot) || !isForgeSnapshotValid(attempt.snapshot)) return reject("INVALID_FORGE_SNAPSHOT");
+  const previous = attempt.snapshot;
+  if (snapshot.state.forgeRunId !== attempt.forgeRunId || !sameForgeValue(snapshot.design, attempt.design) || snapshot.state.isTraining !== attempt.isTraining || !sameForgeValue(snapshot.state.activeCore, previous.state.activeCore) || !sameForgeValue(snapshot.state.equippedGear, previous.state.equippedGear)) return reject("ATTEMPT_MISMATCH");
+  if ((snapshot.state.activeCore?.id || null) !== (attempt.activeCoreId || null)) return reject("CORE_MISMATCH");
+  if (snapshot.revision <= previous.revision) {
+    if (snapshot.revision === previous.revision && !sameForgeValue(snapshot, previous)) return reject("CHECKPOINT_CONFLICT");
+    return { success: true, save: currentSave, payload: attempt, code: "CHECKPOINT_ALREADY_APPLIED" };
+  }
+  if (attempt.strikesCount !== previous.state.strikes || snapshot.revision !== previous.revision + 1 || previous.state.done) return reject("CHECKPOINT_SEQUENCE_INVALID");
+  const physical = snapshot.state;
+  const newStrikes = physical.strikes - attempt.strikesCount;
+  if (newStrikes < 0 || newStrikes > 1 || physical.elapsedTime < previous.state.elapsedTime || !sameForgeValue(physical.history.slice(0, previous.state.history.length), previous.state.history)) return reject("STRIKE_SEQUENCE_INVALID");
+  const phaseRank = { heat: 0, forge: 1, quench: 2 };
+  if (phaseRank[physical.phase] < phaseRank[previous.state.phase] || phaseRank[physical.phase] - phaseRank[previous.state.phase] > 1 || physical.activeHammer !== "standard" && !currentSave.inventory.unlockedTools.includes(`hammer_${physical.activeHammer}`)) return reject("INVALID_FORGE_TRANSITION");
+  const gold = newStrikes === 1 ? strikeGoldReward(physical, attempt.design) : 0;
+  const strikeId = `${attempt.forgeRunId}:${physical.strikes}`;
+  const claimed = currentSave.claimedStrikeRewardIds || [];
+  if (newStrikes === 1 && claimed.includes(strikeId)) return reject("STRIKE_SEQUENCE_INVALID");
+  const nextAttempt: ActiveForgeAttempt = { ...attempt, status: physical.strikes > 0 ? "ACTIVE" : "PREPARED", strikesCount: physical.strikes, snapshot: structuredClone(snapshot), ...(newStrikes ? { lastStrikeAt: Date.now() } : {}) };
+  const nextSave: SaveData = { ...currentSave, activeForgeAttempt: nextAttempt, wallet: { ...currentSave.wallet, gold: currentSave.wallet.gold + gold }, claimedStrikeRewardIds: newStrikes ? [...claimed, strikeId].slice(-200) : claimed };
+  const result = writeSave(nextSave);
+  if (!result.ok) return { success: false, save: currentSave, code: result.code || "PERSISTENCE_FAILED", error: result.error };
+  return { success: true, save: nextSave, payload: nextAttempt };
+}
+
+/** Retained import compatibility; detached callbacks cannot mutate the economy. */
+export function executeStrikeRewardTransaction(currentSave: SaveData, reward: { amount: number; id: string }): TransactionExecutionResult {
+  const code = currentSave.activeForgeAttempt?.isTraining ? "TRAINING_MODE_NO_GOLD" : !Number.isFinite(reward.amount) ? "INVALID_STRIKE_REWARD" : "STRIKE_EVENT_REQUIRED";
+  return { success: false, save: currentSave, code, error: "O ouro é gravado exclusivamente junto ao evento físico do golpe." };
+}
+
 export function executeRecordStrikeTransaction(currentSave: SaveData): TransactionExecutionResult<ActiveForgeAttempt> {
-  if (!currentSave.activeForgeAttempt) {
-    return { success: true, save: currentSave };
-  }
-
-  const nextAttempt: ActiveForgeAttempt = {
-    ...currentSave.activeForgeAttempt,
-    status: "ACTIVE",
-    strikesCount: (currentSave.activeForgeAttempt.strikesCount || 0) + 1,
-    lastStrikeAt: Date.now(),
-  };
-
-  const nextSave: SaveData = {
-    ...currentSave,
-    activeForgeAttempt: nextAttempt,
-  };
-
-  const writeRes = writeSave(nextSave);
-  if (!writeRes.ok) {
-    return {
-      success: false,
-      save: currentSave,
-      error: writeRes.error || "Falha ao registrar golpe no armazenamento.",
-      code: writeRes.code || "PERSISTENCE_FAILED",
-    };
-  }
-
-  return {
-    success: true,
-    save: nextSave,
-    payload: nextAttempt,
-  };
+  return { success: false, save: currentSave, code: "STRIKE_EVENT_REQUIRED", error: "Registre o checkpoint físico identificado do golpe." };
 }
 
 /**
@@ -702,6 +672,7 @@ export function executeStartForgeTransaction(
 ): TransactionExecutionResult<ActiveForgeAttempt> {
   const currentInv = currentSave.inventory || defaultInventory;
   const isTraining = Boolean(options?.isTraining);
+  if (!isSwordDesignValid(design)) return { success: false, save: currentSave, code: "INVALID_FORGE_DESIGN", error: "Projeto de forja inválido." };
 
   // Impede iniciar uma nova forja caso uma tentativa já esteja ativa ou preparada
   if (
@@ -730,6 +701,7 @@ export function executeStartForgeTransaction(
       status: "PREPARED",
       strikesCount: 0,
     };
+    attempt.snapshot = createForgeSnapshot(createSim(attempt.design, { forgeRunId: attempt.forgeRunId, isTraining: true, equippedGear: structuredClone(currentInv.equipped || defaultEquippedGear) }), attempt.design, 0);
 
     const nextSave: SaveData = {
       ...currentSave,
@@ -763,6 +735,10 @@ export function executeStartForgeTransaction(
         error: "Núcleo de Fusão especificado não existe ou já foi consumido.",
         code: "CORE_NOT_FOUND",
       };
+    }
+    if (!isFusionCoreValid(activeCore)) return { success: false, save: currentSave, code: "INVALID_FUSION_CORE", error: "Núcleo de fusão inválido." };
+    if (design.steel !== activeCore.steel || design.family !== activeCore.family || design.profile !== activeCore.profile) {
+      return { success: false, save: currentSave, code: "CORE_DESIGN_MISMATCH", error: "Projeto incompatível com a identidade do núcleo de fusão." };
     }
   }
 
@@ -878,7 +854,7 @@ export function executeStartForgeTransaction(
   const attempt: ActiveForgeAttempt = {
     attemptId: generateUniqueId("attempt"),
     forgeRunId: generateUniqueId("run"),
-    design,
+    design: structuredClone(design),
     isTraining: false,
     materialConsumed: { key: reqMat.key, name: reqMat.name, quantity: 1 },
     activeCoreId: activeCore ? activeCore.id : null,
@@ -886,6 +862,7 @@ export function executeStartForgeTransaction(
     status: "PREPARED",
     strikesCount: 0,
   };
+  attempt.snapshot = createForgeSnapshot(createSim(attempt.design, { forgeRunId: attempt.forgeRunId, isTraining: false, activeCore: activeCore ? structuredClone(activeCore) : null, equippedGear: structuredClone(currentInv.equipped || defaultEquippedGear) }), attempt.design, 0);
 
   const nextInventory: PlayerInventory = {
     ...currentInv,
@@ -918,7 +895,8 @@ export function executeStartForgeTransaction(
 /**
  * 10. Cancel Forge Transaction: Fair cancellation policy.
  * - Antes do primeiro golpe (PREPARED, strikesCount === 0): Reembolso integral (100%) do lingote consumido.
- * - Após o primeiro golpe (ACTIVE, strikesCount > 0): Sem estorno de lingote; concede +1 sucata metálica.
+ * - Após o primeiro golpe regular (ACTIVE, strikesCount > 0): Sem estorno de lingote; concede +1 sucata metálica.
+ * - Treino nunca concede sucata por cancelamento; só recuperação limitada por conclusão elegível.
  * - Rejeita cancelamento se a tentativa já estiver COMPLETED ou CANCELLED.
  */
 export function executeCancelForgeTransaction(
@@ -961,7 +939,7 @@ export function executeCancelForgeTransaction(
       );
       refundedMaterial = true;
     }
-  } else {
+  } else if (!attempt.isTraining) {
     // Tarugo deformado após a primeira martelada: perde o lingote mas recupera 1 sucata para reciclagem
     nextMaterials.scrap = (nextMaterials.scrap || 0) + 1;
     scrapAwarded = 1;

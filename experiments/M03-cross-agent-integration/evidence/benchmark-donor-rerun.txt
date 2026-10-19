@@ -1,0 +1,13 @@
+[lab:build] 12 modules -> experiments/M02-weapon-dna/.build (hash 1bec6a443a9a) in 400ms
+[lab:build] entries: types.ts, catalog.ts, swordDraw.ts, visuals/geometry.ts, visuals/materials.ts, visuals/math.ts, visuals/ornamentation.ts, visuals/qualityMarks.ts, visuals/rendererAdapter.ts, visuals/types.ts, visuals/weaponGenome.ts, visuals/weaponRenderer.ts
+[bench] running in headless Chromium 149.0.7827.55 (deviceScaleFactor 1)
+[bench] metric             unit       n    mean   p50    p95    max  
+[bench] -----------------  ---------  ---  -----  -----  -----  -----
+[bench] genomeDerivation   us/weapon  520  23.65  20.00  60.00  210.0
+[bench] coldGeometryBuild  us/weapon  220  319.5  275.0  650.0  825.0
+[bench] cachedDraw@180px   ms/frame   120  1.05   1.00   1.60   2.90 
+[bench] cachedDraw@420px   ms/frame   120  0.84   0.80   1.30   1.40 
+[bench] cachedDraw@900px   ms/frame   120  0.78   0.80   1.00   1.70 
+[bench] galleryDna         ms/frame   60   21.52  20.80  24.90  31.70
+[bench] galleryLegacy      ms/frame   60   1.05   0.90   1.20   6.80 
+[bench] build 1bec6a443a9a · 1836ms wall · -> experiments/M02-weapon-dna/evidence/benchmark.json

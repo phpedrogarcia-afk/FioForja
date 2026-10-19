@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import { drawSheetFrame, type GameImages } from "./assets";
-import { createSim, stepSim, type SimInput } from "./sim";
+import { createForgeSnapshot, restoreForgeSnapshot, stepSim, type SimEvent, type SimInput } from "./sim";
 import { drawFinishedSword } from "./swordDraw";
-import type { ForgePhase, FusionCore, HudSnapshot, PlayerInventory, SimState, SwordDesign } from "./types";
+import type { ForgePhase, ForgeSnapshot, HudSnapshot, SimState, SwordDesign } from "./types";
 import { playClang, playCoinJingle, playCrack, playHiss, playPull, playRuneHum, playShatter, playWhoosh } from "./audio";
 
 const VW = 1280;
@@ -61,38 +61,33 @@ interface GoldPop {
 }
 
 interface Props {
-  design: SwordDesign;
+  snapshot: ForgeSnapshot;
   images: GameImages;
   shake: boolean;
   reducedMotion: boolean;
   onHud: (hud: HudSnapshot) => void;
   onFinished: (sim: SimState) => void;
-  onStrikeReward?: (reward: { amount: number; id: string }) => void;
-  onStrike?: () => void;
+  onCheckpoint: (snapshot: ForgeSnapshot) => string | null;
   inputRef: MutableRefObject<SimInput>;
-  inventory?: PlayerInventory;
-  activeCore?: FusionCore | null;
-  forgeRunId?: string;
-  isTraining?: boolean;
 }
 
 export function ForgeCanvas({
-  design,
+  snapshot,
   images,
   shake,
   reducedMotion,
   onHud,
   onFinished,
-  onStrikeReward,
-  onStrike,
+  onCheckpoint,
   inputRef,
-  inventory,
-  activeCore,
-  forgeRunId,
-  isTraining,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const simRef = useRef<SimState | null>(null);
+  const revisionRef = useRef(snapshot.revision);
+  const pendingRef = useRef<ForgeSnapshot | null>(null);
+  const retryRef = useRef<() => void>(() => {});
+  const [checkpointError, setCheckpointError] = useState<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,13 +96,34 @@ export function ForgeCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const sim = createSim(design, {
-      hammer: inventory?.equipped?.hammer,
-      equippedGear: inventory?.equipped,
-      activeCore,
-      forgeRunId,
-      isTraining,
-    });
+    if (!simRef.current || simRef.current.forgeRunId !== snapshot.state.forgeRunId) {
+      simRef.current = restoreForgeSnapshot(snapshot);
+      revisionRef.current = snapshot.revision;
+    }
+    const sim = simRef.current;
+    if (!sim) return;
+    const design = snapshot.design;
+    let checkpointAcc = 0;
+    let waitingForHold = sim.charging || sim.quenching;
+    const commit = (checkpoint: ForgeSnapshot): boolean => {
+      const error = onCheckpoint(checkpoint);
+      if (error) { pendingRef.current = checkpoint; setCheckpointError(error); return false; }
+      revisionRef.current = checkpoint.revision;
+      pendingRef.current = null;
+      checkpointAcc = 0;
+      setCheckpointError(null);
+      return true;
+    };
+    retryRef.current = () => {
+      if (pendingRef.current && commit(pendingRef.current)) {
+        inputRef.current.charging = false;
+        waitingForHold = sim.charging || sim.quenching;
+      }
+    };
+    const pageCheckpoint = () => {
+      if (!pendingRef.current && !sim.done) commit(createForgeSnapshot(sim, design, revisionRef.current + 1));
+    };
+    window.addEventListener("pagehide", pageCheckpoint);
     const sparks: Spark[] = [];
     const steams: SteamParticle[] = [];
     const goldPops: GoldPop[] = [];
@@ -176,9 +192,22 @@ export function ForgeCanvas({
         dt = 0;
       }
 
-      const ev = stepSim(sim, dt, inputRef.current, design, time);
+      let ev: SimEvent = {};
+      if (waitingForHold && inputRef.current.charging) waitingForHold = false;
+      if (!pendingRef.current && !waitingForHold && !sim.done) {
+        const previousPhase = sim.phase;
+        const previousHammer = sim.activeHammer;
+        const previousZone = sim.targetZone;
+        ev = stepSim(sim, dt, inputRef.current, design, sim.elapsedTime + dt);
+        checkpointAcc += dt;
+        if (ev.kind || ev.finished || sim.phase !== previousPhase || sim.activeHammer !== previousHammer || sim.targetZone !== previousZone || checkpointAcc >= .75) {
+          if (!commit(createForgeSnapshot(sim, design, revisionRef.current + 1))) ev = {};
+        }
+      }
       inputRef.current.action = false;
       inputRef.current.reheat = false;
+      inputRef.current.switchZone = undefined;
+      inputRef.current.switchHammer = undefined;
 
       // Audio dispatch
       if (ev.sfx === "clang") playClang(ev.force ?? 0.6, ev.kind ?? "good", sim.targetZone);
@@ -209,10 +238,6 @@ export function ForgeCanvas({
           ev.kind === "perfect",
         );
 
-        if (onStrike) {
-          onStrike();
-        }
-
         if (ev.goldReward) {
           playCoinJingle();
           goldPops.push({
@@ -223,13 +248,10 @@ export function ForgeCanvas({
             life: 0.95,
             max: 0.95,
           });
-          if (onStrikeReward && sim.strikeReward) {
-            onStrikeReward({ amount: sim.strikeReward.amount, id: sim.strikeReward.id });
-          }
         }
       }
 
-      if (ev.finished && !finishedSent) {
+      if (sim.done && !pendingRef.current && !finishedSent) {
         finishedSent = true;
         onFinished(sim);
       }
@@ -328,12 +350,18 @@ export function ForgeCanvas({
       running = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
+      window.removeEventListener("pagehide", pageCheckpoint);
     };
-  }, [design, images, shake, reducedMotion, onHud, onFinished, onStrikeReward, onStrike, inputRef, inventory, activeCore, forgeRunId, isTraining]);
+  }, [snapshot, images, shake, reducedMotion, onHud, onFinished, onCheckpoint, inputRef]);
 
   return (
     <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-bg touch-none">
       <canvas ref={canvasRef} className="block h-full w-full touch-none" />
+      {checkpointError && <div role="alert" className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black/85 p-8 text-center text-amber-100">
+        <p>A forja está pausada porque o progresso não foi salvo.</p>
+        <p className="text-sm">{checkpointError}</p>
+        <button className="rounded border border-amber-400 px-5 py-3 font-bold" onClick={() => retryRef.current()}>Tentar salvar o mesmo ponto</button>
+      </div>}
     </div>
   );
 }
@@ -342,7 +370,7 @@ function paint(
   ctx: CanvasRenderingContext2D,
   images: GameImages,
   design: SwordDesign,
-  sim: ReturnType<typeof createSim>,
+  sim: SimState,
   sparks: Spark[],
   steams: SteamParticle[],
   goldPops: GoldPop[],
@@ -611,7 +639,7 @@ function drawTongs(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
 function drawHand(
   ctx: CanvasRenderingContext2D,
   images: GameImages,
-  sim: ReturnType<typeof createSim>,
+  sim: SimState,
   time: number,
   bladeX: number,
   bladeY: number,

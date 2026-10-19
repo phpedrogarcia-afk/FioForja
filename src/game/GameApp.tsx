@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
 import { isMuted, playCoinJingle, playLootFanfare, playUpgradeChime, resumeAudio, setMuted, unlockAudio } from "./audio";
-import { generateForgeRewards, applyStrikeRewardTransaction, type StrikeRewardTransactionResult } from "./sim";
+import { generateForgeRewards, isForgeSnapshotValid, applyStrikeRewardTransaction, type StrikeRewardTransactionResult } from "./sim";
 import { defaultCareer, defaultEquippedGear, defaultInventory, defaultWallet, loadSave, writeSave } from "./save";
 import type { ComponentFusionOutcome, SwordFusionOutcome } from "./fusion";
 import {
@@ -13,8 +13,7 @@ import {
   executeShopPurchaseTransaction,
   executeClaimRewardsTransaction,
   executeFinishSwordTransaction,
-  executeStrikeRewardTransaction,
-  executeRecordStrikeTransaction,
+  executeForgeCheckpointTransaction,
   executeStartForgeTransaction,
   executeCancelForgeTransaction,
   executeDeliverCommissionTransaction,
@@ -29,7 +28,7 @@ import { GalleryScreen } from "./screens/GalleryScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { RewardsScreen } from "./screens/RewardsScreen";
 import { TitleScreen } from "./screens/TitleScreen";
-import type { ActiveForgeAttempt, CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
+import type { ActiveForgeAttempt, CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeSnapshot, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 
@@ -63,6 +62,7 @@ export function GameApp() {
   const [wallet, setWallet] = useState<PlayerWallet>(defaultWallet);
   const [inventory, setInventory] = useState<PlayerInventory>(defaultInventory);
   const [career, setCareer] = useState<CareerStats>(defaultCareer);
+  const [forgeAttempt, setForgeAttempt] = useState<ActiveForgeAttempt | null>(null);
   const [activeCore, setActiveCore] = useState<FusionCore | null>(null);
   const [images, setImages] = useState<GameImages | null>(null);
   const [hud, setHud] = useState<HudSnapshot>(EMPTY_HUD);
@@ -138,7 +138,11 @@ export function GameApp() {
       return false;
     }
     save.current = res.save;
+    setForgeAttempt(res.payload!);
+    setDesign(res.payload!.design);
+    setActiveCore(res.payload!.snapshot?.state.activeCore || null);
     setInventory(res.save.inventory);
+    inputRef.current = { charging: false, action: false, reheat: false };
     setHud(EMPTY_HUD);
     setFinished(null);
     setForgeKey((k) => k + 1);
@@ -150,18 +154,13 @@ export function GameApp() {
     setHud(next);
   }, []);
 
-  const handleStrikeReward = useCallback((reward: { amount: number; id: string }) => {
-    const res = executeStrikeRewardTransaction(save.current, reward);
-    if (!res.success) return;
+  const handleCheckpoint = useCallback((snapshot: ForgeSnapshot): string | null => {
+    const res = executeForgeCheckpointTransaction(save.current, snapshot);
+    if (!res.success) return res.error || "Não foi possível gravar o último ponto da forja.";
+    const goldChanged = save.current.wallet.gold !== res.save.wallet.gold;
     save.current = res.save;
-    setWallet(res.save.wallet);
-  }, []);
-
-  const handleStrike = useCallback(() => {
-    const res = executeRecordStrikeTransaction(save.current);
-    if (res.success) {
-      save.current = res.save;
-    }
+    if (goldChanged) setWallet(res.save.wallet);
+    return null;
   }, []);
 
   const handleClaimRewards = useCallback((rewards: ForgeRewardsData) => {
@@ -203,31 +202,26 @@ export function GameApp() {
     setGallery(res.save.gallery);
   }, [showError]);
 
-  const handleForgeCore = useCallback((core: FusionCore) => {
-    const coreInInventory = save.current.inventory?.fusionCores?.some((c) => c.id === core.id);
-    if (!coreInInventory) return;
-
-    setActiveCore(core);
+  const handleForgeCore = useCallback((selectedCore: FusionCore) => {
+    const core = save.current.inventory.fusionCores.find(c => c.id === selectedCore.id);
+    if (!core) { showError("Este núcleo já não está disponível."); return; }
     const coreDesign: SwordDesign = {
       name: core.name.split("—")[1]?.trim() || "Espada do Crisol",
-      family: core.family,
-      profile: core.profile,
-      steel: core.steel,
-      guard: "cross",
-      pommel: "disc",
-      wrap: "leather",
-      inscription: "",
-      runes: core.rarity === "Lendária" || core.rarity === "Relíquia" || core.rarity === "Épica",
-      length: 0.75,
+      family: core.family, profile: core.profile, steel: core.steel,
+      guard: "cross", pommel: "disc", wrap: "leather", inscription: "",
+      runes: ["Lendária", "Relíquia", "Épica"].includes(core.rarity), length: .75,
     };
-    setDesign(coreDesign);
-    persist({ lastDesign: coreDesign });
-    unlockAudio();
-    setHud(EMPTY_HUD);
-    setFinished(null);
-    setForgeKey((k) => k + 1);
-    setScreen("forge");
-  }, [persist]);
+    const res = executeStartForgeTransaction(save.current, coreDesign, { activeCoreId: core.id });
+    if (!res.success) { showError(res.error || "Não foi possível preparar a forja do núcleo."); return; }
+    save.current = res.save;
+    setForgeAttempt(res.payload!);
+    setActiveCore(res.payload!.snapshot?.state.activeCore || null);
+    setDesign(res.payload!.design);
+    setInventory(res.save.inventory);
+    inputRef.current = { charging: false, action: false, reheat: false };
+    unlockAudio(); setHud(EMPTY_HUD); setFinished(null);
+    setForgeKey(k => k + 1); setScreen("forge");
+  }, [showError]);
 
   const handleBuyTool = useCallback((toolId: string): boolean => {
     const tool = WORKSHOP_EQUIPMENT.find((t) => t.id === toolId);
@@ -308,7 +302,7 @@ export function GameApp() {
   }, [showError]);
 
   const onFinished = useCallback((sim: SimState) => {
-    const res = executeFinishSwordTransaction(save.current, sim, designRef.current);
+    const res = executeFinishSwordTransaction(save.current, sim, save.current.activeForgeAttempt?.design || designRef.current);
     if (!res.success) {
       showError(res.error || "Falha ao registrar lâmina finalizada no armazenamento.");
       if (res.payload && res.uncommittedSave) {
@@ -348,7 +342,8 @@ export function GameApp() {
 
   const handleCancelFailedPersist = useCallback(() => {
     setPendingFailedSave(null);
-    setScreen("design");
+    setRecoveryAttempt(save.current.activeForgeAttempt || null);
+    setScreen("title");
   }, []);
 
   const handleDeliverCommission = useCallback((commissionId: string, swordId: string): boolean => {
@@ -552,22 +547,17 @@ export function GameApp() {
 
     return (
       <div className="relative h-dvh overflow-hidden bg-bg">
-        {images ? (
+        {images && forgeAttempt?.snapshot ? (
           <ForgeCanvas
             key={forgeKey}
-            design={design}
-            activeCore={activeCore}
+            snapshot={forgeAttempt.snapshot}
             images={images}
             shake={save.current.shake}
             reducedMotion={reducedMotion}
             onHud={onHud}
             onFinished={onFinished}
-            onStrikeReward={handleStrikeReward}
-            onStrike={handleStrike}
+            onCheckpoint={handleCheckpoint}
             inputRef={inputRef}
-            inventory={inventory}
-            forgeRunId={save.current.activeForgeAttempt?.forgeRunId}
-            isTraining={save.current.activeForgeAttempt?.isTraining}
           />
         ) : (
           <div className="flex h-full items-center justify-center font-display text-muted">
@@ -593,11 +583,12 @@ export function GameApp() {
           }}
           onQuit={() => {
             inputRef.current.charging = false;
-            const cancelRes = executeCancelForgeTransaction(save.current, { strikesCount: hud.strikes });
-            if (cancelRes.success) {
-              save.current = cancelRes.save;
-              setInventory(cancelRes.save.inventory);
-            }
+            const cancelRes = executeCancelForgeTransaction(save.current);
+            if (!cancelRes.success) { showError(cancelRes.error || "Não foi possível gravar o cancelamento."); return; }
+            save.current = cancelRes.save;
+            setInventory(cancelRes.save.inventory);
+            setActiveCore(null);
+            setForgeAttempt(null);
             setScreen("title");
           }}
         />
@@ -626,10 +617,16 @@ export function GameApp() {
               <div><strong className="text-amber-400">Progresso:</strong> {recoveryAttempt.status === "ACTIVE" ? "Tarugo deformado (Em forjamento)" : "Preparada na Bigorna (Sem marteladas)"}</div>
               <div><strong className="text-amber-400">Marteladas registradas:</strong> {recoveryAttempt.strikesCount || 0}</div>
             </div>
+            <p className="text-xs text-amber-200/80">{isForgeSnapshotValid(recoveryAttempt.snapshot) ? "A metalurgia é retomada do último ponto confirmado. Golpes são salvos imediatamente; aquecimento e carga podem recuar até 1 segundo." : "Esta tentativa antiga não possui checkpoint físico compatível. Cancele para aplicar a recuperação dos insumos, sem inventar novo progresso."}</p>
             <div className="flex gap-3 justify-center pt-2">
               <Button
                 className="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-display font-bold text-xs"
+                disabled={!isForgeSnapshotValid(recoveryAttempt.snapshot)}
                 onClick={() => {
+                  if (!isForgeSnapshotValid(recoveryAttempt.snapshot)) return;
+                  setForgeAttempt(recoveryAttempt);
+                  setActiveCore(recoveryAttempt.snapshot.state.activeCore || null);
+                  inputRef.current = { charging: false, action: false, reheat: false };
                   setDesign(recoveryAttempt.design);
                   setRecoveryAttempt(null);
                   unlockAudio();
@@ -639,7 +636,7 @@ export function GameApp() {
                   setScreen("forge");
                 }}
               >
-                Continuar Forja
+                Retomar ponto salvo
               </Button>
               <Button
                 variant="secondary"
@@ -654,8 +651,8 @@ export function GameApp() {
                     } else if (res.payload?.scrapAwarded) {
                       showError("Tentativa cancelada: Tarugo descartado com +1 Sucata metálica recuperada.");
                     }
-                  }
-                  setRecoveryAttempt(null);
+                    setRecoveryAttempt(null);
+                  } else { showError(res.error || "Não foi possível cancelar a tentativa."); }
                 }}
               >
                 Cancelar / Abandonar

@@ -1,0 +1,61 @@
+▶ Operação 05: um único ciclo físico, econômico e recuperável
+  ✖ snapshots truncados, não finitos, desconhecidos ou done sem execução elegível não são restauráveis (6.53ms)
+  ✖ finish exige done confirmado e identidade de projeto/run/treino/núcleo/estado físico (15.7651ms)
+✖ Operação 05: um único ciclo físico, econômico e recuperável (23.7293ms)
+ℹ tests 2
+ℹ suites 1
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 165.1374
+
+✖ failing tests:
+
+test at src\game\lifecycle-proof.test.ts:591:3
+✖ snapshots truncados, não finitos, desconhecidos ou done sem execução elegível não são restauráveis (6.53ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:599:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at node:internal/test_runner/test:1887:71
+      at node:internal/per_context/primordials:504:82
+      at new Promise (<anonymous>)
+      at new SafePromise (node:internal/per_context/primordials:478:3)
+      at node:internal/per_context/primordials:504:9
+      at Array.map (<anonymous>) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\game\lifecycle-proof.test.ts:604:3
+✖ finish exige done confirmado e identidade de projeto/run/treino/núcleo/estado físico (15.7651ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/phped/.codex/worktrees/cross-agent-integration-v1/FioForja/src/game/lifecycle-proof.test.ts:618:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Suite.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Promise.all (index 5)
+      at async Suite.run (node:internal/test_runner/test:1889:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

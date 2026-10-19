@@ -1,0 +1,270 @@
+
+> build
+> node scripts/with-app-env.mjs vite build && npm run db:migrate
+
+(node:8580) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[nitro:vercel] i Using nodejs24.x runtime.
+[nitro:vercel] i Using web entry format.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 1870 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/static/assets/styles-BOafnTyA.css   83.74 kB │ gzip:  12.76 kB
+.vercel/output/static/assets/routes-CBPuZ_Sc.js   370.23 kB │ gzip: 110.23 kB
+.vercel/output/static/assets/index-DArl9Bhq.js    432.07 kB │ gzip: 135.64 kB
+
+✓ built in 805ms
+vite v8.3.2 building ssr environment for production...
+transforming...
+✓ 91 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/assets/styles-BOafnTyA.css                      83.74 kB │ gzip:  12.76 kB
+node_modules/.nitro/vite/services/ssr/assets/start-DlXvEPhU.js                         0.17 kB │ gzip:   0.15 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-7mmKYLkb.js         0.25 kB │ gzip:   0.18 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-C2Lgoibm.js    0.58 kB │ gzip:   0.32 kB
+node_modules/.nitro/vite/services/ssr/assets/router-BwcJPAsd.js                       13.24 kB │ gzip:   4.49 kB
+node_modules/.nitro/vite/services/ssr/index.js                                        70.11 kB │ gzip:  17.74 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-BTpjmRFM.js                      559.60 kB │ gzip: 131.13 kB
+
+✓ built in 332ms
+
+[nitro] o Building [Nitro] (preset: vercel, compatibility: 2026-10-13)
+[nitro] √ Generated public .vercel/output/static
+vite v8.3.2 building nitro environment for production...
+`output.codeSplitting.groups[0].name` is a function. Set `output.codeSplitting.groups[0].debugName` so the bundler timing report can identify this group.
+transforming...
+✓ 1888 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/functions/__server.func/_ssr/start-DlXvEPhU.mjs                    0.17 kB │ gzip:   0.14 kB
+.vercel/output/functions/__server.func/_ssr/empty-plugin-adapters-7mmKYLkb.mjs    0.26 kB │ gzip:   0.18 kB
+.vercel/output/functions/__server.func/_tanstack-start-manifest_v-C2Lgoibm.mjs    0.67 kB │ gzip:   0.37 kB
+.vercel/output/functions/__server.func/_chunks/ssr-renderer.mjs                   1.02 kB │ gzip:   0.51 kB
+.vercel/output/functions/__server.func/_runtime.mjs                               1.58 kB │ gzip:   0.74 kB
+.vercel/output/functions/__server.func/_libs/class-variance-authority+clsx.mjs    3.23 kB │ gzip:   1.26 kB
+.vercel/output/functions/__server.func/_libs/lucide-react.mjs                     3.70 kB │ gzip:   1.32 kB
+.vercel/output/functions/__server.func/_libs/h3-v2+rou3.mjs                       9.89 kB │ gzip:   3.07 kB
+.vercel/output/functions/__server.func/_libs/tanstack__history.mjs               12.53 kB │ gzip:   3.72 kB
+.vercel/output/functions/__server.func/_ssr/router-BwcJPAsd.mjs                  13.44 kB │ gzip:   4.56 kB
+.vercel/output/functions/__server.func/_libs/h3+rou3+srvx.mjs                    22.69 kB │ gzip:   6.14 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/router-core+[...].mjs     30.07 kB │ gzip:   8.01 kB
+.vercel/output/functions/__server.func/index.mjs                                 32.73 kB │ gzip:  10.06 kB
+.vercel/output/functions/__server.func/_ssr/ssr.mjs                              67.73 kB │ gzip:  17.61 kB
+.vercel/output/functions/__server.func/_libs/tailwind-merge.mjs                  88.95 kB │ gzip:  15.73 kB
+.vercel/output/functions/__server.func/_libs/zod.mjs                            168.12 kB │ gzip:  37.42 kB
+.vercel/output/functions/__server.func/_ssr/routes-BTpjmRFM.mjs                 579.34 kB │ gzip: 131.61 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/react-router+[...].mjs   819.26 kB │ gzip: 172.18 kB
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/index.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/index.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/utils.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/utils.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useNavigate.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useNavigate.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/CatchBoundary.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/CatchBoundary.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/ClientOnly.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/ClientOnly.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useRouter.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useRouter.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useMatch.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useMatch.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useRouterState.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useRouterState.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useLocation.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useLocation.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/RouterProvider.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/RouterProvider.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/link.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/link.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Asset.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Asset.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useBlocker.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/useBlocker.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Matches.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Matches.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/HeadContent.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/HeadContent.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Match.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Match.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/nonRouteComponentContext.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/nonRouteComponentContext.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/routerContext.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/routerContext.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/matchContext.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/matchContext.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Transitioner.js" may not be preserved when bundling.
+   ╭─[ ../../../../Documents/FioForja/node_modules/@tanstack/react-router/dist/esm/Transitioner.js:1:1 ]
+   │
+ 1 │ "use client";
+   │ ──────┬──────  
+   │       ╰──────── module level directive may not be preserved
+   │ 
+   │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+───╯
+
+✓ built in 437ms
+i Generated .vercel/output/nitro.json
+
+[nitro] √ You can preview this build using npx vite preview
+[nitro] √ You can deploy this build using npx nitro deploy --prebuilt
+
+> db:migrate
+> node scripts/migrate.mjs
+
+[migrate] DATABASE_URL not set — skipping (the PGLite fallback migrates itself).
