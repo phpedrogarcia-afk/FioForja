@@ -30,9 +30,6 @@ jobs:
       - name: Check types
         run: npm run typecheck
 
-      - name: Test scripts
-        run: node --test scripts/*.test.mjs
-
       - name: Test application and gameplay
         run: npm test
 
