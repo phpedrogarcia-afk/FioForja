@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui/button";
+import type { WeaponRenderMode } from "../visuals/rendererAdapter";
 
 interface Props {
   onStart: () => void;
   onGallery: () => void;
   galleryCount: number;
+  weaponRenderMode: WeaponRenderMode;
+  onToggleWeaponRenderMode: () => void;
 }
 
-export function TitleScreen({ onStart, onGallery, galleryCount }: Props) {
+export function TitleScreen({
+  onStart,
+  onGallery,
+  galleryCount,
+  weaponRenderMode,
+  onToggleWeaponRenderMode,
+}: Props) {
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-end overflow-hidden bg-bg px-5 pb-10 pt-[max(2rem,env(safe-area-inset-top))] sm:justify-center sm:pb-16">
       <img
@@ -40,8 +49,17 @@ export function TitleScreen({ onStart, onGallery, galleryCount }: Props) {
             className="w-full border-amber-900/50 bg-stone-900/80 font-display tracking-wider text-amber-200 hover:bg-stone-800"
             onClick={onGallery}
           >
-            Arsenal do Ferreiro{galleryCount > 0 ? ` · ${galleryCount}` : ""}
+            Arsenal do Ferreiro{galleryCount > 0 ? " · " + galleryCount : ""}
           </Button>
+          <button
+            type="button"
+            aria-label="Alternar renderizador visual das armas"
+            aria-pressed={weaponRenderMode === "dna"}
+            className="min-h-11 rounded-md border border-amber-900/50 bg-stone-950/70 px-3 py-2 text-xs font-semibold text-amber-200 active:bg-stone-800"
+            onClick={onToggleWeaponRenderMode}
+          >
+            Visual da lâmina: {weaponRenderMode === "dna" ? "Weapon DNA (experimental)" : "Clássico"}
+          </button>
         </div>
       </div>
     </div>

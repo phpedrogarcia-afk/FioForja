@@ -33,6 +33,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 - [Modelo de Identidade das Armas](specs/weapon-identity-model.md): características das famílias e anatomia das armas.
 - [Weapon Visual DNA](specs/weapon-visual-dna.md): contrato do motor opt-in; correções de integração na seção inicial.
 - [Estado da Lâmina Terminada](specs/finished-weapon-state.md): preservação de empenamento, trincas e marcas de martelamento.
+- [APK Android experimental](specs/android-apk.md): empacotamento Capacitor do `GameApp`, comando de build, destinos de entrega, save local e limites de validação. Sem permissões de internet ou recursos do aparelho; apenas permissão interna de assinatura AndroidX.
 
 ---
 
@@ -50,6 +51,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
   - `loot.ts`: motor dinâmico de drops e tabelas de recompensas ponderadas.
   - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C) com blindagem contra armas de treino e encomendas.
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
-- A evidência desta branch, com contagens e limites, está no [relatório da Operação Codex 05](../experiments/M03-cross-agent-integration/README.md). Testes de API, cenários preparados e partidas reais têm escopos distintos.
+- A entrega Android de 24/10/2026 usa a branch `codex/android-apk-delivery`, baseada em `c2b1883`. APK entregue e dez casos aprovados no emulador; receita, evidência e limites ficam na [especificação do APK](specs/android-apk.md). Validação física no Poco permanece pendente.
+- A evidência histórica da integração Codex 05, com contagens e limites, está no [relatório da Operação Codex 05](../experiments/M03-cross-agent-integration/README.md). Testes de API, cenários preparados e partidas reais têm escopos distintos.
 - [Handoff DeepSeek](HANDOFF-DEEPSEEK-WEAPON-DNA.md) e [laboratório M02](../experiments/M02-weapon-dna/README.md) preservam a entrega do doador; não são o estado atual da integração.
 - Implementação atual e direção futura permanecem distintas; os thresholds de notas do código não substituem os thresholds estéticos da Bíblia.

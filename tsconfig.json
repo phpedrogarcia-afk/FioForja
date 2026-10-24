@@ -31,6 +31,9 @@
   },
   "include": [
     "src",
-    "server"
+    "server",
+    "mobile",
+    "vite.mobile.config.ts",
+    "capacitor.config.ts"
   ]
 }

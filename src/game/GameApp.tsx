@@ -31,6 +31,7 @@ import { TitleScreen } from "./screens/TitleScreen";
 import type { ActiveForgeAttempt, CareerStats, EquippedWorkshopGear, FinishedSword, ForgeRewardsData, ForgeSnapshot, FusionCore, HudSnapshot, PlayerInventory, PlayerWallet, SaveData, Screen, SimState, SwordDesign } from "./types";
 import type { SimInput } from "./sim";
 import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
+import { getWeaponRenderMode, setWeaponRenderMode, type WeaponRenderMode } from "./visuals/rendererAdapter";
 
 export { applyStrikeRewardTransaction, type StrikeRewardTransactionResult };
 
@@ -57,6 +58,7 @@ const EMPTY_HUD: HudSnapshot = {
 export function GameApp() {
   const save = useRef(loadSave());
   const [screen, setScreen] = useState<Screen>("title");
+  const [weaponRenderMode, setWeaponRenderModeState] = useState<WeaponRenderMode>(() => getWeaponRenderMode());
   const [design, setDesign] = useState<SwordDesign>(DEFAULT_DESIGN);
   const [gallery, setGallery] = useState<FinishedSword[]>([]);
   const [wallet, setWallet] = useState<PlayerWallet>(defaultWallet);
@@ -457,11 +459,19 @@ export function GameApp() {
     unlockAudio();
   };
 
+  const toggleWeaponRenderMode = () => {
+    const nextMode = weaponRenderMode === "legacy" ? "dna" : "legacy";
+    setWeaponRenderMode(nextMode);
+    setWeaponRenderModeState(nextMode);
+  };
+
   const renderScreen = () => {
     if (screen === "title") {
       return (
         <TitleScreen
           galleryCount={gallery.length}
+          weaponRenderMode={weaponRenderMode}
+          onToggleWeaponRenderMode={toggleWeaponRenderMode}
           onStart={() => {
             unlockAudio();
             setScreen("design");
