@@ -1,5 +1,13 @@
 # Estado do projeto — integração e APK Android experimental
 
+## Decisão mobile aprovada — 24/10/2026
+
+- **Autoridade:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001), decisão explícita do proprietário após jogar no Poco e fornecer vídeo de 23 segundos.
+- **TARGET aprovado:** barra inferior fixa em Início, Coleção, Forja, Loja e Jogador; barra ausente durante fabricação. Preparação mantém espada inteira visível; fabricação elevada/oblíqua com HUD compacto; orientação térmica clara e Revelação centrada na arma.
+- **CURRENT:** novo layout não implementado. O APK de `41d7222` continua sendo a base de observação; o vídeo demonstra corte da prévia, composição insuficiente e preparação extensa.
+- **Próximo recorte:** protótipo visual navegável de preparação, fabricação e coleção, validado na resolução/área útil reais do Poco. Reconstrução das outras telas depende dessa validação humana.
+- **NOT_PROVEN:** protótipo, solução final de câmera e aceitação de uso. A resolução comprimida do vídeo e as medidas do emulador não substituem a medição do aparelho.
+
 ## Entrega Android — 24/10/2026
 
 - **Branch experimental:** `codex/android-apk-delivery`; base `c2b1883038332f3572e7135824116852b328c56a`.
@@ -9,7 +17,7 @@
 - **Evidência atual:** `APK_READY` no envelope de emulador. Dez casos passaram no AVD `FioForja_API36_APK`: offline, toque, forja/têmpera/claim, Arsenal, Clássico/DNA, save após force-stop, Back/Home, recuperação de checkpoint de dois golpes e conclusão da forja retomada. Web Audio estava `running`; audibilidade física não foi testada.
 - **Entrega:** os quatro artefatos finais existem no worktree, no checkout principal e no destino adicional em `Documents`. APK de **12.101.397 bytes**, SHA-256 `d9b7825342a2bc08bd65924bda4f193278d8485d27d9826d25e4ac86914d8b97`. `npm run apk` repete o build e a exportação; O destino solicitado em `Documents` também é automático; `FIOFORJA_APK_EXPORT_DIR` acrescenta outro destino.
 - **Receita, contagens, metadados e limites:** [APK Android experimental](specs/android-apk.md). `BUILD-INFO.txt` registra HEAD, alterações não commitadas, SHA-256 e destinos de cada build.
-- **Aparelho físico:** Poco desconectado; instalação, API/ABI compatível, desempenho e áudio físico permanecem `NOT_PROVEN`. O emulador está sem interface gráfica e sem áudio.
+- **Aparelho físico — evidência posterior:** instalação e abertura do APK confirmadas em Xiaomi `M2103K19PG`, Android 13/API 33, ABI `arm64-v8a,armeabi-v7a,armeabi`. O vídeo do proprietário mostra uso e problemas de composição; não prova desempenho sustentado nem um ciclo físico completo com save validado. Áudio físico permanece `NOT_PROVEN`. Na consulta desta atualização documental, nenhum aparelho estava acessível por ADB.
 - **Scar de ambiente:** uma rodada anterior terminou em APPCRASH nativo do QEMU, com causa interna desconhecida. A rodada completa passou usando GPU host. Não se demonstrou causalidade da GPU nem durabilidade do save contra falha do host; o claim da rodada interrompida não reapareceu após esse reboot. Save após force-stop Android foi comprovado na rodada seguinte.
 
 ## Baseline histórico — integração Codex 05

@@ -143,3 +143,61 @@ Integração seletiva, legado padrão, URL válida com precedência, cache compl
 - **[PROPOSED] Fórmulas Dinâmicas de Encomendas:** Geração procedural de encomendas semanais da guilda de acordo com o renome do artesão.
 - **[PROPOSED] Afiação em Pedra d'Água:** Mini-jogo opcional no acabamento para extrair gume supremo (+3% a +5% P.ATK).
 
+---
+
+## 8. Navegação mobile e composição — decisão humana de 24/10/2026
+
+<a id="fioforja-mobile-ux-001"></a>
+
+### FIOFORJA-MOBILE-UX-001 — Navegação por seções e protagonismo da espada `[USER-APPROVED]`
+
+**Origem:** decisão explícita do proprietário nesta data, após o vídeo de 23 segundos do APK no Poco. **Estado:** direção de produto aprovada; interface ainda não implementada nem validada. Não atribuir `[AGENT-IMPLEMENTED]` ou `[VERIFIED]` ao novo layout antes da evidência correspondente.
+
+#### Arquitetura aprovada
+
+Barra inferior fixa com **cinco seções**, em ordem estável:
+
+| Seção | Responsabilidade |
+|---|---|
+| **Início** | Espada em destaque, progresso e próximo objetivo; acesso claro à próxima criação. |
+| **Coleção** | Arsenal, Compêndio, componentes, runas e comparação. |
+| **Forja** | Escolha e preparação do projeto e materiais, mantendo a prévia visível; início da fabricação imersiva. |
+| **Loja** | Materiais, ferramentas, componentes e itens de fusão. |
+| **Jogador** | Carreira, encomendas, equipamentos e configurações. |
+
+A barra **desaparece durante a fabricação da espada**. A forja ativa ocupa a tela disponível, respeita as áreas seguras do aparelho e mantém uma saída explícita com os contratos atuais de tentativa, cancelamento e recuperação. A visibilidade da barra na Revelação será definida no protótipo; sua ausência durante a fabricação não é opcional.
+
+O acesso às funções se dá por seções e telas próprias, sem depender de uma página global longa. Preparação usa etapas curtas; a disposição e paginação exatas da coleção serão experimentadas. Detalhes extensos podem exigir rolagem local, sem deslocar a navegação ou esconder a prévia de preparação.
+
+O saldo de **850 ouro** no esboço humano é um exemplo de apresentação, não saldo fixo nem nova regra econômica. Usar os dados reais do jogador. O esboço é conceitual, não captura ou implementação.
+
+#### Composição obrigatória
+
+- **Preparação:** espada grande e inteira na parte superior, em uma área estável. Escolhas abaixo, em etapas curtas, sem perder a prévia. Ponta, guarda e pomo devem caber no enquadramento.
+- **Fabricação:** perspectiva elevada e oblíqua; peça centralizada sobre a bigorna; martelo fora do centro quando em repouso; HUD compacto. A superfície de trabalho domina a tela e permite ler a peça e o ponto de contato.
+- **Orientação térmica:** quando o metal estiver frio, comunicar claramente a necessidade de reaquecer antes de um golpe perigoso. O jogador continua responsável por aprender e decidir. Não alterar silenciosamente thresholds, física, custos ou regras de quebra.
+- **Revelação:** espada protagonista; atributos e raridade complementam sua apresentação. Preservar forma, marcas e danos reais da fabricação.
+- **Coleção:** apresentar a imagem inteira da espada, nome, raridade e atributos reais. Qualidade de fabricação e raridade continuam eixos distintos. Reutilizar os renderizadores e dados existentes; não inventar valores ou um novo nível de arma.
+
+#### Limite de execução e próxima validação
+
+A aprovação desta arquitetura **não autoriza a reconstrução imediata de todas as telas**. O próximo recorte é um **protótipo visual navegável de três experiências**:
+
+1. Preparação da espada com prévia persistente.
+2. Fabricação em tela cheia, sem barra inferior.
+3. Coleção com imagem, identidade, raridade e atributos.
+
+As cinco seções devem ser reconhecíveis no protótipo, mas Início, Loja e Jogador não precisam ser reconstruídos integralmente para validar esse recorte. Eventuais acessos demonstrativos devem ser identificados como tal, sem parecer compras ou mudanças de save reais.
+
+Validar essas três experiências na **resolução e área útil reais do Poco**, incluindo densidade e barras do sistema, e obter avaliação humana antes de aplicar o padrão ao restante do jogo. O vídeo recebido é comprimido em 480×1072 e não estabelece sozinho o viewport de implementação. Não assumir as medidas do emulador como medidas do aparelho.
+
+Critérios de validação: arma inteira na prévia; peça e contato legíveis na fabricação; mão em repouso sem oclusão desnecessária; barra ausente durante fabricação; troca de seções previsível; coleção com imagem e dados legíveis; necessidade de reaquecer compreensível. Aparência final, quantidade de itens por página, distribuição exata do HUD e entrada final do Crisol de Fusão permanecem **OPEN** até o recorte pertinente.
+
+#### Relação com o cânone e o estado atual
+
+Esta decisão atualiza o **agrupamento e a apresentação mobile** das funções descritas na [Galeria](canon/galeria.md) e complementa a [tela ideal da forja](specs/ideal-forge-screen.md). Preserva o Arsenal individual, Compêndio, runas, componentes, ferramentas, Legado, encomendas e o [sistema híbrido de fusão](canon/fusao-hibrida.md); reorganizar acessos não elimina esses mecanismos. A compra de itens de fusão na Loja não substitui o Crisol nem a forja manual com núcleo.
+
+**CURRENT:** o APK em `41d7222` ainda usa a preparação extensa, composição R4B e abas da Galeria. Sua instalação e prova funcional não aprovam a nova experiência visual. O enquadramento anterior e os testes do emulador não são evidência de aceitação desta decisão.
+
+**TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **NOT_PROVEN:** protótipo navegável, aceitação visual e de uso no Poco, solução final de câmera e adequação dos assets ao novo enquadramento. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
+

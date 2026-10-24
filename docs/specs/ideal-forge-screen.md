@@ -2,6 +2,8 @@
 
 **Status:** especificação canônica do alvo para implementação experimental futura; não descreve funcionalidade já entregue nem aprova o candidato M01-R2 para `main`. Detalhes de perspectiva, evolução da peça, identidade das famílias e persistência estão nos modelos de [forja](forge-visual-model.md), [identidade](weapon-identity-model.md) e [arma terminada](finished-weapon-state.md). A [Constituição](../CONSTITUTION.md) e os [invariantes](../INVARIANTS.md) governam este alvo.
 
+> **Decisão humana posterior — 24/10/2026:** [FIOFORJA-MOBILE-UX-001](../DECISIONS.md#fioforja-mobile-ux-001) aprova navegação por cinco seções, preparação com prévia persistente e fabricação em tela cheia sem barra inferior. Exige primeiro um protótipo navegável de preparação, fabricação e coleção validado no Poco. Os trechos `CURRENT` deste documento são snapshots do HEAD histórico indicado; não descrevem todo o runtime Android atual.
+
 ## 1. Propósito e evidência
 
 A tela da forja é a **experiência jogável central**. Em cada momento deve sustentar simultaneamente: imersão (“estou fabricando uma arma”), clareza (“sei o que fazer agora”), tensão (“um erro sério pode destruir esta tentativa”), maestria (“minhas decisões mudam a peça”) e antecipação (“quero descobrir o resultado”). **THE WEAPON IS THE HERO.** O jogador olha sobretudo para a peça; interface e efeitos a explicam sem disputar protagonismo.

@@ -1,5 +1,11 @@
 # Handoff — integração e APK Android experimental
 
+## Próximo trabalho de interface — Codex e Antigravity
+
+Consultar [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) antes de alterar navegação ou composição. A arquitetura foi aprovada pelo proprietário em 24/10/2026; o layout ainda não foi implementado. Não reabrir a escolha entre barra fixa e saguão sem nova evidência ou decisão humana.
+
+O próximo recorte é o protótipo navegável de preparação, fabricação e coleção. Mostrar as cinco seções e retirar a barra durante fabricação; manter a espada inteira e protagonista. Validar resolução/área útil reais do Poco e colher avaliação humana antes de reconstruir as demais telas. Preservar física, economia, persistência e experimentos. Os detalhes e limites estão no registro canônico; não criar uma versão divergente neste handoff.
+
 ## Recuperação curta
 
 1. Comece pelo [mapa](AI-START-HERE.md) e pelo [estado atual](PROJECT-STATE.md).
@@ -14,7 +20,7 @@
 - Use Java 21 local; o script encontra `%LOCALAPPDATA%\Programs\FioForja\jdk-21` ou aceita `FIOFORJA_JDK_HOME`. Não é necessário alterar variáveis globais.
 - O save do Android é separado do navegador do computador. Para atualizar preservando progresso, mantenha app ID, origem WebView e chave debug local; não desinstale nem limpe dados. Não versione a chave.
 - A tela inicial oferece “Visual da lâmina” para Clássico/DNA experimental. A preferência usa o adaptador existente; mecânica e padrão legado são preservados.
-- Build, assinatura, instalação, abertura offline, forja/têmpera/claim, Arsenal, Clássico/DNA, save após force-stop, Back/Home e recuperação/conclusão de forja interrompida passaram no AVD dedicado. Evidências em `APK/evidence/2026-10-24T18-23-16-188Z-21288`. Os quatro artefatos finais foram copiados e o hash do APK foi confirmado nos três destinos. Poco e áudio físico permanecem `NOT_PROVEN`.
+- Build, assinatura, instalação, abertura offline, forja/têmpera/claim, Arsenal, Clássico/DNA, save após force-stop, Back/Home e recuperação/conclusão de forja interrompida passaram no AVD dedicado. Evidências em `APK/evidence/2026-10-24T18-23-16-188Z-21288`. Os quatro artefatos finais foram copiados e o hash do APK foi confirmado nos três destinos. Instalação e abertura posteriores no Poco foram confirmadas; validação física completa e áudio físico permanecem `NOT_PROVEN`.
 - Uma rodada anterior falhou por APPCRASH do QEMU; o último claim não sobreviveu à falha do host, embora a espada tenha persistido. A rodada completa seguinte passou com GPU host. Não atribuir causalidade à GPU nem afirmar durabilidade contra falha do host.
 
 ## Contratos herdados da integração Codex 05

@@ -2,6 +2,8 @@
 
 Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direção de produto aprovada, as evidências verificadas do código e as regras inegociáveis.
 
+**Decisão humana de 24/10/2026 — Codex e Antigravity:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) aprova cinco seções com barra inferior fixa e fabricação imersiva sem barra. Próximo recorte: protótipo navegável de preparação, fabricação e coleção, validado no Poco antes de expandir ao restante do jogo. Direção aprovada não significa interface implementada.
+
 ---
 
 ## 1. Documentação Essencial de Leitura Rápida

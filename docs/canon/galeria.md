@@ -1,6 +1,8 @@
 # FioForja — Estrutura Completa da Galeria
 ## Arsenal, coleção, progresso e customização
 
+> **Atualização de apresentação mobile — 24/10/2026:** [FIOFORJA-MOBILE-UX-001](../DECISIONS.md#fioforja-mobile-ux-001) define as cinco seções externas e a próxima validação por protótipo. As áreas e os mecanismos descritos abaixo permanecem referências de domínio; sua enumeração não obriga a expor todas as funções como abas principais da mesma tela. O novo agrupamento ainda não está implementado.
+
 ## 1. PROPÓSITO DA GALERIA
 
 A Galeria existe para responder cinco perguntas do jogador:
