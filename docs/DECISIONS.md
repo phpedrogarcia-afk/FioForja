@@ -203,3 +203,44 @@ Esta decisão atualiza o **agrupamento e a apresentação mobile** das funções
 
 **TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **OBSERVED:** o protótipo separado tem navegação e capturas físicas no Poco, conforme o [relatório do recorte](../experiments/mobile-ux-v1/README.md). **NOT_PROVEN:** aceitação visual e de uso pelo proprietário, integração final, solução final de câmera e adequação definitiva dos assets. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
 
+System.Management.Automation.Runspaces.PipelineReader`1+<GetReadEnumerator>d__20[System.Object]
+
+
+---
+
+## 9. Operação Codex 07 — Integração mobile core
+
+### FIOFORJA-MOBILE-CORE-001 — Cinco seções conectadas ao jogo real `[USER-APPROVED]` `[AGENT-IMPLEMENTED]` `[VERIFIED]`
+
+**Origem:** direção explícita do proprietário em 24/10/2026: transformar o protótipo visual em uma versão jogável com Loja, Arsenal, Craft e Forja conectados; **não** produzir outra demonstração.
+
+**Decisão:**
+
+- `GameApp` é o único dono do estado; as cinco seções leem/escrevem o mesmo `SaveData` e passam pelas transações canônicas.
+- Início, Coleção, Forja, Loja e Craft ficam montadas e alternam por visibilidade, preservando seleção e rolagem.
+- A barra inferior desaparece durante a fabricação; a saída segura é explícita e nunca cancela sozinha.
+- A Coleção lê o Arsenal real, permite inspeção, comparação e instalação/troca de peças com recálculo persistido.
+- A Loja valida ID, tipo, preço e quantidade contra `shop.ts`; entrega material/peça/catalisador/receita ao inventário real.
+- O Craft usa 2×2, mostra chances do motor, exige confirmação com as quatro doadoras e produz um núcleo; "Forjar agora" encaminha à preparação, não cria arma.
+- O núcleo é persistido antes da revelação e consumido apenas na conclusão da forja.
+
+**Fora de escopo preservado:** geometria do martelo, câmera, física, cenas e animações da bigorna continuam da frente Antigravity. Não houve alteração em `ForgeCanvas`, `sim.ts`, `audio.ts` ou assets.
+
+### FIOFORJA-FUSION-002 — Quatro espadas da mesma raridade `[USER-APPROVED]` `[VERIFIED]`
+
+As quatro doadoras de uma fusão de espadas devem ter a **mesma raridade**; a qualidade individual permanece livre. A regra foi aplicada no seletor, no motor (`fuseSwords`) e na validação transacional — não apenas como filtro visual. Núcleos produzidos antes da regra permanecem válidos e forjáveis. Detalhe canônico em [fusao-hibrida.md](canon/fusao-hibrida.md).
+
+### FIOFORJA-MOBILE-PROTECTION-001 — Proteção mínima contra consumo acidental `[AGENT-IMPLEMENTED]` `[VERIFIED]`
+
+O jogo não possuía favoritos nem armas equipadas. Para impedir perda acidental de itens relevantes, foi adicionado apenas `favorite?: boolean` em `FinishedSword` (aditivo, retrocompatível), com alternância na Coleção. O motor e a transação recusam doadoras protegidas. **Não** foi criado um sistema de equipamento de espadas nem simulado qualquer estado inexistente.
+
+### FIOFORJA-SHOP-001 — Catálogo único e preço canônico `[AGENT-IMPLEMENTED]` `[VERIFIED]`
+
+O catálogo do Bazar foi extraído para `src/game/shop.ts` e ampliado com ferramentas e receitas. `executeShopPurchaseTransaction` passou a recusar produto inexistente, tipo divergente, quantidade inválida, preço adulterado e recompra de ferramenta/receita. A gravação precede o sucesso: falha de storage não entrega item nem debita moeda.
+
+### Coordenação com a frente Antigravity `[PROPOSED]`
+
+- Não integrar automaticamente a branch `antigravity/forge-motion-v1` nem alterações de câmera/martelo.
+- O HUD atual da bigorna (grade de quatro estatísticas) transborda horizontalmente em 392 px; a correção pertence à frente visual. Não foi alterado nesta operação.
+- A Revelação reaproveita `RevealScreen` existente; composição/corte da arma e enquadramento continuam da frente visual.
+- Qualquer mudança futura em `DesignScreen` deve preservar o modo `embedded`, `lockToCore` e `onOpenShop`.

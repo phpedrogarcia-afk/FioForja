@@ -55,6 +55,75 @@ export const RANK_VALUE_TO_RARITY: Record<number, RarityGrade> = {
   6: "Relíquia",
 };
 
+/** Custo canônico de operação do Crisol para fusão de espadas. */
+export function getSwordFusionCost(rarity: RarityGrade): { gold: number; rubies: number } {
+  const costs: Record<RarityGrade, { gold: number; rubies: number }> = {
+    Comum: { gold: 120, rubies: 2 },
+    Incomum: { gold: 240, rubies: 5 },
+    Rara: { gold: 450, rubies: 12 },
+    Épica: { gold: 800, rubies: 25 },
+    Lendária: { gold: 1500, rubies: 50 },
+    Relíquia: { gold: 2500, rubies: 100 },
+  };
+  return costs[rarity];
+}
+
+/** Custo canônico de operação do Crisol para fusão de componentes. */
+export function getComponentFusionCost(rarity: RarityGrade): number {
+  const costs: Record<RarityGrade, number> = {
+    Comum: 40,
+    Incomum: 80,
+    Rara: 160,
+    Épica: 320,
+    Lendária: 600,
+    Relíquia: 1000,
+  };
+  return costs[rarity];
+}
+
+/** Raridade-base de uma fusão de componentes (média arredondada, como no motor). */
+export function getComponentFusionBaseRarity(items: InventoryComponent[]): RarityGrade {
+  if (items.length === 0) return "Comum";
+  const avg = Math.round(
+    items.reduce((acc, item) => acc + (RARITY_RANK_VALUES[item.rarity] || 1), 0) / items.length,
+  );
+  return RANK_VALUE_TO_RARITY[avg] || "Comum";
+}
+
+/**
+ * Motivo pelo qual uma espada não pode entrar no Crisol, ou null se elegível.
+ * Proteção, quebra, treino e entrega de encomenda são recusados no motor.
+ */
+export function swordFusionBlockReason(sword: FinishedSword): string | null {
+  if (sword.favorite) return "Protegida contra fusão";
+  if (sword.broken || sword.structuralState === "broken") return "Lâmina quebrada";
+  if (sword.isTraining) return "Arma de treino";
+  if (sword.commissionDelivered) return "Entregue a encomenda";
+  return null;
+}
+
+/**
+ * Validação de seleção compartilhada entre UI e motor, para que o botão e a
+ * transação nunca discordem.
+ */
+export function swordFusionSelectionIssue(swords: FinishedSword[]): string | null {
+  if (swords.length !== 4) return "Selecione quatro espadas.";
+  if (new Set(swords.map((s) => s.id)).size !== 4) return "Uma espada foi selecionada duas vezes.";
+  const blocked = swords.map(swordFusionBlockReason).find((reason) => reason !== null);
+  if (blocked) return blocked;
+  if (new Set(swords.map((s) => s.rarity || "Comum")).size !== 1) {
+    return "As quatro precisam ter a mesma raridade.";
+  }
+  return null;
+}
+
+export function componentFusionSelectionIssue(items: InventoryComponent[]): string | null {
+  if (items.length !== 4) return "Selecione quatro componentes.";
+  if (new Set(items.map((item) => item.id)).size !== 4) return "Um componente foi selecionado duas vezes.";
+  if (new Set(items.map((item) => item.category)).size !== 1) return "Todos devem ser da mesma categoria.";
+  return null;
+}
+
 /**
  * Retorna as probabilidades canônicas exatas da Fusão (Refinado, +1 Superior, +2 Excepcional)
  * conforme a especificação em docs/canon/fusao-hibrida.md.
@@ -166,19 +235,13 @@ export function fuseComponents(
   const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
   const seed = typeof options === "object" ? options?.seed : undefined;
   const rng = createRng(seed);
-  const avgRarityRank = Math.round(items.reduce((acc, it) => acc + RARITY_RANK_VALUES[it.rarity], 0) / 4);
-  const baseRarity: RarityGrade = RANK_VALUE_TO_RARITY[avgRarityRank] || "Comum";
+  const avgRarityRank = Math.round(
+    items.reduce((acc, it) => acc + RARITY_RANK_VALUES[it.rarity], 0) / 4,
+  );
+  const baseRarity: RarityGrade = getComponentFusionBaseRarity(items);
 
-  // Custos em ouro
-  const goldCosts: Record<RarityGrade, number> = {
-    Comum: 40,
-    Incomum: 80,
-    Rara: 160,
-    Épica: 320,
-    Lendária: 600,
-    Relíquia: 1000,
-  };
-  const goldCost = goldCosts[baseRarity];
+  // Custo em ouro (fonte única: getComponentFusionCost)
+  const goldCost = getComponentFusionCost(baseRarity);
 
   // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
   const odds = getFusionOdds(baseRarity, "components", usedCatalyst);
@@ -266,6 +329,17 @@ export function fuseSwords(
   if (swords.length !== 4) {
     throw new Error("A fusão de espadas exige exatamente 4 espadas elegíveis do Arsenal.");
   }
+  if (new Set(swords.map((s) => s.id)).size !== 4) {
+    throw new Error("A fusão exige quatro espadas diferentes.");
+  }
+  // Regra aprovada (FIOFORJA-FUSION-001): as quatro doadoras devem ter a MESMA
+  // raridade. A qualidade individual permanece livre.
+  if (new Set(swords.map((s) => s.rarity || "Comum")).size !== 1) {
+    throw new Error("As quatro espadas da fusão precisam ter a mesma raridade. A qualidade individual pode variar.");
+  }
+  if (swords.some((s) => s.favorite)) {
+    throw new Error("Espadas protegidas não podem ser consumidas. Desproteja no Arsenal para fundir.");
+  }
 
   // Verifica lâminas quebradas, de treino ou já entregues em encomendas
   if (swords.some((s) => s.broken || s.structuralState === "broken")) {
@@ -287,16 +361,8 @@ export function fuseSwords(
   const avgRarityRank = Math.round(rarities.reduce((acc, r) => acc + RARITY_RANK_VALUES[r], 0) / 4);
   const baseRarity: RarityGrade = RANK_VALUE_TO_RARITY[avgRarityRank] || "Comum";
 
-  // Custos de operação
-  const costs: Record<RarityGrade, { gold: number; rubies: number }> = {
-    Comum: { gold: 120, rubies: 2 },
-    Incomum: { gold: 240, rubies: 5 },
-    Rara: { gold: 450, rubies: 12 },
-    Épica: { gold: 800, rubies: 25 },
-    Lendária: { gold: 1500, rubies: 50 },
-    Relíquia: { gold: 2500, rubies: 100 },
-  };
-  const { gold: goldCost, rubies: rubiesCost } = costs[baseRarity];
+  // Custos de operação (fonte única: getSwordFusionCost)
+  const { gold: goldCost, rubies: rubiesCost } = getSwordFusionCost(baseRarity);
 
   // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
   const odds = getFusionOdds(baseRarity, "swords", usedCatalyst);
@@ -460,6 +526,12 @@ export function validateSwordFusionTransaction(
   const found = outcome.consumedSwordIds.map((id) => existingSwords.find((s) => s.id === id));
   if (found.some((s) => !s)) {
     throw new Error("Transação inválida: Uma ou mais espadas selecionadas não foram encontradas no Arsenal.");
+  }
+  if (new Set(found.map((s) => s!.rarity || "Comum")).size !== 1) {
+    throw new Error("Transação inválida: as quatro espadas precisam ter a mesma raridade.");
+  }
+  if (found.some((s) => s!.favorite)) {
+    throw new Error("Transação inválida: espadas protegidas não podem ser consumidas.");
   }
   if (found.some((s) => s!.broken || s!.structuralState === "broken")) {
     throw new Error("Transação inválida: Lâminas quebradas não podem ser fundidas no Crisol.");

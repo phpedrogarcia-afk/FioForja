@@ -79,6 +79,16 @@ export const CANONICAL_MATERIALS: Record<SteelId, CanonicalMaterialInfo> = {
   },
 };
 
+/** Resolves a canonical material by steel id, canonical key or any alias. */
+export function findCanonicalMaterial(keyOrSteel: string): CanonicalMaterialInfo | undefined {
+  return (
+    CANONICAL_MATERIALS[keyOrSteel as SteelId] ||
+    Object.values(CANONICAL_MATERIALS).find(
+      (info) => info.key === keyOrSteel || info.aliases.includes(keyOrSteel),
+    )
+  );
+}
+
 /**
  * Resolves the canonical material required for forging a given steel.
  */

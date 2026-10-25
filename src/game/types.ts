@@ -1,4 +1,18 @@
-export type Screen = "title" | "design" | "forge" | "reveal" | "rewards" | "gallery";
+/**
+ * Main workshop sections (the five approved doors) plus the immersive forge
+ * lifecycle. "forge" is the only screen that hides the bottom navigation.
+ */
+export type Screen =
+  | "home"
+  | "collection"
+  | "forgePrep"
+  | "shop"
+  | "craft"
+  | "forge"
+  | "reveal"
+  | "rewards";
+
+export type WorkshopSection = "home" | "collection" | "forgePrep" | "shop" | "craft";
 
 export type ForgePhase = "heat" | "forge" | "quench";
 
@@ -133,6 +147,11 @@ export interface FinishedSword {
   history?: Array<{ strike: number; kind: StrikeKind; force: number; inHeat: boolean; zone?: ForgeZone }>;
   isTraining?: boolean;
   commissionDelivered?: string;
+  /**
+   * Player-chosen protection. A protected weapon cannot be consumed by the
+   * Crisol. Optional so saves written before this field existed stay valid.
+   */
+  favorite?: boolean;
 }
 
 export interface PhysicalBladeProfile {

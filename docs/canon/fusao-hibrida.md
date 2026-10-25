@@ -68,6 +68,26 @@ O Núcleo de Fusão não nasce neutro. Ele herda a memória do metal das 4 espad
 
 ---
 
+## 4-A. Regra de mesma raridade nas quatro espadas `[USER-APPROVED]` `[VERIFIED]`
+
+**Atualização de 24/10/2026 (Operação Codex 07).** As quatro espadas de uma fusão de espadas devem ter a **mesma raridade**. A qualidade individual é livre.
+
+Válido:
+
+- Rara Q72 + Rara Q85 + Rara Q91 + Rara Q96.
+
+Inválido:
+
+- Rara + Épica + Rara + Comum.
+
+A regra é aplicada em **três pontos**, não apenas na interface:
+
+1. `swordFusionSelectionIssue` (seleção/UI);
+2. `fuseSwords` (motor);
+3. `validateSwordFusionTransaction` (transação, mesmo que o chamador fabrique um `outcome`).
+
+A raridade-base passa a ser a raridade comum das doadoras, e não uma média que permitiria misturas. A regra vale **somente para novas fusões**: núcleos já produzidos antes desta mudança permanecem no inventário, válidos e forjáveis, porque a receita não é reavaliada retroativamente. A fusão de **componentes** continua usando a média (o cânone permite "raridades próximas").
+
 ## 5. Regras de Segurança e Invariantes da Fusão
 
 1. **Consumo Atômico Transacional:** Os 4 itens são removidos do inventário e o novo item adicionado na mesma operação protegida.

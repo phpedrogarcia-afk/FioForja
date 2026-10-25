@@ -1,0 +1,118 @@
+{
+  "startedAt": "2026-10-25T02:02:19.102Z",
+  "fixture": "four Rara swords + gold",
+  "steps": [
+    {
+      "name": "home loaded",
+      "at": 1792893740452,
+      "navLabels": [
+        "Início",
+        "Coleção",
+        "Forja",
+        "Loja",
+        "Craft"
+      ]
+    },
+    {
+      "name": "bought guard",
+      "at": 1792893740886,
+      "goldBefore": "🪙 4000 · 💎 200 · 💠 20",
+      "goldAfter": "🪙 3780 · 💎 200 · 💠 20"
+    },
+    {
+      "name": "installed guard",
+      "at": 1792893741242,
+      "defBefore": "DEF\n\n186",
+      "defAfter": "DEF\n\n194"
+    },
+    {
+      "name": "four donors selected",
+      "at": 1792893741746,
+      "oddsText": "50% |  | Rara |  | Refinado |  | 42% |  | Épica |  | Superior +1 |  | 8% |  | Lendária |  | Excepcional +2"
+    },
+    {
+      "name": "core revealed",
+      "at": 1792893742116,
+      "coreHeading": "Núcleo Dobrado de Alta Densidade — Lâmina de Prova 96",
+      "coreRarity": "Rara"
+    },
+    {
+      "name": "core stored",
+      "at": 1792893742410
+    },
+    {
+      "name": "core survived reload",
+      "at": 1792893743142
+    },
+    {
+      "name": "forge started",
+      "at": 1792893746086,
+      "navInForge": 0,
+      "url": "http://127.0.0.1:8952/#forge"
+    },
+    {
+      "name": "strike",
+      "at": 1792893750376,
+      "strikes": 1,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893751782,
+      "strikes": 2,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893753194,
+      "strikes": 3,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893754595,
+      "strikes": 4,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893757263,
+      "strikes": 5,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893758670,
+      "strikes": 6,
+      "phase": "Martelar"
+    },
+    {
+      "name": "strike",
+      "at": 1792893760072,
+      "strikes": 7,
+      "phase": "Martelar"
+    },
+    {
+      "name": "quench attempt",
+      "at": 1792893763810,
+      "q": 0
+    },
+    {
+      "name": "reveal reached",
+      "at": 1792893763814
+    },
+    {
+      "name": "returned to arsenal",
+      "at": 1792893764913,
+      "arsenalCount": "1 arma(s) no Arsenal"
+    },
+    {
+      "name": "arsenal survived reload",
+      "at": 1792893765746,
+      "persisted": "1 arma(s) no Arsenal"
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "finishedAt": "2026-10-25T02:02:45.746Z"
+}

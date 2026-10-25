@@ -31,6 +31,15 @@ interface Props {
   career?: CareerStats;
   gallery?: FinishedSword[];
   activeCore?: FusionCore | null;
+  /** Renderiza dentro da seção Forja (sem min-h-dvh e sem barra fixa sobre a navegação). */
+  embedded?: boolean;
+  /** Trava família/perfil/aço na identidade do núcleo de fusão armado. */
+  lockToCore?: boolean;
+  onOpenShop?: () => void;
+  onCancelCore?: () => void;
+  activeAttempt?: import("../types").ActiveForgeAttempt | null;
+  onResumeAttempt?: () => void;
+  onRecycleScrap?: () => boolean;
 }
 
 export function DesignScreen({
@@ -43,6 +52,13 @@ export function DesignScreen({
   career = defaultCareer,
   gallery = [],
   activeCore = null,
+  embedded = false,
+  lockToCore = false,
+  onOpenShop,
+  onCancelCore,
+  activeAttempt = null,
+  onResumeAttempt,
+  onRecycleScrap,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -138,23 +154,27 @@ export function DesignScreen({
   const canForgeReal = !isLocked && hasMaterial;
 
   return (
-    <div className="flex min-h-dvh flex-col bg-bg text-fg">
-      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 border-b border-border/40">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          ← Voltar
-        </Button>
-        <div className="text-center">
-          <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
-          <span className="text-[0.65rem] uppercase tracking-wider text-amber-400/80">
-            Almoxarifado & Metais Reais
-          </span>
-        </div>
-        <div className="flex items-center gap-2 rounded-md border border-border/60 bg-surface px-2.5 py-1 text-xs font-display">
-          <span className="text-amber-300 font-bold">🪙 {wallet.gold}</span>
-        </div>
-      </header>
+    <div className={embedded ? "flex h-full min-h-0 flex-col bg-bg text-fg" : "flex min-h-dvh flex-col bg-bg text-fg"}>
+      {embedded ? null : (
+        <header className="flex shrink-0 items-center justify-between gap-2 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 border-b border-border/40">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            ← Voltar
+          </Button>
+          <div className="text-center">
+            <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
+            <span className="text-[0.65rem] uppercase tracking-wider text-amber-400/80">
+              {activeCore ? "Identidade do Núcleo" : "Almoxarifado & Metais Reais"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md border border-border/60 bg-surface px-2.5 py-1 text-xs font-display">
+            <span className="text-amber-300 font-bold">🪙 {wallet.gold}</span>
+          </div>
+        </header>
+      )}
 
-      <div className="mx-auto w-full max-w-3xl px-4 pb-44">
+
+      <div className={embedded ? "min-h-0 flex-1 overflow-y-auto overscroll-contain" : ""}>
+      <div className="mx-auto w-full max-w-3xl px-4 pb-4">
         {/* Sword Preview Canvas */}
         <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
           <canvas ref={canvasRef} className="h-56 w-full sm:h-72" />
@@ -162,18 +182,45 @@ export function DesignScreen({
 
         {/* Fusion Core Notification Banner */}
         {activeCore ? (
-          <div className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/30 p-3.5 flex items-center justify-between">
-            <div>
-              <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-300">
-                🔮 Núcleo de Fusão Ativo: {activeCore.name}
-              </span>
-              <p className="text-xs text-purple-200/80 mt-0.5">
-                Herança: +{activeCore.bonusQuality}% Qualidade · Aço: {activeCore.steel} · Família: {activeCore.family}
+          <div className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/30 p-3.5">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-300">
+                  🔮 Núcleo de Fusão Ativo
+                </span>
+                <p className="mt-0.5 truncate font-display text-sm font-bold text-purple-100">{activeCore.name}</p>
+                <p className="text-xs text-purple-200/80 mt-0.5">
+                  Herança: +{activeCore.bonusQuality}% Qualidade · {STEELS[activeCore.steel]?.name} · {FAMILIES[activeCore.family]?.name}
+                </p>
+                <p className="mt-1 text-[0.68rem] leading-relaxed text-purple-200/70">
+                  O núcleo será consumido apenas na conclusão da forja. Projeto, perfil e aço ficam travados na
+                  identidade dele.
+                </p>
+              </div>
+              {onCancelCore ? (
+                <Button variant="ghost" size="sm" className="shrink-0 text-purple-200" onClick={onCancelCore}>
+                  Liberar
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        {activeAttempt ? (
+          <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-amber-600/60 bg-amber-950/25 p-3">
+            <div className="min-w-0">
+              <p className="font-display text-[0.62rem] font-bold uppercase tracking-wider text-amber-300">
+                Forja interrompida preservada
+              </p>
+              <p className="truncate text-[0.68rem] text-amber-100/80">
+                {activeAttempt.design.name || "Lâmina"} · {activeAttempt.strikesCount || 0} martelada(s)
               </p>
             </div>
-            <span className="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-              Autorizado
-            </span>
+            {onResumeAttempt ? (
+              <Button size="sm" className="shrink-0 bg-amber-600 font-display text-xs font-bold text-stone-950" onClick={onResumeAttempt}>
+                Retomar
+              </Button>
+            ) : null}
           </div>
         ) : null}
 
@@ -215,9 +262,10 @@ export function DesignScreen({
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => onChange(p.design)}
+                  disabled={lockToCore}
+                  onClick={() => !lockToCore && onChange(p.design)}
                   className={cn(
-                    "rounded-lg border p-2.5 text-left transition-all flex flex-col justify-between",
+                    "rounded-lg border p-2.5 text-left transition-all flex flex-col justify-between disabled:opacity-45",
                     isSelected
                       ? "border-amber-400 bg-amber-500/15 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
                       : "border-border/80 bg-surface/70 hover:border-amber-500/50 hover:bg-surface",
@@ -293,7 +341,27 @@ export function DesignScreen({
           {!hasMaterial && (!presetStatus || presetStatus.state !== "locked") ? (
             <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-950/20 p-2.5 text-xs text-amber-300">
               <span className="font-bold">⚠️ Matéria-prima em Falta: </span>
-              Adquira {reqMat.name} no Bazar Medieval (Galeria → Oficina/Bazar) ou forje lâminas de ferro para conquistar drops.
+              Adquira {reqMat.name} na Loja da oficina ou conquiste drops forjando.
+              {onOpenShop ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="mt-2 w-full border-amber-600/50 text-xs text-amber-200"
+                  onClick={onOpenShop}
+                >
+                  Comprar {reqMat.name} na Loja
+                </Button>
+              ) : null}
+              {onRecycleScrap && (inventory.materials?.scrap || 0) >= 2 ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="mt-1.5 w-full border-amber-600/40 text-xs text-amber-200"
+                  onClick={() => onRecycleScrap()}
+                >
+                  ♻️ Reciclar 2 sucatas em 1 {reqMat.name}
+                </Button>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -310,8 +378,15 @@ export function DesignScreen({
           />
         </label>
 
+        {lockToCore ? (
+          <p className="mt-4 rounded-md border border-purple-700/40 bg-purple-950/20 px-3 py-2 text-[0.68rem] leading-relaxed text-purple-200">
+            A identidade do núcleo define família, perfil e aço. Altere apenas acabamento, nome e comprimento.
+          </p>
+        ) : null}
+
         <Section title="Família Canônica">
           <ChipRow
+            disabled={lockToCore}
             options={Object.entries(FAMILIES).map(([id, v]) => ({
               id,
               label: v.name,
@@ -335,6 +410,7 @@ export function DesignScreen({
 
         <Section title="Perfil da lâmina">
           <ChipRow
+            disabled={lockToCore}
             options={Object.entries(PROFILES).map(([id, v]) => ({
               id,
               label: v.name,
@@ -347,6 +423,7 @@ export function DesignScreen({
 
         <Section title="Aço / Metal">
           <ChipRow
+            disabled={lockToCore}
             options={Object.entries(STEELS).map(([id, v]) => {
               const sReq = getRequiredMaterialForSteel(id as SteelId);
               const sStock = getMaterialStock(inventory?.materials, sReq.key);
@@ -417,9 +494,16 @@ export function DesignScreen({
           </label>
         </Section>
       </div>
+      </div>
 
-      {/* Bottom Sticky Action Bar */}
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl">
+      {/* Barra de ação: inline na seção Forja, fixa no fluxo isolado */}
+      <div
+        className={
+          embedded
+            ? "shrink-0 border-t border-border bg-bg/95 px-4 py-2.5"
+            : "fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl"
+        }
+      >
         <div className="mx-auto flex w-full max-w-md flex-col gap-2">
           {canForgeReal ? (
             <>
@@ -428,30 +512,36 @@ export function DesignScreen({
                 className="w-full bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 font-display uppercase tracking-wider font-bold shadow-lg"
                 onClick={() => onForge(false)}
               >
-                🔥 Levar ao Fogo (Consumir 1x {reqMat.name})
+                {activeCore
+                  ? `🔮 Forjar o Núcleo (Consumir 1x ${reqMat.name})`
+                  : `🔥 Levar ao Fogo (Consumir 1x ${reqMat.name})`}
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="w-full text-slate-400 hover:text-amber-300 font-display text-xs"
-                onClick={() => onForge(true)}
-              >
-                🔨 Treino Básico de Oficina (Sem Custo de Metal)
-              </Button>
+              {activeCore ? null : (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="w-full text-slate-400 hover:text-amber-300 font-display text-xs"
+                  onClick={() => onForge(true)}
+                >
+                  🔨 Treino Básico de Oficina (Sem Custo de Metal)
+                </Button>
+              )}
             </>
           ) : (
             <>
               <Button size="lg" className="w-full opacity-50 cursor-not-allowed" disabled>
                 {isLocked ? "🔒 Projeto Bloqueado na Carreira" : `❌ Insumos Insuficientes (Falta 1x ${reqMat.name})`}
               </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="w-full border-dashed border-amber-600/50 text-amber-300 hover:bg-amber-950/30 font-display text-xs"
-                onClick={() => onForge(true)}
-              >
-                🔨 Treino Básico de Oficina (Sem Custo · Ferro Comum)
-              </Button>
+              {activeCore ? null : (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-full border-dashed border-amber-600/50 text-amber-300 hover:bg-amber-950/30 font-display text-xs"
+                  onClick={() => onForge(true)}
+                >
+                  🔨 Treino Básico de Oficina (Sem Custo · Ferro Comum)
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -473,10 +563,12 @@ function ChipRow({
   options,
   value,
   onChange,
+  disabled = false,
 }: {
   options: { id: string; label: string; hint?: string }[];
   value: string;
   onChange: (id: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -486,9 +578,10 @@ function ChipRow({
           <button
             key={opt.id}
             type="button"
+            disabled={disabled}
             onClick={() => onChange(opt.id)}
             className={cn(
-              "min-h-12 rounded-md border px-3 py-2 text-left transition-colors duration-150",
+              "min-h-12 rounded-md border px-3 py-2 text-left transition-colors duration-150 disabled:opacity-45",
               active
                 ? "border-ember bg-elevated text-fg"
                 : "border-border bg-surface text-muted hover:border-iron",

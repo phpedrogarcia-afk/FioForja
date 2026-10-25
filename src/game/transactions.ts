@@ -33,6 +33,7 @@ import {
   recycleScrapToIron,
 } from "./materials.ts";
 import { evaluateBlueprintStatus } from "./blueprints.ts";
+import { findShopArticle } from "./shop.ts";
 import { isSwordEligibleForCommission } from "./commissions.ts";
 
 export interface TransactionExecutionResult<T = unknown> {
@@ -298,11 +299,49 @@ export function executeShopPurchaseTransaction(
   currentSave: SaveData,
   purchase: ShopPurchaseItem,
 ): TransactionExecutionResult {
+  const reject = (code: string, error: string): TransactionExecutionResult => ({
+    success: false,
+    save: currentSave,
+    code,
+    error,
+  });
+
+  // O catálogo comercial é a fonte de verdade: ID, tipo e preço precisam bater.
+  // Chamadas diretas não compram item inexistente nem pagam menos que a etiqueta.
+  if (!purchase || typeof purchase.id !== "string" || purchase.id.length === 0) {
+    return reject("INVALID_PURCHASE", "Produto inválido: ID canônico ausente.");
+  }
+  const article = findShopArticle(purchase.id);
+  if (!article) {
+    return reject("ITEM_NOT_FOUND", `Produto inexistente no catálogo da Loja: ${purchase.id}.`);
+  }
+  if (article.type !== purchase.type) {
+    return reject("ITEM_TYPE_MISMATCH", "Tipo de produto incompatível com o catálogo canônico.");
+  }
+  const quantity = purchase.quantity ?? 1;
+  if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99) {
+    return reject("INVALID_QUANTITY", "Quantidade inválida para aquisição (1 a 99).");
+  }
+  if (article.type !== "material" && quantity !== 1) {
+    return reject("INVALID_QUANTITY", "Este produto só pode ser adquirido em unidade única.");
+  }
+  const goldCost = article.costGold * quantity;
+  const rubyCost = (article.costRubies || 0) * quantity;
+  if (
+    !Number.isFinite(purchase.costGold) ||
+    purchase.costGold !== goldCost ||
+    (purchase.costRubies || 0) !== rubyCost
+  ) {
+    return reject("PRICE_MISMATCH", "Preço divergente do catálogo canônico da Loja.");
+  }
+  if ((article.type === "component" || article.type === "rune") && !article.componentData) {
+    return reject("INVALID_COMPONENT", "Componente sem dados canônicos de montagem.");
+  }
+
   const currentWallet = currentSave.wallet || defaultWallet;
   const currentInventory = currentSave.inventory || defaultInventory;
-  const rubyCost = purchase.costRubies || 0;
 
-  if (currentWallet.gold < purchase.costGold || currentWallet.rubies < rubyCost) {
+  if (currentWallet.gold < goldCost || currentWallet.rubies < rubyCost) {
     return {
       success: false,
       save: currentSave,
@@ -313,7 +352,7 @@ export function executeShopPurchaseTransaction(
 
   const nextWallet: PlayerWallet = {
     ...currentWallet,
-    gold: currentWallet.gold - purchase.costGold,
+    gold: currentWallet.gold - goldCost,
     rubies: currentWallet.rubies - rubyCost,
   };
 
@@ -322,36 +361,39 @@ export function executeShopPurchaseTransaction(
   const nextUnlockedBlueprints = [...(currentInventory.unlockedBlueprints || ["guarda_medieval"])];
   const nextComponents = [...(currentInventory.components || [])];
 
-  if (purchase.type === "tool") {
-    if (nextUnlockedTools.includes(purchase.id)) {
-      return { success: false, save: currentSave, error: "Ferramenta já adquirida.", code: "ALREADY_OWNED" };
+  if (article.type === "tool") {
+    if (nextUnlockedTools.includes(article.id)) {
+      return reject("ALREADY_OWNED", "Ferramenta já adquirida.");
     }
-    nextUnlockedTools.push(purchase.id);
-  } else if (purchase.type === "material") {
-    const qty = purchase.quantity || 1;
-    nextMaterials = addMaterialStock(nextMaterials, purchase.id, qty);
-  } else if (purchase.type === "catalyst") {
-    const qty = purchase.quantity || 1;
-    nextMaterials.catalyst_astral = (nextMaterials.catalyst_astral || 0) + qty;
-  } else if (purchase.type === "recipe") {
-    const blueprintId = purchase.id.replace(/^recipe_/, "");
-    if (!nextUnlockedBlueprints.includes(blueprintId)) {
-      nextUnlockedBlueprints.push(blueprintId);
+    nextUnlockedTools.push(article.id);
+  } else if (article.type === "material") {
+    nextMaterials = addMaterialStock(nextMaterials, article.id, quantity);
+  } else if (article.type === "catalyst") {
+    nextMaterials.catalyst_astral = (nextMaterials.catalyst_astral || 0) + quantity;
+  } else if (article.type === "recipe") {
+    const blueprintId = article.id.replace(/^recipe_/, "");
+    if (!CANONICAL_PRESETS.some((preset) => preset.id === blueprintId)) {
+      return reject("BLUEPRINT_NOT_FOUND", "Receita sem projeto correspondente no Compêndio.");
     }
-  } else if (purchase.type === "component" || purchase.type === "rune") {
-    if (purchase.componentData) {
-      nextComponents.push({
-        id: `shop_${purchase.id}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-        name: purchase.name,
-        category: purchase.componentData.category,
-        componentKey: purchase.componentData.componentKey,
-        rarity: purchase.componentData.rarity,
-        icon: purchase.componentData.icon,
-        description: purchase.componentData.description,
-        statModifier: purchase.componentData.statModifier,
-        acquiredAt: Date.now(),
-      });
+    if (nextUnlockedBlueprints.includes(blueprintId)) {
+      return reject("ALREADY_OWNED", "Receita já adquirida.");
     }
+    nextUnlockedBlueprints.push(blueprintId);
+  } else if ((article.type === "component" || article.type === "rune") && article.componentData) {
+    const data = article.componentData;
+    nextComponents.push({
+      id: generateUniqueId(`shop_${article.id}`),
+      name: article.name,
+      category: data.category,
+      componentKey: data.componentKey,
+      rarity: data.rarity,
+      icon: data.icon,
+      description: data.description,
+      statModifier: data.statModifier,
+      acquiredAt: Date.now(),
+    });
+  } else {
+    return reject("INVALID_PURCHASE", "Tipo de produto não suportado pela Loja.");
   }
 
   const nextInventory: PlayerInventory = {
