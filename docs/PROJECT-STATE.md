@@ -4,9 +4,10 @@
 
 - **Autoridade:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001), decisão explícita do proprietário após jogar no Poco e fornecer vídeo de 23 segundos.
 - **TARGET aprovado:** barra inferior fixa em Início, Coleção, Forja, Loja e Jogador; barra ausente durante fabricação. Preparação mantém espada inteira visível; fabricação elevada/oblíqua com HUD compacto; orientação térmica clara e Revelação centrada na arma.
-- **CURRENT:** novo layout não implementado. O APK de `41d7222` continua sendo a base de observação; o vídeo demonstra corte da prévia, composição insuficiente e preparação extensa.
-- **Próximo recorte:** protótipo visual navegável de preparação, fabricação e coleção, validado na resolução/área útil reais do Poco. Reconstrução das outras telas depende dessa validação humana.
-- **NOT_PROVEN:** protótipo, solução final de câmera e aceitação de uso. A resolução comprimida do vídeo e as medidas do emulador não substituem a medição do aparelho.
+- **CURRENT:** o APK de jogo de `41d7222` permanece inalterado. Um [protótipo separado](../experiments/mobile-ux-v1/README.md) foi construído na branch `codex/mobile-ux-prototype-v1` e instalado como `FioForja Protótipo`, com outro pacote/UID. Não grava o progresso real.
+- **OBSERVED no recorte:** três experiências navegáveis no Poco, 1080×2400/440 dpi, WebView 392×819 CSS/DPR 2,75; prévia inteira, fabricação sem barra, coleção paginada, inspeção e comparação. Evidências e limites no relatório do experimento.
+- **Próximo passo:** avaliação humana dessas três experiências no Poco. Reconstrução das outras telas depende dessa validação.
+- **NOT_PROVEN:** aceitação visual, solução final de câmera, integração ao jogo e desempenho sustentado. Observação física não equivale a aprovação do layout.
 
 ## Entrega Android — 24/10/2026
 

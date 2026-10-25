@@ -2,9 +2,9 @@
 
 ## Próximo trabalho de interface — Codex e Antigravity
 
-Consultar [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) antes de alterar navegação ou composição. A arquitetura foi aprovada pelo proprietário em 24/10/2026; o layout ainda não foi implementado. Não reabrir a escolha entre barra fixa e saguão sem nova evidência ou decisão humana.
+Consultar [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) antes de alterar navegação ou composição. A arquitetura foi aprovada pelo proprietário em 24/10/2026; existe um [protótipo separado](../experiments/mobile-ux-v1/README.md), ainda sem aprovação humana ou integração ao jogo. Não reabrir a escolha entre barra fixa e saguão sem nova evidência ou decisão humana.
 
-O próximo recorte é o protótipo navegável de preparação, fabricação e coleção. Mostrar as cinco seções e retirar a barra durante fabricação; manter a espada inteira e protagonista. Validar resolução/área útil reais do Poco e colher avaliação humana antes de reconstruir as demais telas. Preservar física, economia, persistência e experimentos. Os detalhes e limites estão no registro canônico; não criar uma versão divergente neste handoff.
+O recorte navegável de preparação, fabricação e coleção está em `experiments/mobile-ux-v1/`, branch `codex/mobile-ux-prototype-v1`. Foi observado no Poco a 392×819 CSS/DPR 2,75, com barra ausente na fabricação e coleção paginada. O companion `com.projetofio.fioforja.prototype` está separado do app real. Colher avaliação humana antes de reconstruir as demais telas; preservar física, economia, persistência e experimentos. Receita, evidências e limitações estão no relatório do recorte e na decisão canônica.
 
 ## Recuperação curta
 

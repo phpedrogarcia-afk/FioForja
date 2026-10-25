@@ -11,7 +11,10 @@ export default tseslint.config(
     ignores: [
       "dist/**",
       "dist-mobile/**",
+      "APK/**",
+      "experiments/mobile-ux-v1/.build/**",
       "android/app/src/main/assets/public/**",
+      "android/app/build/**",
       ".output/**",
       ".vercel/**",
       ".nitro/**",

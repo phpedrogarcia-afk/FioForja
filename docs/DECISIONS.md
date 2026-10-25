@@ -151,7 +151,7 @@ Integração seletiva, legado padrão, URL válida com precedência, cache compl
 
 ### FIOFORJA-MOBILE-UX-001 — Navegação por seções e protagonismo da espada `[USER-APPROVED]`
 
-**Origem:** decisão explícita do proprietário nesta data, após o vídeo de 23 segundos do APK no Poco. **Estado:** direção de produto aprovada; interface ainda não implementada nem validada. Não atribuir `[AGENT-IMPLEMENTED]` ou `[VERIFIED]` ao novo layout antes da evidência correspondente.
+**Origem:** decisão explícita do proprietário nesta data, após o vídeo de 23 segundos do APK no Poco. **Estado:** direção de produto aprovada; [protótipo experimental construído](../experiments/mobile-ux-v1/README.md), sem integração ao jogo nem validação humana do layout. Não atribuir aprovação visual ou prontidão de produção com base apenas na implementação do protótipo.
 
 #### Arquitetura aprovada
 
@@ -199,5 +199,5 @@ Esta decisão atualiza o **agrupamento e a apresentação mobile** das funções
 
 **CURRENT:** o APK em `41d7222` ainda usa a preparação extensa, composição R4B e abas da Galeria. Sua instalação e prova funcional não aprovam a nova experiência visual. O enquadramento anterior e os testes do emulador não são evidência de aceitação desta decisão.
 
-**TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **NOT_PROVEN:** protótipo navegável, aceitação visual e de uso no Poco, solução final de câmera e adequação dos assets ao novo enquadramento. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
+**TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **OBSERVED:** o protótipo separado tem navegação e capturas físicas no Poco, conforme o [relatório do recorte](../experiments/mobile-ux-v1/README.md). **NOT_PROVEN:** aceitação visual e de uso pelo proprietário, integração final, solução final de câmera e adequação definitiva dos assets. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
 
