@@ -2,7 +2,7 @@
 
 ## Estado após a Operação Codex 07 (24/10/2026)
 
-- **Branch:** `codex/mobile-core-integration-v1`, HEAD `6a640d4`, base `da46757` (cadeia: `0663f4e → c2b1883 → 41d7222 → cca050e → 82a9fd3 → da46757`).
+- **Branch publicada:** `codex/mobile-core-integration-v1` (commits de código `6a640d4` → `2db89fd`), base `da46757` (cadeia: `0663f4e → c2b1883 → 41d7222 → cca050e → 82a9fd3 → da46757`).
 - **Interface integrada:** Início, Coleção, Forja, Loja e Craft no `GameApp` real; barra inferior fixa fora da forja e oculta dentro dela; Voltar com histórico e diálogo de saída segura.
 - **Loja:** `src/game/shop.ts` é o catálogo único; `executeShopPurchaseTransaction` valida ID, tipo, preço, quantidade e moeda; falha de storage não entrega item.
 - **Coleção:** inspeção por ID, comparação, proteção (`favorite` aditivo) e instalação/troca via `executeComponentInstallTransaction`.

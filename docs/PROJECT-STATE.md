@@ -2,7 +2,7 @@
 
 ## Operação Codex 07 — integração mobile core — 24/10/2026
 
-- **Branch:** `codex/mobile-core-integration-v1`, commit `6a640d4`, base `da46757` (que contém `41d7222`/`cca050e`/`82a9fd3`).
+- **Branch publicada:** `codex/mobile-core-integration-v1` (commits `6a640d4` e `2db89fd`), base `da46757` (que contém `41d7222`/`cca050e`/`82a9fd3`).
 - **Worktree isolado:** `C:\Users\phped\.codex\worktrees\mobile-core-integration-v1\FioForja`. O checkout principal e as branches de outros agentes não foram movidos nem reescritos.
 - **APK:** versão `0.2.1`, código 3, **12.128.406 bytes**, SHA-256 `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d`, HEAD `2db89fd`, sem alterações não commitadas. Entregue no worktree, no checkout principal e em `C:\Users\phped\Documents\FioForja\APK`. Instalado por cima de 0.1.0/0.2.0 no AVD com save preservado.
 - **Interface:** Início, Coleção, Forja, Loja e Craft sobre o mesmo `GameApp`/`SaveData`; barra inferior fixa fora da fabricação e ausente dentro dela; saída segura com confirmação.

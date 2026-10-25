@@ -57,7 +57,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
   - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C) com blindagem contra armas de treino e encomendas.
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
 - A entrega Android de 24/10/2026 usa a branch `codex/android-apk-delivery`, baseada em `c2b1883`. APK entregue e dez casos aprovados no emulador; receita, evidência e limites ficam na [especificação do APK](specs/android-apk.md). Validação física no Poco permanece pendente.
-- A integração mobile core de 24/10/2026 está em `codex/mobile-core-integration-v1` (commit `6a640d4`) e no APK `0.2.0`; evidência de navegador e testes em [`experiments/mobile-core-integration`](../experiments/mobile-core-integration/README.md).
+- A integração mobile core de 24/10/2026 está na branch publicada `codex/mobile-core-integration-v1` (commits `6a640d4`/`2db89fd`) e no APK `0.2.1`; evidência de navegador, testes e prova Android em [`experiments/mobile-core-integration`](../experiments/mobile-core-integration/README.md).
 - A evidência histórica da integração Codex 05, com contagens e limites, está no [relatório da Operação Codex 05](../experiments/M03-cross-agent-integration/README.md). Testes de API, cenários preparados e partidas reais têm escopos distintos.
 - [Handoff DeepSeek](HANDOFF-DEEPSEEK-WEAPON-DNA.md) e [laboratório M02](../experiments/M02-weapon-dna/README.md) preservam a entrega do doador; não são o estado atual da integração.
 - Implementação atual e direção futura permanecem distintas; os thresholds de notas do código não substituem os thresholds estéticos da Bíblia.
