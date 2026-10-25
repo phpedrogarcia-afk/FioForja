@@ -163,7 +163,9 @@ Barra inferior fixa com **cinco seções**, em ordem estável:
 | **Coleção** | Arsenal, Compêndio, componentes, runas e comparação. |
 | **Forja** | Escolha e preparação do projeto e materiais, mantendo a prévia visível; início da fabricação imersiva. |
 | **Loja** | Materiais, ferramentas, componentes e itens de fusão. |
-| **Jogador** | Carreira, encomendas, equipamentos e configurações. |
+| **Craft** | Crisol híbrido: fusão de espadas em núcleos e acesso à fusão de componentes. |
+
+**Atualização humana de 24/10/2026:** Craft substitui Jogador; perfil, carreira, encomendas, equipamentos e configurações continuam previstos no Início/perfil. O [primeiro recorte de Craft](specs/craft-mobile-prototype.md) define seleção 2×2 e revisão antes do sacrifício; mesma raridade não exige mesma qualidade. A saída continua sendo núcleo. A integração transacional depende de aprovação visual e deve preservar núcleos antigos.
 
 A barra **desaparece durante a fabricação da espada**. A forja ativa ocupa a tela disponível, respeita as áreas seguras do aparelho e mantém uma saída explícita com os contratos atuais de tentativa, cancelamento e recuperação. A visibilidade da barra na Revelação será definida no protótipo; sua ausência durante a fabricação não é opcional.
 
@@ -187,7 +189,7 @@ A aprovação desta arquitetura **não autoriza a reconstrução imediata de tod
 2. Fabricação em tela cheia, sem barra inferior.
 3. Coleção com imagem, identidade, raridade e atributos.
 
-As cinco seções devem ser reconhecíveis no protótipo, mas Início, Loja e Jogador não precisam ser reconstruídos integralmente para validar esse recorte. Eventuais acessos demonstrativos devem ser identificados como tal, sem parecer compras ou mudanças de save reais.
+As cinco seções devem ser reconhecíveis no protótipo, mas Início, Loja e perfil não precisam ser reconstruídos integralmente para validar esse recorte. A atualização humana posterior acrescentou o recorte navegável de Craft. Eventuais acessos demonstrativos devem ser identificados como tal, sem parecer compras ou mudanças de save reais.
 
 Validar essas três experiências na **resolução e área útil reais do Poco**, incluindo densidade e barras do sistema, e obter avaliação humana antes de aplicar o padrão ao restante do jogo. O vídeo recebido é comprimido em 480×1072 e não estabelece sozinho o viewport de implementação. Não assumir as medidas do emulador como medidas do aparelho.
 

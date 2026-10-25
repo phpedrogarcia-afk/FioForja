@@ -1,25 +1,28 @@
 import { useMemo, useState } from "react";
-import { Anvil, ArrowLeft, ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, Coins, Hammer, Home, LibraryBig, Maximize, SlidersHorizontal, Store, UserRound, X } from "lucide-react";
+import { Anvil, ArrowLeft, ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, Coins, Flame, Hammer, Home, LibraryBig, Maximize, SlidersHorizontal, Store, UserRound, X } from "lucide-react";
 import { CANONICAL_PRESETS, GUARDS, PROFILES, STEELS, WRAPS } from "../../src/game/catalog";
-import type { FinishedSword, SwordDesign } from "../../src/game/types";
+import type { FinishedSword, FusionCore, SwordDesign } from "../../src/game/types";
 import { SwordView } from "./SwordView";
 import { ForgeView } from "./ForgeView";
 import { specimens } from "./specimens";
+import { CraftView } from "./CraftView";
 
-type Section = "Início" | "Coleção" | "Forja" | "Loja" | "Jogador";
-const sections = [Home, LibraryBig, Hammer, Store, UserRound];
-const names: Section[] = ["Início", "Coleção", "Forja", "Loja", "Jogador"];
+type Section = "Início" | "Coleção" | "Forja" | "Loja" | "Craft";
+const sections = [Home, LibraryBig, Hammer, Store, Flame];
+const names: Section[] = ["Início", "Coleção", "Forja", "Loja", "Craft"];
 
 export function Attributes({ sword }: { sword: FinishedSword }) {
   return <dl className="attributes">{[["ATK", sword.damage], ["DEF", sword.defense], ["AGI", sword.agility], ["DUR", `${sword.durability}%`]].map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>;
 }
 
 export function App() {
-  const [section, setSection] = useState<Section>("Forja");
+  const [section, setSection] = useState<Section>("Craft");
   const [step, setStep] = useState(0);
   const [design, setDesign] = useState<SwordDesign>({ ...CANONICAL_PRESETS[0].design });
   const [active, setActive] = useState(false);
   const [result, setResult] = useState<FinishedSword | null>(null);
+  const [previewCore, setPreviewCore] = useState<FusionCore | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const preview = useMemo(() => ({ design, quality: specimens[0].quality, id: "prototype-preview" }), [design]);
 
   return <div className={`prototype ${active ? "immersive" : ""}`}>
@@ -29,7 +32,8 @@ export function App() {
       <div className="section-heading"><button className="icon-button" aria-label="Voltar à preparação" onClick={() => setResult(null)}><ArrowLeft /></button><div><p className="eyebrow">RESULTADO DEMONSTRATIVO</p><h2>{result.broken ? "Uma lição na bigorna" : "Sua criação"}</h2></div></div>
       <div className="reveal-sword"><SwordView sword={result} /></div><div className="weapon-summary"><span className="rarity" data-rarity={result.rarity}>{result.rarity}</span><h2>{result.design.name}</h2><p>Qualidade {result.quality} · {result.grade}</p><Attributes sword={result} /></div>
       <p className="hint">Simulação local. Esta arma e suas recompensas não são gravadas.</p><button className="primary" onClick={() => { setResult(null); setSection("Coleção"); }}>Explorar coleção de exemplo <ArrowRight size={17} /></button>
-    </main> : section === "Forja" ? <main className="preparation">
+    </main> : section === "Forja" ? <main className={`preparation${previewCore ? " has-core" : ""}`}>
+      {previewCore && <div className="core-preparation-notice"><strong>Prévia: {previewCore.rarity}</strong><p>O núcleo continua guardado na demonstração. Materiais, projeto e transação de fabricação serão conectados após a aprovação visual.</p><button className="text-button" onClick={() => setPreviewCore(null)}>Voltar à fabricação de demonstração</button></div>}
       <div className="project-preview"><span className="preview-kicker">SUA PRÓXIMA CRIAÇÃO</span><SwordView sword={preview} /><div className="preview-caption"><h2>{design.name}</h2><p>{STEELS[design.steel].name} · {PROFILES[design.profile].name}</p></div></div>
       <div className="steps" role="tablist" aria-label="Etapas da preparação">{["Projeto", "Material", "Montagem"].map((label, i) => <button role="tab" aria-selected={step === i} key={label} onClick={() => setStep(i)}><span>{i < step ? <Check size={12} /> : i + 1}</span>{label}</button>)}</div>
       <div className="preparation-options">
@@ -37,8 +41,9 @@ export function App() {
         {step === 1 && <><div className="option-heading"><h3>O metal da sua lâmina</h3><small>Sem consumo nesta prévia</small></div><div className="material-choices">{(["iron", "steel", "damascus"] as const).map(steel => <button className="choice material-choice" key={steel} aria-pressed={design.steel === steel} onClick={() => setDesign({ ...design, steel })}><Anvil size={22} /><span><strong>{STEELS[steel].name}</strong><small>Faixa de trabalho: {Math.round(STEELS[steel].heatMin * 100)}–{Math.round(STEELS[steel].heatMax * 100)}%</small></span>{design.steel === steel && <Check size={16} />}</button>)}</div></>}
         {step === 2 && <><div className="option-heading"><h3>Os detalhes da sua arma</h3><small>Veja cada escolha na prévia</small></div><div className="mount-options"><label>Perfil<select value={design.profile} onChange={e => setDesign({ ...design, profile: e.target.value as SwordDesign["profile"] })}>{Object.entries(PROFILES).map(([id, p]) => <option key={id} value={id}>{p.name}</option>)}</select></label><label>Guarda<select value={design.guard} onChange={e => setDesign({ ...design, guard: e.target.value as SwordDesign["guard"] })}>{Object.entries(GUARDS).map(([id, p]) => <option key={id} value={id}>{p.name}</option>)}</select></label><label>Empunhadura<select value={design.wrap} onChange={e => setDesign({ ...design, wrap: e.target.value as SwordDesign["wrap"] })}>{Object.entries(WRAPS).map(([id, p]) => <option key={id} value={id}>{p.name}</option>)}</select></label></div></>}
       </div>
-      <div className="preparation-action"><p className="hint">{step === 2 ? "O resultado final depende da sua execução na bigorna." : "A prévia permanece visível enquanto você prepara."}</p><button className="primary" onClick={() => step < 2 ? setStep(step + 1) : setActive(true)}>{step < 2 ? "Continuar" : "Começar fabricação de demonstração"}{step < 2 ? <ArrowRight size={18} /> : <Hammer size={18} />}</button></div>
-    </main> : section === "Coleção" ? <Collection /> : <main className="navigation-demo"><div className="section-heading"><p className="eyebrow">{section === "Início" ? "BEM-VINDO À OFICINA" : "ÁREA PREVISTA NA NAVEGAÇÃO"}</p><h2>{section === "Início" ? "Cada lâmina conta uma história." : section}</h2></div><div className="featured-sword"><SwordView sword={specimens[0]} /></div><h3>{section === "Início" ? "Sua próxima criação começa aqui." : section === "Loja" ? "Materiais · Ferramentas · Componentes" : "Carreira · Equipamentos · Encomendas"}</h3><p className="hint">{section === "Início" ? "Explore as três experiências deste protótipo." : "Este acesso demonstra a organização. O conteúdo desta área será tratado após a validação das três telas."}</p><button className="primary" onClick={() => setSection("Forja")}>Preparar uma espada <ArrowRight size={17} /></button><button className="secondary" onClick={() => setSection("Coleção")}>Visitar coleção</button></main>}
+      <div className="preparation-action"><p className="hint">{previewCore ? "Fabricação com núcleo depende da integração transacional posterior." : step === 2 ? "O resultado final depende da sua execução na bigorna." : "A prévia permanece visível enquanto você prepara."}</p><button className="primary" disabled={!!previewCore && step === 2} onClick={() => step < 2 ? setStep(step + 1) : setActive(true)}>{step < 2 ? "Continuar" : previewCore ? "Aplicação do núcleo ainda não conectada" : "Começar fabricação de demonstração"}{step < 2 ? <ArrowRight size={18} /> : <Hammer size={18} />}</button></div>
+    </main> : section === "Coleção" ? <Collection /> : section === "Craft" ? null : <main className="navigation-demo"><div className="section-heading"><p className="eyebrow">{section === "Início" ? "BEM-VINDO À OFICINA" : "ÁREA PREVISTA NA NAVEGAÇÃO"}</p><h2>{section === "Início" ? "Cada lâmina conta uma história." : section}</h2></div>{section === "Início" && <button className="profile-entry secondary" onClick={() => setProfileOpen(!profileOpen)} aria-expanded={profileOpen}><UserRound size={17} />Seu perfil e progresso</button>}{profileOpen && section === "Início" && <p className="hint">Carreira · Conquistas · Encomendas · Configurações<br />Acessos previstos; sem alterações neste protótipo.</p>}<div className="featured-sword"><SwordView sword={specimens[0]} /></div><h3>{section === "Início" ? "Sua próxima criação começa aqui." : "Materiais · Ferramentas · Componentes"}</h3><p className="hint">{section === "Início" ? "Prepare uma criação ou explore o Crisol no Craft." : "Este acesso demonstra a organização. Compras ainda não estão conectadas."}</p><button className="primary" onClick={() => setSection("Forja")}>Preparar uma espada <ArrowRight size={17} /></button><button className="secondary" onClick={() => setSection("Coleção")}>Visitar coleção</button></main>}
+    <CraftView hidden={active || !!result || section !== "Craft"} onPreviewCore={core => { setPreviewCore(core); setDesign({ ...CANONICAL_PRESETS[0].design, name: core.name.split("—")[1]?.trim() || "Espada do Crisol", family: core.family, profile: core.profile, steel: core.steel }); setStep(0); setSection("Forja"); }} />
     {!active && <nav className="bottom-nav" aria-label="Seções principais">{names.map((name, i) => { const Icon = sections[i]; return <button key={name} aria-current={section === name ? "page" : undefined} onClick={() => { setSection(name); setResult(null); }}><Icon size={21} strokeWidth={1.6} /><span>{name}</span></button>; })}</nav>}
   </div>;
 }

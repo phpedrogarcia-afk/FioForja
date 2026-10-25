@@ -30,7 +30,7 @@ O fluxo inicial de encaminhamento USB/abertura no navegador foi rejeitado pela r
 - **Fabricação:** modo sem barra inferior, topo da bigorna em perspectiva oblíqua com asset R4B existente, mão em repouso à direita e HUD fora do canvas. Toque de segurar/soltar, regiões de golpe, calor, reaquecimento, têmpera e conclusão usam `createSim/stepSim` existentes em memória.
 - **Coleção:** dois itens por página nesta hipótese visual, nome/raridade/qualidade/ATK/DEF/AGI/DUR, filtros de raridade, inspeção e comparação de duas armas. Quantidade de itens por página não é decisão final.
 - **Revelação:** resultado demonstrativo com imagem grande e dados da própria simulação. Quebra usa os fragmentos do renderizador legado, sem remontar uma arma íntegra. A barra aparece na Revelação nesta variante, sujeita à avaliação humana.
-- **Início, Loja, Jogador e categorias secundárias da coleção:** acessos identificados como demonstração, sem reconstrução integral. A barra contém as cinco seções aprovadas.
+- **Início, Loja, perfil e categorias secundárias da coleção:** acessos identificados como demonstração, sem reconstrução integral. A barra contém Início, Coleção, Forja, Loja e Craft; perfil/progresso fica no Início.
 
 ## Reuso e isolamento
 
@@ -38,7 +38,7 @@ Prévia, coleção e armas íntegras usam o Weapon DNA existente; a forja físic
 
 `specimens.ts` contém quatro armas produzidas pelas ações reais da prova do emulador `2026-10-24T18-23-16-188Z-21288`. São exemplos fixos, não leitura do inventário do proprietário. O saldo de 850 é rotulado como exemplo. A tentativa demonstrativa usa `isTraining: true`; sua conclusão não é adicionada ao Arsenal de exemplos nem ao save real.
 
-Não há chamadas de transações, `loadSave`, `writeSave`, `setItem`, compra, consumo de itens ou recompensa persistida. O app original instalado foi lido por `sha256sum`: hash **d9b7825342a2bc08bd65924bda4f193278d8485d27d9826d25e4ac86914d8b97**, idêntico à entrega anterior. UIDs observados: original `10264`, companion `10295`. As capturas do companion registraram `storageKeys: []`. Isso evidencia isolamento no percurso observado; não é um ensaio geral de durabilidade do save original.
+Não há chamadas de transações, `loadSave`, `writeSave`, `setItem`, compra ou recompensa persistida. Craft remove doadoras e guarda núcleos somente em memória. O app original instalado foi lido por `sha256sum`: hash **d9b7825342a2bc08bd65924bda4f193278d8485d27d9826d25e4ac86914d8b97**, idêntico à entrega anterior. UIDs observados: original `10264`, companion `10295`. As capturas do companion registraram `storageKeys: []`. Isso evidencia isolamento no percurso observado; não é um ensaio geral de durabilidade do save original.
 
 ## Evidência no Poco
 
@@ -73,3 +73,19 @@ O lint global inicialmente incluiu JS gerado pelo Gradle em `android/app/build/`
 - **Navegação completa:** compras, carreira, encomendas e gestão de equipamentos ainda não foram reconstruídas. Não interpretar seus acessos demonstrativos como funções entregues.
 
 Próximo passo: o proprietário avaliar preparação, fabricação e coleção no Poco. Ajustar esse recorte conforme evidência antes de integrar o padrão às demais telas. Sem merge ou push nesta entrega.
+
+## Extensão Craft — 24/10/2026
+
+**Direção aprovada:** [Craft mobile](../../docs/specs/craft-mobile-prototype.md). **Plano executado:** [plano local](../../docs/superpowers/plans/2026-10-24-craft-mobile.md). A aparência e a usabilidade continuam pendentes de avaliação humana.
+
+O protótipo agora inicia em Craft. Quatro espaços 2×2 permitem selecionar e inspecionar espadas de mesma raridade com qualidades diferentes. A confirmação mostra as quatro doadoras, atributos e traços expansíveis; custo, odds e criação do núcleo reutilizam `fuseSwords`/`getFusionOdds`, sem executar transações. A cotação usa uma semente fixa apenas para obter custos; o resultado cotado não é apresentado nem aplicado. A confirmação gera o resultado demonstrativo, remove as quatro doadoras e adiciona um núcleo em uma única atualização de estado local, com trava contra confirmação repetida.
+
+Três Raras e uma Comum vêm das amostras anteriores. Uma quarta Rara e uma espada protegida são **fixtures sintéticas explicitamente identificadas no seletor**, derivadas das amostras; não foram obtidas pelo jogador. A proteção é metadado da demonstração, sem criar ou prometer um novo campo no save.
+
+Guardar núcleo preserva somente a sessão, inclusive ao trocar de seção. Recarregar/fechar o companion descarta o estado. Recomeçar demonstração reinicia os exemplos. Forjar agora abre uma prévia do projeto e impede iniciar fabricação com núcleo: requisitos e transações só serão conectados após a revisão visual. Componentes exibe as quatro categorias, sem executar suas fusões. A nova arte do núcleo é um marcador CSS conceitual, não asset de produção.
+
+**Verificações deste recorte:** três testes de seleção; typecheck do experimento; lint focado sem avisos; build Vite/Android; prova Playwright no Edge instalado, com viewport 392×819/DPR 2,75. O percurso verifica grade, conteúdo das quatro lâminas com margem dentro do canvas, chances/catalisador, inspeção, cancelamento, confirmação repetida produzindo um só núcleo, retorno entre seções, bloqueio da fabricação com núcleo, perfil e descarte ao recarregar. Evidências em `evidence/craft/`.
+
+**OBSERVED no Poco conectado:** instalação do companion separado; seleção das quatro doadoras → confirmação → revelação de núcleo Raro; viewport 392×819/DPR 2,75, documento sem overflow externo e `storageKeys: []`. Capturas/observações `evidence/craft-device-*.{png,json}`. O primeiro acesso de diagnóstico imediatamente após abrir o app encontrou uma conexão de depuração ainda não pronta; a observação subsequente funcionou, sem alteração de código ou instalação de ferramenta.
+
+**Pendências de integração, não resolvidas por este protótipo:** mesma raridade e proteção também no motor/transações; compatibilidade de núcleos anteriores; requisitos/economia do início de fabricação; compensações históricas divergentes entre documento e código; aprovação visual, balanceamento e experiência audiovisual final. Nenhum arquivo de `src/`, lógica de forja, economia ou formato de save foi modificado.
