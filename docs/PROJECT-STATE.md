@@ -4,14 +4,14 @@
 
 - **Branch:** `codex/mobile-core-integration-v1`, commit `6a640d4`, base `da46757` (que contém `41d7222`/`cca050e`/`82a9fd3`).
 - **Worktree isolado:** `C:\Users\phped\.codex\worktrees\mobile-core-integration-v1\FioForja`. O checkout principal e as branches de outros agentes não foram movidos nem reescritos.
-- **APK:** versão `0.2.0`, código 2, **12.128.161 bytes**, SHA-256 `637aef70dfe11e46fe04803ef2cd3172000b7916f73bab90390ef37b84b32ace`, HEAD `6a640d4`, sem alterações não commitadas. Entregue no worktree, no checkout principal e em `C:\Users\phped\Documents\FioForja\APK`.
+- **APK:** versão `0.2.1`, código 3, **12.128.406 bytes**, SHA-256 `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d`, HEAD `2db89fd`, sem alterações não commitadas. Entregue no worktree, no checkout principal e em `C:\Users\phped\Documents\FioForja\APK`. Instalado por cima de 0.1.0/0.2.0 no AVD com save preservado.
 - **Interface:** Início, Coleção, Forja, Loja e Craft sobre o mesmo `GameApp`/`SaveData`; barra inferior fixa fora da fabricação e ausente dentro dela; saída segura com confirmação.
 - **Loja:** catálogo único em `src/game/shop.ts`; compra valida ID, tipo, preço, quantidade e moeda; guarda, lingote, catalisador e receita chegam ao inventário real.
 - **Coleção:** Arsenal real, inspeção, comparação, proteção mínima e instalação/troca de peças com recálculo persistido.
 - **Craft:** quatro doadoras da **mesma raridade** (qualidades livres), chances do motor (50/42/8 para Raras), confirmação, núcleo persistido e "Forjar agora" encaminhando à preparação.
 - **Núcleo → Forja:** material reservado no início; núcleo consumido apenas na conclusão; herança, raridade e origem preservadas no Arsenal.
 - **Provas:** `npm test` **231/231**, typecheck 0, lint 0 erros/39 avisos, build web 0; percurso real de navegador em 392×819/DPR 2,75 com compra, instalação, fusão, reload, forja, revelação e novo reload. Relatório em `experiments/mobile-core-integration/`.
-- **Ainda `NOT_PROVEN`:** aceitação visual humana, validação física no Poco, áudio físico, desempenho sustentado e correção do HUD da bigorna (frente Antigravity).
+- **Android:** cinco seções, Voltar físico, force-stop/relançamento, modo avião e prévia da Forja verificados no AVD 1080×2400/420 dpi. Compras/fusão/forja no APK 0.2.1 não foram repetidas no AVD; estão provadas por 24 testes transacionais e pelo percurso de navegador. Validação física no Poco, áudio físico, desempenho sustentado e HUD da bigorna (frente Antigravity) continuam `NOT_PROVEN`.
 
 ## Decisão mobile aprovada — 24/10/2026
 

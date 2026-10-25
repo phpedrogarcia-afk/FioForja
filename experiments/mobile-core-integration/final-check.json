@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "stateText": "Estado: estável",
+  "stateLocalized": true,
+  "forgeCanvas": {
+    "ok": true,
+    "nonTransparent": 7363,
+    "bounds": {
+      "minX": 420,
+      "maxX": 498,
+      "minY": 33,
+      "maxY": 445
+    },
+    "width": 919,
+    "height": 484
+  }
+}

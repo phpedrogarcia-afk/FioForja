@@ -8,7 +8,7 @@
 - **Coleção:** inspeção por ID, comparação, proteção (`favorite` aditivo) e instalação/troca via `executeComponentInstallTransaction`.
 - **Craft:** mesma raridade exigida no seletor, em `fuseSwords` e em `validateSwordFusionTransaction`; núcleos antigos preservados.
 - **Núcleo → Forja:** "Forjar agora" abre a preparação com identidade travada; material reservado no início; núcleo consumido na conclusão.
-- **APK 0.2.0:** `com.projetofio.fioforja`, código 2, 12.128.161 bytes, SHA-256 `637aef70dfe11e46fe04803ef2cd3172000b7916f73bab90390ef37b84b32ace`, HEAD `6a640d4`. Versão anterior preservada em `Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24`.
+- **APK 0.2.1:** `com.projetofio.fioforja`, código 3, 12.128.406 bytes, SHA-256 `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d`, HEAD `2db89fd`. Instalado por cima de 0.1.0/0.2.0 no AVD com o save preservado. Versão 0.1.0 anterior guardada em `Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24`.
 - **Verificação:** 231/231 testes, typecheck 0, lint 0 erros, build web 0; percurso de navegador documentado em [`experiments/mobile-core-integration`](../experiments/mobile-core-integration/README.md).
 - **Próximo passo:** instalar o APK por cima no Poco, validar toque, áreas seguras, Voltar, persistência e áudio; revisar visualmente o HUD da bigorna (truncamento em 392 px) com a frente Antigravity.
 

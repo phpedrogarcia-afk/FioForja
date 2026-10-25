@@ -103,28 +103,30 @@ Próximo passo: copiar `FioForja-teste.apk` ao Poco, instalar e avaliar toque, s
 
 ---
 
-## Rodada 0.2.0 — Operação Codex 07 (integração mobile core)
+## Rodada 0.2.1 — Operação Codex 07 (integração mobile core)
 
-**Branch:** `codex/mobile-core-integration-v1`. **Commit empacotado:** `6a640d4a0e8094b62a0ab25290db210b32a27d16`. **Data:** 24/10/2026.
+**Branch:** `codex/mobile-core-integration-v1`. **Commit empacotado:** `2db89fd59cc968387a5ee46e4da11750431472ee`. **Data:** 24/10/2026.
 
-O APK 0.2.0 contém a interface integrada: Início, Coleção, Forja, Loja e Craft sobre o mesmo save, com a barra inferior ausente durante a fabricação. A receita, a identidade e os destinos não mudaram.
+O APK 0.2.1 contém a interface integrada: Início, Coleção, Forja, Loja e Craft sobre o mesmo save, com a barra inferior ausente durante a fabricação. A receita, a identidade e os destinos não mudaram.
 
-| Item | 0.2.0 |
+| Item | 0.2.1 |
 |---|---|
 | Pacote | `com.projetofio.fioforja` (inalterado) |
-| Versão | `0.2.0`, código **2** |
+| Versão | `0.2.1`, código **3** |
 | Android | `minSdk 24`, `targetSdk 36` (inalterado) |
 | Assinatura | debug local, verificada por `apksigner` |
-| Tamanho | **12.128.161 bytes** |
-| SHA-256 | `637aef70dfe11e46fe04803ef2cd3172000b7916f73bab90390ef37b84b32ace` |
-| `BUILD-INFO` | HEAD `6a640d4`, sem alterações não commitadas |
-| Cópia identificada | `APK/FioForja-debug-v0.2.0.apk` |
+| Tamanho | **12.128.406 bytes** |
+| SHA-256 | `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d` |
+| `BUILD-INFO` | HEAD `2db89fd`, sem alterações não commitadas |
+| Cópia identificada | `APK/FioForja-debug-v0.2.1.apk` |
 | Destinos | worktree, checkout principal e `C:\Users\phped\Documents\FioForja\APK` |
 
-**Preservação da versão anterior:** antes do rebuild, os artefatos 0.1.0 foram copiados para `C:\Users\phped\Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24\` (APK `4285d300…`, 12.336.603 bytes, HEAD `da46757` com alterações não commitadas). O binário anterior não foi apagado do histórico de entrega.
+**Preservação das versões anteriores:** os artefatos 0.1.0 foram copiados para `C:\Users\phped\Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24\` (APK `4285d300…`, 12.336.603 bytes, HEAD `da46757` com alterações não commitadas). O build intermediário 0.2.0 (`637aef70…`, código 2) foi substituído pelo 0.2.1 durante a validação, após um defeito de prévia da Forja ser encontrado e corrigido. Nenhum binário anterior foi apagado.
 
-**Instalação por cima:** mesmo `applicationId`, mesma chave debug e mesma origem `https://localhost/`. `versionCode` subiu de 1 para 2, o que permite atualização sem desinstalar. O save Android anterior permanece no WebView `localStorage`.
+**Instalação por cima:** mesmo `applicationId`, mesma chave debug e mesma origem `https://localhost/`. `versionCode` subiu 1 → 2 → 3 durante a rodada; a instalação `adb install -r` preservou o save Android existente (4 armas forjadas, melhor Q93, 1.632 ouro, 7 ferro, 4 aço, 5 peças) nas duas atualizações.
 
-**Validação desta rodada:** `[PARTIAL]`. A compilação, a verificação de identidade/assinatura/permissões/assets e a exportação para os três destinos passaram. A instalação/abertura no AVD e o teste físico no Poco estão registrados na seção seguinte quando executados. Não declarar validação no aparelho sem essa observação.
+**Validação Android desta rodada — `[PARTIAL]`:** o AVD `FioForja_API36_APK` (1080×2400, 420 dpi, Android 16/API 36) instalou o APK por cima, abriu o jogo, exibiu as cinco seções, navegou por Loja/Coleção/Forja/Craft, respondeu ao Voltar físico, sobreviveu a force-stop + relançamento e abriu em modo avião após o cold start. A prévia da Forja, que ficava em branco por desenhar com a aba oculta, foi corrigida em 0.2.1 e verificada no AVD. Compras, fusão e conclusão de forja **não** foram repetidas no APK 0.2.1; estão provadas por testes transacionais e pelo percurso de navegador. O teste físico no Poco continua pendente por ausência de aparelho em ADB.
 
-**Mudanças funcionais no bundle:** cinco seções; Loja transacional; instalação de componentes; fusão com mesma raridade; núcleo persistido; Craft 2×2; saída segura da forja. O HUD e a cena da bigorna são os mesmos da frente Antigravity. Nenhuma permissão nova foi adicionada.
+**Limite de ambiente:** o emulador encerrou sozinho uma vez (exit 1) após a instalação final, sem mensagem de falha do app; a mesma rodada já havia capturado a tela inicial com o save preservado. Reinícios anteriores passaram. Não atribuir o encerramento ao aplicativo sem reprodução.
+
+**Mudanças funcionais no bundle:** cinco seções; Loja transacional; instalação de componentes; fusão com mesma raridade; núcleo persistido; Craft 2×2; saída segura da forja; prévia da Forja resiliente à visibilidade. O HUD e a cena da bigorna são os mesmos da frente Antigravity. Nenhuma permissão nova foi adicionada.

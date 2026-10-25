@@ -40,6 +40,28 @@ node experiments/mobile-core-integration/probe.mjs
 
 O probe usa Edge instalado (`FIOFORJA_BROWSER_CHANNEL` sobrescreve). Ele semeia o save **uma vez por aba** e recarrega a página nos pontos de persistência.
 
+## Prova Android (AVD)
+
+APK **0.2.1** (código 3), `com.projetofio.fioforja`, SHA-256 `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d`, 12.128.406 bytes, HEAD `2db89fd`. AVD `FioForja_API36_APK`: **1080×2400**, **420 dpi**, Android 16/API 36.
+
+| Verificação | Resultado |
+|---|---|
+| Instalação por cima de 0.1.0 e 0.2.0 | `adb install -r` sucesso; `versionCode` 1 → 2 → 3 |
+| Save anterior | preservado: 4 forjadas, Q93, 1.632 ouro, 7 ferro, 4 aço, 5 peças |
+| Cinco seções | Início, Coleção, Forja, Loja, Craft visíveis e navegáveis por toque |
+| Voltar físico | Loja → Início; em Início o app permanece aberto |
+| Force-stop + relançamento | volta ao Início com o mesmo save |
+| Modo avião | abre e renderiza offline após cold start |
+| Coleção/inspeção | 4 armas, miniaturas, atributos e painel de inspeção |
+| Prévia da Forja | **defeito encontrado e corrigido**: o canvas desenhava uma vez com a aba oculta e ficava em branco; agora usa `WeaponPreview` com `ResizeObserver` |
+| Compras/fusão/forja no AVD | não repetidas no 0.2.1; provadas por testes e pelo navegador |
+
+O emulador encerrou sozinho uma vez (exit 1) após a instalação final; a tela inicial do APK final já havia sido capturada com o save preservado. Não há aparelho físico em ADB nesta rodada.
+
+Capturas: `evidence/android-*.png` (não versionadas).
+
+**Correção final verificada no navegador:** `check-final.mjs` confirmou `Estado: estável` na inspeção e a prévia da Forja pintada (7.363 pixels não transparentes, extensão vertical de 412 px em um canvas de 919×484), em 392×819/DPR 2,75. Resultado em `final-check.json`.
+
 ## Testes automatizados
 
 - `src/game/mobile-integration.test.ts`: 24 testes — Loja (7), Coleção (3), Craft (8), núcleo→forja (5), compatibilidade de save (1). Cobre preço adulterado, produto inexistente, falha de storage, mesma raridade, IDs repetidos, lâmina protegida/quebrada/treino/entregue, catalisador, reload, consumo único do núcleo e herança.
