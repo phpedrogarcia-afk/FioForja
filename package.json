@@ -1,6 +1,6 @@
 {
   "name": "fio-forja",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -17,7 +17,7 @@
     "preview:stop": "node scripts/preview.mjs stop",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test scripts/*.test.mjs scripts/internal/*.test.mjs && node --experimental-strip-types --test src/game/sim.test.ts src/game/arsenal-vivo.test.ts src/game/prestige-transactions.test.ts src/game/progression.test.ts src/game/lifecycle-proof.test.ts src/game/mobile-integration.test.ts src/game/visuals/*.test.ts src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts",
+    "test": "node --test scripts/*.test.mjs scripts/internal/*.test.mjs && node --experimental-strip-types --test src/game/sim.test.ts src/game/arsenal-vivo.test.ts src/game/prestige-transactions.test.ts src/game/progression.test.ts src/game/lifecycle-proof.test.ts src/game/mobile-integration.test.ts src/game/mobile-core-review.test.ts src/game/visuals/*.test.ts src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:mobile": "node scripts/build-mobile.mjs",

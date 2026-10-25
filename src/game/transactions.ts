@@ -222,6 +222,19 @@ export function executeComponentInstallTransaction(
 /**
  * 4. Weapon Refinement / Upgrade Transaction: Workbench edge polish and grip reinforcement (+8 ATK, +2 DUR).
  */
+export function getSwordUpgradeQuote(sword: FinishedSword) {
+  const upgrades = sword.upgradesApplied || 0;
+  const updatedSword = recalculateSwordStats({ ...sword, upgradesApplied: upgrades + 1 });
+  return {
+    goldCost: 60 * (upgrades + 1),
+    rubyCost: upgrades >= 1 ? 1 : 0,
+    maxed: upgrades >= 3,
+    updatedSword,
+    damageDelta: (updatedSword.damage || 0) - (sword.damage || 0),
+    durabilityDelta: (updatedSword.durability || 0) - (sword.durability || 0),
+  };
+}
+
 export function executeUpgradeSwordTransaction(
   currentSave: SaveData,
   swordId: string,
@@ -240,8 +253,7 @@ export function executeUpgradeSwordTransaction(
   }
 
   const currentWallet = currentSave.wallet || defaultWallet;
-  const goldCost = 60 * (upgrades + 1);
-  const rubyCost = upgrades >= 1 ? 1 : 0;
+  const { goldCost, rubyCost, updatedSword } = getSwordUpgradeQuote(targetSword);
 
   if (currentWallet.gold < goldCost || currentWallet.rubies < rubyCost) {
     return { success: false, save: currentSave, error: "Recursos insuficientes para o refino.", code: "INSUFFICIENT_FUNDS" };
@@ -252,11 +264,6 @@ export function executeUpgradeSwordTransaction(
     gold: currentWallet.gold - goldCost,
     rubies: currentWallet.rubies - rubyCost,
   };
-
-  const updatedSword = recalculateSwordStats({
-    ...targetSword,
-    upgradesApplied: upgrades + 1,
-  });
 
   const nextGallery = currentSave.gallery.map((s) => (s.id === swordId ? updatedSword : s));
   const nextSave: SaveData = {

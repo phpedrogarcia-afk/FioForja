@@ -1,6 +1,6 @@
 # Navegação mobile — cinco seções integradas
 
-**Estado:** `[USER-APPROVED]` arquitetura; `[AGENT-IMPLEMENTED]` integração; `[VERIFIED]` no navegador; Android em `[PARTIAL]` até a instalação no aparelho.
+**Estado:** `[USER-APPROVED]` arquitetura; `[AGENT-IMPLEMENTED]` integração; `[VERIFIED]` no envelope funcional Codex 08: navegador, percurso AVD e navegação básica no Poco. Candidata à avaliação humana; áudio, desempenho sustentado e primeiro frame da Revelação não foram resolvidos por esses resultados.
 **Autoridade:** [FIOFORJA-MOBILE-UX-001](../DECISIONS.md#fioforja-mobile-ux-001) e a atualização de Craft em [FIOFORJA-MOBILE-CORE-001](../DECISIONS.md#fioforja-mobile-core-001).
 **Branch de implementação:** `codex/mobile-core-integration-v1`.
 
@@ -24,6 +24,9 @@ A oficina é **uma só**: `GameApp` continua sendo o único dono do estado (`sav
 - Alvos de toque: mínimo de 56 px na barra; botões de ação com `min-h` de 36–48 px.
 - A seção ativa usa `aria-current="page"` e marcador dourado; as demais ficam legíveis em repouso.
 - As cinco seções ficam **montadas** e são alternadas por `hidden`; trocar de aba não remonta a árvore nem reinicia seleção do Craft, inspeção da Coleção ou preparação da Forja.
+- Como os Sheets usam portal, `hidden` da seção não basta para escondê-los: os nove painéis de Início/Coleção/Loja/Craft exigem também a seção `active`. A navegação remove o portal sobreposto, preservando o estado local para o retorno.
+
+No Início/perfil, as encomendas oferecem escolha explícita da arma elegível antes de entregar e mantêm o histórico das cumpridas. Na Loja/Ferramentas, o jogador equipa ferramentas adquiridas ou restaura o padrão. Na inspeção da Coleção, o refino apresenta preço e delta efetivo antes de debitar.
 
 ## 3. Exceção canônica: fabricação
 
@@ -51,12 +54,13 @@ Cancelar aplica `executeCancelForgeTransaction`: reembolso integral antes do pri
 
 ## 6. Provas
 
-- `experiments/mobile-core-integration/probe.mjs` — percurso de navegador em 392×819/DPR 2,75: Loja → compra → Coleção → instalação (DEF 186→194) → Craft → 4 Raras → odds 50/42/8 → núcleo → reload → Forja → saída segura → 8 golpes + têmpera → Revelação → Arsenal → reload. Resultado `PASS` em `evidence/probe-report.json`.
+- `experiments/mobile-core-integration/probe.mjs` — percursos históricos de navegador em 392×819/DPR 2,75: Loja → compra → Coleção → instalação (DEF 186→194) → Craft → 4 Raras → odds 50/42/8 → núcleo → reload → Forja → saída segura → sete eventos de golpe registrados + têmpera → Revelação → Arsenal → reload. A primeira execução revelou Raro; a segunda, Lendário. Resultados `PASS`, horários, localização no Git e limites no [relatório da integração](../../experiments/mobile-core-integration/README.md). O JSON não estabelece o total físico além dos sete eventos registrados.
 - Testes de integração em `src/game/mobile-integration.test.ts`.
 - `npm run typecheck`, `npm test`, `npm run lint` verdes na branch.
 
 ## 7. Limites
 
 - A barra fica **oculta** em Revelação/Recompensas nesta entrega; a decisão anterior deixava a visibilidade em aberto. As telas têm retorno explícito para Arsenal/Início.
-- O HUD da bigorna é da frente Antigravity; a grade de quatro estatísticas transborda em 392 px. Não foi alterado aqui — ver [pendências](../PROJECT-STATE.md#pontos-que-dependem-da-frente-antigravity).
-- O botão Voltar foi verificado via `popstate` no navegador; o gesto físico no aparelho depende da instalação do APK.
+- O HUD da bigorna é da frente Antigravity; a grade de quatro estatísticas transborda em 392 px. Não foi alterado aqui — ver [estado e limites](../PROJECT-STATE.md).
+- O botão Voltar foi verificado via `popstate` no navegador e por toque nativo no AVD. No Poco 0.2.2, navegação pelas cinco seções, Voltar de Craft à Loja e force-stop/relançamento preservaram exatamente o baseline subsequente à restauração; o aparelho passou por reinstalação autorizada após desinstalação humana, não atualização por cima.
+- A [Operação Codex 08](../../.project-intelligence/experiments/CODEX08-review.md) confirmou quatro percursos UI adicionais **RED 4 → GREEN 4**: equipamento, portal entre seções, escolha/histórico de encomenda e cotação de refino. Esses percursos são separados dos **475 testes de `npm test` (468 PASS/7 SKIP/0 FAIL)**. Checks/builds e nove casos no AVD passaram. O AVD desta rodada mediu 412×839 CSS/DPR 2,625; o Poco, 392×819 CSS/DPR 2,75. Compras/fusão do percurso AVD não foram executadas no Poco.

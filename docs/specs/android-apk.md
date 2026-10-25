@@ -1,6 +1,8 @@
 # APK Android experimental
 
-**Rodada:** 23–24/10/2026. **Branch:** `codex/android-apk-delivery`. **Base:** `c2b1883038332f3572e7135824116852b328c56a`.
+**Operação Codex 08 (25/10/2026): `PASS` no envelope funcional testado; candidata à avaliação humana.** Branch isolada `codex/mobile-core-review-v1`, base `78945e0de9d7a70d14994e80a14b2885998ec9ec` + working tree revisado. O APK atual **0.2.2/código 4** tem **12.129.669 bytes**, SHA-256 `d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56`. Checks/builds e assinatura passaram; AVD tem nove casos PASS; Poco tem prova limitada de reinstalação/restauração/navegação. Detalhes na seção [Rodada 0.2.2](#rodada-022--operação-codex-08) e no [registro Codex 08](../../.project-intelligence/experiments/CODEX08-review.md). Não implica aprovação de governança/produção nem comprova áudio, desempenho sustentado ou primeiro frame da Revelação. Publicação autorizada exclusivamente para `codex/mobile-core-review-v1`; conferir seu HEAD remoto ao retomar.
+
+**Rodada histórica inicial:** 23–24/10/2026. **Branch:** `codex/android-apk-delivery`. **Base:** `c2b1883038332f3572e7135824116852b328c56a`. As seções até "Rodada 0.2.1" descrevem essa entrega inicial 0.1.0; números, APKs e provas de rodadas diferentes não são intercambiáveis. A receita continua comum, executada no worktree da rodada em questão.
 
 ## Escopo e fontes
 
@@ -12,7 +14,7 @@ A [integração Codex 05](../../experiments/M03-cross-agent-integration/README.m
 
 ## Identidade e ferramentas
 
-| Item | Configuração desta entrega |
+| Item | Configuração da entrega inicial 0.1.0 |
 |---|---|
 | Pacote | `com.projetofio.fioforja` |
 | Versão | `0.1.0`, código `1`, assinatura debug |
@@ -35,7 +37,7 @@ npm.cmd run apk
 
 Nenhuma variável global é alterada. `npm run apk` constrói `dist-mobile`, copia os **11 assets de arte exigidos**, sincroniza o projeto Android e executa `assembleDebug`. Antes de entregar, usa `aapt` para verificar pacote, versão, rótulo `FioForja`, `minSdk 24`, `targetSdk 36` e a lista exclusiva da permissão interna de assinatura AndroidX. Também verifica a presença dos assets e a assinatura com `apksigner`.
 
-São produzidos quatro artefatos:
+São produzidos quatro artefatos; a lista abaixo usa o nome da rodada inicial. A cópia identificada de cada nova rodada acompanha a versão efetiva do pacote:
 
 - `FioForja-teste.apk`;
 - `FioForja-debug-v0.1.0.apk`;
@@ -60,7 +62,7 @@ Atualize instalando o APK por cima da versão anterior com o mesmo app ID e assi
 
 O contrato herdado recupera o último checkpoint confirmado; não promete preservar frames não confirmados. Compilar um APK não prova persistência depois de suspensão, encerramento do processo ou atualização. Esses comportamentos exigem observação no Android, sem apagar saves existentes.
 
-## Evidência registrada nesta rodada
+## Evidência histórica da rodada inicial 0.1.0
 
 | Verificação | Resultado e envelope |
 |---|---|
@@ -74,7 +76,7 @@ O contrato herdado recupera o último checkpoint confirmado; não promete preser
 
 `npm audit` identifica avisos altos em Vite e zod herdados do lockfile; nenhuma versão preexistente foi alterada nesta entrega. Há avisos moderados novos na cadeia CLI/xcode/uuid de tooling iOS não usado pelo APK. Isso não constitui uma aprovação geral das dependências. Correção de dependências e `npm audit fix` ficam fora desta missão.
 
-## Validação Android concluída no emulador
+## Validação histórica do APK inicial no emulador
 
 **STATUS = APK_READY**, limitado ao APK entregue e ao AVD Android 16/API 36 `x86_64`. A rodada `2026-10-24T18-23-16-188Z-21288` passou os **dez casos**: modo avião; título e seletor DNA; forja/têmpera/claim/Arsenal; save após force-stop; comparação Clássico/DNA sem alterar os dados; dois golpes reais numa nova tentativa; Back minimiza e retorna; Home e retorno; modal de recuperação com checkpoint de dois golpes; conclusão da forja retomada. Nenhuma exceção JavaScript foi observada no intervalo monitorado. Os rádios foram restaurados ao estado anterior `0/1/1`.
 
@@ -96,9 +98,9 @@ Medições desta rodada: Activity `TotalTime` **1.856 / 1.544 / 1.252 ms**, do c
 - A rodada de 23/10 terminou em APPCRASH de `qemu-system-x86_64-headless.exe`, exceção `0xc0000005`, relatório Windows `5d6eb934-ed71-478a-b7bc-a9fc13f90c85`. A espada persistiu, mas o claim observado imediatamente antes da falha do host não reapareceu após o reboot. A causa interna e a durabilidade contra falha do host são **UNKNOWN / NOT_PROVEN**. A continuação que exigia esse claim falhou corretamente e seu relatório foi preservado.
 - A rodada completa de 24/10 usou GPU host AMD RX 6600 XT, preservando userdata; o backend foi confirmado nos logs. Isso não demonstra que a GPU causou ou resolveu o crash anterior. Save após force-stop Android passou; não se generaliza para desligamento abrupto do computador.
 - A captura antiga `first-arsenal` da rodada interrompida mostrava um frame anterior de recompensas apesar do DOM já estar na galeria. Não é evidência visual da galeria. As capturas Clássico/DNA da rodada final mostram efetivamente a galeria.
-- **NOT_PROVEN:** instalação e execução no Poco, API/ABI efetivamente instaladas nesse aparelho, desempenho térmico/sustentado, latência e toque físicos, audibilidade, atualização entre versões distintas, migração de save desktop e confiabilidade em todos os dispositivos. Nenhum telefone estava conectado. Os ícones/splash nativos permanecem os padrões do template.
+- **NOT_PROVEN ao encerrar a rodada inicial:** instalação e execução no Poco, API/ABI efetivamente instaladas nesse aparelho, desempenho térmico/sustentado, latência e toque físicos, audibilidade, atualização entre versões distintas, migração de save desktop e confiabilidade em todos os dispositivos. Nenhum telefone estava conectado. Instalação e abertura posteriores da versão inicial no Poco foram relatadas no estado do projeto; isso não valida o APK integrado 0.2.1. Os ícones/splash nativos permanecem os padrões do template.
 
-Próximo passo: copiar `FioForja-teste.apk` ao Poco, instalar e avaliar toque, som e fluidez. Não há merge, push ou mudança de `main` nesta entrega.
+Próximo passo daquela rodada: copiar `FioForja-teste.apk` ao Poco, instalar e avaliar toque, som e fluidez. Não houve merge, push ou mudança de `main` naquela entrega; publicação posterior deve ser atribuída à sua própria rodada.
 
 
 ---
@@ -130,3 +132,24 @@ O APK 0.2.1 contém a interface integrada: Início, Coleção, Forja, Loja e Cra
 **Limite de ambiente:** o emulador encerrou sozinho uma vez (exit 1) após a instalação final, sem mensagem de falha do app; a mesma rodada já havia capturado a tela inicial com o save preservado. Reinícios anteriores passaram. Não atribuir o encerramento ao aplicativo sem reprodução.
 
 **Mudanças funcionais no bundle:** cinco seções; Loja transacional; instalação de componentes; fusão com mesma raridade; núcleo persistido; Craft 2×2; saída segura da forja; prévia da Forja resiliente à visibilidade. O HUD e a cena da bigorna são os mesmos da frente Antigravity. Nenhuma permissão nova foi adicionada.
+
+## Rodada 0.2.2 — Operação Codex 08
+
+| Item | Candidato testado |
+|---|---|
+| Pacote | `com.projetofio.fioforja` |
+| Versão | **0.2.2**, código **4** |
+| Fonte | Base `78945e0` + working tree revisado; `BUILD-INFO` registra alterações não commitadas **YES** |
+| Tamanho | **12.129.669 bytes** |
+| SHA-256 | `d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56` |
+| Build/assinatura | `npm run apk` PASS; assinatura `apksigner` verificada |
+| Entrega | `C:\Users\phped\Documents\FioForja\APK\FioForja-teste.apk` e `FioForja-debug-v0.2.2.apk`, além dos destinos automáticos da receita |
+| Versão anterior | 0.2.1 preservada na cópia por versão e em `APK/Arquivo-Codex08/FioForja-v0.2.1-code3.apk`, SHA-256 `02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d`; APK físico 0.1.0 tem backup prévio |
+
+O APK não é apresentado como build de HEAD limpo. Typecheck PASS; lint **0 erros/38 avisos**; build web e mobile PASS. `db:migrate` foi explicitamente pulado por `DATABASE_URL` ausente, com fallback PGLite, sem migração de banco remoto. `npm test`: **475 encontrados/468 PASS/7 SKIP/0 FAIL**. Os quatro percursos UI e os 72 outputs econômicos da revisão independente estão fora desse total.
+
+**AVD — [nove casos PASS](../../experiments/CODEX08-review/android-summary.json):** Android 16/API 36 x86_64, `emulator-5556`, viewport **412×839 CSS/DPR 2,625**. A atualização **0.2.1→0.2.2 por cima** preservou os dados sem limpar o app. O percurso usa fixture sintética explícita de quatro Raras e, depois dela, somente entradas nativas ADB e leitura CDP: comprar aço/catalisador/duas guardas, instalar e trocar (DEF 185→193→195, devolução da anterior), fundir em núcleo Épico consumindo um catalisador, reabrir, forjar com oito golpes e têmpera 98, produzir espada Épica Q75, consumir núcleo na conclusão e reabrir preservando o estado relevante. Recompensas foram geradas e persistidas, **não coletadas**. O resumo reúne etapas confirmadas, preservadas após reparos do driver e interrupção de coordenação, sem refazer o percurso inteiro.
+
+**Poco — [reinstalação/restauração e navegação PASS](../../experiments/CODEX08-review/poco-summary.json):** o proprietário confirmou a desinstalação do app original e autorizou reinstalar. O snapshot anterior à remoção foi restaurado e comparado na escrita, SHA-256 `387b58558af9e0c3576966751b0917f605b4afc82778de2546b2706cdd7a2f24`. Uma nova forja local foi observada antes da leitura de navegação (carreira 2→3, aço 2→1), com ator não atribuído; não houve segunda restauração. O baseline subsequente `66c14a7bbb4ea0a08054b40dadea1c92d4e4ea4278b8977d8fecc28e5250a4be` ficou igual após cinco seções, Voltar e force-stop/relançamento, em **392×819 CSS/DPR 2,75**. Não houve fixture, compra ou fusão desta prova no Poco. **Não é prova de atualização por cima no aparelho físico.**
+
+**Limites/scars:** a captura imediata `07-weapon-reveal.png` mostra canvas vazio, sem isolar timing de captura versus desenho (`NOT_PROVEN`); `08-persisted-inspection.png`, após reabrir, mostra a arma inteira. Áudio físico, desempenho sustentado, progressão/balanceamento de longo prazo e aceitação humana continuam fora do comprovado. A normalização da Loja foi preservada; a validação de fusão verifica receita possível, não autentica o sorteio original nem oferece proteção geral contra edição do save. Os JSONs de evidência não foram reescritos.

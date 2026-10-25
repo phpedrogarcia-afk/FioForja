@@ -151,7 +151,7 @@ Integração seletiva, legado padrão, URL válida com precedência, cache compl
 
 ### FIOFORJA-MOBILE-UX-001 — Navegação por seções e protagonismo da espada `[USER-APPROVED]`
 
-**Origem:** decisão explícita do proprietário nesta data, após o vídeo de 23 segundos do APK no Poco. **Estado:** direção de produto aprovada; [protótipo experimental construído](../experiments/mobile-ux-v1/README.md), sem integração ao jogo nem validação humana do layout. Não atribuir aprovação visual ou prontidão de produção com base apenas na implementação do protótipo.
+**Origem:** decisão explícita do proprietário nesta data, após o vídeo de 23 segundos do APK no Poco. **Estado inicial:** direção de produto aprovada; [protótipo experimental construído](../experiments/mobile-ux-v1/README.md), então sem integração ao jogo nem validação humana do layout. **Atualização:** a integração funcional ocorreu na Operação Codex 07, registrada na seção 9. Aprovação visual e prontidão de produção não decorrem apenas da implementação.
 
 #### Arquitetura aprovada
 
@@ -165,7 +165,7 @@ Barra inferior fixa com **cinco seções**, em ordem estável:
 | **Loja** | Materiais, ferramentas, componentes e itens de fusão. |
 | **Craft** | Crisol híbrido: fusão de espadas em núcleos e acesso à fusão de componentes. |
 
-**Atualização humana de 24/10/2026:** Craft substitui Jogador; perfil, carreira, encomendas, equipamentos e configurações continuam previstos no Início/perfil. O [primeiro recorte de Craft](specs/craft-mobile-prototype.md) define seleção 2×2 e revisão antes do sacrifício; mesma raridade não exige mesma qualidade. A saída continua sendo núcleo. A integração transacional depende de aprovação visual e deve preservar núcleos antigos.
+**Atualização humana de 24/10/2026:** Craft substitui Jogador; perfil, carreira, encomendas, equipamentos e configurações continuam previstos no Início/perfil. O [primeiro recorte de Craft](specs/craft-mobile-prototype.md) define seleção 2×2 e revisão antes do sacrifício; mesma raridade não exige mesma qualidade. A saída continua sendo núcleo. A integração transacional foi autorizada posteriormente na Operação Codex 07, preservando núcleos antigos; a avaliação visual continua pendente.
 
 A barra **desaparece durante a fabricação da espada**. A forja ativa ocupa a tela disponível, respeita as áreas seguras do aparelho e mantém uma saída explícita com os contratos atuais de tentativa, cancelamento e recuperação. A visibilidade da barra na Revelação será definida no protótipo; sua ausência durante a fabricação não é opcional.
 
@@ -199,16 +199,16 @@ Critérios de validação: arma inteira na prévia; peça e contato legíveis na
 
 Esta decisão atualiza o **agrupamento e a apresentação mobile** das funções descritas na [Galeria](canon/galeria.md) e complementa a [tela ideal da forja](specs/ideal-forge-screen.md). Preserva o Arsenal individual, Compêndio, runas, componentes, ferramentas, Legado, encomendas e o [sistema híbrido de fusão](canon/fusao-hibrida.md); reorganizar acessos não elimina esses mecanismos. A compra de itens de fusão na Loja não substitui o Crisol nem a forja manual com núcleo.
 
-**CURRENT:** o APK em `41d7222` ainda usa a preparação extensa, composição R4B e abas da Galeria. Sua instalação e prova funcional não aprovam a nova experiência visual. O enquadramento anterior e os testes do emulador não são evidência de aceitação desta decisão.
+**Baseline histórico da decisão:** o APK em `41d7222` usava a preparação extensa, composição R4B e abas da Galeria. Sua instalação e prova funcional não aprovam a nova experiência visual. O enquadramento anterior e os testes do emulador não são evidência de aceitação desta decisão.
 
-**TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **OBSERVED:** o protótipo separado tem navegação e capturas físicas no Poco, conforme o [relatório do recorte](../experiments/mobile-ux-v1/README.md). **NOT_PROVEN:** aceitação visual e de uso pelo proprietário, integração final, solução final de câmera e adequação definitiva dos assets. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
-
-System.Management.Automation.Runspaces.PipelineReader`1+<GetReadEnumerator>d__20[System.Object]
+**TARGET:** cinco seções com barra fixa, fabricação imersiva e espada protagonista. **OBSERVED:** o protótipo separado tem navegação e capturas físicas no Poco, conforme o [relatório do recorte](../experiments/mobile-ux-v1/README.md); a integração funcional posterior está na seção 9, e a navegação física limitada do candidato 0.2.2 está na seção 10. **NOT_PROVEN:** aceitação visual e de uso pelo proprietário, ciclo funcional físico integral do APK integrado, solução final de câmera e adequação definitiva dos assets. Codex e Antigravity devem consultar este registro antes de reorganizar a interface, preservando código funcional, saves, branches e experimentos durante a validação.
 
 
 ---
 
 ## 9. Operação Codex 07 — Integração mobile core
+
+<a id="fioforja-mobile-core-001"></a>
 
 ### FIOFORJA-MOBILE-CORE-001 — Cinco seções conectadas ao jogo real `[USER-APPROVED]` `[AGENT-IMPLEMENTED]` `[VERIFIED]`
 
@@ -244,3 +244,22 @@ O catálogo do Bazar foi extraído para `src/game/shop.ts` e ampliado com ferram
 - O HUD atual da bigorna (grade de quatro estatísticas) transborda horizontalmente em 392 px; a correção pertence à frente visual. Não foi alterado nesta operação.
 - A Revelação reaproveita `RevealScreen` existente; composição/corte da arma e enquadramento continuam da frente visual.
 - Qualquer mudança futura em `DesignScreen` deve preservar o modo `embedded`, `lockToCore` e `onOpenShop`.
+
+## 10. Operação Codex 08 — revisão da integração mobile (25/10/2026)
+
+**Estado:** `PASS` no envelope funcional testado; **candidata à avaliação humana**. **Base:** `78945e0de9d7a70d14994e80a14b2885998ec9ec` + working tree revisado; branch isolada `codex/mobile-core-review-v1`.
+
+A revisão preserva as decisões de cinco seções e de forja manual com núcleo. Evidência e discrepâncias históricas são registradas no [relatório Codex 08](../.project-intelligence/experiments/CODEX08-review.md): duas execuções de navegador distintas, sete eventos de golpe registrados em cada JSON e `231` como subtotal TypeScript. Os arquivos de evidência históricos não são reescritos para alinhar narrativas.
+
+- **`KEEP` — Loja:** a normalização de identidade e efeitos pelo catálogo já existia na base. Preservada e coberta por regressões, sem atribuir correção inexistente à revisão.
+- **Persistência inicial:** o primeiro backup só recebe o candidato após a gravação primária bem-sucedida; uma compra recusada não pode reaparecer na recuperação de save fresco.
+- **Fusão:** validar custos, resultado, herança e fragmentos reconstruindo uma receita possível do mesmo tier. Odds preservadas; núcleos antigos continuam forjáveis. Isso não autentica o sorteio original nem detecta genericamente a troca `usedCatalyst true → false` quando o resultado é possível nos dois cenários; o save local não se torna uma autoridade contra adulteração.
+- **Acessos mobile:** equipar ferramentas adquiridas ou padrão; limitar nove Sheets à seção ativa; escolher a arma antes de entregar encomenda e consultar o histórico cumprido; apresentar custo e delta real do refino por cálculo compartilhado com a transação.
+
+**Evidência de software:** `npm test` **475 encontrados / 468 PASS / 7 SKIP / 0 FAIL**, incluindo 41 regressões novas sem remoção de testes anteriores; quatro percursos UI adicionais **RED 4 → GREEN 4**, fora do total. A suíte focal de 123 PASS é sobreposta e não deve ser somada novamente.
+
+**Build e APK:** typecheck PASS, lint 0 erros/38 avisos, builds web/mobile/APK PASS e assinatura verificada. Migração remota SKIP explícito por `DATABASE_URL` ausente, com fallback PGLite. APK **0.2.2/código 4**, 12.129.669 bytes, SHA-256 `d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56`, construído com alterações não commitadas declaradas em `BUILD-INFO`, sem alegar HEAD limpo.
+
+**Android:** [nove casos PASS no AVD](../experiments/CODEX08-review/android-summary.json), incluindo atualização por cima, compras, montagem/troca, fusão, forja manual e reabertura, com fixture declarada e recompensas não coletadas. No [Poco](../experiments/CODEX08-review/poco-summary.json), a desinstalação humana confirmada foi seguida de reinstalação autorizada e restauração; navegação/Voltar/relançamento preservaram o baseline posterior, sem fixture, compra ou fusão dessa prova. Não atribuir ao Poco a atualização por cima comprovada no emulador.
+
+Uma revisão econômica independente reportou zero diferenças em 72 outputs, excluindo IDs/datas, fora de `npm test`. Esses resultados não são aprovação de governança ou produção. Permanecem fora do comprovado áudio físico, desempenho sustentado e longo prazo; o primeiro frame da Revelação mostra canvas vazio com causa não isolada entre timing e desenho, embora a inspeção após reabrir mostre a arma inteira. A publicação autorizada abrange exclusivamente `codex/mobile-core-review-v1`; não há autorização de merge ou reescrita de branches preexistentes. Conferir o HEAD remoto ao retomar.

@@ -1,0 +1,80 @@
+{
+  "mission": "FIOFORJA-CODEX08",
+  "base": "78945e0de9d7a70d14994e80a14b2885998ec9ec",
+  "tests": {
+    "scripts": {
+      "discovered": 203,
+      "passed": 196,
+      "skipped": 7,
+      "failed": 0
+    },
+    "typescript": {
+      "discovered": 272,
+      "passed": 272,
+      "skipped": 0,
+      "failed": 0
+    },
+    "total": {
+      "discovered": 475,
+      "passed": 468,
+      "skipped": 7,
+      "failed": 0
+    },
+    "added": 41,
+    "removed": 0,
+    "focused": {
+      "passed": 123,
+      "overlaps": true
+    },
+    "ui": {
+      "beforeFailed": 4,
+      "afterPassed": 4,
+      "separate": true
+    }
+  },
+  "commands": {
+    "npm test": 0,
+    "npm run typecheck": 0,
+    "npm run lint": 0,
+    "npm run build": 0,
+    "npm run build:mobile": 0,
+    "npm run apk": 0
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 38
+  },
+  "databaseMigration": "SKIP: DATABASE_URL absent; PGLite fallback owns its migration",
+  "apk": {
+    "version": "0.2.2",
+    "versionCode": 4,
+    "bytes": 12129669,
+    "sha256": "d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56",
+    "path": "C:/Users/phped/Documents/FioForja/APK/FioForja-teste.apk",
+    "signature": "apksigner verified",
+    "sourceState": "base plus reviewed working-tree changes; before final commit"
+  },
+  "sourceFiles": {
+    "android/app/build.gradle": "bb67a6688a68682f7806ed6385194ffb6434e2f14d97daa569eb80017f8c5ae7",
+    "package-lock.json": "86c79fe23223d50c5ce38d829f40415fd501641780e34f9a0444203561ad089c",
+    "package.json": "de5eddfcbd25eb37e5f3a1e457f948f6696fcad66d43580b4190a2b58bbe3637",
+    "src/game/GameApp.tsx": "5c8ac282317c94e20c5920667910048fbaa74970783a3fae6b7dc173c9c12726",
+    "src/game/fusion.ts": "024307545b0df8081b526ce102757240e9dace35610b7013826ea0b34cf73d6c",
+    "src/game/save.ts": "cbb8f95dcd3fb32129810384f5d108764951582afecb828af5983a235fec073c",
+    "src/game/screens/CollectionScreen.tsx": "d2c120a807880593cbf9c1a98bb12355377d0299a9270375fca9265ed4c3ded0",
+    "src/game/screens/CraftScreen.tsx": "ae54c32dac7ebca69bd0f1012e52afdeff36490c7f5ce29b5b6f66c7c5879957",
+    "src/game/screens/ShopScreen.tsx": "d1c1f7c7a2cf48a8ca3ca06d04a2dee64ef82c607a36786fa014985eeaa75a1c",
+    "src/game/screens/WorkshopHome.tsx": "8a1e2221c2ec96c068f4ec39cb8616366875283424e9beb69b6652fba9cb002c",
+    "src/game/transactions.ts": "474668a5dc9a526feea12118398bf3a1ed0a61953d8ab2ec093f41b465cdbd98"
+  },
+  "android": {
+    "emulator": "android-summary.json",
+    "poco": "poco-summary.json"
+  },
+  "harnessLint": {
+    "errors": 0,
+    "exitCode": 0,
+    "warnings": 0,
+    "command": "eslint experiments/CODEX08-review/*.mjs"
+  }
+}

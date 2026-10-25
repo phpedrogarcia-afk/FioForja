@@ -337,16 +337,15 @@ export function writeSave(data: SaveData): import("./types.ts").SaveResult {
           /* non-fatal if backup slot is tight */
         }
       }
-    } else {
-      try {
-        storage.setItem(BACKUP_KEY, serialized);
-      } catch {
-        /* non-fatal */
-      }
     }
 
     // Write primary state
     storage.setItem(KEY, serialized);
+    // A first-write candidate becomes recoverable only after primary commits.
+    // Otherwise a failed purchase could later be resurrected from the backup.
+    if (!existingRaw) {
+      try { storage.setItem(BACKUP_KEY, serialized); } catch { /* primary already committed */ }
+    }
     lastSuccessfulSaveSnapshot = structuredClone(data);
     return { ok: true };
   } catch (err: any) {

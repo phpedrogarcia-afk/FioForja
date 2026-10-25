@@ -1,0 +1,35 @@
+{
+  "result": "PASS",
+  "package": "com.projetofio.fioforja",
+  "version": "0.2.2",
+  "code": 4,
+  "context": "Human-confirmed uninstall; fresh install and restoration from the exact pre-uninstall owner snapshot",
+  "viewport": {
+    "w": 392,
+    "h": 819,
+    "dpr": 2.75
+  },
+  "restorationVerifiedAtWrite": true,
+  "restoredSnapshotSha": "387b58558af9e0c3576966751b0917f605b4afc82778de2546b2706cdd7a2f24",
+  "subsequentPlayObserved": {
+    "careerBefore": 2,
+    "careerAtNavigation": 3,
+    "steelBefore": 2,
+    "steelAtNavigation": 1,
+    "actor": "NOT_PROVEN by this observation; no further restoration applied"
+  },
+  "navigationBaselineSha": "66c14a7bbb4ea0a08054b40dadea1c92d4e4ea4278b8977d8fecc28e5250a4be",
+  "navigationAndRelaunchPreservedExactly": true,
+  "checks": [
+    "five sections by native ADB taps",
+    "hardware Back Craft to Shop",
+    "background then force-stop/relaunch",
+    "no data changed during navigation and relaunch"
+  ],
+  "limits": [
+    "No synthetic fixture on owner device",
+    "No purchase/fusion in this physical proof",
+    "Install-over-update proved on emulator, not on uninstalled Poco",
+    "No sustained performance measurement"
+  ]
+}

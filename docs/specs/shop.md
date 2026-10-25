@@ -1,6 +1,6 @@
 # Loja funcional — catálogo, compra e persistência
 
-**Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` (testes + navegador).
+**Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` no envelope funcional da [revisão Codex 08](../../.project-intelligence/experiments/CODEX08-review.md), base `78945e0` + working tree revisado. Normalização já correta da Loja preservada; regressões e acesso a equipamento verificados. APK 0.2.2/código 4 e percurso de compras no AVD PASS; no Poco, a prova foi limitada a reinstalação/restauração/navegação, sem compras. Candidata à avaliação humana.
 **Fonte de verdade:** `src/game/shop.ts` (catálogo) e `executeShopPurchaseTransaction` em `src/game/transactions.ts`.
 
 ## 1. Catálogo canônico
@@ -40,16 +40,22 @@ O preço é multiplicado pela quantidade apenas para materiais. A gravação aco
 - **Material** → `addMaterialStock` sob a chave canônica (`iron` → `iron_ingot`), consumido pela forja.
 - **Componente/runa** → `inventory.components` com `componentKey` e `statModifier`; instalável na Coleção.
 - **Catalisador** → `materials.catalyst_astral`; selecionável no Craft e consumido uma vez na fusão confirmada.
-- **Ferramenta** → `inventory.unlockedTools`; equipável na Oficina.
+- **Ferramenta** → `inventory.unlockedTools`; equipável no painel **Equipamento da oficina**, dentro da categoria Ferramentas da Loja. A lista inclui ferramentas compradas e equipamento padrão; permite restaurar o padrão pelo mesmo fluxo.
 - **Receita** → `inventory.unlockedBlueprints`; desbloqueia o projeto no Compêndio, sem dispensar o metal.
 
 ## 4. UX
 
 Categoria em chips roláveis; cards com ícone, nome, raridade, descrição curta, preço, saldo e possuídos. Tocar abre um painel com efeito, destino, saldo e botão único de confirmação ("Comprar por X ouro + Y rubis"). Feedback de sucesso é do próprio painel e não substitui a mensagem de erro global.
 
+Na categoria Ferramentas, **Equipar** aplica o equipamento adquirido ou padrão e **Em uso** identifica a seleção atual. O painel de produto só permanece aberto enquanto a Loja é a seção ativa; navegar para outra seção não deixa seu portal bloqueando a tela.
+
 ## 5. Provas
 
 `src/game/mobile-integration.test.ts` cobre: compra de guarda, compra de lingote, saldo insuficiente, produto inexistente, preço adulterado, receita repetida, falha de storage e persistência após reload. O percurso de navegador compra uma guarda por 220 ouro (4000 → 3780) e instala a peça.
+
+Na Operação 08, `src/game/mobile-core-review.test.ts` acrescenta regressões de identidade e efeitos canônicos, quantidade de materiais, item único e chave do catalisador. A normalização já passava na base e foi preservada (`KEEP`). A falha de backup inicial foi reproduzida e corrigida no writer compartilhado: uma compra recusada não reaparece ao recuperar um save fresco. O percurso adicional [comprar, equipar e restaurar ferramenta](../../experiments/CODEX08-review/ui-regressions-green.json) passou após o controle RED correspondente; não é prova Android.
+
+No [AVD](../../experiments/CODEX08-review/android-summary.json), compras nativas de aço, catalisador e duas guardas abasteceram os estoques; instalação e troca deram DEF 185→193→195, com devolução da guarda antiga. Houve fixture sintética anterior ao percurso; não é progressão orgânica nem prova de compra no Poco.
 
 ## 6. Limites
 

@@ -9,13 +9,17 @@ import {
   type ShopCategoryId,
 } from "../shop";
 import { getMaterialStock } from "../materials";
+import { WORKSHOP_EQUIPMENT } from "../catalog";
+import { defaultEquippedGear } from "../save";
 import type { PlayerInventory, PlayerWallet } from "../types";
 import { Sheet } from "../components/Sheet";
 
 interface Props {
+  active?: boolean;
   wallet: PlayerWallet;
   inventory: PlayerInventory;
   onPurchase: (article: ShopArticle) => boolean;
+  onEquipTool: (toolId: string) => boolean;
 }
 
 function ownedCount(article: ShopArticle, inventory: PlayerInventory): number {
@@ -52,7 +56,7 @@ function destinationOf(article: ShopArticle): string {
  * Loja real: cada card mostra preço, moeda, saldo, efeito e destino.
  * A compra só acontece na confirmação e passa pela transação canônica.
  */
-export function ShopScreen({ wallet, inventory, onPurchase }: Props) {
+export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEquipTool }: Props) {
   const [category, setCategory] = useState<ShopCategoryId>("materials");
   const [selected, setSelected] = useState<ShopArticle | null>(null);
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
@@ -160,8 +164,41 @@ export function ShopScreen({ wallet, inventory, onPurchase }: Props) {
         })}
       </ul>
 
+      {category === "tools" ? (
+        <section aria-label="Equipamento da oficina" className="space-y-2 border-t border-border pt-3">
+          <h2 className="font-display text-sm font-bold text-amber-100">Equipamento da oficina</h2>
+          <p className="text-xs text-muted">Escolha uma ferramenta adquirida ou volte ao equipamento padrão.</p>
+          {WORKSHOP_EQUIPMENT.filter((tool) => tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id)).map((tool) => {
+            const equipped = inventory.equipped || defaultEquippedGear;
+            const currentId = tool.category === "hammer" ? `hammer_${equipped.hammer}` : equipped[tool.category];
+            const isEquipped = currentId === tool.id;
+            return (
+              <div key={tool.id} className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-amber-50">{tool.icon} {tool.name}</p>
+                  <p className="mt-0.5 text-[0.62rem] text-muted">{tool.stats}</p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shrink-0 text-xs"
+                  aria-label={`${isEquipped ? "Em uso" : "Equipar"} ${tool.name}`}
+                  disabled={isEquipped}
+                  onClick={() => {
+                    const ok = onEquipTool(tool.id);
+                    setFeedback({ ok, message: ok ? `${tool.name} em uso.` : "Não foi possível equipar a ferramenta." });
+                  }}
+                >
+                  {isEquipped ? "Em uso" : "Equipar"}
+                </Button>
+              </div>
+            );
+          })}
+        </section>
+      ) : null}
+
       <Sheet
-        open={selected !== null}
+        open={active && selected !== null}
         onOpenChange={(open) => !open && setSelected(null)}
         eyebrow="Detalhe do produto"
         title={selected?.name || ""}

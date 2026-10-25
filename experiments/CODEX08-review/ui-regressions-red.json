@@ -1,0 +1,30 @@
+{
+  "baseUrl": "http://127.0.0.1:8953/",
+  "viewport": {
+    "width": 392,
+    "height": 819
+  },
+  "checks": [
+    {
+      "name": "buy, equip and restore workshop tools",
+      "result": "FAIL",
+      "error": "locator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Equipar Bigorna do Mestre Forjador', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "inspection shop link dismisses hidden portal and preserves inspection",
+      "result": "FAIL",
+      "error": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('tab', { name: /Metais e materiais/ }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "commission chooses second sword and retains fulfilled history",
+      "result": "FAIL",
+      "error": "locator.selectOption: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByRole('combobox', { name: 'Arma para Cliente da revisão' })\u001b[22m\n"
+    },
+    {
+      "name": "refinement shows canonical cost and actual capped effect before debit",
+      "result": "FAIL",
+      "error": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByText(/60 ouro/) to be visible\u001b[22m\n"
+    }
+  ],
+  "result": "FAIL"
+}

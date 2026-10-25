@@ -17,6 +17,7 @@ import { Sheet } from "../components/Sheet";
 import type { WeaponRenderMode } from "../visuals/rendererAdapter";
 
 interface Props {
+  active?: boolean;
   swords: FinishedSword[];
   wallet: PlayerWallet;
   inventory: PlayerInventory;
@@ -49,6 +50,7 @@ interface Objective {
  * Todos os números vêm do save carregado — nunca de fixtures.
  */
 export function WorkshopHome({
+  active = true,
   swords,
   wallet,
   inventory,
@@ -68,6 +70,7 @@ export function WorkshopHome({
   onToggleMute,
 }: Props) {
   const [panel, setPanel] = useState<"profile" | "commissions" | "settings" | null>(null);
+  const [commissionSwordIds, setCommissionSwordIds] = useState<Record<string, string>>({});
 
   const featured = useMemo(
     () =>
@@ -78,7 +81,8 @@ export function WorkshopHome({
   );
 
   const activeCommissions = commissions.filter((c) => !c.completed);
-  const completedCommissions = commissions.filter((c) => c.completed).length;
+  const fulfilledCommissions = commissions.filter((c) => c.completed);
+  const completedCommissions = fulfilledCommissions.length;
   const eligibleCores = inventory.fusionCores || [];
   const catalysts = inventory.materials?.catalyst_astral || 0;
   const fragments = inventory.materials?.fusion_fragment || 0;
@@ -318,7 +322,7 @@ export function WorkshopHome({
       </div>
 
       <Sheet
-        open={panel === "profile"}
+        open={active && panel === "profile"}
         onOpenChange={(open) => setPanel(open ? "profile" : null)}
         eyebrow="Legado"
         title="Carreira do ferreiro"
@@ -360,7 +364,7 @@ export function WorkshopHome({
       </Sheet>
 
       <Sheet
-        open={panel === "commissions"}
+        open={active && panel === "commissions"}
         onOpenChange={(open) => setPanel(open ? "commissions" : null)}
         eyebrow="Guilda"
         title="Encomendas"
@@ -374,6 +378,7 @@ export function WorkshopHome({
           <ul className="space-y-3">
             {activeCommissions.map((commission) => {
               const eligible = swords.filter((sword) => isSwordEligibleForCommission(commission, sword).eligible);
+              const selectedSword = eligible.find((sword) => sword.id === commissionSwordIds[commission.id]) || eligible[0];
               return (
                 <li key={commission.id} className="rounded-lg border border-border bg-surface p-3">
                   <div className="flex items-start justify-between gap-2">
@@ -391,14 +396,29 @@ export function WorkshopHome({
                     {commission.requiredRole ? ` · papel ${commission.requiredRole}` : ""}
                     {commission.minStat ? ` · ${commission.minStat.stat} ≥ ${commission.minStat.minValue}` : ""}
                   </p>
-                  {eligible.length > 0 ? (
-                    <Button
-                      size="sm"
-                      className="mt-2 w-full bg-amber-600 font-display text-xs font-bold text-stone-950"
-                      onClick={() => onDeliverCommission(commission.id, eligible[0].id)}
-                    >
-                      Entregar {eligible[0].design.name} (Q{eligible[0].quality})
-                    </Button>
+                  {selectedSword ? (
+                    <div className="mt-2 space-y-2">
+                      <label className="block text-[0.62rem] uppercase tracking-wider text-muted">
+                        Arma para entrega
+                        <select
+                          aria-label={`Arma para ${commission.clientName}`}
+                          value={selectedSword.id}
+                          onChange={(event) => setCommissionSwordIds((previous) => ({ ...previous, [commission.id]: event.target.value }))}
+                          className="mt-1 min-h-10 w-full rounded-md border border-border bg-surface px-2 text-xs text-fg"
+                        >
+                          {eligible.map((sword) => (
+                            <option key={sword.id} value={sword.id}>{sword.design.name} (Q{sword.quality})</option>
+                          ))}
+                        </select>
+                      </label>
+                      <Button
+                        size="sm"
+                        className="w-full bg-amber-600 font-display text-xs font-bold text-stone-950"
+                        onClick={() => onDeliverCommission(commission.id, selectedSword.id)}
+                      >
+                        Entregar {selectedSword.design.name} (Q{selectedSword.quality})
+                      </Button>
+                    </div>
                   ) : (
                     <p className="mt-2 text-[0.65rem] text-amber-300/80">Nenhuma arma do Arsenal atende ainda.</p>
                   )}
@@ -407,10 +427,28 @@ export function WorkshopHome({
             })}
           </ul>
         )}
+        {fulfilledCommissions.length > 0 ? (
+          <section className="mt-4 space-y-2 border-t border-border pt-3">
+            <h2 className="font-display text-sm font-bold text-emerald-200">Encomendas cumpridas</h2>
+            <ul className="space-y-2">
+              {fulfilledCommissions.map((commission) => {
+                const delivered = swords.find((sword) => sword.id === commission.deliveredSwordId);
+                return (
+                  <li key={commission.id} className="rounded-lg border border-emerald-800/50 bg-emerald-950/20 p-3 text-xs">
+                    <p className="font-display font-bold text-emerald-200">{commission.clientName} · Cumprida</p>
+                    <p className="mt-1 text-muted">
+                      {delivered ? `${delivered.design.name} · Q${delivered.quality}` : `Arma entregue: ${commission.deliveredSwordId || "registro antigo"}`}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
       </Sheet>
 
       <Sheet
-        open={panel === "settings"}
+        open={active && panel === "settings"}
         onOpenChange={(open) => setPanel(open ? "settings" : null)}
         eyebrow="Oficina"
         title="Configurações"

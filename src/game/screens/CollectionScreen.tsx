@@ -16,6 +16,7 @@ import {
 } from "../catalog";
 import { evaluateBlueprintStatus } from "../blueprints";
 import { getMaterialStock, getRequiredMaterialForSteel } from "../materials";
+import { getSwordUpgradeQuote } from "../transactions";
 import type {
   CareerStats,
   FinishedSword,
@@ -117,6 +118,7 @@ function signed(value: number | undefined): string {
 }
 
 interface Props {
+  active?: boolean;
   swords: FinishedSword[];
   inventory: PlayerInventory;
   wallet: PlayerWallet;
@@ -135,6 +137,7 @@ interface Props {
  * relida da galeria), nunca uma cópia local divergente.
  */
 export function CollectionScreen({
+  active = true,
   swords,
   inventory,
   wallet,
@@ -164,6 +167,7 @@ export function CollectionScreen({
   );
 
   const inspected = swords.find((s) => s.id === inspectId) || null;
+  const upgradeQuote = inspected ? getSwordUpgradeQuote(inspected) : null;
   const components = inventory.components || [];
   const cores = inventory.fusionCores || [];
   const compareA = swords.find((s) => s.id === compareIds[0]) || null;
@@ -537,7 +541,7 @@ export function CollectionScreen({
 
       {/* Inspeção detalhada */}
       <Sheet
-        open={inspected !== null}
+        open={active && inspected !== null}
         onOpenChange={(open) => {
           if (!open) {
             setInspectId(null);
@@ -694,6 +698,17 @@ export function CollectionScreen({
               {inspected.forgeRunId ? ` · run ${inspected.forgeRunId.slice(-8)}` : ""}.
             </p>
 
+            {upgradeQuote && !inspected.broken ? (
+              <div className="rounded-lg border border-amber-700/40 bg-amber-950/20 p-2.5 text-xs text-[#d8c8ab]">
+                <p className="font-semibold text-amber-200">
+                  {upgradeQuote.maxed ? "Refino máximo atingido (3/3)" : `Próximo refino: ${upgradeQuote.goldCost} ouro${upgradeQuote.rubyCost ? ` + ${upgradeQuote.rubyCost} rubi` : ""}`}
+                </p>
+                {!upgradeQuote.maxed ? (
+                  <p className="mt-1">Efeito: {signed(upgradeQuote.damageDelta)} ATK · {signed(upgradeQuote.durabilityDelta)} DUR</p>
+                ) : null}
+              </div>
+            ) : null}
+
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant="secondary"
@@ -710,9 +725,10 @@ export function CollectionScreen({
                 className="text-xs"
                 disabled={
                   inspected.broken ||
-                  (inspected.upgradesApplied || 0) >= 3 ||
-                  wallet.gold < 60 * ((inspected.upgradesApplied || 0) + 1) ||
-                  wallet.rubies < ((inspected.upgradesApplied || 0) >= 1 ? 1 : 0)
+                  !upgradeQuote ||
+                  upgradeQuote.maxed ||
+                  wallet.gold < upgradeQuote.goldCost ||
+                  wallet.rubies < upgradeQuote.rubyCost
                 }
                 onClick={() => {
                   const ok = onUpgrade(inspected);
@@ -728,7 +744,7 @@ export function CollectionScreen({
 
       {/* Escolha de espada para instalar componente avulso */}
       <Sheet
-        open={installComponentId !== null}
+        open={active && installComponentId !== null}
         onOpenChange={(open) => !open && setInstallComponentId(null)}
         eyebrow="Bancada"
         title="Instalar em qual espada?"

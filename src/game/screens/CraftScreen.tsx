@@ -132,6 +132,7 @@ function DonorRow({ sword, index }: { sword: FinishedSword; index: number }) {
 }
 
 interface Props {
+  active?: boolean;
   swords: FinishedSword[];
   inventory: PlayerInventory;
   wallet: PlayerWallet;
@@ -147,6 +148,7 @@ interface Props {
  * apenas apresenta o resultado já persistido.
  */
 export function CraftScreen({
+  active = true,
   swords,
   inventory,
   wallet,
@@ -714,7 +716,7 @@ export function CraftScreen({
 
       {/* Seletor de doadoras */}
       <Sheet
-        open={pickerOpen}
+        open={active && pickerOpen}
         onOpenChange={setPickerOpen}
         eyebrow={mode === "swords" ? "Arsenal" : "Inventário"}
         title={mode === "swords" ? "Escolha as doadoras" : "Escolha os componentes"}
@@ -836,7 +838,7 @@ export function CraftScreen({
 
       {/* Confirmação */}
       <Sheet
-        open={reviewOpen}
+        open={active && reviewOpen}
         onOpenChange={setReviewOpen}
         eyebrow="Confirmação"
         title={mode === "swords" ? "Confirmar as quatro doadoras" : "Confirmar os quatro componentes"}
@@ -902,7 +904,7 @@ export function CraftScreen({
 
       {/* Inspeção da doadora */}
       <Sheet
-        open={inspect !== null}
+        open={active && inspect !== null}
         onOpenChange={(open) => !open && setInspect(null)}
         eyebrow="Inspeção"
         title={inspect ? ("design" in inspect ? inspect.design.name : inspect.name) : ""}

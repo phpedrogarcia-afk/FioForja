@@ -1,0 +1,206 @@
+{
+  "mission": "CODEX08-ANDROID-EMULATOR",
+  "functionalVerdict": "PASS",
+  "journey": "Staged; preserved PASS steps were not rerun after driver repairs or coordinator interruption.",
+  "serial": "emulator-5556",
+  "avd": "FioForja_API36_APK",
+  "environment": {
+    "ro.kernel.qemu": "1",
+    "ro.build.version.sdk": "36",
+    "ro.build.version.release": "16",
+    "ro.product.model": "sdk_gphone64_x86_64",
+    "ro.product.cpu.abi": "x86_64",
+    "ro.hardware": "ranchu"
+  },
+  "nativeTouchMapping": {
+    "left": 0,
+    "top": 136,
+    "right": 1080,
+    "bottom": 2337,
+    "scaleX": 2.621359223300971,
+    "scaleY": 2.6233611442193085,
+    "viewport": {
+      "width": 412,
+      "height": 839,
+      "dpr": 2.625
+    }
+  },
+  "oldApk": {
+    "version": "0.2.1",
+    "code": 3,
+    "sha256": "02e7ec2b01badbd848adf4212fc9e2a9abf2ce57aacd093747220cfbd0e8be8d"
+  },
+  "candidate": {
+    "version": "0.2.2",
+    "code": 4,
+    "bytes": 12129669,
+    "installedBaseApkSha256": "d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56"
+  },
+  "fixture": "EXPLICIT_SYNTHETIC: four Rara swords of free quality, wallet, steel unlock; zero materials/components/cores. Not naturally earned progression.",
+  "interaction": "Only native ADB tap/swipe/keyevents after fixture. CDP reads DOM/HUD/storage only; no transaction, React or canvas injection.",
+  "backup": {
+    "storageFile": "evidence/android-emulator/android-original-storage-backup.json",
+    "storageSha256": "3406670c5e1744332efad15d43d39b01171f8f5575c2351cbaaf4ce88df88137",
+    "nativeTar": "evidence/android-emulator/android-original-app-webview.tar",
+    "nativeTarSha256": "acc75d30820a8dc33488b88db61fc2c7694f27312d31cba9c95659c837bb74bb",
+    "beforeUpgradeSaveSha256": "9cbee87d8dc8fea8c3a689e8f19da5ae706544d39c69821bbda2ff2ebece8e52"
+  },
+  "cases": [
+    {
+      "name": "0.2.1-to-0.2.2-update-preserves-fixture-without-clearing-app",
+      "result": "PASS",
+      "source": "android-run-first-driver-fling-scar.json"
+    },
+    {
+      "name": "shop-steel-metal-purchase",
+      "result": "PASS",
+      "source": "android-run-first-driver-fling-scar.json"
+    },
+    {
+      "name": "shop-catalyst-purchase",
+      "result": "PASS",
+      "source": "android-run-coordination-interrupted.json"
+    },
+    {
+      "name": "shop-two-guard-purchases",
+      "result": "PASS",
+      "source": "android-run-coordination-interrupted.json"
+    },
+    {
+      "name": "collection-install-and-replace-guard-returning-first-to-inventory",
+      "result": "PASS",
+      "source": "android-run-coordination-interrupted.json"
+    },
+    {
+      "name": "craft-four-rara-donors-free-quality-catalyst-fusion-real-core",
+      "result": "PASS",
+      "source": "android-run-coordination-interrupted.json"
+    },
+    {
+      "name": "core-survives-process-reopen",
+      "result": "PASS",
+      "source": "android-run-report.json"
+    },
+    {
+      "name": "core-forge-start-eight-native-strikes-and-quench",
+      "result": "PASS",
+      "source": "android-run-report.json"
+    },
+    {
+      "name": "new-weapon-and-transaction-effects-survive-process-reopen",
+      "result": "PASS",
+      "source": "android-run-report.json"
+    }
+  ],
+  "observedEffects": {
+    "guardDefense": [
+      185,
+      193,
+      195
+    ],
+    "returnedGuard": [
+      "guard_curved"
+    ],
+    "fusion": {
+      "coreId": "core_6a1a1962-3089-48ea-bcbc-87463fb49dd6",
+      "rarity": "Épica",
+      "donors": [
+        "codex08_emulator_72",
+        "codex08_emulator_85",
+        "codex08_emulator_91",
+        "codex08_emulator_96"
+      ],
+      "catalystConsumed": 1
+    },
+    "forge": {
+      "runId": "run_93f3c119-306e-482b-8d42-6da4885d20dc",
+      "metal": {
+        "key": "steel_ingot",
+        "before": 1,
+        "after": 0
+      },
+      "nativeStrikes": 8,
+      "quenchScore": 98,
+      "result": {
+        "id": "sword_run_93f3c119-306e-482b-8d42-6da4885d20dc",
+        "quality": 75,
+        "rarity": "Épica",
+        "damage": 239,
+        "defense": 162,
+        "agility": 87,
+        "durability": 88
+      },
+      "coreConsumedAtCompletion": true,
+      "rewardsClaimed": false
+    },
+    "persistence": {
+      "exactRelevantStatePreserved": true,
+      "finalWallet": {
+        "gold": 10700,
+        "rubies": 287,
+        "diamonds": 20
+      }
+    }
+  },
+  "scars": [
+    {
+      "name": "Absent package detection",
+      "classification": "DRIVER",
+      "detail": "pm path exit1 was handled as an exception before install; changed inventory query only."
+    },
+    {
+      "name": "Fixture disk flush",
+      "classification": "DRIVER",
+      "detail": "An immediate force-stop after CDP fixture write lost that synthetic write. Background flush and read/reopen proved the fixture before upgrade. Does not measure UI transaction durability."
+    },
+    {
+      "name": "UIAutomator idle timeout",
+      "classification": "DRIVER",
+      "detail": "Reused native bounds already observed in this same AVD/configuration and checked against current CSS viewport/DPR."
+    },
+    {
+      "name": "Horizontal fling tap",
+      "classification": "DRIVER",
+      "detail": "Early tap stopped horizontal scrolling instead of selecting a tab. Waited for scrolling to settle; froze successful steel purchase."
+    },
+    {
+      "name": "Uppercase visible text",
+      "classification": "DRIVER",
+      "detail": "Native visible heading uses CSS uppercase; observation assertion changed to case-insensitive."
+    },
+    {
+      "name": "Coordinator interruption",
+      "classification": "COORDINATION",
+      "detail": "Phone package disappearance triggered a halt. Owner confirmed voluntary uninstall; coordinator authorized emulator continuation. No app/driver fault was established."
+    }
+  ],
+  "visualEvidence": {
+    "persistedInspection": "evidence/android-emulator/08-persisted-inspection.png",
+    "persistedWeaponVisible": true,
+    "immediateReveal": "evidence/android-emulator/07-weapon-reveal.png",
+    "revealWeaponVisibility": "NOT_PROVEN: immediate screenshot shows blank canvas; capture timing versus rendering behavior was not isolated."
+  },
+  "limits": [
+    "Synthetic fixture is not natural progression.",
+    "One emulator journey does not prove reliability or performance.",
+    "No Poco action or physical sound verification by this agent.",
+    "Native input for UI; CDP writes were confined to declared pre-journey fixture.",
+    "Runtime exception observations were interval based; interruption terminated one observer before final flush.",
+    "Rewards were generated and persisted but were not claimed in this scoped journey."
+  ],
+  "evidence": [
+    {
+      "file": "evidence/android-emulator/android-run-first-driver-fling-scar.json",
+      "sha256": "e59428871f4dd27a089a1b52c2d841ad57a40470acf1a93457e0f45bfed3ef4f"
+    },
+    {
+      "file": "evidence/android-emulator/android-run-coordination-interrupted.json",
+      "sha256": "304cc656becd462ab03444badae74ce6d7815fd4ca405cebdf306e83d6b15cb8"
+    },
+    {
+      "file": "evidence/android-emulator/android-run-report.json",
+      "sha256": "d741b0cf1a0047a742dd5a7de996bc75ab397146a6d2d1b95da1a2cb92ae6c87"
+    }
+  ],
+  "generatedAt": "2026-10-25T10:07:40.693Z"
+}

@@ -223,6 +223,12 @@ export function fuseComponents(
   items: InventoryComponent[],
   options?: { seed?: number; useCatalyst?: boolean } | boolean,
 ): ComponentFusionOutcome {
+  const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
+  const seed = typeof options === "object" ? options?.seed : undefined;
+  return buildComponentFusion(items, usedCatalyst, createRng(seed)());
+}
+
+function buildComponentFusion(items: InventoryComponent[], usedCatalyst: boolean, roll: number): ComponentFusionOutcome {
   if (items.length !== 4) {
     throw new Error("A fusão de componentes exige exatamente 4 componentes.");
   }
@@ -232,9 +238,6 @@ export function fuseComponents(
     throw new Error("Todos os 4 componentes devem pertencer à mesma categoria (guardas, pomos, cabos ou runas).");
   }
 
-  const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
-  const seed = typeof options === "object" ? options?.seed : undefined;
-  const rng = createRng(seed);
   const avgRarityRank = Math.round(
     items.reduce((acc, it) => acc + RARITY_RANK_VALUES[it.rarity], 0) / 4,
   );
@@ -245,7 +248,7 @@ export function fuseComponents(
 
   // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
   const odds = getFusionOdds(baseRarity, "components", usedCatalyst);
-  const roll = rng();
+
 
   let tierJump: "refined" | "superior" | "exceptional" = "refined";
   let jumpTier = 0;
@@ -326,6 +329,12 @@ export function fuseSwords(
   swords: FinishedSword[],
   options?: { seed?: number; useCatalyst?: boolean } | boolean,
 ): SwordFusionOutcome {
+  const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
+  const seed = typeof options === "object" ? options?.seed : undefined;
+  return buildSwordFusion(swords, usedCatalyst, createRng(seed)());
+}
+
+function buildSwordFusion(swords: FinishedSword[], usedCatalyst: boolean, roll: number): SwordFusionOutcome {
   if (swords.length !== 4) {
     throw new Error("A fusão de espadas exige exatamente 4 espadas elegíveis do Arsenal.");
   }
@@ -352,9 +361,6 @@ export function fuseSwords(
     throw new Error("Armas entregues em encomendas da guilda não podem ser consumidas no Crisol.");
   }
 
-  const usedCatalyst = typeof options === "object" ? !!options?.useCatalyst : !!options;
-  const seed = typeof options === "object" ? options?.seed : undefined;
-  const rng = createRng(seed);
 
   // Calcula raridade média e qualidade das doadoras
   const rarities = swords.map((s) => s.rarity || "Comum");
@@ -366,7 +372,7 @@ export function fuseSwords(
 
   // Probabilidades canônicas de 3 níveis: Refinado (0), Superior (+1) e Excepcional (+2)
   const odds = getFusionOdds(baseRarity, "swords", usedCatalyst);
-  const roll = rng();
+
 
   let tierJump: "refined" | "superior" | "exceptional" = "refined";
   let jumpTier = 0;
@@ -479,6 +485,39 @@ export function fuseSwords(
 /**
  * Validação prévia de integridade atômica para fusão de componentes
  */
+function sameFusionValue(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const left = Object.keys(a).sort(), right = Object.keys(b).sort();
+  return left.length === right.length && left.every((key, i) => key === right[i] && sameFusionValue((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]));
+}
+
+function fusionValidationRoll(odds: ReturnType<typeof getFusionOdds>, tier: unknown): number {
+  if (tier === "exceptional" && odds.exceptional > 0) return odds.exceptional / 2;
+  if (tier === "superior" && odds.superior > 0) return odds.exceptional + odds.superior / 2;
+  if (tier === "refined" && odds.refined > 0) return odds.exceptional + odds.superior + odds.refined / 2;
+  throw new Error("Resultado de fusão incompatível com as probabilidades atuais.");
+}
+
+function validateFusionResult(actual: ComponentFusionOutcome | SwordFusionOutcome, expected: ComponentFusionOutcome | SwordFusionOutcome): void {
+  // Reconstruct the possible recipe, not the original random roll. No provenance
+  // claim is made against someone who deliberately rewrites the whole local save.
+  for (const key of ["success", "goldCost", "usedCatalyst", "tierJump", "jumpTier", "upgradedRarity", "fragmentsAwarded"] as const) {
+    if (actual[key] !== expected[key]) throw new Error(`Resultado de fusão divergente da receita: ${key}.`);
+  }
+  if ("resultCore" in actual && "resultCore" in expected) {
+    if (actual.rubiesCost !== expected.rubiesCost) throw new Error("Custo em rubis divergente da receita.");
+    const { id, createdAt, ...data } = actual.resultCore;
+    const { id: _id, createdAt: _createdAt, ...canonical } = expected.resultCore;
+    if (typeof id !== "string" || !id.trim() || !Number.isFinite(createdAt) || createdAt < 0 || !sameFusionValue(data, canonical)) throw new Error("Núcleo incompatível com as doadoras e a receita atual.");
+  } else if ("resultComponent" in actual && "resultComponent" in expected) {
+    const { id, acquiredAt, ...data } = actual.resultComponent;
+    const { id: _id, acquiredAt: _acquiredAt, ...canonical } = expected.resultComponent;
+    if (typeof id !== "string" || !id.trim() || !Number.isFinite(acquiredAt) || acquiredAt < 0 || !sameFusionValue(data, canonical)) throw new Error("Componente incompatível com as doadoras e a receita atual.");
+  } else throw new Error("Tipo de resultado de fusão inválido.");
+}
+
 export function validateComponentFusionTransaction(
   save: SaveData,
   outcome: ComponentFusionOutcome,
@@ -498,6 +537,11 @@ export function validateComponentFusionTransaction(
   if (!found.every((c) => c!.category === category)) {
     throw new Error("Transação inválida: Componentes consumidos devem pertencer à mesma categoria.");
   }
+  if (typeof outcome.usedCatalyst !== "boolean") throw new Error("Opção de catalisador inválida.");
+  const donors = found as InventoryComponent[];
+  const baseRarity = getComponentFusionBaseRarity(donors);
+  const roll = fusionValidationRoll(getFusionOdds(baseRarity, "components", outcome.usedCatalyst), outcome.tierJump);
+  validateFusionResult(outcome, buildComponentFusion(donors, outcome.usedCatalyst, roll));
   if (save.wallet.gold < outcome.goldCost) {
     throw new Error("Ouro insuficiente para pagar a taxa do Crisol.");
   }
@@ -542,6 +586,11 @@ export function validateSwordFusionTransaction(
   if (found.some((s) => Boolean(s!.commissionDelivered))) {
     throw new Error("Transação inválida: Armas entregues em encomendas da guilda não podem ser consumidas no Crisol.");
   }
+  if (typeof outcome.usedCatalyst !== "boolean") throw new Error("Opção de catalisador inválida.");
+  const donors = found as FinishedSword[];
+  const baseRarity = donors[0].rarity || "Comum";
+  const roll = fusionValidationRoll(getFusionOdds(baseRarity, "swords", outcome.usedCatalyst), outcome.tierJump);
+  validateFusionResult(outcome, buildSwordFusion(donors, outcome.usedCatalyst, roll));
   if (save.wallet.gold < outcome.goldCost || save.wallet.rubies < outcome.rubiesCost) {
     throw new Error("Recursos insuficientes para pagar a transmutação do Crisol.");
   }

@@ -1,6 +1,6 @@
 # Coleção real — Arsenal, inspeção e montagem
 
-**Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` (testes + navegador).
+**Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` no envelope funcional da [revisão Codex 08](../../.project-intelligence/experiments/CODEX08-review.md), base `78945e0` + working tree revisado: testes, navegador e instalação/troca/inspeção no AVD do APK 0.2.2. No Poco, a prova se limita a reinstalação/restauração/navegação com baseline preservado. Candidata à avaliação humana.
 **Fonte de dados:** `save.gallery`, `save.inventory` (componentes, runas, núcleos), `catalog.ts` e `blueprints.ts`.
 
 ## 1. Seções internas
@@ -23,7 +23,9 @@ Lê a espada **por ID** do estado canônico; não guarda uma cópia divergente. 
 - família, perfil, material, guarda, cabo, pomo, inscrição;
 - montagem instalada por categoria (guarda/cabo/pomo/runa), com **Instalar** ou **Trocar**;
 - propriedades/afixos, histórico de fusão (núcleo, número de doadoras, data, traços) e origem;
-- **Proteger/Desproteger** e **Refinar** (custo 60×(nível+1) ouro, +1 rubi a partir do segundo refino).
+- **Proteger/Desproteger** e **Refinar**: preço da próxima operação e delta efetivo de ATK/DUR, calculados pelo mesmo `getSwordUpgradeQuote` da transação. O custo é 60×(nível+1) ouro, +1 rubi a partir do segundo refino, com máximo de três refinos. O delta exibido respeita o limite real de durabilidade; não promete ganho que o recálculo não entrega.
+
+Os painéis da Coleção só abrem enquanto ela é a seção ativa. Ir da inspeção à Loja remove o portal da tela; ao retornar, a seleção da arma continua preservada.
 
 ## 3. Instalação e troca
 
@@ -54,6 +56,8 @@ O jogo não possuía favoritos. Esta entrega adiciona **apenas** o campo aditivo
 - Troca devolve a peça anterior ao inventário (teste).
 - Lâmina quebrada recusa montagem (teste).
 - Proteção bloqueia fusão (teste).
+- Operação 08: o percurso [inspeção → Loja → inspeção](../../experiments/CODEX08-review/ui-regressions-green.json) confirma que o portal oculto não intercepta a nova seção e que a inspeção é preservada. O percurso de refino verifica preço e delta limitado antes do débito. Ambos têm controles RED em arquivo separado; não são validação Android.
+- Operação 08 no [AVD](../../experiments/CODEX08-review/android-summary.json): instalar/trocar guarda produz DEF 185→193→195 e devolve a antiga; a nova espada Épica Q75 e seus efeitos sobrevivem ao reabrir. A inspeção persistida mostra a arma inteira. O frame imediato da Revelação tem canvas vazio, sem isolamento de timing versus desenho; não foi declarado resolvido.
 
 ## 6. Limites
 

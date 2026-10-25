@@ -1,5 +1,20 @@
 # Estado do projeto — integração e APK Android experimental
 
+## Operação Codex 08 — revisão isolada — 25/10/2026 — PASS no envelope funcional testado
+
+- **Base:** `78945e0de9d7a70d14994e80a14b2885998ec9ec`; branch `codex/mobile-core-review-v1`; worktree `C:\Users\phped\.codex\worktrees\mobile-core-review-v1\FioForja`.
+- **Estado Git na abertura:** `main` local em `4a1cd01`, `origin/main` observado em `3ad7239`; branch remota DeepSeek em `78945e0`. Esses pontos não são equivalentes nem foram movidos pela revisão. O trabalho funcional anterior continua no checkout original e no snapshot `5f71ba4`.
+- **Auditoria documental:** os JSONs de navegador pertencem a duas execuções distintas; `231` era o subtotal TypeScript, não a suíte completa. Detalhes, escopos e pendências no [registro Codex 08](../.project-intelligence/experiments/CODEX08-review.md).
+- **Testes novos confirmados:** `npm test` **475 encontrados / 468 PASS / 7 SKIP / 0 FAIL**: JavaScript 203 (196 PASS/7 SKIP) + TypeScript 272 (272 PASS), com 41 regressões novas e nenhum teste antigo removido. Suíte focal 123 PASS, sobreposta ao total; quatro percursos UI adicionais **RED 4 → GREEN 4**, fora dele.
+- **Correções:** primeiro save só publica o candidato no backup após commit primário; fusão valida custo e efeitos por reconstrução de receita possível sem mudar odds; ferramentas podem ser equipadas e restauradas ao padrão; nove Sheets respeitam a seção ativa; encomenda permite escolher a arma e preserva histórico; refino mostra preço e delta efetivos por orçamento compartilhado. Normalização de payload da Loja já era correta: `KEEP` com regressões.
+- **Limite de fusão:** não autentica o sorteio original, não detecta toda troca `usedCatalyst true → false` compatível com ambos os cenários e não protege genericamente contra edição manual do save.
+- **Checks/builds:** typecheck PASS; lint **0 erros/38 avisos**; web e mobile PASS; `db:migrate` explicitamente SKIP por `DATABASE_URL` ausente, com fallback PGLite, sem migração de banco remoto. APK e assinatura `apksigner` PASS.
+- **APK entregue:** `0.2.2`, código `4`, **12.129.669 bytes**, SHA-256 `d528b890f9f83a2299f105874084bf8e7f8717e5c86a5cf920b74a393fc40f56`. Fonte: base `78945e0` + working tree revisado, `BUILD-INFO` com alterações não commitadas `YES`; não é build de HEAD limpo. Cópias em `C:\Users\phped\Documents\FioForja\APK\FioForja-teste.apk` e `FioForja-debug-v0.2.2.apk`; anteriores preservados.
+- **AVD:** [nove casos PASS](../experiments/CODEX08-review/android-summary.json), com fixture sintética declarada: atualização 0.2.1→0.2.2 sem limpar dados, compras de aço/catalisador/duas guardas, montagem DEF 185→193→195 e devolução da antiga, quatro Raras→núcleo Épico, forja manual com oito golpes/têmpera 98, espada Épica Q75, núcleo consumido e estado preservado ao reabrir. Recompensas geradas, não coletadas.
+- **Poco:** [reinstalação autorizada e restauração](../experiments/CODEX08-review/poco-summary.json) após desinstalação confirmada pelo proprietário; não foi atualização por cima. Snapshot pré-remoção conferido na escrita; nova forja local observada antes do baseline de navegação (ator não atribuído). O baseline subsequente permaneceu igual após cinco seções, Voltar e force-stop/relançamento, 392×819/DPR 2,75. Sem fixture, compra ou fusão nesta prova física.
+- **Revisão independente:** 72 outputs econômicos comparados, zero diferenças excluindo IDs/datas; fora do total de `npm test`.
+- **Limites:** candidata à avaliação humana, sem aprovação de governança ou produção. Áudio físico, desempenho sustentado e progressão de longo prazo continuam `NOT_PROVEN`. O canvas vazio na captura imediata da Revelação não foi isolado entre timing e desenho; a inspeção após reabrir mostra a arma inteira. Publicação autorizada exclusivamente para `codex/mobile-core-review-v1`; conferir seu HEAD remoto ao retomar. A evidência histórica abaixo mantém seus próprios envelopes.
+
 ## Operação Codex 07 — integração mobile core — 24/10/2026
 
 - **Branch publicada:** `codex/mobile-core-integration-v1` (commits `6a640d4` e `2db89fd`), base `da46757` (que contém `41d7222`/`cca050e`/`82a9fd3`).
@@ -10,19 +25,19 @@
 - **Coleção:** Arsenal real, inspeção, comparação, proteção mínima e instalação/troca de peças com recálculo persistido.
 - **Craft:** quatro doadoras da **mesma raridade** (qualidades livres), chances do motor (50/42/8 para Raras), confirmação, núcleo persistido e "Forjar agora" encaminhando à preparação.
 - **Núcleo → Forja:** material reservado no início; núcleo consumido apenas na conclusão; herança, raridade e origem preservadas no Arsenal.
-- **Provas:** `npm test` **231/231**, typecheck 0, lint 0 erros/39 avisos, build web 0; percurso real de navegador em 392×819/DPR 2,75 com compra, instalação, fusão, reload, forja, revelação e novo reload. Relatório em `experiments/mobile-core-integration/`.
+- **Provas históricas:** processo TypeScript **231/231**; esse subtotal foi descrito incorretamente como o total de `npm test` e não inclui o processo JavaScript. Typecheck 0, lint 0 erros/39 avisos, build web 0; percurso de navegador em 392×819/DPR 2,75 com compra, instalação, fusão, reload, forja, revelação e novo reload. Relatório e distinção entre as duas execuções em `experiments/mobile-core-integration/`.
 - **Android:** cinco seções, Voltar físico, force-stop/relançamento, modo avião e prévia da Forja verificados no AVD 1080×2400/420 dpi. Compras/fusão/forja no APK 0.2.1 não foram repetidas no AVD; estão provadas por 24 testes transacionais e pelo percurso de navegador. Validação física no Poco, áudio físico, desempenho sustentado e HUD da bigorna (frente Antigravity) continuam `NOT_PROVEN`.
 
 ## Decisão mobile aprovada — 24/10/2026
 
 - **Autoridade:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001), decisão explícita do proprietário após jogar no Poco e fornecer vídeo de 23 segundos.
-- **TARGET aprovado:** barra inferior fixa em Início, Coleção, Forja, Loja e Jogador; barra ausente durante fabricação. Preparação mantém espada inteira visível; fabricação elevada/oblíqua com HUD compacto; orientação térmica clara e Revelação centrada na arma.
-- **CURRENT:** o APK 0.2.0 (branch `codex/mobile-core-integration-v1`) já usa a arquitetura de cinco seções no jogo real; ver a seção Codex 07 acima. O APK de `41d7222` e o [protótipo separado](../experiments/mobile-ux-v1/README.md) continuam preservados como checkpoints históricos. O companion `FioForja Protótipo` tem outro pacote/UID e não grava o progresso real.
-- **OBSERVED no recorte:** três experiências navegáveis no Poco, 1080×2400/440 dpi, WebView 392×819 CSS/DPR 2,75; prévia inteira, fabricação sem barra, coleção paginada, inspeção e comparação. Evidências e limites no relatório do experimento.
-- **Próximo passo:** avaliação humana dessas três experiências no Poco. Reconstrução das outras telas depende dessa validação.
-- **NOT_PROVEN:** aceitação visual, solução final de câmera, integração ao jogo e desempenho sustentado. Observação física não equivale a aprovação do layout.
+- **TARGET aprovado:** barra inferior fixa em Início, Coleção, Forja, Loja e Craft; Craft substituiu a quinta seção Jogador por decisão humana posterior. Perfil e carreira ficam no Início/perfil. A barra desaparece durante fabricação; preparação mantém espada inteira visível; fabricação elevada/oblíqua com HUD compacto; orientação térmica clara e Revelação centrada na arma.
+- **APK integrado atual:** `0.2.2`, candidato da revisão Codex 08 acima. A rodada Codex 07 entregou `0.2.1`; `0.2.0` foi intermediário. O APK de `41d7222` e o [protótipo separado](../experiments/mobile-ux-v1/README.md) continuam preservados como checkpoints históricos. O companion `FioForja Protótipo` tem outro pacote/UID e não grava o progresso real.
+- **OBSERVED no protótipo separado:** três experiências navegáveis no Poco, 1080×2400/440 dpi, WebView 392×819 CSS/DPR 2,75; prévia inteira, fabricação sem barra, coleção paginada, inspeção e comparação. Essa observação não valida o APK integrado.
+- **Próximo passo humano:** avaliar o APK integrado no Poco; preservar física, economia e saves ao revisar a composição.
+- **NOT_PROVEN:** aceitação visual, solução final de câmera e desempenho sustentado. A integração ao jogo foi implementada na Operação 07; observação física do companion não equivale a aprovação do layout integrado.
 
-## Entrega Android — 24/10/2026
+## Entrega Android histórica — 24/10/2026
 
 - **Branch experimental:** `codex/android-apk-delivery`; base `c2b1883038332f3572e7135824116852b328c56a`.
 - **Worktree da entrega:** `C:\Users\phped\.codex\worktrees\android-apk-delivery\FioForja`.

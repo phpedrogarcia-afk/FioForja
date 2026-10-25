@@ -1,0 +1,26 @@
+{
+  "baseUrl": "http://127.0.0.1:8953/",
+  "viewport": {
+    "width": 392,
+    "height": 819
+  },
+  "checks": [
+    {
+      "name": "buy, equip and restore workshop tools",
+      "result": "PASS"
+    },
+    {
+      "name": "inspection shop link dismisses hidden portal and preserves inspection",
+      "result": "PASS"
+    },
+    {
+      "name": "commission chooses second sword and retains fulfilled history",
+      "result": "PASS"
+    },
+    {
+      "name": "refinement shows canonical cost and actual capped effect before debit",
+      "result": "PASS"
+    }
+  ],
+  "result": "PASS"
+}

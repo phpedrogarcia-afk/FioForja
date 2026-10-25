@@ -56,7 +56,7 @@ import type {
   WorkshopSection,
 } from "./types";
 import type { SimInput } from "./sim";
-import { DEFAULT_DESIGN } from "./catalog";
+import { DEFAULT_DESIGN, WORKSHOP_EQUIPMENT } from "./catalog";
 import type { ShopArticle } from "./shop";
 import { getWeaponRenderMode, setWeaponRenderMode, type WeaponRenderMode } from "./visuals/rendererAdapter";
 
@@ -374,6 +374,8 @@ export function GameApp() {
   const handleEquipTool = useCallback(
     (toolId: string) => {
       const currentInventory = save.current.inventory || defaultInventory;
+      const tool = WORKSHOP_EQUIPMENT.find((item) => item.id === toolId);
+      if (!tool || (!tool.unlockedByDefault && !currentInventory.unlockedTools.includes(toolId))) return false;
       const currentEquipped = currentInventory.equipped || defaultEquippedGear;
       const nextEquipped = { ...currentEquipped };
       if (toolId.startsWith("hammer_")) nextEquipped.hammer = toolId.replace("hammer_", "") as never;
@@ -382,10 +384,15 @@ export function GameApp() {
       else if (toolId.startsWith("quench_")) nextEquipped.quench = toolId as never;
 
       const nextInventory: PlayerInventory = { ...currentInventory, equipped: nextEquipped };
+      const res = persist({ inventory: nextInventory });
+      if (!res.ok) {
+        showError(res.error || "Não foi possível gravar o equipamento da oficina.");
+        return false;
+      }
       setInventory(nextInventory);
-      persist({ inventory: nextInventory });
+      return true;
     },
-    [persist],
+    [persist, showError],
   );
 
   const handleUpgradeSword = useCallback(
@@ -681,6 +688,7 @@ export function GameApp() {
           <main className="relative min-h-0 flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto overscroll-contain" hidden={screen !== "home"}>
               <WorkshopHome
+                active={screen === "home"}
                 swords={gallery}
                 wallet={wallet}
                 inventory={inventory}
@@ -703,6 +711,7 @@ export function GameApp() {
 
             <div className="h-full overflow-y-auto overscroll-contain" hidden={screen !== "collection"}>
               <CollectionScreen
+                active={screen === "collection"}
                 swords={gallery}
                 inventory={inventory}
                 wallet={wallet}
@@ -738,11 +747,12 @@ export function GameApp() {
             </div>
 
             <div className="h-full overflow-y-auto overscroll-contain" hidden={screen !== "shop"}>
-              <ShopScreen wallet={wallet} inventory={inventory} onPurchase={handleBuyArticle} />
+              <ShopScreen active={screen === "shop"} wallet={wallet} inventory={inventory} onPurchase={handleBuyArticle} onEquipTool={handleEquipTool} />
             </div>
 
             <div className="h-full overflow-y-auto overscroll-contain" hidden={screen !== "craft"}>
               <CraftScreen
+                active={screen === "craft"}
                 swords={gallery}
                 inventory={inventory}
                 wallet={wallet}
