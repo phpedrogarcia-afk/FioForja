@@ -2,7 +2,7 @@
 
 Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direção de produto aprovada, as evidências verificadas do código e as regras inegociáveis.
 
-**Decisão humana de 24/10/2026 — Codex e Antigravity:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) aprova cinco seções com barra inferior fixa e fabricação imersiva sem barra. O [protótipo navegável](../experiments/mobile-ux-v1/README.md) de preparação, fabricação e coleção foi construído separadamente e observado no Poco; aguarda avaliação humana antes de expandir ao restante do jogo. O aplicativo de produção ainda não recebeu esse layout.
+**Decisão humana de 24/10/2026 — Codex e Antigravity:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) aprova cinco seções com barra inferior fixa e fabricação imersiva sem barra. A [Operação Codex 07](DECISIONS.md#fioforja-mobile-core-001--cinco-seções-conectadas-ao-jogo-real-user-approved-agent-implemented-verified) integrou o layout ao jogo real na branch `codex/mobile-core-integration-v1`: Loja, Arsenal, Craft e Forja compartilham um único save e passam pelas transações canônicas. O [protótipo navegável](../experiments/mobile-ux-v1/README.md) continua preservado como referência visual; a avaliação humana do novo APK 0.2.0 e a validação física no Poco permanecem pendentes.
 
 ---
 
@@ -36,6 +36,9 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
 - [Weapon Visual DNA](specs/weapon-visual-dna.md): contrato do motor opt-in; correções de integração na seção inicial.
 - [Estado da Lâmina Terminada](specs/finished-weapon-state.md): preservação de empenamento, trincas e marcas de martelamento.
 - [APK Android experimental](specs/android-apk.md): empacotamento Capacitor do `GameApp`, comando de build, destinos de entrega, save local e limites de validação. Sem permissões de internet ou recursos do aparelho; apenas permissão interna de assinatura AndroidX.
+- [Navegação mobile](specs/mobile-navigation.md): cinco seções, barra fixa, áreas seguras, Voltar e fabricação imersiva.
+- [Loja funcional](specs/shop.md): catálogo único, validação de preço/ID, destinos e falha fail-closed.
+- [Coleção real](specs/collection.md): Arsenal, inspeção, montagem, proteção mínima, comparação e núcleos.
 
 ---
 
@@ -54,6 +57,7 @@ Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direçã
   - `fusion.ts`: motor de transmutação do Crisol de Fusão (Opção C) com blindagem contra armas de treino e encomendas.
   - `audio.ts`: sintetizador procedural de áudio sem dependências externas.
 - A entrega Android de 24/10/2026 usa a branch `codex/android-apk-delivery`, baseada em `c2b1883`. APK entregue e dez casos aprovados no emulador; receita, evidência e limites ficam na [especificação do APK](specs/android-apk.md). Validação física no Poco permanece pendente.
+- A integração mobile core de 24/10/2026 está em `codex/mobile-core-integration-v1` (commit `6a640d4`) e no APK `0.2.0`; evidência de navegador e testes em [`experiments/mobile-core-integration`](../experiments/mobile-core-integration/README.md).
 - A evidência histórica da integração Codex 05, com contagens e limites, está no [relatório da Operação Codex 05](../experiments/M03-cross-agent-integration/README.md). Testes de API, cenários preparados e partidas reais têm escopos distintos.
 - [Handoff DeepSeek](HANDOFF-DEEPSEEK-WEAPON-DNA.md) e [laboratório M02](../experiments/M02-weapon-dna/README.md) preservam a entrega do doador; não são o estado atual da integração.
 - Implementação atual e direção futura permanecem distintas; os thresholds de notas do código não substituem os thresholds estéticos da Bíblia.

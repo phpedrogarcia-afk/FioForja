@@ -1,5 +1,17 @@
 # Handoff — integração e APK Android experimental
 
+## Estado após a Operação Codex 07 (24/10/2026)
+
+- **Branch:** `codex/mobile-core-integration-v1`, HEAD `6a640d4`, base `da46757` (cadeia: `0663f4e → c2b1883 → 41d7222 → cca050e → 82a9fd3 → da46757`).
+- **Interface integrada:** Início, Coleção, Forja, Loja e Craft no `GameApp` real; barra inferior fixa fora da forja e oculta dentro dela; Voltar com histórico e diálogo de saída segura.
+- **Loja:** `src/game/shop.ts` é o catálogo único; `executeShopPurchaseTransaction` valida ID, tipo, preço, quantidade e moeda; falha de storage não entrega item.
+- **Coleção:** inspeção por ID, comparação, proteção (`favorite` aditivo) e instalação/troca via `executeComponentInstallTransaction`.
+- **Craft:** mesma raridade exigida no seletor, em `fuseSwords` e em `validateSwordFusionTransaction`; núcleos antigos preservados.
+- **Núcleo → Forja:** "Forjar agora" abre a preparação com identidade travada; material reservado no início; núcleo consumido na conclusão.
+- **APK 0.2.0:** `com.projetofio.fioforja`, código 2, 12.128.161 bytes, SHA-256 `637aef70dfe11e46fe04803ef2cd3172000b7916f73bab90390ef37b84b32ace`, HEAD `6a640d4`. Versão anterior preservada em `Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24`.
+- **Verificação:** 231/231 testes, typecheck 0, lint 0 erros, build web 0; percurso de navegador documentado em [`experiments/mobile-core-integration`](../experiments/mobile-core-integration/README.md).
+- **Próximo passo:** instalar o APK por cima no Poco, validar toque, áreas seguras, Voltar, persistência e áudio; revisar visualmente o HUD da bigorna (truncamento em 392 px) com a frente Antigravity.
+
 ## Próximo trabalho de interface — Codex e Antigravity
 
 Consultar [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) antes de alterar navegação ou composição. A arquitetura foi aprovada pelo proprietário em 24/10/2026; existe um [protótipo separado](../experiments/mobile-ux-v1/README.md), ainda sem aprovação humana ou integração ao jogo. Não reabrir a escolha entre barra fixa e saguão sem nova evidência ou decisão humana.

@@ -99,3 +99,32 @@ Medições desta rodada: Activity `TotalTime` **1.856 / 1.544 / 1.252 ms**, do c
 - **NOT_PROVEN:** instalação e execução no Poco, API/ABI efetivamente instaladas nesse aparelho, desempenho térmico/sustentado, latência e toque físicos, audibilidade, atualização entre versões distintas, migração de save desktop e confiabilidade em todos os dispositivos. Nenhum telefone estava conectado. Os ícones/splash nativos permanecem os padrões do template.
 
 Próximo passo: copiar `FioForja-teste.apk` ao Poco, instalar e avaliar toque, som e fluidez. Não há merge, push ou mudança de `main` nesta entrega.
+
+
+---
+
+## Rodada 0.2.0 — Operação Codex 07 (integração mobile core)
+
+**Branch:** `codex/mobile-core-integration-v1`. **Commit empacotado:** `6a640d4a0e8094b62a0ab25290db210b32a27d16`. **Data:** 24/10/2026.
+
+O APK 0.2.0 contém a interface integrada: Início, Coleção, Forja, Loja e Craft sobre o mesmo save, com a barra inferior ausente durante a fabricação. A receita, a identidade e os destinos não mudaram.
+
+| Item | 0.2.0 |
+|---|---|
+| Pacote | `com.projetofio.fioforja` (inalterado) |
+| Versão | `0.2.0`, código **2** |
+| Android | `minSdk 24`, `targetSdk 36` (inalterado) |
+| Assinatura | debug local, verificada por `apksigner` |
+| Tamanho | **12.128.161 bytes** |
+| SHA-256 | `637aef70dfe11e46fe04803ef2cd3172000b7916f73bab90390ef37b84b32ace` |
+| `BUILD-INFO` | HEAD `6a640d4`, sem alterações não commitadas |
+| Cópia identificada | `APK/FioForja-debug-v0.2.0.apk` |
+| Destinos | worktree, checkout principal e `C:\Users\phped\Documents\FioForja\APK` |
+
+**Preservação da versão anterior:** antes do rebuild, os artefatos 0.1.0 foram copiados para `C:\Users\phped\Documents\FioForja\APK\Backups\pre-mobile-core-2026-10-24\` (APK `4285d300…`, 12.336.603 bytes, HEAD `da46757` com alterações não commitadas). O binário anterior não foi apagado do histórico de entrega.
+
+**Instalação por cima:** mesmo `applicationId`, mesma chave debug e mesma origem `https://localhost/`. `versionCode` subiu de 1 para 2, o que permite atualização sem desinstalar. O save Android anterior permanece no WebView `localStorage`.
+
+**Validação desta rodada:** `[PARTIAL]`. A compilação, a verificação de identidade/assinatura/permissões/assets e a exportação para os três destinos passaram. A instalação/abertura no AVD e o teste físico no Poco estão registrados na seção seguinte quando executados. Não declarar validação no aparelho sem essa observação.
+
+**Mudanças funcionais no bundle:** cinco seções; Loja transacional; instalação de componentes; fusão com mesma raridade; núcleo persistido; Craft 2×2; saída segura da forja. O HUD e a cena da bigorna são os mesmos da frente Antigravity. Nenhuma permissão nova foi adicionada.

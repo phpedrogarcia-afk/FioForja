@@ -1,10 +1,10 @@
 {
-  "startedAt": "2026-10-25T02:02:19.102Z",
+  "startedAt": "2026-10-25T02:11:21.424Z",
   "fixture": "four Rara swords + gold",
   "steps": [
     {
       "name": "home loaded",
-      "at": 1792893740452,
+      "at": 1792894283059,
       "navLabels": [
         "Início",
         "Coleção",
@@ -15,104 +15,104 @@
     },
     {
       "name": "bought guard",
-      "at": 1792893740886,
+      "at": 1792894283532,
       "goldBefore": "🪙 4000 · 💎 200 · 💠 20",
       "goldAfter": "🪙 3780 · 💎 200 · 💠 20"
     },
     {
       "name": "installed guard",
-      "at": 1792893741242,
+      "at": 1792894283940,
       "defBefore": "DEF\n\n186",
       "defAfter": "DEF\n\n194"
     },
     {
       "name": "four donors selected",
-      "at": 1792893741746,
+      "at": 1792894284544,
       "oddsText": "50% |  | Rara |  | Refinado |  | 42% |  | Épica |  | Superior +1 |  | 8% |  | Lendária |  | Excepcional +2"
     },
     {
       "name": "core revealed",
-      "at": 1792893742116,
-      "coreHeading": "Núcleo Dobrado de Alta Densidade — Lâmina de Prova 96",
-      "coreRarity": "Rara"
+      "at": 1792894284939,
+      "coreHeading": "Coração Metálico Transcendental [Salto Excepcional +2] — Lâmina de Prova 96",
+      "coreRarity": "Lendária"
     },
     {
       "name": "core stored",
-      "at": 1792893742410
+      "at": 1792894285238
     },
     {
       "name": "core survived reload",
-      "at": 1792893743142
+      "at": 1792894286006
     },
     {
       "name": "forge started",
-      "at": 1792893746086,
+      "at": 1792894289010,
       "navInForge": 0,
       "url": "http://127.0.0.1:8952/#forge"
     },
     {
       "name": "strike",
-      "at": 1792893750376,
+      "at": 1792894293569,
       "strikes": 1,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893751782,
+      "at": 1792894294974,
       "strikes": 2,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893753194,
+      "at": 1792894296384,
       "strikes": 3,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893754595,
+      "at": 1792894297791,
       "strikes": 4,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893757263,
+      "at": 1792894300426,
       "strikes": 5,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893758670,
+      "at": 1792894301835,
       "strikes": 6,
       "phase": "Martelar"
     },
     {
       "name": "strike",
-      "at": 1792893760072,
+      "at": 1792894303240,
       "strikes": 7,
       "phase": "Martelar"
     },
     {
       "name": "quench attempt",
-      "at": 1792893763810,
+      "at": 1792894306968,
       "q": 0
     },
     {
       "name": "reveal reached",
-      "at": 1792893763814
+      "at": 1792894306971
     },
     {
       "name": "returned to arsenal",
-      "at": 1792893764913,
+      "at": 1792894308129,
       "arsenalCount": "1 arma(s) no Arsenal"
     },
     {
       "name": "arsenal survived reload",
-      "at": 1792893765746,
+      "at": 1792894308925,
       "persisted": "1 arma(s) no Arsenal"
     }
   ],
   "errors": [],
   "result": "PASS",
-  "finishedAt": "2026-10-25T02:02:45.746Z"
+  "finishedAt": "2026-10-25T02:11:48.925Z"
 }

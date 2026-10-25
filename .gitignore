@@ -32,3 +32,6 @@ experiments/M03-cross-agent-integration/evidence/browser/**/*-trace.zip
 *.apk
 *.jks
 *.keystore
+
+# Local Android save pulls (never version)
+.tmp-android/

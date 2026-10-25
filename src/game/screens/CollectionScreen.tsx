@@ -100,6 +100,17 @@ function heritageHeadline(core: FusionCore): string {
   return biases[0][0] > 0 ? biases[0][1] : "Memória de metal equilibrada";
 }
 
+function structuralStateLabel(sword: FinishedSword): string {
+  if (sword.broken || sword.structuralState === "broken") return "Fragmentos";
+  const labels: Record<string, string> = {
+    stable: "estável",
+    deformed: "deformada",
+    damaged: "danificada",
+    cracked: "trincada",
+  };
+  return labels[sword.structuralState || "stable"] || "estável";
+}
+
 function signed(value: number | undefined): string {
   const n = value || 0;
   return n >= 0 ? `+${n}` : String(n);
@@ -548,7 +559,7 @@ export function CollectionScreen({
 
             <div className="flex flex-wrap gap-1.5 text-[0.62rem]">
               <span className="rounded border border-border bg-black/25 px-1.5 py-1 text-muted">
-                Estado: {inspected.broken || inspected.structuralState === "broken" ? "Fragmentos" : inspected.structuralState || "estável"}
+                Estado: {structuralStateLabel(inspected)}
               </span>
               <span className="rounded border border-border bg-black/25 px-1.5 py-1 text-muted">
                 Durabilidade: {statsOf(inspected).dur}%

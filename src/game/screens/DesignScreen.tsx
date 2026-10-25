@@ -1,8 +1,8 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CANONICAL_PRESETS, FAMILIES, GUARDS, POMMELS, PROFILES, STEELS, WRAPS } from "../catalog";
-import { drawFinishedSword } from "../swordDraw";
+import { WeaponPreview } from "../components/WeaponPreview";
 import type {
   CareerStats,
   FamilyId,
@@ -60,35 +60,6 @@ export function DesignScreen({
   onResumeAttempt,
   onRecycleScrap,
 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    const g = ctx.createRadialGradient(w / 2, h * 0.55, 30, w / 2, h * 0.55, Math.max(w, h) * 0.6);
-    g.addColorStop(0, "#161d30");
-    g.addColorStop(0.65, "#0c101a");
-    g.addColorStop(1, "#060810");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-    drawFinishedSword(ctx, design, w / 2, h * 0.58, Math.min(w, h) * 0.94, {
-      angle: -Math.PI / 2.05,
-      assembled: true,
-      heat: 0,
-      shape: 1,
-      quality: 92,
-    });
-  }, [design]);
-
   // Current material requirement and stock
   const reqMat = getRequiredMaterialForSteel(design.steel);
   const currentStock = getMaterialStock(inventory?.materials, reqMat.key);
@@ -176,8 +147,8 @@ export function DesignScreen({
       <div className={embedded ? "min-h-0 flex-1 overflow-y-auto overscroll-contain" : ""}>
       <div className="mx-auto w-full max-w-3xl px-4 pb-4">
         {/* Sword Preview Canvas */}
-        <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
-          <canvas ref={canvasRef} className="h-56 w-full sm:h-72" />
+        <div className="mt-3 h-56 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)] sm:h-72">
+          <WeaponPreview sword={{ design, quality: 92 }} />
         </div>
 
         {/* Fusion Core Notification Banner */}
@@ -226,11 +197,11 @@ export function DesignScreen({
 
         {/* Canonical Presets Section with explicit progression states */}
         <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3.5">
-          <div className="flex items-center justify-between">
-            <p className="font-display text-xs uppercase tracking-[0.16em] text-amber-300 font-bold">
-              📜 Compêndio de Obras Mestras (Projetos & Blueprints)
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+            <p className="font-display text-[0.68rem] font-bold uppercase leading-snug tracking-[0.12em] text-amber-300">
+              📜 Compêndio de Obras Mestras
             </p>
-            <span className="text-[0.7rem] text-muted">Desbloqueio Progressivo</span>
+            <span className="shrink-0 text-[0.62rem] text-muted">Projetos & blueprints</span>
           </div>
 
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
