@@ -74,3 +74,7 @@ Não houve instalação no Poco nesta missão. Mesma identidade/certificado perm
 - Antigravity continua isolado em sua worktree de movimento; nenhum de seus fontes foi alterado. Os dois documentos locais de filosofia em `rea-ux-harvest` permanecem preservados fora desta branch. Não houve merge ou push.
 
 **Recomendação M02B:** manter estes cards e a transação; comparar somente a descoberta das oito categorias, com as tarefas “achar aço”, “achar catalisador” e “achar uma receita”. Medir gestos e erros de localização sem voltar a acrescentar descrições à grade. M02B não foi iniciada.
+
+## Atualização posterior no Poco — 26/10/2026
+
+Após o encerramento acima, o proprietário conectou o Poco e autorizou a instalação. `adb install -r` atualizou **0.2.2/código 4 → 0.2.3/código 5** com `Success`; `firstInstallTime` permaneceu inalterado. Backup privado dos dados do app foi preservado em `APK/evidence/M02A-poco-update-20261026`, ignorado pelo Git. Os hashes dos **nove arquivos de Local Storage foram idênticos antes/depois da instalação**, antes de abrir o app. `MainActivity` abriu com status `ok`, e a captura física mostrou a tela Início com o progresso existente. Isso comprova atualização e abertura no aparelho; não comprova ainda usabilidade da nova Loja, compras, offline, áudio ou aceitação visual nesta versão. Nenhuma compra ou forja foi executada no inventário do proprietário.
