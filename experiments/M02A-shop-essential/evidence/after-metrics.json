@@ -1,0 +1,166 @@
+{
+  "after392": {
+    "cards": [
+      {
+        "bottom": 358.921875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "top": 202.875,
+        "width": 180
+      },
+      {
+        "bottom": 358.921875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "top": 202.875,
+        "width": 180
+      },
+      {
+        "bottom": 522.96875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "top": 366.921875,
+        "width": 180
+      },
+      {
+        "bottom": 522.96875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "top": 366.921875,
+        "width": 180
+      },
+      {
+        "bottom": 687.015625,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "top": 530.96875,
+        "width": 180
+      },
+      {
+        "bottom": 687.015625,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "top": 530.96875,
+        "width": 180
+      }
+    ],
+    "categories": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "columns": "180px 180px",
+    "fullProducts": 6,
+    "listTextWords": 76,
+    "scrollContainers": [
+      {
+        "content": 713,
+        "height": 713
+      }
+    ],
+    "viewport": [
+      392,
+      819,
+      1
+    ]
+  },
+  "after360": {
+    "cards": [
+      {
+        "bottom": 358.921875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "top": 202.875,
+        "width": 164
+      },
+      {
+        "bottom": 358.921875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "top": 202.875,
+        "width": 164
+      },
+      {
+        "bottom": 522.96875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "top": 366.921875,
+        "width": 164
+      },
+      {
+        "bottom": 522.96875,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "top": 366.921875,
+        "width": 164
+      },
+      {
+        "bottom": 687.015625,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "top": 530.96875,
+        "width": 164
+      },
+      {
+        "bottom": 687.015625,
+        "height": 156.046875,
+        "nameFont": "14px",
+        "overflow": false,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "top": 530.96875,
+        "width": 164
+      }
+    ],
+    "categories": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "columns": "164px 164px",
+    "fullProducts": 6,
+    "listTextWords": 76,
+    "scrollContainers": [
+      {
+        "content": 694,
+        "height": 694
+      }
+    ],
+    "viewport": [
+      360,
+      800,
+      1
+    ]
+  }
+}

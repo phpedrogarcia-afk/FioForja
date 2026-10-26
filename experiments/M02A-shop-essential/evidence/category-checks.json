@@ -1,0 +1,58 @@
+[
+  {
+    "category": "Metais e materiais",
+    "count": 6,
+    "minWidth": 164,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Ferramentas",
+    "count": 5,
+    "minWidth": 156.5,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Cabos",
+    "count": 3,
+    "minWidth": 164,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Guardas",
+    "count": 5,
+    "minWidth": 164,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Pomos",
+    "count": 3,
+    "minWidth": 164,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Runas",
+    "count": 5,
+    "minWidth": 164,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Catalisadores",
+    "count": 1,
+    "minWidth": 336,
+    "minHeight": 156.046875,
+    "overflow": false
+  },
+  {
+    "category": "Projetos e receitas",
+    "count": 7,
+    "minWidth": 156.5,
+    "minHeight": 156.046875,
+    "overflow": false
+  }
+]

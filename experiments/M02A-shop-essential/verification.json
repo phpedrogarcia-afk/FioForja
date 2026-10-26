@@ -1,0 +1,22 @@
+{
+  "mission": "M02A-shop-essential",
+  "date": "2026-10-26",
+  "base": "1bcc1ea88ad339df4ce56df45ce2794c18ecf92d",
+  "branch": "codex/shop-essential-m02a",
+  "runtimeFilesChanged": ["src/game/screens/ShopScreen.tsx"],
+  "packagedSourceGitBlobs": {
+    "src/game/screens/ShopScreen.tsx": "d1b0d4befd446cf9cbbcb08bd17cf7bedce4c534",
+    "package.json": "f8809aa87f1f934e977786f87d6f4a03746b1b58",
+    "package-lock.json": "45cbc4cf2a16d4c9f3e4240b07b5f1be49c64bae",
+    "android/app/build.gradle": "3de2f66aa316988280f0868617bce12588b5bcd6"
+  },
+  "tests": {"affected":65,"androidPackaging":4,"failed":0},
+  "typecheck":"PASS",
+  "lint":{"errors":0,"warnings":38},
+  "mobileBuild":"PASS",
+  "apkBuild":"PASS",
+  "apk":{"version":"0.2.3","code":5,"bytes":12129945,"sha256":"70a1343076fedbc2762efa157b2d505815a7c11aa5de3b2b4658c5450c8d32b1","sourceDirtyAtBuild":true,"appId":"com.projetofio.fioforja","certificateSha256":"29896d7ad281e0f642a44d513b2b277a3e1723de2df0d796ea0eff1a8af195bc","previousCertificateMatches":true,"deliveryCopiesMatch":true},
+  "pocoPhysicalTest":"NOT_PERFORMED",
+  "mainChanged":false,
+  "push":false
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "step": "two canonical purchases",
+    "result": "PASS",
+    "before": {
+      "gold": 850,
+      "rubies": 35,
+      "iron": 8,
+      "damasco": 0
+    },
+    "after": {
+      "gold": 450,
+      "rubies": 34,
+      "iron": 9,
+      "damasco": 1
+    },
+    "walletNow": "🪙 450\n·\n💎 34\n·\n💠 20",
+    "ironNow": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 9",
+    "damascoNow": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 1"
+  },
+  {
+    "step": "insufficient funds",
+    "result": "PASS",
+    "missingGold": 950,
+    "buttonDisabled": true
+  },
+  {
+    "step": "close and reopen page",
+    "result": "PASS",
+    "gold": 450,
+    "rubies": 34,
+    "iron": 9,
+    "damasco": 1
+  }
+]

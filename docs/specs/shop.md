@@ -1,5 +1,7 @@
 # Loja funcional — catálogo, compra e persistência
 
+**M02A — Loja Essencial (26/10/2026):** apresentação em grade responsiva, duas colunas verificadas em 392×819 e 360×800 CSS px. Os seis materiais iniciais cabem inteiros sem rolagem vertical; descrição e atributos ficam na ficha. Compra e persistência verificadas por UI real em save de teste, 65 testes afetados PASS; APK 0.2.3/código 5 entregue. Avaliação física/visual no Poco pendente. [Comparação e limites](../../experiments/M02A-shop-essential/README.md).
+
 **Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` no envelope funcional da [revisão Codex 08](../../.project-intelligence/experiments/CODEX08-review.md), base `78945e0` + working tree revisado. Normalização já correta da Loja preservada; regressões e acesso a equipamento verificados. APK 0.2.2/código 4 e percurso de compras no AVD PASS; no Poco, a prova foi limitada a reinstalação/restauração/navegação, sem compras. Candidata à avaliação humana.
 **Fonte de verdade:** `src/game/shop.ts` (catálogo) e `executeShopPurchaseTransaction` em `src/game/transactions.ts`.
 
@@ -45,7 +47,7 @@ O preço é multiplicado pela quantidade apenas para materiais. A gravação aco
 
 ## 4. UX
 
-Categoria em chips roláveis; cards com ícone, nome, raridade, descrição curta, preço, saldo e possuídos. Tocar abre um painel com efeito, destino, saldo e botão único de confirmação ("Comprar por X ouro + Y rubis"). Feedback de sucesso é do próprio painel e não substitui a mensagem de erro global.
+Categorias permanecem nos mesmos chips roláveis e na mesma ordem. Cards em grade mostram ícone existente, nome completo, raridade, preço/moeda e possuídos ou “Adquirido”; não exibem descrição. A grade usa duas colunas quando cabem e se adapta à largura disponível. O card inteiro abre a ficha com descrição, atributos, posse, efeito, destino, saldo e botão único de confirmação ("Comprar por X ouro + Y rubis"). A categoria na ficha usa o nome em português. Saldo insuficiente informa a quantidade que falta por moeda, sem sugerir revenda inexistente. A compra continua passando pela transação canônica; sucesso mantém feedback inline e toast existentes.
 
 Na categoria Ferramentas, **Equipar** aplica o equipamento adquirido ou padrão e **Em uso** identifica a seleção atual. O painel de produto só permanece aberto enquanto a Loja é a seção ativa; navegar para outra seção não deixa seu portal bloqueando a tela.
 

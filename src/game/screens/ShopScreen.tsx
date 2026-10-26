@@ -31,9 +31,13 @@ function ownedCount(article: ShopArticle, inventory: PlayerInventory): number {
     case "tool":
       return (inventory.unlockedTools || []).includes(article.id) ? 1 : 0;
     case "recipe":
-      return (inventory.unlockedBlueprints || []).includes(article.id.replace(/^recipe_/, "")) ? 1 : 0;
+      return (inventory.unlockedBlueprints || []).includes(article.id.replace(/^recipe_/, ""))
+        ? 1
+        : 0;
     default:
-      return (inventory.components || []).filter((c) => c.componentKey === article.componentData?.componentKey).length;
+      return (inventory.components || []).filter(
+        (c) => c.componentKey === article.componentData?.componentKey,
+      ).length;
   }
 }
 
@@ -53,7 +57,7 @@ function destinationOf(article: ShopArticle): string {
 }
 
 /**
- * Loja real: cada card mostra preço, moeda, saldo, efeito e destino.
+ * Cards resumem identidade, preço e posse; o detalhe explica efeito e destino.
  * A compra só acontece na confirmação e passa pela transação canônica.
  */
 export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEquipTool }: Props) {
@@ -65,6 +69,16 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
     () => BAZAAR_ARTICLES.filter((article) => shopCategoryOf(article) === category),
     [category],
   );
+  const missingFunds = selected
+    ? [
+        wallet.gold < selected.costGold ? `${selected.costGold - wallet.gold} ouro` : null,
+        wallet.rubies < (selected.costRubies || 0)
+          ? `${(selected.costRubies || 0) - wallet.rubies} rubis`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" e ")
+    : "";
 
   const buy = (article: ShopArticle) => {
     const ok = onPurchase(article);
@@ -79,12 +93,20 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
   return (
     <main className="mx-auto w-full max-w-2xl space-y-3 px-3 pt-3 pb-6">
       <header>
-        <p className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-400/90">Bazar da oficina</p>
+        <p className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-400/90">
+          Bazar da oficina
+        </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-amber-50">Loja</h1>
-        <p className="mt-1 text-xs text-muted">Tudo o que entra aqui tem uso real na forja ou no Crisol.</p>
+        <p className="mt-1 text-xs text-muted">
+          Tudo o que entra aqui tem uso real na forja ou no Crisol.
+        </p>
       </header>
 
-      <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1" role="tablist" aria-label="Categorias da Loja">
+      <div
+        className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1"
+        role="tablist"
+        aria-label="Categorias da Loja"
+      >
         {SHOP_CATEGORIES.map((item) => (
           <button
             key={item.id}
@@ -122,11 +144,12 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
         </p>
       ) : null}
 
-      <ul className="space-y-2">
+      <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-2">
         {articles.map((article) => {
           const owned = ownedCount(article, inventory);
           const ownedOutright = (article.type === "tool" || article.type === "recipe") && owned > 0;
-          const canAfford = wallet.gold >= article.costGold && wallet.rubies >= (article.costRubies || 0);
+          const canAfford =
+            wallet.gold >= article.costGold && wallet.rubies >= (article.costRubies || 0);
           return (
             <li key={article.id}>
               <button
@@ -135,27 +158,33 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
                   setFeedback(null);
                   setSelected(article);
                 }}
-                className="flex w-full items-start gap-3 rounded-xl border border-border bg-surface p-3 text-left hover:border-amber-600/60"
+                className="flex h-full w-full min-w-0 flex-col rounded-xl border border-border bg-surface p-2.5 text-left hover:border-amber-600/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
               >
-                <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-lg border border-border bg-black/30 text-xl">
-                  {article.icon}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-start justify-between gap-2">
-                    <span className="font-display text-sm font-bold text-amber-50">{article.name}</span>
-                    <span className="shrink-0 rounded border border-amber-800/60 bg-amber-950/40 px-1.5 py-0.5 text-[0.6rem] font-bold text-amber-300">
-                      {article.rarity}
-                    </span>
+                <span className="mb-2 flex w-full items-center justify-between gap-1">
+                  <span
+                    aria-hidden
+                    className="grid size-8 shrink-0 place-items-center rounded-lg border border-border bg-black/30 text-xl"
+                  >
+                    {article.icon}
                   </span>
-                  <span className="mt-0.5 block text-[0.68rem] leading-snug text-muted">{article.desc}</span>
-                  <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.68rem]">
-                    <span className={"font-semibold " + (canAfford ? "text-amber-300" : "text-red-300")}>
+                  <span className="rounded border border-amber-800/60 bg-amber-950/40 px-1.5 py-0.5 text-[0.65rem] font-bold text-amber-300">
+                    {article.rarity}
+                  </span>
+                </span>
+                <span className="min-h-12 w-full break-words font-display text-sm leading-snug font-bold text-amber-50">
+                  {article.name}
+                </span>
+                <span className="mt-auto block w-full pt-2">
+                  <span className="flex flex-wrap items-center gap-x-1 text-sm leading-snug">
+                    <span
+                      className={"font-semibold " + (canAfford ? "text-amber-300" : "text-red-300")}
+                    >
                       🪙 {article.costGold}
                       {article.costRubies ? ` · 💎 ${article.costRubies}` : ""}
                     </span>
-                    <span className="text-muted">
-                      {ownedOutright ? "✓ Adquirido" : `Possui: ${owned}`}
-                    </span>
+                  </span>
+                  <span className="mt-0.5 block text-[0.7rem] text-muted">
+                    {ownedOutright ? "✓ Adquirido" : `Possui: ${owned}`}
                   </span>
                 </span>
               </button>
@@ -165,17 +194,30 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
       </ul>
 
       {category === "tools" ? (
-        <section aria-label="Equipamento da oficina" className="space-y-2 border-t border-border pt-3">
+        <section
+          aria-label="Equipamento da oficina"
+          className="space-y-2 border-t border-border pt-3"
+        >
           <h2 className="font-display text-sm font-bold text-amber-100">Equipamento da oficina</h2>
-          <p className="text-xs text-muted">Escolha uma ferramenta adquirida ou volte ao equipamento padrão.</p>
-          {WORKSHOP_EQUIPMENT.filter((tool) => tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id)).map((tool) => {
+          <p className="text-xs text-muted">
+            Escolha uma ferramenta adquirida ou volte ao equipamento padrão.
+          </p>
+          {WORKSHOP_EQUIPMENT.filter(
+            (tool) => tool.unlockedByDefault || inventory.unlockedTools.includes(tool.id),
+          ).map((tool) => {
             const equipped = inventory.equipped || defaultEquippedGear;
-            const currentId = tool.category === "hammer" ? `hammer_${equipped.hammer}` : equipped[tool.category];
+            const currentId =
+              tool.category === "hammer" ? `hammer_${equipped.hammer}` : equipped[tool.category];
             const isEquipped = currentId === tool.id;
             return (
-              <div key={tool.id} className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+              <div
+                key={tool.id}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2"
+              >
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-amber-50">{tool.icon} {tool.name}</p>
+                  <p className="text-xs font-semibold text-amber-50">
+                    {tool.icon} {tool.name}
+                  </p>
                   <p className="mt-0.5 text-[0.62rem] text-muted">{tool.stats}</p>
                 </div>
                 <Button
@@ -186,7 +228,12 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
                   disabled={isEquipped}
                   onClick={() => {
                     const ok = onEquipTool(tool.id);
-                    setFeedback({ ok, message: ok ? `${tool.name} em uso.` : "Não foi possível equipar a ferramenta." });
+                    setFeedback({
+                      ok,
+                      message: ok
+                        ? `${tool.name} em uso.`
+                        : "Não foi possível equipar a ferramenta.",
+                    });
                   }}
                 >
                   {isEquipped ? "Em uso" : "Equipar"}
@@ -202,7 +249,11 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
         onOpenChange={(open) => !open && setSelected(null)}
         eyebrow="Detalhe do produto"
         title={selected?.name || ""}
-        description={selected ? `${selected.rarity} · ${selected.category}` : undefined}
+        description={
+          selected
+            ? `${selected.rarity} · ${SHOP_CATEGORIES.find((item) => item.id === shopCategoryOf(selected))?.label}`
+            : undefined
+        }
         footer={
           selected ? (
             <Button
@@ -239,6 +290,7 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
                 </p>
               </div>
             </div>
+            <p className="text-xs text-muted">Você possui: {ownedCount(selected, inventory)}</p>
             {selected.stats ? (
               <p className="rounded-lg border border-amber-800/50 bg-amber-950/25 px-3 py-2 text-xs font-semibold text-amber-200">
                 {selected.stats}
@@ -253,10 +305,11 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
             </div>
             {wallet.gold < selected.costGold || wallet.rubies < (selected.costRubies || 0) ? (
               <p className="flex items-center gap-1.5 rounded-lg border border-red-600/50 bg-red-950/30 px-3 py-2 text-xs text-red-200">
-                <ShieldAlert size={14} /> Saldo insuficiente. Venda/forje para reunir moedas.
+                <ShieldAlert size={14} className="shrink-0" /> Você precisa de mais {missingFunds}.
               </p>
             ) : null}
-            {ownedCount(selected, inventory) > 0 && (selected.type === "tool" || selected.type === "recipe") ? (
+            {ownedCount(selected, inventory) > 0 &&
+            (selected.type === "tool" || selected.type === "recipe") ? (
               <p className="flex items-center gap-1.5 text-xs text-emerald-300">
                 <Check size={14} /> Você já possui este item.
               </p>

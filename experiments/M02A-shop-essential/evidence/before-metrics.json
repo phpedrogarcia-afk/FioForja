@@ -1,0 +1,154 @@
+{
+  "before392": {
+    "cards": [
+      {
+        "bottom": 301.484375,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "🧱\nLingote de Ferro Forjado\nComum\nMassa sólida de ferro maleável tradicional para forjamento básico.\n🪙 50\nPossui: 8",
+        "top": 202.875,
+        "width": 353
+      },
+      {
+        "bottom": 408.09375,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "🪙\nBarra de Aço Nobre do Reino\nIncomum\nLiga de carbono balanceada para corte fino e lâminas cavalheirescas.\n🪙 140\nPossui: 4",
+        "top": 309.484375,
+        "width": 353
+      },
+      {
+        "bottom": 514.703125,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "🌊\nTarugo Dobrado de Damasco\nRara\nMúltiplas dobras de aços nobres que produzem padrões ondulados e retenção elástica.\n🪙 350 · 💎 1\nPossui: 0",
+        "top": 416.09375,
+        "width": 353
+      },
+      {
+        "bottom": 621.3125,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "⬛\nBloco de Aço Negro Forjado\nÉpica\nAço de dureza extrema temperado em cinzas vulcânicas para retenção navalha.\n🪙 450 · 💎 1\nPossui: 0",
+        "top": 522.703125,
+        "width": 353
+      },
+      {
+        "bottom": 727.921875,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "✨\nLingote de Prata Élfica Sagrada\nLendária\nLiga ancestral luminosa forjada com harmonia natural e massa ultraleve.\n🪙 850 · 💎 3\nPossui: 0",
+        "top": 629.3125,
+        "width": 353
+      },
+      {
+        "bottom": 834.53125,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "☄️\nFragmento de Meteorito Celestial\nRelíquia\nNúcleo de bólido estelar colhido nas cordilheiras do norte cintilando com partículas astrais.\n🪙 1400 · 💎 5\nPossui: 0",
+        "top": 735.921875,
+        "width": 353
+      }
+    ],
+    "categories": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "columns": "none",
+    "fullProducts": 5,
+    "listTextWords": 141,
+    "scrollContainers": [
+      {
+        "content": 822,
+        "height": 713
+      }
+    ],
+    "viewport": [
+      392,
+      819,
+      1
+    ]
+  },
+  "before360": {
+    "cards": [
+      {
+        "bottom": 301.484375,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "🧱\nLingote de Ferro Forjado\nComum\nMassa sólida de ferro maleável tradicional para forjamento básico.\n🪙 50\nPossui: 8",
+        "top": 202.875,
+        "width": 321
+      },
+      {
+        "bottom": 427.703125,
+        "height": 118.21875,
+        "overflow": false,
+        "text": "🪙\nBarra de Aço Nobre do Reino\nIncomum\nLiga de carbono balanceada para corte fino e lâminas cavalheirescas.\n🪙 140\nPossui: 4",
+        "top": 309.484375,
+        "width": 321
+      },
+      {
+        "bottom": 534.3125,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "🌊\nTarugo Dobrado de Damasco\nRara\nMúltiplas dobras de aços nobres que produzem padrões ondulados e retenção elástica.\n🪙 350 · 💎 1\nPossui: 0",
+        "top": 435.703125,
+        "width": 321
+      },
+      {
+        "bottom": 640.921875,
+        "height": 98.609375,
+        "overflow": false,
+        "text": "⬛\nBloco de Aço Negro Forjado\nÉpica\nAço de dureza extrema temperado em cinzas vulcânicas para retenção navalha.\n🪙 450 · 💎 1\nPossui: 0",
+        "top": 542.3125,
+        "width": 321
+      },
+      {
+        "bottom": 767.140625,
+        "height": 118.21875,
+        "overflow": false,
+        "text": "✨\nLingote de Prata Élfica Sagrada\nLendária\nLiga ancestral luminosa forjada com harmonia natural e massa ultraleve.\n🪙 850 · 💎 3\nPossui: 0",
+        "top": 648.921875,
+        "width": 321
+      },
+      {
+        "bottom": 893.359375,
+        "height": 118.21875,
+        "overflow": false,
+        "text": "☄️\nFragmento de Meteorito Celestial\nRelíquia\nNúcleo de bólido estelar colhido nas cordilheiras do norte cintilando com partículas astrais.\n🪙 1400 · 💎 5\nPossui: 0",
+        "top": 775.140625,
+        "width": 321
+      }
+    ],
+    "categories": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "columns": "none",
+    "fullProducts": 4,
+    "listTextWords": 141,
+    "scrollContainers": [
+      {
+        "content": 880,
+        "height": 694
+      }
+    ],
+    "viewport": [
+      360,
+      800,
+      1
+    ]
+  }
+}

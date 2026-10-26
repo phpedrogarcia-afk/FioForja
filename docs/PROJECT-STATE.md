@@ -1,5 +1,12 @@
 # Estado do projeto — integração e APK Android experimental
 
+## M02A — Loja Essencial — 26/10/2026
+
+- Branch isolada `codex/shop-essential-m02a`, base funcional Codex 08 `1bcc1ea88ad339df4ce56df45ce2794c18ecf92d`; [relatório e comparação](../experiments/M02A-shop-essential/README.md).
+- Única tela alterada: `ShopScreen`. Grade com resumo de identidade, preço e posse; detalhes sob demanda; déficit por moeda substitui “Venda/forje”. Categorias e mecanismos funcionais preservados. Seis materiais inteiros em 392×819 e 360×800, contra cinco/quatro na base.
+- 65 testes afetados e quatro de empacotamento PASS; typecheck PASS; lint 0 erros/38 avisos herdados; compra de ferro/Damasco, débito, entrega, bloqueio e reabertura comprovados por UI em save de teste.
+- APK 0.2.3/código 5 entregue em `C:\Users\phped\Documents\FioForja\APK`, SHA-256 `70a1343076fedbc2762efa157b2d505815a7c11aa5de3b2b4658c5450c8d32b1`; versão anterior preservada e mesmo certificado confirmado. Sem teste físico desta rodada; atualização com dados em execução e aprovação visual no Poco continuam NOT_PROVEN. M02B não iniciada; sem merge/push.
+
 ## Operação Codex 08 — revisão isolada — 25/10/2026 — PASS no envelope funcional testado
 
 - **Base:** `78945e0de9d7a70d14994e80a14b2885998ec9ec`; branch `codex/mobile-core-review-v1`; worktree `C:\Users\phped\.codex\worktrees\mobile-core-review-v1\FioForja`.
