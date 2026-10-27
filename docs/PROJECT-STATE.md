@@ -2,6 +2,8 @@
 
 ## M03A — Preparação intuitiva — 26/10/2026
 
+**Atualização física posterior — 27/10/2026:** Poco atualizado de 0.2.3/código 5 para 0.2.5/código 7 por instalação sobreposta; certificado igual e nove arquivos de Local Storage idênticos antes/depois da instalação, antes da abertura. Backup privado dos dados e APK anteriores preservado. Jogo abriu com dados existentes; preparação e listas de projeto/metal foram observadas no aparelho com a espada inteira visível. Avaliação humana, forja com estoque do proprietário, áudio e offline continuam pendentes. Este registro supera apenas a pendência de instalação e observação física indicada no item histórico abaixo. [Detalhes](../experiments/M03A-intuitive-preparation/README.md#atualização-posterior-no-poco--27102026).
+
 - Branch isolada `codex/intuitive-preparation-m03a`, base M02B `653694b`. [Relatório e evidências](../experiments/M03A-intuitive-preparation/README.md); [contrato da preparação](specs/preparation.md).
 - Dois controles principais com listas inline, arma inteira fora da rolagem, nove campos opcionais preservados. Miolo essencial comum sem rolagem em 360×800/392×819. Projeto/família mantêm metal explícito; edições gravam `lastDesign` v5. Gates existentes extraídos para uso compartilhado pela tela/transação; thresholds e efeitos preservados.
 - 115 testes afetados + 6 de Android/assets PASS; typecheck PASS; lint 0 erros/38 avisos herdados. Navegador comprova retorno da Loja, rascunho/reabertura, bloqueios, entrada na forja e retomada, além do fluxo de núcleo sintético com compra real. Não representa dados/progressão naturais do proprietário.

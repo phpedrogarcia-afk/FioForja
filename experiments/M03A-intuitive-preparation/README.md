@@ -57,8 +57,14 @@ Certificado novo/anterior idêntico, SHA-256 `29896d7ad281e0f642a44d513b2b277a3e
 ## Decisões e limites
 
 - **Ruling:** adaptar inline em vez de Sheet. Kev sugeriu Sheet com probabilidade 0,3644 (inline 0,2405; insuficiente 0,2962); o painel padrão ocupa até 90dvh e cobriria a arma ou exigiria uma segunda prévia. O contrato visual e o menor custo de um único preview prevaleceram. Seletores nativos foram substituídos por listas inline para não depender de como o WebView abre pickers. Não atribuir eficiência causal à consulta.
-- **NOT_PROVEN:** instalação/atualização M03A e avaliação visual física no Poco, teclado virtual, áreas seguras reais, modo DNA visual desta tela, desempenho sustentado e maior intuitividade. O telefone conectado não foi usado para modificar seu save nem instalar esta rodada.
+- **NOT_PROVEN na entrega original:** instalação/atualização M03A e avaliação visual física no Poco, teclado virtual, áreas seguras reais, modo DNA visual desta tela, desempenho sustentado e maior intuitividade. O telefone conectado não foi usado para modificar seu save nem instalar naquela rodada. A instalação e observação física ocorreram posteriormente conforme registro abaixo; a avaliação humana continua pendente.
 - **Limitação preexistente:** antes de iniciar uma tentativa, `prepCore` é apenas memória da sessão. Reabrir mantém o núcleo no inventário, mas requer selecioná-lo novamente. Não foi criado novo campo de save nem inferência ambígua de identidade. Após início, o checkpoint mantém o núcleo.
 - Nenhuma regressão detectada no envelope testado; isso não prova ausência universal de regressões. Pendência humana: avaliar o APK nas duas experiências principais, seleção e personalização, antes de integrar.
 
 **STOP:** M03A encerrada. Não iniciar outra missão nem integrar à main.
+
+## Atualização posterior no Poco — 27/10/2026
+
+Após o proprietário conectar o aparelho e pedir continuidade, o Poco `M2103K19PG` foi atualizado por `adb install -r` de 0.2.3/código 5 para 0.2.5/código 7. As assinaturas dos APKs instalado e candidato coincidiram. Uma cópia privada do APK anterior e dos dados do aplicativo foi criada em `C:\Users\phped\Documents\FioForja\APK\Backups\poco-M03A-20261027-201615`. A instalação retornou `Success`, a primeira data de instalação permaneceu, e os hashes dos nove arquivos de Local Storage permaneceram idênticos entre o backup e a verificação após atualização, antes de abrir o aplicativo.
+
+O aplicativo abriu (`MainActivity`, status `ok`) e exibiu o progresso existente. Na tela física 1080×2400, a prévia completa apareceu junto às escolhas; abrir projetos e metais manteve a espada visível. Capturas e manifesto permanecem no backup privado, fora do Git. Não foram realizadas compras, alterações de projeto/metal ou forjas com o inventário do proprietário. A observação física não equivale à aprovação humana nem prova áudio, offline, partidas longas ou a entrada na fabricação no dispositivo. O APK/código 7 e os testes técnicos anteriores não mudaram nesta atualização; a avaliação pelo proprietário permanece pendente.

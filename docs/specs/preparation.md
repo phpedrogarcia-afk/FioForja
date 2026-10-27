@@ -1,6 +1,6 @@
 # Preparação intuitiva — M03A
 
-**Estado:** implementada na branch `codex/intuitive-preparation-m03a`, sobre M02B `653694b`. Verificação técnica e comparação em navegador; avaliação visual e instalação M03A no Poco pendentes. [Relatório e capturas](../../experiments/M03A-intuitive-preparation/README.md).
+**Estado:** implementada na branch `codex/intuitive-preparation-m03a`, sobre M02B `653694b`. Verificação técnica e comparação em navegador; instalada e observada posteriormente no Poco, com avaliação humana pendente. [Relatório e capturas](../../experiments/M03A-intuitive-preparation/README.md).
 
 ## Caminho principal
 
