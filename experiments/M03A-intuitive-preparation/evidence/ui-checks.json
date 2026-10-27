@@ -1,0 +1,62 @@
+[
+  {
+    "case": "draft-return-and-reopen",
+    "result": "PASS",
+    "observed": "Lâmina M03A / MEMORIA remained after Shop return and reload; 360px advanced scroll left preview at y46..328"
+  },
+  {
+    "case": "locked-project",
+    "result": "PASS",
+    "observed": "Cimitarra locked at career0; Begin disabled; short blocker and one requirement"
+  },
+  {
+    "case": "missing-material",
+    "result": "PASS",
+    "observed": "Metal insuficiente; requires1iron; Shop action present; Begin disabled"
+  },
+  {
+    "case": "core-shop-roundtrip",
+    "result": "PASS",
+    "observed": "Core project+metal remain locked after buying1meteor; wallet5000/200→3600/195; Meteor stock0→1; Forjar o núcleo enabled"
+  },
+  {
+    "case": "inline-project-metal-392",
+    "result": "PASS",
+    "observed": "Project list below fixed preview;7locked radios;common project+iron selected;Begin enabled;no native modal"
+  },
+  {
+    "case": "inline-metal-360",
+    "result": "PASS",
+    "observed": "7metals in inline radios;rare metals locked;sword stays above choices"
+  },
+  {
+    "case": "forge-entry-392-build",
+    "result": "PASS",
+    "observed": "Real builtGameApp entersAQUECER;bottomnavabsent;heat10;no simulation edits"
+  },
+  {
+    "case": "interrupted-attempt-recovery",
+    "result": "PASS",
+    "observed": "Reloadfoundactiveattempt;steel4→3onlyonce;Retomarpontosalvoreenteredforge"
+  },
+  {
+    "case": "final-built-core-workflow",
+    "result": "PASS",
+    "observed": "Corelocks project+metal+family+profile;missingmeteorShop→purchase→samecore;360and392captured;Forjaronucleuentersactualforge"
+  },
+  {
+    "case": "unlocked-project-switch-and-explicit-rare-metal",
+    "result": "PASS",
+    "observed": "Career7selectsCimitarra;keepssteel4untiluserexplicitlychoosesDamasco0;statusinsufficientandStartdisabled"
+  },
+  {
+    "case": "final-built-draft-roundtrip",
+    "result": "PASS",
+    "observed": "FinalbuiltUIkeepsRascunhofinal,RETORNO,pommelsphereafterShopreturnandreload"
+  },
+  {
+    "case": "review-P2-release-core-then-select-project",
+    "result": "PASS_AFTER_RED_GREEN",
+    "observed": "Liberarcore→Guardaappliedwithmeteorstillselected;MetallurgyblockandforgeDisabled;explicitironselectionchangesblockertomissingstock,notabypass;finalmessage=Metalbloqueado"
+  }
+]

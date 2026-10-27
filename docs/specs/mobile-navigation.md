@@ -16,6 +16,8 @@
 
 A oficina é **uma só**: `GameApp` continua sendo o único dono do estado (`save.current`) e todas as seções leem/escrevem o mesmo `SaveData`. Não existe segunda carteira, segundo inventário, segundo save ou segundo motor de fusão.
 
+**M03A:** na preparação, a [prévia fica fora da rolagem dos controles](preparation.md); projeto/metal aparecem primeiro e os demais ajustes são opcionais. As cinco seções e o estado único permanecem intactos.
+
 ## 2. Regras de layout
 
 - Casca: `flex h-dvh flex-col overflow-hidden`; cabeçalho fixo, **miolo rolável** (`overflow-y-auto overscroll-contain`) e `BottomNav` fixa no rodapé.

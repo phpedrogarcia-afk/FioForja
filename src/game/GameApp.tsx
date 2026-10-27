@@ -144,6 +144,14 @@ export function GameApp() {
     return res;
   }, []);
 
+  // Usa o campo existente: retornar da Loja ou reabrir mantém a preparação.
+  const changePreparation = useCallback((next: SwordDesign) => {
+    setDesign(next);
+    if (!persist({ lastDesign: next }).ok) {
+      showError("Não foi possível guardar a preparação. Tente novamente antes de fechar.");
+    }
+  }, [persist, showError]);
+
   /** Navegação com entrada de histórico para o gesto/botão Voltar do Android. */
   const go = useCallback((next: Screen) => {
     setScreen(next);
@@ -729,7 +737,7 @@ export function GameApp() {
               <DesignScreen
                 embedded
                 design={design}
-                onChange={setDesign}
+                onChange={changePreparation}
                 onBack={() => go("home")}
                 onForge={startForge}
                 inventory={inventory}

@@ -1,0 +1,72 @@
+{
+  "mission": "M03A-intuitive-preparation",
+  "date": "2026-10-26",
+  "base": "653694b41de18187ec068e2d67770954031a2f80",
+  "branch": "codex/intuitive-preparation-m03a",
+  "packagedSourceGitBlobs": {
+    "src/game/screens/DesignScreen.tsx": "2fce4d77bf8450062cedc2cdbd4d3037660f570f",
+    "src/game/GameApp.tsx": "02826029afbe2d53070a4b09f7032b6af15bb269",
+    "src/game/preparation.ts": "ac256cc6f85751d1d6dfd60c3e2acb8042eefeb7",
+    "src/game/transactions.ts": "5984d8198b71ab80b0845ff5e14cf2a55a379b38",
+    "package.json": "7ee8ca64920cdaa24d66253236569c0d56ba04cd",
+    "package-lock.json": "47d32243c6b4064faa7a862666557be84b7b420b",
+    "android/app/build.gradle": "d5ee6ea37f99600aeb54cf431a62aa53d7221a28"
+  },
+  "tests": {
+    "affectedPass": 115,
+    "newTests": 7,
+    "independentOracleCombinationsWithinOneTest": 224,
+    "androidAndAssetsPass": 6,
+    "fail": 0
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 38
+  },
+  "apk": {
+    "version": "0.2.5",
+    "code": 7,
+    "bytes": 12368091,
+    "sha256": "9fa653bf5b87703fbfbae0610512f388b12fb85b04316f0a25465ddfb6618ea9",
+    "sourceDirtyAtBuild": true,
+    "certificateSHA256": "29896d7ad281e0f642a44d513b2b277a3e1723de2df0d796ea0eff1a8af195bc",
+    "previousCertificateMatches": true,
+    "copies": [
+      {
+        "path": "APK/FioForja-teste.apk",
+        "sha256": "9fa653bf5b87703fbfbae0610512f388b12fb85b04316f0a25465ddfb6618ea9"
+      },
+      {
+        "path": "C:/Users/phped/Documents/FioForja/APK/FioForja-teste.apk",
+        "sha256": "9fa653bf5b87703fbfbae0610512f388b12fb85b04316f0a25465ddfb6618ea9"
+      },
+      {
+        "path": "C:/Users/phped/Projetos/FioForja/FioForja/APK/FioForja-teste.apk",
+        "sha256": "9fa653bf5b87703fbfbae0610512f388b12fb85b04316f0a25465ddfb6618ea9"
+      }
+    ],
+    "fixturePackaged": false,
+    "localGameAssets": 11
+  },
+  "pocoPhysicalTest": "NOT_PERFORMED",
+  "humanVisualAcceptance": "PENDING",
+  "coreSelectionBeforeAttemptPersisted": false,
+  "coreSelectionPersistenceStatus": "PREEXISTING_LIMITATION",
+  "kevAdvisory": {
+    "choice": "sheet",
+    "probability": 0.3644,
+    "actualChoice": "inline",
+    "overriddenBecause": "Existing90dvhSheetwouldoccludeprevieworrequireduplicate;inlinepreservesasinglepreview",
+    "evidenceSha256": "7eb1d53ae635d205e6ce12d152c63d6a5f72171dced6f0014368688e63056cf1",
+    "notProofOrAuthority": true
+  },
+  "mainChanged": false,
+  "push": false,
+  "review": {
+    "findings": 1,
+    "priority": "P2",
+    "status": "FIXED_RED_GREEN_AND_BUILT_UI",
+    "remainingActionable": 0
+  }
+}

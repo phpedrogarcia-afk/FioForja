@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CANONICAL_PRESETS, FAMILIES, GUARDS, POMMELS, PROFILES, STEELS, WRAPS } from "../catalog";
@@ -20,6 +20,12 @@ import type {
 import { getMaterialStock, getRequiredMaterialForSteel } from "../materials";
 import { evaluateBlueprintStatus } from "../blueprints";
 import { defaultCareer, defaultInventory, defaultWallet } from "../save";
+import {
+  getDesignBlueprint,
+  getMetallurgyBlocker,
+  getPreparationBlocker,
+  selectPreparationProject,
+} from "../preparation";
 
 interface Props {
   design: SwordDesign;
@@ -60,463 +66,306 @@ export function DesignScreen({
   onResumeAttempt,
   onRecycleScrap,
 }: Props) {
-  // Current material requirement and stock
   const reqMat = getRequiredMaterialForSteel(design.steel);
-  const currentStock = getMaterialStock(inventory?.materials, reqMat.key);
-  const hasMaterial = currentStock >= 1;
-
-  // Check if current design corresponds to a preset and whether it is locked
-  const matchedPreset = CANONICAL_PRESETS.find((p) => p.name === design.name);
-  const presetStatus = matchedPreset
-    ? evaluateBlueprintStatus(matchedPreset, inventory, career, gallery, activeCore)
-    : null;
-
-  let metallurgyLocked = false;
-  let metallurgyReason = "";
-  if (design.steel === "damascus") {
-    const unlockedDamascus =
-      career.totalForged >= 3 ||
-      inventory.unlockedBlueprints?.includes("cimitarra_damasco") ||
-      activeCore?.steel === "damascus";
-    if (!unlockedDamascus) {
-      metallurgyLocked = true;
-      metallurgyReason = "Metalurgia do Damasco: Requer 3 forjas concluídas ou autorização por Núcleo/Receita.";
-    }
-  } else if (design.steel === "blacksteel") {
-    const unlockedBlacksteel =
-      career.totalForged >= 4 ||
-      inventory.unlockedBlueprints?.includes("juramento_ferro") ||
-      activeCore?.steel === "blacksteel";
-    if (!unlockedBlacksteel) {
-      metallurgyLocked = true;
-      metallurgyReason = "Metalurgia do Aço Negro: Requer 4 forjas concluídas ou receita/núcleo.";
-    }
-  } else if (design.steel === "elven_silver") {
-    const unlockedElven =
-      career.totalForged >= 7 ||
-      inventory.unlockedBlueprints?.includes("folha_aereth") ||
-      activeCore?.steel === "elven_silver";
-    if (!unlockedElven) {
-      metallurgyLocked = true;
-      metallurgyReason = "Metalurgia Élfica: Requer 7 forjas concluídas ou segredo élfico no Bazar.";
-    }
-  } else if (design.steel === "meteor") {
-    const unlockedMeteor =
-      career.masterpieces >= 1 ||
-      career.legendaries >= 1 ||
-      inventory.unlockedBlueprints?.includes("queda_asterion") ||
-      activeCore?.steel === "meteor";
-    if (!unlockedMeteor) {
-      metallurgyLocked = true;
-      metallurgyReason = "Metalurgia Meteórica: Requer 1 Obra-prima (Rank S) ou Núcleo de Fusão meteórico.";
-    }
-  } else if (design.steel === "ancient_alloy") {
-    const unlockedAncient =
-      career.legendaries >= 1 ||
-      inventory.unlockedBlueprints?.includes("cinzas_ancestrais") ||
-      activeCore?.steel === "ancient_alloy";
-    if (!unlockedAncient) {
-      metallurgyLocked = true;
-      metallurgyReason = "Metalurgia Primordial: Requer 1 arma Lendária ou Núcleo de Fusão primordial.";
-    }
-  }
-
-  const isLocked = (presetStatus ? presetStatus.state === "locked" : false) || metallurgyLocked;
-  const canForgeReal = !isLocked && hasMaterial;
+  const currentStock = getMaterialStock(inventory.materials, reqMat.key);
+  const blocker = getPreparationBlocker(design, inventory, career, gallery, activeCore);
+  const matchedPreset = getDesignBlueprint(design);
+  const canForgeReal = !blocker && currentStock >= 1 && !activeAttempt;
+  const status = activeAttempt
+    ? "Uma forja aguarda retomada."
+    : blocker
+      ? blocker.code === "METALLURGY_LOCKED"
+        ? "Metal bloqueado."
+        : "Projeto bloqueado."
+      : currentStock < 1
+        ? "Metal insuficiente."
+        : "Pronto para forjar.";
+  const reason = blocker?.error
+    .replace(/^Projeto.*?bloqueado\.\s*/, "")
+    .replace(/^Metalurgia.*?:\s*/, "");
 
   return (
-    <div className={embedded ? "flex h-full min-h-0 flex-col bg-bg text-fg" : "flex min-h-dvh flex-col bg-bg text-fg"}>
-      {embedded ? null : (
-        <header className="flex shrink-0 items-center justify-between gap-2 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 border-b border-border/40">
-          <Button variant="ghost" size="sm" onClick={onBack}>
+    <div
+      className={
+        embedded
+          ? "flex h-full min-h-0 flex-col bg-bg text-fg"
+          : "flex h-dvh min-h-0 flex-col bg-bg text-fg"
+      }
+    >
+      {!embedded && (
+        <header className="flex shrink-0 items-center justify-between border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
+          <Button variant="ghost" onClick={onBack}>
             ← Voltar
           </Button>
-          <div className="text-center">
-            <h1 className="font-display text-sm uppercase tracking-[0.22em] text-muted">Projeto da Forja</h1>
-            <span className="text-[0.65rem] uppercase tracking-wider text-amber-400/80">
-              {activeCore ? "Identidade do Núcleo" : "Almoxarifado & Metais Reais"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 rounded-md border border-border/60 bg-surface px-2.5 py-1 text-xs font-display">
-            <span className="text-amber-300 font-bold">🪙 {wallet.gold}</span>
-          </div>
+          <h1 className="font-display text-sm">Preparar espada</h1>
+          <span className="text-xs">🪙 {wallet.gold}</span>
         </header>
       )}
-
-
-      <div className={embedded ? "min-h-0 flex-1 overflow-y-auto overscroll-contain" : ""}>
-      <div className="mx-auto w-full max-w-3xl px-4 pb-4">
-        {/* Sword Preview Canvas */}
-        <div className="mt-3 h-56 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)] sm:h-72">
+      <figure
+        className="mx-auto flex h-[clamp(11rem,40dvh,24rem)] w-full max-w-3xl shrink-0 flex-col px-4 pt-2"
+        aria-label="Prévia permanente da preparação"
+      >
+        <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_18px_40px_rgb(8_5_3_/_0.45)]">
           <WeaponPreview sword={{ design, quality: 92 }} />
         </div>
-
-        {/* Fusion Core Notification Banner */}
-        {activeCore ? (
-          <div className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/30 p-3.5">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-300">
-                  🔮 Núcleo de Fusão Ativo
-                </span>
-                <p className="mt-0.5 truncate font-display text-sm font-bold text-purple-100">{activeCore.name}</p>
-                <p className="text-xs text-purple-200/80 mt-0.5">
-                  Herança: +{activeCore.bonusQuality}% Qualidade · {STEELS[activeCore.steel]?.name} · {FAMILIES[activeCore.family]?.name}
-                </p>
-                <p className="mt-1 text-[0.68rem] leading-relaxed text-purple-200/70">
-                  O núcleo será consumido apenas na conclusão da forja. Projeto, perfil e aço ficam travados na
-                  identidade dele.
+        <figcaption className="py-1 text-center font-display text-sm text-amber-100">
+          {design.name || "Sua espada"}
+        </figcaption>
+      </figure>
+      <div
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        aria-label="Escolhas da preparação"
+      >
+        <div className="mx-auto w-full max-w-3xl space-y-2 px-4 py-2">
+          {activeCore && (
+            <div className="flex items-center justify-between gap-2 rounded-lg border border-purple-700/50 bg-purple-950/20 p-2 text-xs text-purple-200">
+              <div>
+                <p className="font-display font-bold">
+                  Núcleo de fusão · +{activeCore.bonusQuality}% qualidade
                 </p>
               </div>
-              {onCancelCore ? (
-                <Button variant="ghost" size="sm" className="shrink-0 text-purple-200" onClick={onCancelCore}>
+              {onCancelCore && (
+                <Button size="sm" variant="ghost" onClick={onCancelCore}>
                   Liberar
                 </Button>
-              ) : null}
+              )}
             </div>
-          </div>
-        ) : null}
-
-        {activeAttempt ? (
-          <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-amber-600/60 bg-amber-950/25 p-3">
-            <div className="min-w-0">
-              <p className="font-display text-[0.62rem] font-bold uppercase tracking-wider text-amber-300">
-                Forja interrompida preservada
-              </p>
-              <p className="truncate text-[0.68rem] text-amber-100/80">
-                {activeAttempt.design.name || "Lâmina"} · {activeAttempt.strikesCount || 0} martelada(s)
-              </p>
-            </div>
-            {onResumeAttempt ? (
-              <Button size="sm" className="shrink-0 bg-amber-600 font-display text-xs font-bold text-stone-950" onClick={onResumeAttempt}>
-                Retomar
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
-
-        {/* Canonical Presets Section with explicit progression states */}
-        <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3.5">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
-            <p className="font-display text-[0.68rem] font-bold uppercase leading-snug tracking-[0.12em] text-amber-300">
-              📜 Compêndio de Obras Mestras
-            </p>
-            <span className="shrink-0 text-[0.62rem] text-muted">Projetos & blueprints</span>
-          </div>
-
-          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {CANONICAL_PRESETS.map((p) => {
-              const st = evaluateBlueprintStatus(p, inventory, career, gallery, activeCore);
-              const isSelected = design.name === p.name || design.name === p.design.name;
-
-              let badgeText = "Pronto";
-              let badgeClass = "bg-emerald-950/60 border-emerald-500/40 text-emerald-300";
-
-              if (st.state === "mastered") {
-                badgeText = "🏆 Dominada";
-                badgeClass = "bg-amber-950/70 border-amber-400 text-amber-300 font-bold";
-              } else if (st.state === "crafted") {
-                badgeText = "⚔️ Fabricada";
-                badgeClass = "bg-sky-950/60 border-sky-400 text-sky-300";
-              } else if (st.state === "ready") {
-                badgeText = "✅ Pronta";
-                badgeClass = "bg-emerald-950/60 border-emerald-500/40 text-emerald-300";
-              } else if (st.state === "discovered") {
-                badgeText = "⚠️ Falta Insumo";
-                badgeClass = "bg-amber-950/40 border-amber-500/30 text-amber-400";
-              } else {
-                badgeText = "🔒 Bloqueada";
-                badgeClass = "bg-red-950/40 border-red-500/30 text-red-300";
-              }
-
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  disabled={lockToCore}
-                  onClick={() => !lockToCore && onChange(p.design)}
-                  className={cn(
-                    "rounded-lg border p-2.5 text-left transition-all flex flex-col justify-between disabled:opacity-45",
-                    isSelected
-                      ? "border-amber-400 bg-amber-500/15 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
-                      : "border-border/80 bg-surface/70 hover:border-amber-500/50 hover:bg-surface",
-                  )}
-                >
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-display text-xs font-bold text-fg truncate">{p.name}</span>
-                    <span className={cn("text-[0.65rem] px-1.5 py-0.5 rounded border uppercase tracking-wider", badgeClass)}>
-                      {badgeText}
-                    </span>
-                  </div>
-                  <div className="mt-1 flex items-center justify-between text-[0.7rem] text-muted">
-                    <span>{STEELS[p.design.steel]?.name || p.design.steel}</span>
-                    <span className="font-mono text-xs">
-                      {st.hasMaterial ? `Estoque: ${st.materialStock}` : "Sem Insumo"}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Requirement & Stock Card for Currently Selected Weapon */}
-        <div className="mt-5 rounded-lg border border-border bg-surface p-4">
-          <div className="flex items-center justify-between">
-            <span className="font-display text-xs uppercase tracking-wider text-muted font-bold">
-              Insumos Necessários para a Lâmina
-            </span>
-            <span className="text-xs font-mono text-slate-400">Consumo: 1x Insumo Base</span>
-          </div>
-
-          <div className="mt-3 flex items-center gap-3.5 rounded-lg border border-border/80 bg-elevated p-3">
-            <span className="text-2xl">{reqMat.icon}</span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-display text-sm font-bold text-fg">{reqMat.name}</span>
-                <span className="text-[0.65rem] px-1.5 py-0.5 rounded bg-surface border border-border uppercase tracking-wider text-amber-300">
-                  {reqMat.rarity}
-                </span>
-              </div>
-              <p className="text-xs text-subtle truncate mt-0.5">{reqMat.description}</p>
-            </div>
-            <div className="text-right">
-              <div className="font-mono text-sm font-bold">
-                {currentStock >= 1 ? (
-                  <span className="text-emerald-400">Disponível: {currentStock}</span>
-                ) : (
-                  <span className="text-red-400">Faltando (0 em estoque)</span>
-                )}
-              </div>
-              <span className="text-[0.65rem] text-slate-500">Exige 1 unidade</span>
-            </div>
-          </div>
-
-          {/* Locked Status Banner if blueprint is locked */}
-          {presetStatus && presetStatus.state === "locked" ? (
-            <div className="mt-3 rounded-md border border-red-500/30 bg-red-950/20 p-2.5 text-xs text-red-300">
-              <span className="font-bold">🔒 Projeto Bloqueado: </span>
-              {presetStatus.requirementText}
-            </div>
-          ) : null}
-
-          {/* Locked Metallurgy Banner */}
-          {metallurgyLocked ? (
-            <div className="mt-3 rounded-md border border-red-500/30 bg-red-950/20 p-2.5 text-xs text-red-300">
-              <span className="font-bold">🔒 Metalurgia Bloqueada: </span>
-              {metallurgyReason}
-            </div>
-          ) : null}
-
-          {/* Missing Material Advice */}
-          {!hasMaterial && (!presetStatus || presetStatus.state !== "locked") ? (
-            <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-950/20 p-2.5 text-xs text-amber-300">
-              <span className="font-bold">⚠️ Matéria-prima em Falta: </span>
-              Adquira {reqMat.name} na Loja da oficina ou conquiste drops forjando.
-              {onOpenShop ? (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="mt-2 w-full border-amber-600/50 text-xs text-amber-200"
-                  onClick={onOpenShop}
-                >
-                  Comprar {reqMat.name} na Loja
+          )}
+          {activeAttempt && (
+            <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-700/50 p-2 text-xs text-amber-200">
+              <p>Forja interrompida: {activeAttempt.design.name || "Lâmina"}</p>
+              {onResumeAttempt && (
+                <Button size="sm" onClick={onResumeAttempt}>
+                  Retomar
                 </Button>
-              ) : null}
-              {onRecycleScrap && (inventory.materials?.scrap || 0) >= 2 ? (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="mt-1.5 w-full border-amber-600/40 text-xs text-amber-200"
-                  onClick={() => onRecycleScrap()}
-                >
-                  ♻️ Reciclar 2 sucatas em 1 {reqMat.name}
-                </Button>
-              ) : null}
+              )}
             </div>
-          ) : null}
-        </div>
-
-        {/* Custom Design Controls */}
-        <label className="mt-5 block font-display text-xs uppercase tracking-[0.16em] text-muted">
-          Nome da lâmina
-          <input
-            className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
-            maxLength={28}
-            value={design.name}
-            onChange={(e) => onChange({ ...design, name: e.target.value })}
-            placeholder="Ex.: Juramento"
-          />
-        </label>
-
-        {lockToCore ? (
-          <p className="mt-4 rounded-md border border-purple-700/40 bg-purple-950/20 px-3 py-2 text-[0.68rem] leading-relaxed text-purple-200">
-            A identidade do núcleo define família, perfil e aço. Altere apenas acabamento, nome e comprimento.
-          </p>
-        ) : null}
-
-        <Section title="Família Canônica">
-          <ChipRow
+          )}
+          <PreparationChoice
+            label="1. Projeto"
+            value={activeCore ? "core" : matchedPreset?.id || "custom"}
+            selectedLabel={
+              activeCore
+                ? FAMILIES[activeCore.family].name
+                : matchedPreset?.design.name || "Projeto personalizado"
+            }
             disabled={lockToCore}
-            options={Object.entries(FAMILIES).map(([id, v]) => ({
-              id,
-              label: v.name,
-              hint: v.fantasy,
+            options={CANONICAL_PRESETS.map((p) => ({
+              id: p.id,
+              label: p.design.name,
+              disabled: !evaluateBlueprintStatus(p, inventory, career, gallery, activeCore)
+                .unlocked,
             }))}
-            value={design.family || "royal"}
             onChange={(id) => {
-              const fam = FAMILIES[id as FamilyId];
-              onChange({
-                ...design,
-                family: id as FamilyId,
-                profile: fam.defaultProfile,
-                steel: fam.defaultSteel,
-                wrap: fam.defaultWrap,
-                guard: fam.defaultGuard,
-                pommel: fam.defaultPommel,
-              });
+              const preset = CANONICAL_PRESETS.find((p) => p.id === id);
+              if (!preset || lockToCore) return;
+              const next = selectPreparationProject(
+                preset,
+                design,
+                inventory,
+                career,
+                gallery,
+                activeCore,
+              );
+              if (next) onChange(next);
             }}
           />
-        </Section>
-
-        <Section title="Perfil da lâmina">
-          <ChipRow
-            disabled={lockToCore}
-            options={Object.entries(PROFILES).map(([id, v]) => ({
-              id,
-              label: v.name,
-              hint: v.blurb,
-            }))}
-            value={design.profile}
-            onChange={(id) => onChange({ ...design, profile: id as ProfileId })}
-          />
-        </Section>
-
-        <Section title="Aço / Metal">
-          <ChipRow
-            disabled={lockToCore}
-            options={Object.entries(STEELS).map(([id, v]) => {
-              const sReq = getRequiredMaterialForSteel(id as SteelId);
-              const sStock = getMaterialStock(inventory?.materials, sReq.key);
-              return {
-                id,
-                label: v.name,
-                hint: `${v.blurb} · Estoque: ${sStock}`,
-              };
-            })}
+          <PreparationChoice
+            label="2. Metal · consome 1 unidade"
             value={design.steel}
-            onChange={(id) => onChange({ ...design, steel: id as SteelId })}
+            selectedLabel={STEELS[design.steel].name + " · " + currentStock + " em estoque"}
+            disabled={lockToCore}
+            options={Object.entries(STEELS).map(([id, steel]) => ({
+              id,
+              label:
+                steel.name +
+                " · " +
+                getMaterialStock(
+                  inventory.materials,
+                  getRequiredMaterialForSteel(id as SteelId).key,
+                ) +
+                " em estoque",
+              disabled: Boolean(getMetallurgyBlocker(id as SteelId, inventory, career, activeCore)),
+            }))}
+            onChange={(id) => {
+              const steel = id as SteelId;
+              if (!lockToCore && !getMetallurgyBlocker(steel, inventory, career, activeCore))
+                onChange({ ...design, steel });
+            }}
           />
-        </Section>
-
-        <Section title="Cabo">
-          <ChipRow
-            options={Object.entries(WRAPS).map(([id, v]) => ({ id, label: v.name }))}
-            value={design.wrap}
-            onChange={(id) => onChange({ ...design, wrap: id as WrapId })}
-          />
-        </Section>
-
-        <Section title="Guarda">
-          <ChipRow
-            options={Object.entries(GUARDS).map(([id, v]) => ({ id, label: v.name }))}
-            value={design.guard}
-            onChange={(id) => onChange({ ...design, guard: id as GuardId })}
-          />
-        </Section>
-
-        <Section title="Pomo">
-          <ChipRow
-            options={Object.entries(POMMELS).map(([id, v]) => ({ id, label: v.name }))}
-            value={design.pommel}
-            onChange={(id) => onChange({ ...design, pommel: id as PommelId })}
-          />
-        </Section>
-
-        <Section title="Comprimento">
-          <input
-            type="range"
-            min={0.75}
-            max={1.2}
-            step={0.01}
-            value={design.length}
-            onChange={(e) => onChange({ ...design, length: Number(e.target.value) })}
-            className="mt-2 w-full accent-ember"
-            aria-label="Comprimento da lâmina"
-          />
-        </Section>
-
-        <Section title="Inscrição">
-          <input
-            className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
-            maxLength={24}
-            value={design.inscription}
-            onChange={(e) => onChange({ ...design, inscription: e.target.value })}
-            placeholder="Palavra na lâmina"
-          />
-          <label className="mt-3 flex min-h-11 items-center gap-3 text-sm text-muted">
-            <input
-              type="checkbox"
-              checked={design.runes}
-              onChange={(e) => onChange({ ...design, runes: e.target.checked })}
-              className="size-4 accent-ember"
-            />
-            Gravar em runas
-          </label>
-        </Section>
-      </div>
-      </div>
-
-      {/* Barra de ação: inline na seção Forja, fixa no fluxo isolado */}
-      <div
-        className={
-          embedded
-            ? "shrink-0 border-t border-border bg-bg/95 px-4 py-2.5"
-            : "fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl"
-        }
-      >
-        <div className="mx-auto flex w-full max-w-md flex-col gap-2">
-          {canForgeReal ? (
-            <>
-              <Button
-                size="lg"
-                className="w-full bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 font-display uppercase tracking-wider font-bold shadow-lg"
-                onClick={() => onForge(false)}
-              >
-                {activeCore
-                  ? `🔮 Forjar o Núcleo (Consumir 1x ${reqMat.name})`
-                  : `🔥 Levar ao Fogo (Consumir 1x ${reqMat.name})`}
-              </Button>
-              {activeCore ? null : (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="w-full text-slate-400 hover:text-amber-300 font-display text-xs"
-                  onClick={() => onForge(true)}
-                >
-                  🔨 Treino Básico de Oficina (Sem Custo de Metal)
-                </Button>
-              )}
-            </>
-          ) : (
-            <>
-              <Button size="lg" className="w-full opacity-50 cursor-not-allowed" disabled>
-                {isLocked ? "🔒 Projeto Bloqueado na Carreira" : `❌ Insumos Insuficientes (Falta 1x ${reqMat.name})`}
-              </Button>
-              {activeCore ? null : (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="w-full border-dashed border-amber-600/50 text-amber-300 hover:bg-amber-950/30 font-display text-xs"
-                  onClick={() => onForge(true)}
-                >
-                  🔨 Treino Básico de Oficina (Sem Custo · Ferro Comum)
-                </Button>
-              )}
-            </>
+          <div
+            role="status"
+            className={cn("text-xs", canForgeReal ? "text-emerald-300" : "text-amber-300")}
+          >
+            <p>{status}</p>
+            {reason && <p className="mt-1">{reason}</p>}
+            {currentStock < 1 && !blocker && <p className="mt-1">Requer 1 × {reqMat.name}.</p>}
+          </div>
+          {currentStock < 1 && !blocker && onOpenShop && (
+            <Button variant="secondary" className="min-h-11 w-full" onClick={onOpenShop}>
+              Buscar metal na Loja
+            </Button>
           )}
+          {currentStock < 1 &&
+            !blocker &&
+            reqMat.key === "iron_ingot" &&
+            onRecycleScrap &&
+            (inventory.materials?.scrap || 0) >= 2 && (
+              <Button
+                variant="secondary"
+                className="min-h-11 w-full"
+                onClick={() => onRecycleScrap()}
+              >
+                Reciclar 2 sucatas em 1 ferro
+              </Button>
+            )}
+          <details className="rounded-lg border border-border bg-surface p-3">
+            <summary className="min-h-6 cursor-pointer font-display text-xs font-bold uppercase tracking-wide text-amber-200">
+              Personalizar espada
+            </summary>
+            <p className="mt-2 text-xs text-muted">
+              Ajustes opcionais. O metal é mantido ao trocar de família.
+            </p>
+            <label className="mt-5 block font-display text-xs uppercase tracking-[0.16em] text-muted">
+              Nome da lâmina
+              <input
+                className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
+                maxLength={28}
+                value={design.name}
+                onChange={(e) => onChange({ ...design, name: e.target.value })}
+                placeholder="Ex.: Juramento"
+              />
+            </label>
+
+            {lockToCore ? (
+              <p className="mt-4 rounded-md border border-purple-700/40 bg-purple-950/20 px-3 py-2 text-[0.68rem] leading-relaxed text-purple-200">
+                A identidade do núcleo define família, perfil e aço. Altere apenas acabamento, nome
+                e comprimento.
+              </p>
+            ) : null}
+
+            <Section title="Família Canônica">
+              <ChipRow
+                disabled={lockToCore}
+                options={Object.entries(FAMILIES).map(([id, v]) => ({
+                  id,
+                  label: v.name,
+                  hint: v.fantasy,
+                }))}
+                value={design.family || "royal"}
+                onChange={(id) => {
+                  const fam = FAMILIES[id as FamilyId];
+                  onChange({
+                    ...design,
+                    family: id as FamilyId,
+                    profile: fam.defaultProfile,
+                    steel: design.steel,
+                    wrap: fam.defaultWrap,
+                    guard: fam.defaultGuard,
+                    pommel: fam.defaultPommel,
+                  });
+                }}
+              />
+            </Section>
+
+            <Section title="Perfil da lâmina">
+              <ChipRow
+                disabled={lockToCore}
+                options={Object.entries(PROFILES).map(([id, v]) => ({
+                  id,
+                  label: v.name,
+                  hint: v.blurb,
+                }))}
+                value={design.profile}
+                onChange={(id) => onChange({ ...design, profile: id as ProfileId })}
+              />
+            </Section>
+
+            <Section title="Cabo">
+              <ChipRow
+                options={Object.entries(WRAPS).map(([id, v]) => ({ id, label: v.name }))}
+                value={design.wrap}
+                onChange={(id) => onChange({ ...design, wrap: id as WrapId })}
+              />
+            </Section>
+
+            <Section title="Guarda">
+              <ChipRow
+                options={Object.entries(GUARDS).map(([id, v]) => ({ id, label: v.name }))}
+                value={design.guard}
+                onChange={(id) => onChange({ ...design, guard: id as GuardId })}
+              />
+            </Section>
+
+            <Section title="Pomo">
+              <ChipRow
+                options={Object.entries(POMMELS).map(([id, v]) => ({ id, label: v.name }))}
+                value={design.pommel}
+                onChange={(id) => onChange({ ...design, pommel: id as PommelId })}
+              />
+            </Section>
+
+            <Section title="Comprimento">
+              <input
+                type="range"
+                min={0.75}
+                max={1.2}
+                step={0.01}
+                value={design.length}
+                onChange={(e) => onChange({ ...design, length: Number(e.target.value) })}
+                className="mt-2 w-full accent-ember"
+                aria-label="Comprimento da lâmina"
+              />
+            </Section>
+
+            <Section title="Inscrição">
+              <input
+                className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
+                maxLength={24}
+                value={design.inscription}
+                onChange={(e) => onChange({ ...design, inscription: e.target.value })}
+                placeholder="Palavra na lâmina"
+              />
+              <label className="mt-3 flex min-h-11 items-center gap-3 text-sm text-muted">
+                <input
+                  type="checkbox"
+                  checked={design.runes}
+                  onChange={(e) => onChange({ ...design, runes: e.target.checked })}
+                  className="size-4 accent-ember"
+                />
+                Gravar em runas
+              </label>
+            </Section>
+
+            {!activeCore && (
+              <Button
+                variant="secondary"
+                className="mt-5 min-h-11 w-full whitespace-normal"
+                disabled={Boolean(activeAttempt)}
+                onClick={() => onForge(true)}
+              >
+                Treino sem custo · ferro comum
+              </Button>
+            )}
+          </details>
         </div>
       </div>
+      <footer className="shrink-0 border-t border-border bg-bg/95 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="mx-auto w-full max-w-3xl">
+          <p className="mb-1 text-center text-xs text-muted">
+            1 × {reqMat.name}
+            {activeCore ? " + núcleo ao concluir" : ""}
+          </p>
+          <Button
+            size="lg"
+            className="min-h-12 w-full bg-gradient-to-r from-amber-600 to-orange-700 font-display font-bold"
+            disabled={!canForgeReal}
+            onClick={() => onForge(false)}
+          >
+            {activeCore ? "Forjar o núcleo" : "Começar a fabricar"}
+          </Button>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -549,6 +398,7 @@ function ChipRow({
           <button
             key={opt.id}
             type="button"
+            aria-pressed={active}
             disabled={disabled}
             onClick={() => onChange(opt.id)}
             className={cn(
@@ -563,6 +413,82 @@ function ChipRow({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/** Seleção inline: nenhum portal ou picker nativo pode cobrir a prévia. */
+function PreparationChoice({
+  label,
+  value,
+  selectedLabel,
+  options,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  selectedLabel: string;
+  options: { id: string; label: string; disabled: boolean }[];
+  disabled: boolean;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const groupId = label.startsWith("1")
+    ? "preparation-project-options"
+    : "preparation-metal-options";
+  return (
+    <div>
+      <button
+        ref={trigger}
+        type="button"
+        className="min-h-16 w-full rounded-lg border border-border bg-elevated px-3 py-2 text-left disabled:opacity-75"
+        aria-label={label + ": " + selectedLabel}
+        aria-expanded={open && !disabled}
+        aria-controls={groupId}
+        disabled={disabled}
+        onClick={() => setOpen(!open)}
+      >
+        <span className="block text-xs text-muted">{label}</span>
+        <span className="mt-1 flex items-center justify-between gap-2 text-sm text-fg">
+          <span>{selectedLabel}</span>
+          <span aria-hidden="true">{disabled ? "🔒" : open ? "▴" : "▾"}</span>
+        </span>
+      </button>
+      {open && !disabled && (
+        <fieldset id={groupId} className="mt-1 rounded-lg border border-border bg-surface p-1">
+          <legend className="sr-only">{label}</legend>
+          {options.map((option) => (
+            <label
+              key={option.id}
+              className={cn(
+                "flex min-h-12 cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm",
+                option.disabled ? "cursor-not-allowed text-muted" : "text-fg",
+                option.id === value && "bg-elevated text-amber-200",
+              )}
+            >
+              <input
+                className="size-4 shrink-0 accent-ember"
+                type="radio"
+                name={groupId}
+                value={option.id}
+                checked={value === option.id}
+                disabled={option.disabled}
+                onChange={() => {
+                  onChange(option.id);
+                  setOpen(false);
+                  trigger.current?.focus();
+                }}
+              />
+              <span>
+                {option.label}
+                {option.disabled ? " · Bloqueado" : ""}
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
     </div>
   );
 }

@@ -1,6 +1,10 @@
 # Registro de Decisões Canônicas & Governança — FioForja
 
 Este documento é a fonte de autoridade para decisões arquiteturais, de produto e regras econômicas do projeto FioForja.
+
+## M03A — Preparação intuitiva (26/10/2026)
+
+**FIOFORJA-PREPARATION-001** `[USER-AUTHORIZED]` `[AGENT-IMPLEMENTED]` `[TECHNICALLY-VERIFIED]`: caminho principal com projeto, metal e começar; personalização detalhada opcional; prévia completa permanente. Reduzir complexidade visível, preservando profundidade e transações. Listas inline evitam sobrepor a arma; projeto/família mantêm o metal escolhido. Draft usa `lastDesign` existente. Núcleos continuam pré-formas com identidade bloqueada e forja manual. [Contrato, evidência e limites](specs/preparation.md). Candidata à avaliação visual humana, sem aprovação de integração à main.
 Os registros distinguem origem da decisão e alcance da evidência. Tags das Operações 01–04 são históricas; não provam o estado atual. A auditoria Codex 05 encontrou contraexemplos de golpe, núcleo, finalização, recuperação e treino. Evidência vigente: [relatório](../experiments/M03-cross-agent-integration/README.md).
 
 Taxonomia:

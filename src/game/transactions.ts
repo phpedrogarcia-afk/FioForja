@@ -32,7 +32,7 @@ import {
   getRequiredMaterialForSteel,
   recycleScrapToIron,
 } from "./materials.ts";
-import { evaluateBlueprintStatus } from "./blueprints.ts";
+import { getPreparationBlocker } from "./preparation.ts";
 import { findShopArticle } from "./shop.ts";
 import { isSwordEligibleForCommission } from "./commissions.ts";
 
@@ -791,101 +791,8 @@ export function executeStartForgeTransaction(
     }
   }
 
-  // Validate blueprint lock
-  const matchedPreset = CANONICAL_PRESETS.find(
-    (p) =>
-      p.id === (design as any).id ||
-      p.name === design.name ||
-      p.design.name === design.name ||
-      (p.family === design.family && p.design.profile === design.profile),
-  );
-  if (matchedPreset) {
-    const status = evaluateBlueprintStatus(
-      matchedPreset,
-      currentInv,
-      currentSave.career || defaultCareer,
-      currentSave.gallery || [],
-      activeCore,
-    );
-    if (!status.unlocked || status.state === "locked") {
-      return {
-        success: false,
-        save: currentSave,
-        error: `Projeto "${matchedPreset.name}" bloqueado. ${status.requirementText}`,
-        code: "BLUEPRINT_LOCKED",
-      };
-    }
-  }
-
-  // Proteção da metalurgia em design livre (gating contra craft de aço raro sem prestígio/núcleo)
-  const career = currentSave.career || defaultCareer;
-  if (design.steel === "damascus") {
-    const unlockedDamascus =
-      career.totalForged >= 3 ||
-      currentInv.unlockedBlueprints?.includes("cimitarra_damasco") ||
-      activeCore?.steel === "damascus";
-    if (!unlockedDamascus) {
-      return {
-        success: false,
-        save: currentSave,
-        error: "Metalurgia do Damasco bloqueada: Requer pelo menos 3 forjas concluídas ou autorização por Núcleo/Receita.",
-        code: "METALLURGY_LOCKED",
-      };
-    }
-  } else if (design.steel === "blacksteel") {
-    const unlockedBlacksteel =
-      career.totalForged >= 4 ||
-      currentInv.unlockedBlueprints?.includes("juramento_ferro") ||
-      activeCore?.steel === "blacksteel";
-    if (!unlockedBlacksteel) {
-      return {
-        success: false,
-        save: currentSave,
-        error: "Metalurgia do Aço Negro bloqueada: Requer pelo menos 4 forjas concluídas ou receita/núcleo.",
-        code: "METALLURGY_LOCKED",
-      };
-    }
-  } else if (design.steel === "elven_silver") {
-    const unlockedElven =
-      career.totalForged >= 7 ||
-      currentInv.unlockedBlueprints?.includes("folha_aereth") ||
-      activeCore?.steel === "elven_silver";
-    if (!unlockedElven) {
-      return {
-        success: false,
-        save: currentSave,
-        error: "Metalurgia Élfica bloqueada: Requer pelo menos 7 forjas concluídas ou receita élfica no Bazar.",
-        code: "METALLURGY_LOCKED",
-      };
-    }
-  } else if (design.steel === "meteor") {
-    const unlockedMeteor =
-      career.masterpieces >= 1 ||
-      career.legendaries >= 1 ||
-      currentInv.unlockedBlueprints?.includes("queda_asterion") ||
-      activeCore?.steel === "meteor";
-    if (!unlockedMeteor) {
-      return {
-        success: false,
-        save: currentSave,
-        error: "Metalurgia Meteórica bloqueada: Requer pelo menos 1 Obra-prima (Rank S) ou Núcleo de Fusão meteórico.",
-        code: "METALLURGY_LOCKED",
-      };
-    }
-  } else if (design.steel === "ancient_alloy") {
-    const unlockedAncient =
-      career.legendaries >= 1 ||
-      currentInv.unlockedBlueprints?.includes("cinzas_ancestrais") ||
-      activeCore?.steel === "ancient_alloy";
-    if (!unlockedAncient) {
-      return {
-        success: false,
-        save: currentSave,
-        error: "Metalurgia Primordial bloqueada: Requer pelo menos 1 arma Lendária ou Núcleo de Fusão primordial.",
-        code: "METALLURGY_LOCKED",
-      };
-    }
-  }
+  const blocker = getPreparationBlocker(design, currentInv, currentSave.career || defaultCareer, currentSave.gallery || [], activeCore);
+  if (blocker) return { success: false, save: currentSave, ...blocker };
 
   const reqMat = getRequiredMaterialForSteel(design.steel);
   const stock = getMaterialStock(currentInv.materials, reqMat.key);

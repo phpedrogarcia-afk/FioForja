@@ -1,5 +1,13 @@
 # Estado do projeto — integração e APK Android experimental
 
+## M03A — Preparação intuitiva — 26/10/2026
+
+- Branch isolada `codex/intuitive-preparation-m03a`, base M02B `653694b`. [Relatório e evidências](../experiments/M03A-intuitive-preparation/README.md); [contrato da preparação](specs/preparation.md).
+- Dois controles principais com listas inline, arma inteira fora da rolagem, nove campos opcionais preservados. Miolo essencial comum sem rolagem em 360×800/392×819. Projeto/família mantêm metal explícito; edições gravam `lastDesign` v5. Gates existentes extraídos para uso compartilhado pela tela/transação; thresholds e efeitos preservados.
+- 115 testes afetados + 6 de Android/assets PASS; typecheck PASS; lint 0 erros/38 avisos herdados. Navegador comprova retorno da Loja, rascunho/reabertura, bloqueios, entrada na forja e retomada, além do fluxo de núcleo sintético com compra real. Não representa dados/progressão naturais do proprietário.
+- APK 0.2.5/código 7: SHA-256 `9fa653bf5b87703fbfbae0610512f388b12fb85b04316f0a25465ddfb6618ea9`, certificado mantido, 0.2.4 em backup. Não instalado nesta rodada. Avaliação visual física, teclado virtual, áreas seguras reais e modo DNA visual permanecem pendentes. `prepCore` anterior ao início continua apenas em memória; reabrir exige selecionar novamente o núcleo preservado no inventário.
+- Nenhuma alteração em câmera/martelo/simulação ou nas outras seções. Sem merge/push; trabalho Antigravity preservado.
+
 ## M02B — Categorias intuitivas — 26/10/2026
 
 - Branch isolada `codex/shop-categories-m02b`, base M02A `d332233` (contém `bc3f364`). [Relatório comparativo](../experiments/M02B-shop-categories/README.md).
