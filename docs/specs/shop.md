@@ -1,5 +1,7 @@
 # Loja funcional — catálogo, compra e persistência
 
+**M02B — Categorias intuitivas (26/10/2026):** botão Categorias com filtro atual identificado e painel único com oito opções; faixa horizontal removida. Alternativas A/B comparadas em 360×800 e 392×819; B mantém seis materiais inteiros, contra quatro em A. Compra, filtro, inventário, Voltar e foco verificados no navegador; APK 0.2.4/código 6 entregue, avaliação da M02B no Poco pendente. O proprietário confirmou a legibilidade dos cards/nomes/preços da M02A no aparelho. [Comparação, testes e limites](../../experiments/M02B-shop-categories/README.md).
+
 **M02A — Loja Essencial (26/10/2026):** apresentação em grade responsiva, duas colunas verificadas em 392×819 e 360×800 CSS px. Os seis materiais iniciais cabem inteiros sem rolagem vertical; descrição e atributos ficam na ficha. Compra e persistência verificadas por UI real em save de teste, 65 testes afetados PASS; APK 0.2.3/código 5 entregue. Avaliação física/visual no Poco pendente. [Comparação e limites](../../experiments/M02A-shop-essential/README.md).
 
 **Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` no envelope funcional da [revisão Codex 08](../../.project-intelligence/experiments/CODEX08-review.md), base `78945e0` + working tree revisado. Normalização já correta da Loja preservada; regressões e acesso a equipamento verificados. APK 0.2.2/código 4 e percurso de compras no AVD PASS; no Poco, a prova foi limitada a reinstalação/restauração/navegação, sem compras. Candidata à avaliação humana.
@@ -47,7 +49,9 @@ O preço é multiplicado pela quantidade apenas para materiais. A gravação aco
 
 ## 4. UX
 
-Categorias permanecem nos mesmos chips roláveis e na mesma ordem. Cards em grade mostram ícone existente, nome completo, raridade, preço/moeda e possuídos ou “Adquirido”; não exibem descrição. A grade usa duas colunas quando cabem e se adapta à largura disponível. O card inteiro abre a ficha com descrição, atributos, posse, efeito, destino, saldo e botão único de confirmação ("Comprar por X ouro + Y rubis"). A categoria na ficha usa o nome em português. Saldo insuficiente informa a quantidade que falta por moeda, sem sugerir revenda inexistente. A compra continua passando pela transação canônica; sucesso mantém feedback inline e toast existentes.
+O botão **Categorias** identifica o filtro atual e abre um painel com as oito opções na ordem canônica, sem rolagem horizontal. Radios nativos identificam a seleção; escolher fecha o painel e aplica o mesmo filtro. Cards M02A em grade mostram ícone existente, nome completo, raridade, preço/moeda e possuídos ou “Adquirido”; não exibem descrição. A grade usa duas colunas quando cabem e se adapta à largura disponível. O card inteiro abre a ficha com descrição, atributos, posse, efeito, destino, saldo e botão único de confirmação ("Comprar por X ouro + Y rubis"). A categoria na ficha usa o nome em português. Saldo insuficiente informa a quantidade que falta por moeda, sem sugerir revenda inexistente. A compra continua passando pela transação canônica; sucesso mantém feedback inline e toast existentes.
+
+Voltar primeiro fecha o painel ou a ficha, mantendo a Loja e a categoria; outro Voltar sai da seção. A entrada transitória usa o histórico existente e é tratada apenas enquanto a Loja está ativa. Escape/fechar também removem a entrada e restauram foco ao controle de origem. Categoria permanece após compra; não foi acrescentada persistência do filtro ao save.
 
 Na categoria Ferramentas, **Equipar** aplica o equipamento adquirido ou padrão e **Em uso** identifica a seleção atual. O painel de produto só permanece aberto enquanto a Loja é a seção ativa; navegar para outra seção não deixa seu portal bloqueando a tela.
 

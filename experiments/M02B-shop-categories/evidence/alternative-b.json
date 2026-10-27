@@ -1,0 +1,180 @@
+{
+  "cbB392": {
+    "cards": [
+      {
+        "height": 156.046875,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "width": 180
+      },
+      {
+        "height": 156.046875,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "width": 180
+      },
+      {
+        "height": 156.046875,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "width": 180
+      },
+      {
+        "height": 156.046875,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "width": 180
+      },
+      {
+        "height": 156.046875,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "width": 180
+      },
+      {
+        "height": 156.046875,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "width": 180
+      }
+    ],
+    "categoryHeight": 56,
+    "categoryScrollWidth": 366,
+    "categoryWidth": 366,
+    "fullProducts": 6,
+    "labels": [],
+    "productTop": 199.875,
+    "viewport": [
+      392,
+      819,
+      1
+    ]
+  },
+  "cbB360": {
+    "cards": [
+      {
+        "height": 156.046875,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "width": 164
+      },
+      {
+        "height": 156.046875,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "width": 164
+      },
+      {
+        "height": 156.046875,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "width": 164
+      },
+      {
+        "height": 156.046875,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "width": 164
+      },
+      {
+        "height": 156.046875,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "width": 164
+      },
+      {
+        "height": 156.046875,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "width": 164
+      }
+    ],
+    "categoryHeight": 56,
+    "categoryScrollWidth": 334,
+    "categoryWidth": 334,
+    "fullProducts": 6,
+    "labels": [],
+    "productTop": 199.875,
+    "viewport": [
+      360,
+      800,
+      1
+    ]
+  },
+  "cbPanel360": {
+    "options": [
+      {
+        "bottom": 564,
+        "checked": true,
+        "height": 64.5,
+        "id": "materials",
+        "overflow": false,
+        "text": "Metais e materiais",
+        "top": 499.5,
+        "width": 160
+      },
+      {
+        "bottom": 564,
+        "checked": false,
+        "height": 64.5,
+        "id": "tools",
+        "overflow": false,
+        "text": "Ferramentas",
+        "top": 499.5,
+        "width": 160
+      },
+      {
+        "bottom": 636,
+        "checked": false,
+        "height": 64,
+        "id": "wraps",
+        "overflow": false,
+        "text": "Cabos",
+        "top": 572,
+        "width": 160
+      },
+      {
+        "bottom": 636,
+        "checked": false,
+        "height": 64,
+        "id": "guards",
+        "overflow": false,
+        "text": "Guardas",
+        "top": 572,
+        "width": 160
+      },
+      {
+        "bottom": 708,
+        "checked": false,
+        "height": 64,
+        "id": "pommels",
+        "overflow": false,
+        "text": "Pomos",
+        "top": 644,
+        "width": 160
+      },
+      {
+        "bottom": 708,
+        "checked": false,
+        "height": 64,
+        "id": "runes",
+        "overflow": false,
+        "text": "Runas",
+        "top": 644,
+        "width": 160
+      },
+      {
+        "bottom": 780,
+        "checked": false,
+        "height": 64,
+        "id": "catalysts",
+        "overflow": false,
+        "text": "Catalisadores",
+        "top": 716,
+        "width": 160
+      },
+      {
+        "bottom": 780,
+        "checked": false,
+        "height": 64,
+        "id": "recipes",
+        "overflow": false,
+        "text": "Projetos e receitas",
+        "top": 716,
+        "width": 160
+      }
+    ],
+    "viewport": [
+      360,
+      800
+    ]
+  }
+}

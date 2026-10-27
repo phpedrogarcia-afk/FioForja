@@ -1,0 +1,25 @@
+{
+  "mission": "M02B-shop-categories",
+  "date": "2026-10-26",
+  "base": "d332233eb75a607d6454d4775753a3098799a2f8",
+  "branch": "codex/shop-categories-m02b",
+  "selectedAlternative": "B",
+  "ownerFeedback": {"M02ACardsNamesPrices":"CLEAR_AND_LEGIBLE_ON_POCO","M02BNavigationApproval":"PENDING"},
+  "runtimeFilesChanged": ["src/game/screens/ShopScreen.tsx"],
+  "packagedSourceGitBlobs": {
+    "src/game/screens/ShopScreen.tsx": "b7da5d14c2017ac2b1e3feda89e805de94b0bf6d",
+    "package.json": "979ab5a457a211f36fceeb564395af2f6edf2f37",
+    "package-lock.json": "ac87dccaab95a723817a6aa025fb69cfa7165f1c",
+    "android/app/build.gradle": "1630a8a8ff5de3ad6df433a59c395cea8147bd43"
+  },
+  "tests":{"affectedPass":65,"androidPackagingPass":4,"fail":0},
+  "typecheck":"PASS",
+  "lint":{"errors":0,"warnings":38},
+  "categoryFilterChecks":16,
+  "browserBackKeyboardFocus":"PASS",
+  "apk":{"version":"0.2.4","code":6,"bytes":12130785,"sha256":"460634f125cdd4f027457967043499085f499080b0bbca450e3fee51c26a659c","sourceDirtyAtBuild":true,"previousCertificateMatches":true,"deliveryCopiesMatch":true},
+  "pocoPhysicalTest":"NOT_PERFORMED",
+  "kevAdvisory":{"choice":"B","notProofOrAuthority":true,"evidenceSha256":"221d68f4e0d73056170224aa6dde2e4c487b14d54a1ac81d9df6f7d3b941efbf"},
+  "mainChanged":false,
+  "push":false
+}

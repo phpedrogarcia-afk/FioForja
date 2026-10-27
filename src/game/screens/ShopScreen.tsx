@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Check, Coins, Plus, ShieldAlert } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Coins, Plus, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   BAZAAR_ARTICLES,
@@ -63,7 +63,62 @@ function destinationOf(article: ShopArticle): string {
 export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEquipTool }: Props) {
   const [category, setCategory] = useState<ShopCategoryId>("materials");
   const [selected, setSelected] = useState<ShopArticle | null>(null);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const panelHistory = useRef(false);
+  const panelOpener = useRef<HTMLElement | null>(null);
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
+  const currentCategory =
+    SHOP_CATEGORIES.find((item) => item.id === category) || SHOP_CATEGORIES[0];
+
+  // Reuse the section history: Back closes a Shop panel before leaving Shop.
+  const openPanel = (panel: { kind: "categories" } | { kind: "product"; id: string }) => {
+    panelOpener.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (panelHistory.current) return;
+    try {
+      window.history.pushState(
+        { ...window.history.state, fioSection: "shop", fio: true, fioShopPanel: panel },
+        "",
+        window.location.href,
+      );
+      panelHistory.current = true;
+    } catch {
+      /* Closing by X or Escape still works if history is unavailable. */
+    }
+  };
+
+  const closePanel = () => {
+    setCategoriesOpen(false);
+    setSelected(null);
+    if (panelHistory.current) {
+      panelHistory.current = false;
+      if (window.history.state?.fioShopPanel) window.history.back();
+    }
+    requestAnimationFrame(() => panelOpener.current?.focus());
+  };
+
+  useEffect(() => {
+    if (!active) return;
+    const syncPanel = (
+      panel: { kind?: string; id?: string } | undefined,
+      restoreFocus: boolean,
+    ) => {
+      const product =
+        panel?.kind === "product"
+          ? BAZAAR_ARTICLES.find((item) => item.id === panel.id)
+          : undefined;
+      panelHistory.current = panel?.kind === "categories" || Boolean(product);
+      setCategoriesOpen(panel?.kind === "categories");
+      setSelected(product || null);
+      if (restoreFocus && !panelHistory.current) {
+        requestAnimationFrame(() => panelOpener.current?.focus());
+      }
+    };
+    const onPop = (event: PopStateEvent) => syncPanel(event.state?.fioShopPanel, true);
+    syncPanel(window.history.state?.fioShopPanel, false);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [active]);
 
   const articles = useMemo(
     () => BAZAAR_ARTICLES.filter((article) => shopCategoryOf(article) === category),
@@ -87,7 +142,7 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
         ? { ok: true, message: `${article.name} entregue ao inventário.` }
         : { ok: false, message: "A compra não foi concluída. Nada foi debitado." },
     );
-    if (ok) setSelected(null);
+    if (ok) closePanel();
   };
 
   return (
@@ -102,33 +157,25 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
         </p>
       </header>
 
-      <div
-        className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1"
-        role="tablist"
-        aria-label="Categorias da Loja"
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={active && categoriesOpen}
+        onClick={() => {
+          openPanel({ kind: "categories" });
+          setCategoriesOpen(true);
+        }}
+        className="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-amber-700/60 bg-surface px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
       >
-        {SHOP_CATEGORIES.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={category === item.id}
-            onClick={() => {
-              setCategory(item.id);
-              setFeedback(null);
-            }}
-            className={
-              "flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors " +
-              (category === item.id
-                ? "border-amber-500 bg-amber-500/20 text-amber-100"
-                : "border-border bg-surface text-muted hover:text-amber-200")
-            }
-          >
-            <span aria-hidden>{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
-      </div>
+        <span className="min-w-0">
+          <span className="block text-xs text-muted">Categorias</span>
+          <span className="block text-sm font-semibold text-amber-100">
+            <span aria-hidden>{currentCategory.icon} </span>
+            {currentCategory.label}
+          </span>
+        </span>
+        <ChevronDown size={20} className="shrink-0 text-amber-300" aria-hidden />
+      </button>
 
       {feedback ? (
         <p
@@ -155,6 +202,7 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
               <button
                 type="button"
                 onClick={() => {
+                  openPanel({ kind: "product", id: article.id });
                   setFeedback(null);
                   setSelected(article);
                 }}
@@ -245,8 +293,47 @@ export function ShopScreen({ active = true, wallet, inventory, onPurchase, onEqu
       ) : null}
 
       <Sheet
+        open={active && categoriesOpen}
+        onOpenChange={(open) => !open && closePanel()}
+        title="Categorias da Loja"
+        description="Selecione o tipo de produto."
+      >
+        <fieldset className="grid grid-cols-2 gap-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <legend className="sr-only">Categorias da Loja</legend>
+          {SHOP_CATEGORIES.map((item) => (
+            <label
+              key={item.id}
+              className={
+                "flex min-h-16 cursor-pointer items-center gap-2 rounded-xl border px-2 py-3 text-sm leading-snug focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber-400 " +
+                (category === item.id
+                  ? "border-amber-500 bg-amber-500/15 font-semibold text-amber-100"
+                  : "border-border bg-surface text-muted")
+              }
+            >
+              <input
+                type="radio"
+                name="shop-category"
+                value={item.id}
+                checked={category === item.id}
+                onClick={() => {
+                  if (category === item.id) closePanel();
+                }}
+                onChange={() => {
+                  setCategory(item.id);
+                  setFeedback(null);
+                  closePanel();
+                }}
+                className="size-4 shrink-0 accent-amber-500"
+              />
+              <span className="min-w-0 break-words">{item.label}</span>
+            </label>
+          ))}
+        </fieldset>
+      </Sheet>
+
+      <Sheet
         open={active && selected !== null}
-        onOpenChange={(open) => !open && setSelected(null)}
+        onOpenChange={(open) => !open && closePanel()}
         eyebrow="Detalhe do produto"
         title={selected?.name || ""}
         description={

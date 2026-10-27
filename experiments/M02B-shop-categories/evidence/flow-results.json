@@ -1,0 +1,179 @@
+[
+  {
+    "test": "baseline Back with product sheet",
+    "result": "RED",
+    "observed": "navigates to #home"
+  },
+  {
+    "test": "select active category",
+    "result": "RED_THEN_GREEN"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Metais e materiais",
+    "taps": 2,
+    "productCount": 6,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Ferramentas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Cabos",
+    "taps": 2,
+    "productCount": 3,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Guardas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Pomos",
+    "taps": 2,
+    "productCount": 3,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Runas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Catalisadores",
+    "taps": 2,
+    "productCount": 1,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 392,
+    "category": "Projetos e receitas",
+    "taps": 2,
+    "productCount": 7,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Metais e materiais",
+    "taps": 2,
+    "productCount": 6,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Ferramentas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Cabos",
+    "taps": 2,
+    "productCount": 3,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Guardas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Pomos",
+    "taps": 2,
+    "productCount": 3,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Runas",
+    "taps": 2,
+    "productCount": 5,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Catalisadores",
+    "taps": 2,
+    "productCount": 1,
+    "result": "PASS"
+  },
+  {
+    "test": "category access and filter",
+    "width": 360,
+    "category": "Projetos e receitas",
+    "taps": 2,
+    "productCount": 7,
+    "result": "PASS"
+  },
+  {
+    "test": "Back closes product, stays Shop and Runas",
+    "result": "PASS"
+  },
+  {
+    "test": "keyboard Enter and radio ArrowDown",
+    "result": "PASS",
+    "selected": "Catalisadores"
+  },
+  {
+    "test": "Escape closes category panel and returns focus",
+    "result": "PASS"
+  },
+  {
+    "test": "no extra history after repeated panel closes; Back leaves Shop",
+    "result": "PASS"
+  },
+  {
+    "test": "buy Fehu and keep Runas",
+    "result": "PASS",
+    "gold": 530,
+    "rubies": 34,
+    "fehu": 1
+  },
+  {
+    "test": "buy catalyst and keep Catalisadores",
+    "result": "PASS",
+    "gold": 130,
+    "rubies": 33,
+    "catalyst": 1
+  },
+  {
+    "test": "close and reopen; inventory persists",
+    "result": "PASS",
+    "gold": 130,
+    "rubies": 33,
+    "fehu": 1,
+    "catalyst": 1,
+    "categoryAfterRestart": "materials (existing behavior)"
+  }
+]

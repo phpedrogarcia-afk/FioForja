@@ -1,0 +1,130 @@
+{
+  "cbA392": {
+    "cards": [
+      {
+        "height": 156.046875,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "width": 172.5
+      },
+      {
+        "height": 156.046875,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "width": 172.5
+      },
+      {
+        "height": 156.046875,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "width": 172.5
+      },
+      {
+        "height": 156.046875,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "width": 172.5
+      },
+      {
+        "height": 156.046875,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "width": 172.5
+      },
+      {
+        "height": 156.046875,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "width": 172.5
+      }
+    ],
+    "categoryHeight": 166,
+    "categoryScrollWidth": 353,
+    "categoryWidth": 353,
+    "fullProducts": 4,
+    "labels": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "productTop": 309.875,
+    "viewport": [
+      392,
+      819,
+      1
+    ]
+  },
+  "cbA360": {
+    "cards": [
+      {
+        "height": 156.046875,
+        "text": "🧱\nComum\nLingote de Ferro Forjado\n🪙 50\nPossui: 8",
+        "width": 156.5
+      },
+      {
+        "height": 156.046875,
+        "text": "🪙\nIncomum\nBarra de Aço Nobre do Reino\n🪙 140\nPossui: 4",
+        "width": 156.5
+      },
+      {
+        "height": 156.046875,
+        "text": "🌊\nRara\nTarugo Dobrado de Damasco\n🪙 350 · 💎 1\nPossui: 0",
+        "width": 156.5
+      },
+      {
+        "height": 156.046875,
+        "text": "⬛\nÉpica\nBloco de Aço Negro Forjado\n🪙 450 · 💎 1\nPossui: 0",
+        "width": 156.5
+      },
+      {
+        "height": 156.046875,
+        "text": "✨\nLendária\nLingote de Prata Élfica Sagrada\n🪙 850 · 💎 3\nPossui: 0",
+        "width": 156.5
+      },
+      {
+        "height": 156.046875,
+        "text": "☄️\nRelíquia\nFragmento de Meteorito Celestial\n🪙 1400 · 💎 5\nPossui: 0",
+        "width": 156.5
+      }
+    ],
+    "categoryHeight": 166,
+    "categoryScrollWidth": 321,
+    "categoryWidth": 321,
+    "fullProducts": 4,
+    "labels": [
+      "🧱Metais e materiais",
+      "⚒️Ferramentas",
+      "🧵Cabos",
+      "🛡️Guardas",
+      "🔘Pomos",
+      "ᚠRunas",
+      "🔮Catalisadores",
+      "📜Projetos e receitas"
+    ],
+    "productTop": 309.875,
+    "viewport": [
+      360,
+      800,
+      1
+    ]
+  },
+  "cbAflows": [
+    {
+      "name": "Runas",
+      "taps": 1,
+      "selected": "true",
+      "count": 5
+    },
+    {
+      "name": "Catalisadores",
+      "taps": 1,
+      "selected": "true",
+      "count": 1
+    },
+    {
+      "name": "Projetos e receitas",
+      "taps": 1,
+      "selected": "true",
+      "count": 7
+    }
+  ]
+}

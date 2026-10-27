@@ -263,3 +263,13 @@ A revisão preserva as decisões de cinco seções e de forja manual com núcleo
 **Android:** [nove casos PASS no AVD](../experiments/CODEX08-review/android-summary.json), incluindo atualização por cima, compras, montagem/troca, fusão, forja manual e reabertura, com fixture declarada e recompensas não coletadas. No [Poco](../experiments/CODEX08-review/poco-summary.json), a desinstalação humana confirmada foi seguida de reinstalação autorizada e restauração; navegação/Voltar/relançamento preservaram o baseline posterior, sem fixture, compra ou fusão dessa prova. Não atribuir ao Poco a atualização por cima comprovada no emulador.
 
 Uma revisão econômica independente reportou zero diferenças em 72 outputs, excluindo IDs/datas, fora de `npm test`. Esses resultados não são aprovação de governança ou produção. Permanecem fora do comprovado áudio físico, desempenho sustentado e longo prazo; o primeiro frame da Revelação mostra canvas vazio com causa não isolada entre timing e desenho, embora a inspeção após reabrir mostre a arma inteira. A publicação autorizada abrange exclusivamente `codex/mobile-core-review-v1`; não há autorização de merge ou reescrita de branches preexistentes. Conferir o HEAD remoto ao retomar.
+
+## M02B — Categorias intuitivas da Loja (26/10/2026)
+
+### FIOFORJA-SHOP-CATEGORIES-001 `[USER-AUTHORIZED]` `[AGENT-SELECTED]`
+
+O proprietário autorizou comparar A (oito categorias em duas linhas) e B (botão Categorias com painel) e implementar a alternativa mais defensável, preservando M02A. Confirmou também que os cards, nomes e preços M02A estavam claros e legíveis no Poco; esse feedback não aprova a M02B.
+
+**Decisão técnica:** B. Nas duas larguras exigidas, A ocupou 166 px e deixou quatro materiais inteiros; B ocupa 56 px na lista, deixa seis e oferece as oito opções em um painel único, em dois toques. Nomes completos, IDs, filtro, preços e transações preservados. Voltar dos painéis permanece na Loja pelo histórico existente, com tratamento local. [Evidência e limites](../experiments/M02B-shop-categories/README.md).
+
+**Estado:** implementada e verificada no navegador; candidata à avaliação humana. APK 0.2.4/código 6 construído. Usabilidade e aprovação visual M02B no Poco permanecem pendentes; nenhuma integração à main foi autorizada por esta escolha.

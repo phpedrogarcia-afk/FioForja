@@ -1,5 +1,13 @@
 # Estado do projeto — integração e APK Android experimental
 
+## M02B — Categorias intuitivas — 26/10/2026
+
+- Branch isolada `codex/shop-categories-m02b`, base M02A `d332233` (contém `bc3f364`). [Relatório comparativo](../experiments/M02B-shop-categories/README.md).
+- Escolha técnica B: botão Categorias + painel com oito radios, sem faixa horizontal. Mantém seis materiais inteiros em 360×800/392×819; a alternativa A deixava quatro. Cards, catálogo, IDs, preços, transações e save preservados; única tela alterada `ShopScreen`.
+- Feedback humano: cards, nomes e preços da M02A claros/legíveis no Poco. A navegação M02B ainda não tem aprovação visual humana.
+- 16 verificações de filtro, compra real de Fehu/catalisador, entrega e reabertura PASS no navegador. Voltar fecha os painéis antes de sair; teclado/Escape/foco verificados. 65 testes afetados + 4 de empacotamento PASS; typecheck PASS; lint 0 erros/38 avisos herdados.
+- APK 0.2.4/código 6 entregue, SHA-256 `460634f125cdd4f027457967043499085f499080b0bbca450e3fee51c26a659c`; 0.2.3 preservado, mesmo certificado confirmado. Não instalado no Poco nesta missão. Voltar físico, área segura efetiva e usabilidade M02B no aparelho pendentes. Sem merge/push.
+
 ## M02A — Loja Essencial — 26/10/2026
 
 - Branch isolada `codex/shop-essential-m02a`, base funcional Codex 08 `1bcc1ea88ad339df4ce56df45ce2794c18ecf92d`; [relatório e comparação](../experiments/M02A-shop-essential/README.md).
