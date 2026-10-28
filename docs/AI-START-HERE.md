@@ -1,5 +1,7 @@
 # FioForja — AI Start Here
 
+**M04A — 28/10/2026:** [primeira forja contextual](specs/forge-onboarding.md), baseada no checkpoint mobile `9b09a36` (M03A + Coleção). Usa snapshots existentes e metadados opcionais v5; não altera física/renderização. [Evidências e pendências](../experiments/M04A-first-forge/README.md). A main remota `3ad7239` diverge desta linha; integração não realizada.
+
 Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direção de produto aprovada, as evidências verificadas do código e as regras inegociáveis.
 
 **M03A — Da escolha à bigorna, 27/10/2026:** [preparação visual refinada](specs/preparation.md) na branch `codex/forge-preparation-m03a`, base `2ac3cf5`. APK 0.2.7/código 9 instalado no Poco, com backup e observação física; aceitação humana pendente. [Comparação, testes e limites](../experiments/M03A-choice-to-anvil/README.md). Não integra a frente Antigravity nem a main.

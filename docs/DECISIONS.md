@@ -6,7 +6,7 @@ Este documento é a fonte de autoridade para decisões arquiteturais, de produto
 
 **FIOFORJA-PREPARATION-002** `[USER-AUTHORIZED]` `[AGENT-IMPLEMENTED]` `[TECHNICALLY-VERIFIED]`: preservar o caminho projeto → metal → forjar e a personalização opcional. Projetos disponíveis usam miniaturas do renderer atual; bloqueados e seus requisitos aparecem sob demanda. A prévia principal continua visível. Padrões não editados seguem o projeto/família, enquanto escolhas explícitas válidas e metal permanecem. Núcleo exibe raridade e origem e exige forja. IDs e preferências opcionais são retrocompatíveis com o save v5; dois gates canônicos identificados por ID e família/perfil são verificados. [Provas e limites](../experiments/M03A-choice-to-anvil/README.md). Avaliação humana permanece pendente; sem autorização para integrar à main.
 
-**FIOFORJA-GAMEPLAY-CLARITY** `[PROPOSED]`: o material de análise recomenda que cena, controles e consequências ensinem o jogador, com textos/números como apoio. É direção proposta para planejamento posterior; não autoriza tutorial, efeitos ou alterações na bigorna nesta missão.
+**FIOFORJA-GAMEPLAY-CLARITY** `[USER_APPROVED: M04A, 28/10/2026]`: a primeira fabricação ensina por contexto e ação. A fase física determina a orientação; textos e números complementam. A aprendizagem não modifica dificuldade, física ou recompensas. A proposta registrada na M03A foi aprovada para este recorte de orientação na M04A; efeitos, áudio e composição permanecem em frentes separadas. [Contrato e limites](specs/forge-onboarding.md).
 
 ## M03A — Preparação intuitiva (26/10/2026)
 

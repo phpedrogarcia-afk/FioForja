@@ -1,3 +1,6 @@
+import { STEELS } from "../catalog";
+import { forgeGuidance, type ForgeInputMode } from "../forgeOnboarding";
+import type { ForgeOnboarding, SteelId } from "../types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { HudSnapshot } from "../types";
@@ -5,6 +8,11 @@ import { metalColorCss } from "../swordDraw";
 
 interface Props {
   hud: HudSnapshot;
+  steel: SteelId;
+  onboarding: ForgeOnboarding;
+  inputMode: ForgeInputMode;
+  reheating: boolean;
+  onDismissGuidance: () => void;
   muted: boolean;
   onMute: () => void;
   onPull: () => void;
@@ -16,7 +24,7 @@ interface Props {
 }
 
 export function ForgeHud({
-  hud,
+  hud, steel, onboarding, inputMode, reheating, onDismissGuidance,
   muted,
   unlockedHammers,
   onMute,
@@ -26,8 +34,10 @@ export function ForgeHud({
   onSelectHammer,
   onQuit,
 }: Props) {
-  const phaseLabel =
-    hud.phase === "heat" ? "Aquecer" : hud.phase === "forge" ? "Martelar" : "Temperar";
+  const ready = hud.heat >= STEELS[steel].heatMin && hud.heat <= STEELS[steel].heatMax;
+  const stage = hud.phase === "heat" ? 0 : hud.phase === "forge" ? 1 : 2;
+  const guidance = forgeGuidance(hud, steel, onboarding, inputMode, reheating);
+  const guided = !onboarding.dismissed && !onboarding.completed;
 
   const integrityColor =
     hud.integrity < 35 ? "#ef4444" : hud.integrity < 65 ? "#f59e0b" : "#10b981";
@@ -40,22 +50,27 @@ export function ForgeHud({
       <div className="pointer-events-auto flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="rounded-lg border border-border bg-bg/85 px-3 py-2 shadow-lg backdrop-blur-xs">
-            <p className="font-display text-[0.65rem] uppercase tracking-[0.2em] text-muted">{phaseLabel}</p>
-            <p className="mt-1 max-w-[16rem] text-sm leading-snug text-fg sm:max-w-sm">{hud.message}</p>
+            <ol aria-label="Etapas da forja" className="flex gap-2 text-[0.65rem] font-semibold">
+              {["Fogo", "Bigorna", "Têmpera"].map((label, index) => <li key={label} aria-current={index === stage ? "step" : undefined} className={index === stage ? "text-amber-200" : "text-muted"}>{index + 1}/3 {label}</li>)}
+            </ol>
+            <p id="forge-guidance" role="status" aria-live="polite" className="mt-1 max-w-[16rem] text-xs leading-snug text-fg sm:max-w-sm">{guidance}</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={onMute} aria-label={muted ? "Ativar som" : "Silenciar"}>
+          <div className="flex flex-col items-end gap-1">
+           <div className="flex gap-2">
+            <Button variant="secondary" size="sm" className="min-h-11" onClick={onMute} aria-label={muted ? "Ativar som" : "Silenciar"}>
               {muted ? "Som" : "Mudo"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={onQuit}>
+            <Button variant="ghost" size="sm" className="min-h-11" onClick={onQuit}>
               Sair
             </Button>
+           </div>
+            {guided ? <button type="button" onClick={onDismissGuidance} className="min-h-11 text-xs text-amber-200 underline underline-offset-4">Dispensar dicas</button> : null}
           </div>
         </div>
 
         {/* Crack / Structural Failure Warning Banner */}
         {hud.cracks > 0 && !hud.broken && (
-          <div className="flex items-center gap-2 rounded-md border border-red-500/50 bg-red-950/80 px-3 py-2 text-red-200 shadow-md backdrop-blur-xs animate-pulse sm:max-w-md">
+          <div className="flex items-center gap-2 rounded-md border border-red-500/50 bg-red-950/80 px-3 py-2 text-red-200 shadow-md backdrop-blur-xs animate-pulse motion-reduce:animate-none sm:max-w-md">
             <span className="text-lg">⚠️</span>
             <div className="text-xs">
               <span className="font-bold uppercase tracking-wider text-red-400">Risco Crítico:</span> {hud.cracks} trinca(s) no metal! Reaqueça antes do próximo golpe!
@@ -85,12 +100,13 @@ export function ForgeHud({
 
         {/* Multi-Zone Targeting & Tool Selectors (During Forge Phase) */}
         {hud.phase === "forge" && !hud.broken && (
-          <div className="flex flex-col gap-2 rounded-lg border border-[#23324d] bg-[#0c101c]/90 p-2.5 shadow-md backdrop-blur-xs sm:max-w-md">
+          <details className="rounded-lg border border-[#23324d] bg-[#0c101c]/90 p-2.5 shadow-md backdrop-blur-xs sm:max-w-md">
+            <summary className="min-h-11 cursor-pointer font-display text-xs text-slate-200">Zona e ferramenta</summary>
             <div className="flex items-center justify-between text-[0.65rem] font-display uppercase tracking-wider text-slate-400">
-              <span>Zona da Lâmina [1, 2, 3]</span>
-              <span>Ferramenta [H]</span>
+              <span>Zona da Lâmina{inputMode === "keyboard" ? " [1, 2, 3]" : ""}</span>
+              <span>Ferramenta{inputMode === "keyboard" ? " [H]" : ""}</span>
             </div>
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               {/* Blade Zones */}
               <div className="flex gap-1.5">
                 {[
@@ -101,13 +117,14 @@ export function ForgeHud({
                   <button
                     key={z.id}
                     onClick={() => onSelectZone?.(z.id)}
-                    className={`rounded px-2 py-1 text-xs font-display transition-colors ${
+                    aria-pressed={activeZone === z.id}
+                    className={`min-h-11 rounded px-2 py-1 text-xs font-display transition-colors ${
                       activeZone === z.id
                         ? "border border-amber-500 bg-amber-500/20 text-amber-300 font-bold shadow-xs"
                         : "border border-border bg-surface text-slate-400 hover:text-fg"
                     }`}
                   >
-                    {z.label} <span className="opacity-70">({z.count})</span>
+                    {inputMode === "keyboard" ? z.label : z.label.replace(/ \[.*\]/, "")} <span className="opacity-70">({z.count})</span>
                   </button>
                 ))}
               </div>
@@ -126,7 +143,8 @@ export function ForgeHud({
                       disabled={!isUnlocked}
                       onClick={() => isUnlocked && onSelectHammer?.(h.id)}
                       title={isUnlocked ? h.label : `${h.label} (Bloqueado na Oficina)`}
-                      className={`rounded px-1.5 py-1 text-[0.7rem] font-display transition-colors ${
+                      aria-pressed={activeHammer === h.id}
+                      className={`min-h-11 rounded px-1.5 py-1 text-[0.7rem] font-display transition-colors ${
                         activeHammer === h.id
                           ? "border border-blue-400 bg-blue-500/20 text-blue-200 font-semibold"
                           : isUnlocked
@@ -140,13 +158,13 @@ export function ForgeHud({
                 })}
               </div>
             </div>
-          </div>
+          </details>
         )}
       </div>
 
       <div className="pointer-events-auto mt-auto flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         {hud.phase === "heat" ? (
-          <Button size="lg" className="w-full sm:w-auto shadow-lg" onClick={onPull}>
+          <Button size="lg" className={cn("w-full sm:w-auto shadow-lg", ready && "ring-2 ring-amber-200 ring-offset-2 ring-offset-bg")} onClick={onPull}>
             Retirar do fogo para a bigorna
           </Button>
         ) : null}
@@ -159,10 +177,6 @@ export function ForgeHud({
               center={hud.sweetCenter}
               width={hud.sweetWidth}
             />
-            <div className="flex items-center justify-between text-xs text-muted">
-              <span>Segure na bigorna para carregar · Solte na faixa iluminada</span>
-              <span className="hidden sm:inline">[Espaço / Clique]</span>
-            </div>
             {hud.heat < 0.58 ? (
               <Button
                 variant={hud.heat < 0.38 ? "danger" : "secondary"}
@@ -170,7 +184,7 @@ export function ForgeHud({
                 className="w-full sm:w-auto shadow-md"
                 onClick={onReheat}
               >
-                🔥 Reaquecer na fornalha (R)
+                Reaquecer{inputMode === "keyboard" ? " (R)" : ""}
               </Button>
             ) : null}
           </div>
@@ -178,7 +192,7 @@ export function ForgeHud({
 
         {hud.phase === "quench" && !hud.broken ? (
           <div className="w-full sm:max-w-md">
-            <div className="relative h-4 overflow-hidden rounded-sm border border-border bg-elevated">
+            <div aria-label="Têmpera — solte dentro da faixa indicada" aria-describedby="forge-guidance" className="relative h-4 overflow-hidden rounded-sm border border-border bg-elevated">
               <div
                 className="absolute inset-y-0 bg-ember-hot transition-[width] duration-75"
                 style={{ width: `${hud.quenchFill * 100}%` }}
@@ -188,9 +202,7 @@ export function ForgeHud({
                 style={{ left: "44%", width: "16%" }}
               />
             </div>
-            <p className="mt-2 text-center text-xs text-muted sm:text-left">
-              Segure para mergulhar no banho de óleo/água. Solte na faixa verde!
-            </p>
+
           </div>
         ) : null}
       </div>
@@ -222,7 +234,7 @@ function ForceMeter({
 }) {
   const lo = Math.max(0, center - width / 2);
   return (
-    <div className="relative h-9 overflow-hidden rounded-md border border-border bg-elevated shadow-inner">
+    <div aria-label="Força do golpe — faixa iluminada indica a força ideal" aria-describedby="forge-guidance" className="relative h-9 overflow-hidden rounded-md border border-border bg-elevated shadow-inner">
       <div
         className="absolute inset-y-1 rounded-xs bg-good/35 border-x border-good"
         style={{ left: `${lo * 100}%`, width: `${width * 100}%` }}

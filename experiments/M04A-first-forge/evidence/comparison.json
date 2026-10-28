@@ -1,0 +1,44 @@
+[
+  {
+    "width": 360,
+    "kind": "before",
+    "text": "MARTELAR\n\nRetomando o último ponto salvo da forja.\n\nMUDO\nSAIR\n\nCALOR\n\n75%\n\nFORMA\n\n16%\n\nINTEGRIDADE\n\n100%\n\nGOLPES\n\n0/8\n\nZONA DA LÂMINA [1, 2, 3]\nFERRAMENTA [H]\nBase [1] (0)\nCentro [2] (0)\nPonta [3] (0)\n⚒️ Pena\n🔨 Padrão\n🪓 Marreta\nSegure na bigorna para carregar · Solte na faixa iluminada",
+    "textCharacters": 288,
+    "topHeight": 260.59375,
+    "bottomHeight": 64,
+    "overflowX": 0,
+    "overflowY": 0
+  },
+  {
+    "width": 360,
+    "kind": "after",
+    "text": "1/3 Fogo\n2/3 Bigorna\n3/3 Têmpera\n\nSegure na bigorna para carregar. Solte na faixa iluminada.\n\nMUDO\nSAIR\nDispensar dicas\n\nCALOR\n\n75%\n\nFORMA\n\n16%\n\nINTEGRIDADE\n\n100%\n\nGOLPES\n\n0/8\n\nZona e ferramenta",
+    "textCharacters": 194,
+    "topHeight": 249.59375,
+    "bottomHeight": 36,
+    "overflowX": 0,
+    "overflowY": 0,
+    "current": "2/3 Bigorna"
+  },
+  {
+    "width": 392,
+    "kind": "before",
+    "text": "MARTELAR\n\nRetomando o último ponto salvo da forja.\n\nMUDO\nSAIR\n\nCALOR\n\n75%\n\nFORMA\n\n16%\n\nINTEGRIDADE\n\n100%\n\nGOLPES\n\n0/8\n\nZONA DA LÂMINA [1, 2, 3]\nFERRAMENTA [H]\nBase [1] (0)\nCentro [2] (0)\nPonta [3] (0)\n⚒️ Pena\n🔨 Padrão\n🪓 Marreta\nSegure na bigorna para carregar · Solte na faixa iluminada",
+    "textCharacters": 288,
+    "topHeight": 246.1875,
+    "bottomHeight": 64,
+    "overflowX": 0,
+    "overflowY": 0
+  },
+  {
+    "width": 392,
+    "kind": "after",
+    "text": "1/3 Fogo\n2/3 Bigorna\n3/3 Têmpera\n\nSegure na bigorna para carregar. Solte na faixa iluminada.\n\nMUDO\nSAIR\nDispensar dicas\n\nCALOR\n\n75%\n\nFORMA\n\n16%\n\nINTEGRIDADE\n\n100%\n\nGOLPES\n\n0/8\n\nZona e ferramenta",
+    "textCharacters": 194,
+    "topHeight": 238.875,
+    "bottomHeight": 36,
+    "overflowX": 0,
+    "overflowY": 0,
+    "current": "2/3 Bigorna"
+  }
+]

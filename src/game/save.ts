@@ -1,3 +1,4 @@
+import { normalizeOnboarding } from "./forgeOnboarding.ts";
 import type { CareerStats, EquippedWorkshopGear, FinishedSword, PlayerInventory, PlayerWallet, SaveData, SaveResult } from "./types.ts";
 import { DEFAULT_DESIGN } from "./catalog.ts";
 import { DEFAULT_COMMISSIONS } from "./commissions.ts";
@@ -73,6 +74,7 @@ export const defaultSaveData: SaveData = {
   wallet: defaultWallet,
   inventory: defaultInventory,
   career: defaultCareer,
+  forgeOnboarding: normalizeOnboarding(undefined),
   muted: false,
   shake: true,
   claimedForgeRewardIds: [],
@@ -224,6 +226,7 @@ export function migrateSave(raw: any): SaveData {
     wallet,
     inventory,
     career,
+    forgeOnboarding: normalizeOnboarding(raw.forgeOnboarding),
     muted: Boolean(raw.muted),
     shake: raw.shake !== undefined ? Boolean(raw.shake) : true,
     claimedForgeRewardIds,

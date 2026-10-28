@@ -1,3 +1,6 @@
+## Atualização M04A — 28/10/2026
+Branch `codex/first-forge-onboarding-m04a`, base `9b09a36` (checkpoint APK 0.2.8). Orientação contextual de aquecimento/martelo/têmpera, marcos persistidos junto dos checkpoints, dispensa persistida e navegação de três fases. [Contrato](specs/forge-onboarding.md), [provas e limitações](../experiments/M04A-first-forge/README.md). Base verificada contém M03A e Coleção M04. Main local `4a1cd01` e remota `3ad7239` divergem do fluxo mobile; ambas preservadas. Frente de movimento `antigravity/forge-motion-v1` em `67ab141` não incorporada.
+
 # Estado do projeto — integração e APK Android experimental
 
 ## M03A — Da escolha à bigorna — 27/10/2026

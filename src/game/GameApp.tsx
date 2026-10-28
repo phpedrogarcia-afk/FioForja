@@ -1,3 +1,4 @@
+import { normalizeOnboarding, observeOnboarding, type ForgeInputMode } from "./forgeOnboarding";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ForgeCanvas } from "./ForgeCanvas";
 import { loadGameImages, type GameImages } from "./assets";
@@ -98,6 +99,9 @@ export function GameApp() {
   const [forgeAttempt, setForgeAttempt] = useState<ActiveForgeAttempt | null>(null);
   const [activeCore, setActiveCore] = useState<FusionCore | null>(null);
   const [prepCore, setPrepCore] = useState<FusionCore | null>(null);
+  const [onboarding, setOnboarding] = useState(() => normalizeOnboarding(save.current.forgeOnboarding));
+  const [reheating, setReheating] = useState(false);
+  const [inputMode, setInputMode] = useState<ForgeInputMode>(() => typeof window !== "undefined" && window.matchMedia("(pointer: coarse) and (hover: none)").matches ? "touch" : "mouse");
   const [images, setImages] = useState<GameImages | null>(null);
   const [hud, setHud] = useState<HudSnapshot>(EMPTY_HUD);
   const [finished, setFinished] = useState<FinishedSword | null>(null);
@@ -109,6 +113,9 @@ export function GameApp() {
   const [pendingFailedSave, setPendingFailedSave] = useState<{ sword: FinishedSword; uncommittedSave: SaveData } | null>(null);
   const [recoveryAttempt, setRecoveryAttempt] = useState<ActiveForgeAttempt | null>(null);
   const [confirmExitForge, setConfirmExitForge] = useState(false);
+
+  const forgeInputBlocked = useRef(false);
+  forgeInputBlocked.current = confirmExitForge;
 
   const inputRef = useRef<SimInput>({ charging: false, action: false, reheat: false });
   const designRef = useRef(design);
@@ -127,6 +134,7 @@ export function GameApp() {
   /** Reflete o save canônico em todos os consumidores de estado. */
   const sync = useCallback((next: SaveData) => {
     save.current = next;
+    setOnboarding(normalizeOnboarding(next.forgeOnboarding));
     setGallery(next.gallery);
     setWallet(next.wallet);
     setInventory(next.inventory);
@@ -167,6 +175,7 @@ export function GameApp() {
   useEffect(() => {
     const loaded = loadSave();
     save.current = loaded;
+    setOnboarding(normalizeOnboarding(loaded.forgeOnboarding));
     setGallery(loaded.gallery);
     setDesign(loaded.lastDesign);
     setWallet(loaded.wallet || defaultWallet);
@@ -236,7 +245,8 @@ export function GameApp() {
       setDesign(attempt.design);
       inputRef.current = { charging: false, action: false, reheat: false };
       unlockAudio();
-      setHud(EMPTY_HUD);
+      setHud({ ...EMPTY_HUD, ...attempt.snapshot.state, message: "Retomando o último ponto salvo da forja." });
+      setReheating(attempt.snapshot.state.reheating);
       setFinished(null);
       setForgeKey((k) => k + 1);
       setRecoveryAttempt(null);
@@ -264,7 +274,8 @@ export function GameApp() {
       setInventory(res.save.inventory);
       setPrepCore(null);
       inputRef.current = { charging: false, action: false, reheat: false };
-      setHud(EMPTY_HUD);
+      setHud({ ...EMPTY_HUD, ...res.payload!.snapshot!.state, message: "" });
+      setReheating(false);
       setFinished(null);
       setForgeKey((k) => k + 1);
       go("forge");
@@ -305,8 +316,11 @@ export function GameApp() {
   }, []);
 
   const handleCheckpoint = useCallback((snapshot: ForgeSnapshot): string | null => {
-    const res = executeForgeCheckpointTransaction(save.current, snapshot);
+    const progress = observeOnboarding(normalizeOnboarding(save.current.forgeOnboarding), snapshot.state);
+    const res = executeForgeCheckpointTransaction({ ...save.current, forgeOnboarding: progress }, snapshot);
     if (!res.success) return res.error || "Não foi possível gravar o último ponto da forja.";
+    setOnboarding((previous) => JSON.stringify(previous) === JSON.stringify(progress) ? previous : progress);
+    setReheating(snapshot.state.reheating);
     const goldChanged = save.current.wallet.gold !== res.save.wallet.gold;
     save.current = res.save;
     if (goldChanged) setWallet(res.save.wallet);
@@ -539,15 +553,20 @@ export function GameApp() {
   useEffect(() => {
     if (screen !== "forge") return;
     const down = (e: PointerEvent) => {
+      if (forgeInputBlocked.current) return;
       const t = e.target as HTMLElement | null;
-      if (t?.closest("button, input, a, label")) return;
+      if (t?.closest("button, input, a, label, summary, select, textarea, [contenteditable=true]")) return;
       e.preventDefault();
+      setInputMode(e.pointerType === "touch" || e.pointerType === "pen" ? "touch" : "mouse");
       inputRef.current.charging = true;
     };
     const up = () => {
       inputRef.current.charging = false;
     };
     const keyDown = (e: KeyboardEvent) => {
+      if (forgeInputBlocked.current) return;
+      if ((e.target as HTMLElement | null)?.closest("button, input, select, textarea, a, summary, [contenteditable=true]")) return;
+      setInputMode("keyboard");
       if (e.code === "Space" || e.code === "Enter") {
         e.preventDefault();
         inputRef.current.charging = true;
@@ -629,6 +648,15 @@ export function GameApp() {
           )}
           <ForgeHud
             hud={hud}
+            steel={design.steel}
+            onboarding={onboarding}
+            inputMode={inputMode}
+            reheating={reheating}
+            onDismissGuidance={() => {
+              const next = { ...onboarding, dismissed: true };
+              if (persist({ forgeOnboarding: next }).ok) setOnboarding(next);
+              else showError("Não foi possível guardar a dispensa. Tente novamente.");
+            }}
             muted={muted}
             unlockedHammers={(() => {
               const unlocked: import("./types").HammerType[] = ["standard"];

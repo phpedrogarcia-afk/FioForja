@@ -406,7 +406,15 @@ export interface CareerStats {
   totalValueEarned: number;
 }
 
+export interface ForgeOnboarding {
+  heat: boolean;
+  hammer: boolean;
+  completed: boolean;
+  dismissed: boolean;
+}
+
 export interface SaveData {
+  forgeOnboarding?: ForgeOnboarding;
   version: number;
   gallery: FinishedSword[];
   trainingGallery?: FinishedSword[];
