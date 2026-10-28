@@ -1,0 +1,53 @@
+{
+  "mission": "M04A",
+  "base": "9b09a36bab7631d3af2989623cd62973f7829533",
+  "sourceCommit": "ce8387577bf08cba8b658c90f345a962437d745b",
+  "apk": {
+    "version": "0.2.9",
+    "versionCode": 11,
+    "bytes": 12132681,
+    "sha256": "64399fa0c1c0e8a0f412ccd600ad9b9c287b2303606c50dd6be31165a1a1d358",
+    "certificateSha256": "29896d7ad281e0f642a44d513b2b277a3e1723de2df0d796ea0eff1a8af195bc",
+    "signatureMatchesPrior": true,
+    "defaultDeliveryVersion": "0.2.8",
+    "versionedCandidateDelivered": true
+  },
+  "android": {
+    "device": "READ_ONLY_AVD",
+    "install": "PASS",
+    "coldStart": "PASS",
+    "offlineNetwork": "Active default network: none",
+    "interactiveFlow": "BLOCKED",
+    "cause": "WebView Browser context management unsupported by Playwright; emulator exited twice with code1, cause unknown",
+    "additionalProbe": "REJECTED_BY_AUTOMATIC_APPROVAL_REVIEW: blocked by policy",
+    "poco": "NOT_CONNECTED",
+    "pocoInstall": "NOT_PERFORMED"
+  },
+  "browser": {
+    "touchChecks": 33,
+    "controlChecks": 3,
+    "viewports": [
+      "360x800",
+      "392x819"
+    ],
+    "realCycles": 2
+  },
+  "tests": {
+    "discovered": 504,
+    "pass": 497,
+    "skip": 7,
+    "fail": 0
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 40
+  },
+  "builds": [
+    "web PASS",
+    "mobile PASS",
+    "APK PASS"
+  ],
+  "verdict": "PARTIAL_ANDROID_INTERACTIVE_AND_HUMAN_PENDING",
+  "mainChanged": false
+}

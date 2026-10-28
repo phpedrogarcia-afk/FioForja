@@ -1,0 +1,8 @@
+{
+  "scope": "high-confidence credential patterns in not-yet-remote commit diffs, sensitive tracked paths, new local links",
+  "newReachableCommits": 10,
+  "credentialPatternHits": [],
+  "sensitiveTrackedPaths": [],
+  "brokenLinks": [],
+  "secretsUniversallyAbsent": "NOT_PROVEN"
+}
