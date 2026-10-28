@@ -1,0 +1,213 @@
+{
+  "mission": "M04-collection-intuitive",
+  "phase": "alternative-A",
+  "date": "2026-10-28T00:18:49.710Z",
+  "sizes": {
+    "360x800": {
+      "size": "360x800",
+      "arsenal": {
+        "scroller": {
+          "top": 37,
+          "bottom": 731,
+          "height": 694
+        },
+        "cards": [
+          {
+            "title": "Juramento das Cinzas de Valdoria",
+            "top": 308,
+            "bottom": 491,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Cimitarra de Damasco",
+            "top": 308,
+            "bottom": 491,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lâmina do Primeiro Inverno",
+            "top": 501,
+            "bottom": 683,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Véu de Ferro",
+            "top": 501,
+            "bottom": 683,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lua Silenciosa",
+            "top": 693,
+            "bottom": 876,
+            "fullyVisible": false,
+            "nameVisible": false
+          },
+          {
+            "title": "Fragmento da Bigorna",
+            "top": 693,
+            "bottom": 876,
+            "fullyVisible": false,
+            "nameVisible": false
+          }
+        ],
+        "fullyVisibleCards": 4,
+        "namesVisibleCards": 4
+      },
+      "documentOverflow": 0,
+      "navigation": {
+        "kind": "grid",
+        "height": 118,
+        "overflow": 0,
+        "options": [
+          {
+            "label": "Arsenal",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "width": 108,
+            "height": 56,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true,
+        "tapsToSection": 1
+      },
+      "runasReached": "Runas"
+    },
+    "392x819": {
+      "size": "392x819",
+      "arsenal": {
+        "scroller": {
+          "top": 37,
+          "bottom": 750,
+          "height": 713
+        },
+        "cards": [
+          {
+            "title": "Juramento das Cinzas de Valdoria",
+            "top": 308,
+            "bottom": 491,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Cimitarra de Damasco",
+            "top": 308,
+            "bottom": 491,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lâmina do Primeiro Inverno",
+            "top": 501,
+            "bottom": 683,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Véu de Ferro",
+            "top": 501,
+            "bottom": 683,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lua Silenciosa",
+            "top": 693,
+            "bottom": 876,
+            "fullyVisible": false,
+            "nameVisible": false
+          },
+          {
+            "title": "Fragmento da Bigorna",
+            "top": 693,
+            "bottom": 876,
+            "fullyVisible": false,
+            "nameVisible": false
+          }
+        ],
+        "fullyVisibleCards": 4,
+        "namesVisibleCards": 4
+      },
+      "documentOverflow": 0,
+      "navigation": {
+        "kind": "grid",
+        "height": 118,
+        "overflow": 0,
+        "options": [
+          {
+            "label": "Arsenal",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "width": 119,
+            "height": 56,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true,
+        "tapsToSection": 1
+      },
+      "runasReached": "Runas"
+    }
+  }
+}

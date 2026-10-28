@@ -1,5 +1,15 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, FlaskConical, Hammer, ShieldCheck, Sparkles, Star, Wrench } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowRight,
+  ChevronDown,
+  FlaskConical,
+  Hammer,
+  SearchX,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Wrench,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WeaponPreview } from "../components/WeaponPreview";
 import { Sheet } from "../components/Sheet";
@@ -17,6 +27,13 @@ import {
 import { evaluateBlueprintStatus } from "../blueprints";
 import { getMaterialStock, getRequiredMaterialForSteel } from "../materials";
 import { getSwordUpgradeQuote } from "../transactions";
+import {
+  COLLECTION_SECTIONS,
+  collectionCountLabel,
+  getArsenalEmptyState,
+  type CollectionRarityFilter,
+  type CollectionSectionId,
+} from "../collectionSections";
 import type {
   CareerStats,
   FinishedSword,
@@ -27,17 +44,7 @@ import type {
   RarityGrade,
 } from "../types";
 
-type CollectionTab = "arsenal" | "compendio" | "componentes" | "runas" | "nucleos" | "comparar";
 type ComponentCategory = InventoryComponent["category"];
-
-const TABS: Array<{ id: CollectionTab; label: string }> = [
-  { id: "arsenal", label: "Arsenal" },
-  { id: "compendio", label: "Compêndio" },
-  { id: "componentes", label: "Peças" },
-  { id: "runas", label: "Runas" },
-  { id: "nucleos", label: "Núcleos" },
-  { id: "comparar", label: "Comparar" },
-];
 
 const RARITY_STYLE: Record<string, string> = {
   Comum: "border-stone-600 bg-stone-800/80 text-stone-200",
@@ -80,7 +87,10 @@ function AttributeBar({ sword }: { sword: FinishedSword }) {
         ["AGI", stats.agi],
         ["DUR", stats.dur],
       ].map(([label, value]) => (
-        <div key={String(label)} className="rounded border border-border/80 bg-black/25 px-1 py-1 text-center">
+        <div
+          key={String(label)}
+          className="rounded border border-border/80 bg-black/25 px-1 py-1 text-center"
+        >
           <p className="text-[0.55rem] uppercase tracking-wider text-muted">{label}</p>
           <p className="font-display text-sm font-bold tabular-nums text-[#e8dcc4]">{value}</p>
         </div>
@@ -149,14 +159,18 @@ export function CollectionScreen({
   onGoShop,
   onGoForge,
 }: Props) {
-  const [tab, setTab] = useState<CollectionTab>("arsenal");
-  const [rarityFilter, setRarityFilter] = useState<"Todas" | RarityGrade>("Todas");
+  const [tab, setTab] = useState<CollectionSectionId>("arsenal");
+  const [rarityFilter, setRarityFilter] = useState<CollectionRarityFilter>("Todas");
+  const [sectionsOpen, setSectionsOpen] = useState(false);
   const [inspectId, setInspectId] = useState<string | null>(null);
   const [pickerCategory, setPickerCategory] = useState<ComponentCategory | null>(null);
   const [installComponentId, setInstallComponentId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<[string | null, string | null]>([null, null]);
+  const sectionsButton = useRef<HTMLButtonElement | null>(null);
+  const sectionsHistory = useRef(false);
 
+  const totalArsenal = useMemo(() => swords.filter((s) => !s.isTraining).length, [swords]);
   const arsenal = useMemo(
     () =>
       swords
@@ -165,6 +179,61 @@ export function CollectionScreen({
         .sort((a, b) => b.createdAt - a.createdAt),
     [swords, rarityFilter],
   );
+  const emptyState = getArsenalEmptyState(totalArsenal, arsenal.length, rarityFilter);
+  const currentSection =
+    COLLECTION_SECTIONS.find((section) => section.id === tab) || COLLECTION_SECTIONS[0];
+
+  // Reaproveita o histórico da Coleção: Voltar fecha o seletor antes de sair da seção.
+  const openSections = () => {
+    if (sectionsHistory.current) return;
+    try {
+      window.history.pushState(
+        {
+          ...window.history.state,
+          fioSection: "collection",
+          fio: true,
+          fioCollectionPanel: "sections",
+        },
+        "",
+        window.location.href,
+      );
+      sectionsHistory.current = true;
+    } catch {
+      /* X e Escape continuam fechando o painel. */
+    }
+    setSectionsOpen(true);
+  };
+
+  const closeSections = () => {
+    setSectionsOpen(false);
+    if (sectionsHistory.current) {
+      sectionsHistory.current = false;
+      if (window.history.state?.fioCollectionPanel) window.history.back();
+    }
+    requestAnimationFrame(() => sectionsButton.current?.focus());
+  };
+
+  const selectSection = (next: CollectionSectionId) => {
+    setTab(next);
+    setNotice(null);
+    closeSections();
+  };
+
+  useEffect(() => {
+    if (!active) return;
+    const syncPanel = (panel: string | undefined, restoreFocus: boolean) => {
+      const open = panel === "sections";
+      sectionsHistory.current = open;
+      setSectionsOpen(open);
+      if (restoreFocus && !open) {
+        requestAnimationFrame(() => sectionsButton.current?.focus());
+      }
+    };
+    const onPop = (event: PopStateEvent) => syncPanel(event.state?.fioCollectionPanel, true);
+    syncPanel(window.history.state?.fioCollectionPanel, false);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [active]);
 
   const inspected = swords.find((s) => s.id === inspectId) || null;
   const upgradeQuote = inspected ? getSwordUpgradeQuote(inspected) : null;
@@ -187,62 +256,96 @@ export function CollectionScreen({
   return (
     <main className="mx-auto w-full max-w-2xl space-y-3 px-3 pt-3 pb-6">
       <header>
-        <p className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-400/90">O Arsenal</p>
+        <p className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-400/90">
+          O Arsenal
+        </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-amber-50">Coleção</h1>
-        <p className="mt-1 text-xs text-muted">A arma é a heroína. Cada peça conta a história da forja.</p>
+        <p className="mt-1 text-xs text-muted">
+          A arma é a heroína. Cada peça conta a história da forja.
+        </p>
       </header>
 
-      <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1" role="tablist" aria-label="Categorias da Coleção">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
-            onClick={() => {
-              setTab(item.id);
-              setNotice(null);
-            }}
-            className={
-              "min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold " +
-              (tab === item.id
-                ? "border-amber-500 bg-amber-500/20 text-amber-100"
-                : "border-border bg-surface text-muted")
-            }
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <button
+        ref={sectionsButton}
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={active && sectionsOpen}
+        aria-label={`Seção da Coleção: ${currentSection.label}. Abrir as seis seções`}
+        onClick={() => (sectionsOpen ? closeSections() : openSections())}
+        className="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-amber-700/60 bg-surface px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+      >
+        <span className="min-w-0">
+          <span className="block text-[0.6rem] uppercase tracking-[0.18em] text-muted">Seção</span>
+          <span className="mt-0.5 block truncate font-display text-sm font-bold text-amber-100">
+            {currentSection.label}
+          </span>
+        </span>
+        <ChevronDown size={20} className="shrink-0 text-amber-300" aria-hidden />
+      </button>
 
       {notice ? (
-        <p role="status" className="rounded-lg border border-emerald-700/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-200">
+        <p
+          role="status"
+          className="rounded-lg border border-emerald-700/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-200"
+        >
           {notice}
         </p>
       ) : null}
 
       {tab === "arsenal" ? (
         <section aria-label="Arsenal" className="space-y-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted">{arsenal.length} arma(s) no Arsenal</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="min-w-0 text-xs text-muted">
+              {collectionCountLabel(totalArsenal, arsenal.length, rarityFilter)}
+            </p>
             <select
               aria-label="Filtrar por raridade"
+              title="Filtrar por raridade"
               value={rarityFilter}
-              onChange={(event) => setRarityFilter(event.target.value as "Todas" | RarityGrade)}
-              className="min-h-9 rounded-md border border-border bg-surface px-2 text-xs text-fg"
+              onChange={(event) => setRarityFilter(event.target.value as CollectionRarityFilter)}
+              className="min-h-9 shrink-0 rounded-md border border-border bg-surface px-2 text-xs text-fg"
             >
-              {["Todas", "Comum", "Incomum", "Rara", "Épica", "Lendária", "Relíquia"].map((rarity) => (
-                <option key={rarity} value={rarity}>{rarity}</option>
-              ))}
+              {["Todas", "Comum", "Incomum", "Rara", "Épica", "Lendária", "Relíquia"].map(
+                (rarity) => (
+                  <option key={rarity} value={rarity}>
+                    {rarity}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
-          {arsenal.length === 0 ? (
+          {emptyState.kind === "collection-empty" ? (
             <div className="rounded-xl border border-dashed border-border bg-surface/60 p-6 text-center">
               <Hammer size={30} className="mx-auto text-amber-700" />
               <p className="mt-2 font-display text-sm text-amber-100">Nenhuma lâmina aqui ainda.</p>
-              <Button size="sm" className="mt-3 bg-amber-600 font-display text-xs font-bold text-stone-950" onClick={onGoForge}>
+              <p className="mt-1 text-[0.68rem] text-muted">
+                Forje a primeira espada para começar o Arsenal.
+              </p>
+              <Button
+                size="sm"
+                className="mt-3 bg-amber-600 font-display text-xs font-bold text-stone-950"
+                onClick={onGoForge}
+              >
                 Forjar a primeira
+              </Button>
+            </div>
+          ) : emptyState.kind === "filter-empty" ? (
+            <div className="rounded-xl border border-dashed border-border bg-surface/60 p-6 text-center">
+              <SearchX size={30} className="mx-auto text-amber-700" />
+              <p className="mt-2 font-display text-sm text-amber-100">
+                Nenhuma arma com raridade {emptyState.filter}.
+              </p>
+              <p className="mt-1 text-[0.68rem] leading-relaxed text-muted">
+                Você tem {totalArsenal} {totalArsenal === 1 ? "arma" : "armas"} no Arsenal, mas
+                nenhuma corresponde a este filtro.
+              </p>
+              <Button
+                size="sm"
+                className="mt-3 bg-amber-600 font-display text-xs font-bold text-stone-950"
+                onClick={() => setRarityFilter("Todas")}
+              >
+                Mostrar todas as armas
               </Button>
             </div>
           ) : (
@@ -262,9 +365,16 @@ export function CollectionScreen({
                   >
                     <div className="relative h-28 bg-[radial-gradient(ellipse_at_50%_45%,#242a33,#0d1015)]">
                       <WeaponPreview sword={sword} />
-                      <span className="absolute top-1.5 left-1.5"><RarityChip rarity={sword.rarity} /></span>
+                      <span className="absolute top-1.5 left-1.5">
+                        <RarityChip rarity={sword.rarity} />
+                      </span>
                       {sword.favorite ? (
-                        <span className="absolute top-1.5 right-1.5 rounded bg-amber-500/20 p-1 text-amber-300" title="Protegida">
+                        <span
+                          role="img"
+                          aria-label="Protegida contra fusão"
+                          title="Protegida contra fusão"
+                          className="absolute top-1.5 right-1.5 rounded bg-amber-500/20 p-1 text-amber-300"
+                        >
                           <ShieldCheck size={13} />
                         </span>
                       ) : null}
@@ -275,8 +385,15 @@ export function CollectionScreen({
                       ) : null}
                     </div>
                     <div className="space-y-1 p-2">
-                      <h3 className="truncate font-display text-xs font-bold text-amber-50">{sword.design.name || "Sem nome"}</h3>
-                      <p className="text-[0.6rem] text-muted">Q{sword.quality} · {gradeFor(sword.quality)}</p>
+                      <h3
+                        title={sword.design.name || "Sem nome"}
+                        className="line-clamp-2 font-display text-xs leading-4 font-bold break-words text-amber-50"
+                      >
+                        {sword.design.name || "Sem nome"}
+                      </h3>
+                      <p className="text-[0.6rem] text-muted">
+                        Q{sword.quality} · {gradeFor(sword.quality)}
+                      </p>
                       <p className="text-[0.6rem] tabular-nums text-[#d8c8ab]">
                         ⚔ {stats.atk} · 🛡 {stats.def} · 🌀 {stats.agi} · 🔨 {stats.dur}
                       </p>
@@ -313,12 +430,23 @@ export function CollectionScreen({
                           : "border-emerald-700/60 bg-emerald-950/40 text-emerald-200")
                     }
                   >
-                    {status.isMastered ? "Dominada" : status.isCrafted ? "Fabricada" : status.state === "locked" ? "Bloqueada" : status.hasMaterial ? "Pronta" : "Falta metal"}
+                    {status.isMastered
+                      ? "Dominada"
+                      : status.isCrafted
+                        ? "Fabricada"
+                        : status.state === "locked"
+                          ? "Bloqueada"
+                          : status.hasMaterial
+                            ? "Pronta"
+                            : "Falta metal"}
                   </span>
                 </div>
-                <p className="mt-1.5 text-[0.68rem] leading-relaxed text-[#cdbb9d]">{status.requirementText}</p>
+                <p className="mt-1.5 text-[0.68rem] leading-relaxed text-[#cdbb9d]">
+                  {status.requirementText}
+                </p>
                 <p className="mt-1 text-[0.62rem] text-muted">
-                  {material.icon} {material.name}: {getMaterialStock(inventory.materials, material.key)} em estoque
+                  {material.icon} {material.name}:{" "}
+                  {getMaterialStock(inventory.materials, material.key)} em estoque
                 </p>
               </article>
             );
@@ -333,7 +461,14 @@ export function CollectionScreen({
             return (
               <div key={category}>
                 <h3 className="mb-1.5 font-display text-[0.62rem] uppercase tracking-[0.18em] text-muted">
-                  {category === "guard" ? "Guardas" : category === "wrap" ? "Cabos" : category === "pommel" ? "Pomos" : "Runas"} · {items.length}
+                  {category === "guard"
+                    ? "Guardas"
+                    : category === "wrap"
+                      ? "Cabos"
+                      : category === "pommel"
+                        ? "Pomos"
+                        : "Runas"}{" "}
+                  · {items.length}
                 </h3>
                 {items.length === 0 ? (
                   <p className="rounded-lg border border-dashed border-border px-3 py-2 text-[0.68rem] text-muted">
@@ -342,14 +477,28 @@ export function CollectionScreen({
                 ) : (
                   <ul className="space-y-1.5">
                     {items.map((item) => (
-                      <li key={item.id} className="flex items-center gap-2.5 rounded-lg border border-border bg-surface p-2.5">
-                        <span aria-hidden className="text-xl">{item.icon}</span>
+                      <li
+                        key={item.id}
+                        className="flex items-center gap-2.5 rounded-lg border border-border bg-surface p-2.5"
+                      >
+                        <span aria-hidden className="text-xl">
+                          {item.icon}
+                        </span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-display text-xs font-bold text-amber-50">{item.name}</p>
+                          <p className="line-clamp-2 font-display text-xs leading-4 font-bold break-words text-amber-50">
+                            {item.name}
+                          </p>
                           <p className="text-[0.6rem] text-muted">
-                            {item.rarity} · {["damageBonus", "defenseBonus", "agilityBonus", "durabilityBonus"]
-                              .filter((key) => (item.statModifier as Record<string, number | undefined>)?.[key])
-                              .map((key) => `${key.replace("Bonus", "").toUpperCase()} +${(item.statModifier as Record<string, number>)[key]}`)
+                            {item.rarity} ·{" "}
+                            {["damageBonus", "defenseBonus", "agilityBonus", "durabilityBonus"]
+                              .filter(
+                                (key) =>
+                                  (item.statModifier as Record<string, number | undefined>)?.[key],
+                              )
+                              .map(
+                                (key) =>
+                                  `${key.replace("Bonus", "").toUpperCase()} +${(item.statModifier as Record<string, number>)[key]}`,
+                              )
                               .join(" · ") || "Sem bônus"}
                           </p>
                         </div>
@@ -357,6 +506,7 @@ export function CollectionScreen({
                           size="sm"
                           variant="secondary"
                           className="shrink-0 text-[0.68rem]"
+                          aria-label={`Instalar ${item.name}`}
                           onClick={() => setInstallComponentId(item.id)}
                         >
                           <Wrench size={13} /> Instalar
@@ -381,20 +531,32 @@ export function CollectionScreen({
               (c) => c.category === "rune" && c.componentKey.includes(rune.symbol),
             );
             return (
-              <article key={rune.name} className="flex items-start gap-2.5 rounded-lg border border-border bg-surface p-2.5">
-                <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-full border border-amber-800/60 bg-black/30 text-lg text-amber-300">
+              <article
+                key={rune.name}
+                className="flex items-start gap-2.5 rounded-lg border border-border bg-surface p-2.5"
+              >
+                <span
+                  aria-hidden
+                  className="grid size-9 shrink-0 place-items-center rounded-full border border-amber-800/60 bg-black/30 text-lg text-amber-300"
+                >
                   {rune.symbol}
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-display text-xs font-bold text-amber-50">{rune.name}</h3>
-                  <p className="text-[0.62rem] text-muted">{rune.school} · {rune.rarity}</p>
+                  <p className="text-[0.62rem] text-muted">
+                    {rune.school} · {rune.rarity}
+                  </p>
                   <p className="mt-0.5 text-[0.68rem] leading-snug text-[#cdbb9d]">{rune.effect}</p>
                   <p className="mt-0.5 text-[0.6rem] text-muted">Peças soltas: {owned.length}</p>
                 </div>
               </article>
             );
           })}
-          <Button variant="secondary" className="w-full text-xs" onClick={() => setTab("componentes")}>
+          <Button
+            variant="secondary"
+            className="w-full text-xs"
+            onClick={() => setTab("componentes")}
+          >
             Instalar uma runa numa espada
           </Button>
         </section>
@@ -406,18 +568,30 @@ export function CollectionScreen({
             <div className="rounded-xl border border-dashed border-border bg-surface/60 p-6 text-center">
               <FlaskConical size={30} className="mx-auto text-amber-700" />
               <p className="mt-2 font-display text-sm text-amber-100">Nenhum núcleo guardado.</p>
-              <p className="mt-1 text-[0.68rem] text-muted">Funda quatro espadas da mesma raridade no Craft.</p>
-              <Button size="sm" variant="secondary" className="mt-3 text-xs" onClick={() => setTab("arsenal")}>
+              <p className="mt-1 text-[0.68rem] text-muted">
+                Funda quatro espadas da mesma raridade no Craft.
+              </p>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="mt-3 text-xs"
+                onClick={() => setTab("arsenal")}
+              >
                 Ver Arsenal
               </Button>
             </div>
           ) : (
             cores.map((core) => (
-              <article key={core.id} className="rounded-xl border border-amber-700/50 bg-[#1d1710] p-3">
+              <article
+                key={core.id}
+                className="rounded-xl border border-amber-700/50 bg-[#1d1710] p-3"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <RarityChip rarity={core.rarity} />
-                    <h3 className="mt-1 font-display text-sm font-bold text-amber-50">{core.name}</h3>
+                    <h3 className="mt-1 font-display text-sm font-bold text-amber-50">
+                      {core.name}
+                    </h3>
                   </div>
                   <span className="shrink-0 rounded border border-amber-700/60 bg-black/30 px-1.5 py-0.5 text-[0.6rem] text-amber-300">
                     +{core.bonusQuality}% Q
@@ -431,17 +605,26 @@ export function CollectionScreen({
                     ["AGI", core.heritage?.agilityBias],
                     ["DUR", core.heritage?.durabilityBias],
                   ].map(([label, value]) => (
-                    <div key={String(label)} className="rounded border border-border/70 bg-black/25 py-1">
+                    <div
+                      key={String(label)}
+                      className="rounded border border-border/70 bg-black/25 py-1"
+                    >
                       <p className="text-muted">{label}</p>
-                      <p className="font-display text-xs font-bold text-amber-200">{signed(Number(value || 0))}</p>
+                      <p className="font-display text-xs font-bold text-amber-200">
+                        {signed(Number(value || 0))}
+                      </p>
                     </div>
                   ))}
                 </div>
                 <p className="mt-1.5 text-[0.62rem] leading-snug text-muted">
-                  {core.inheritedPerks.length > 0 ? core.inheritedPerks.join(" · ") : "Sem traço especial herdado."}
-                  {" "}· Origem: {core.consumedSwordIds.length} doadoras consumidas.
+                  {core.inheritedPerks.length > 0
+                    ? core.inheritedPerks.join(" · ")
+                    : "Sem traço especial herdado."}{" "}
+                  · Origem: {core.consumedSwordIds.length} doadoras consumidas.
                 </p>
-                <p className="mt-1 text-[0.6rem] text-amber-400/80">Ainda precisa ser forjado na bigorna.</p>
+                <p className="mt-1 text-[0.6rem] text-amber-400/80">
+                  Ainda precisa ser forjado na bigorna.
+                </p>
                 <Button
                   size="sm"
                   className="mt-2 w-full bg-amber-600 font-display text-xs font-bold text-stone-950"
@@ -472,9 +655,13 @@ export function CollectionScreen({
                   className="mt-1 min-h-10 w-full rounded-md border border-border bg-surface px-2 text-xs text-fg"
                 >
                   <option value="">Selecionar…</option>
-                  {swords.filter((s) => !s.isTraining).map((s) => (
-                    <option key={s.id} value={s.id}>{s.design.name} (Q{s.quality})</option>
-                  ))}
+                  {swords
+                    .filter((s) => !s.isTraining)
+                    .map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.design.name} (Q{s.quality})
+                      </option>
+                    ))}
                 </select>
               </label>
             ))}
@@ -483,7 +670,10 @@ export function CollectionScreen({
           {compareA || compareB ? (
             <div className="grid grid-cols-2 gap-2">
               {[compareA, compareB].map((sword, index) => (
-                <div key={index} className="overflow-hidden rounded-lg border border-border bg-surface">
+                <div
+                  key={index}
+                  className="overflow-hidden rounded-lg border border-border bg-surface"
+                >
                   {sword ? (
                     <>
                       <div className="h-28 bg-[radial-gradient(ellipse_at_50%_45%,#242a33,#0d1015)]">
@@ -491,8 +681,12 @@ export function CollectionScreen({
                       </div>
                       <div className="space-y-1 p-2">
                         <RarityChip rarity={sword.rarity} />
-                        <p className="truncate font-display text-xs font-bold text-amber-50">{sword.design.name}</p>
-                        <p className="text-[0.6rem] text-muted">Q{sword.quality} · {gradeFor(sword.quality)}</p>
+                        <p className="line-clamp-2 font-display text-xs leading-4 font-bold break-words text-amber-50">
+                          {sword.design.name}
+                        </p>
+                        <p className="text-[0.6rem] text-muted">
+                          Q{sword.quality} · {gradeFor(sword.quality)}
+                        </p>
                         <AttributeBar sword={sword} />
                       </div>
                     </>
@@ -527,7 +721,16 @@ export function CollectionScreen({
                       <td className="py-1 uppercase text-muted">{key}</td>
                       <td className="py-1 text-right tabular-nums">{a}</td>
                       <td className="py-1 text-right tabular-nums">{b}</td>
-                      <td className={"py-1 text-right font-bold tabular-nums " + (delta > 0 ? "text-emerald-300" : delta < 0 ? "text-red-300" : "text-muted")}>
+                      <td
+                        className={
+                          "py-1 text-right font-bold tabular-nums " +
+                          (delta > 0
+                            ? "text-emerald-300"
+                            : delta < 0
+                              ? "text-red-300"
+                              : "text-muted")
+                        }
+                      >
                         {delta > 0 ? `+${delta}` : delta}
                       </td>
                     </tr>
@@ -538,6 +741,46 @@ export function CollectionScreen({
           ) : null}
         </section>
       ) : null}
+
+      {/* Seletor das seis seções */}
+      <Sheet
+        open={active && sectionsOpen}
+        onOpenChange={(open) => !open && closeSections()}
+        eyebrow="Coleção"
+        title="Seções da Coleção"
+        description="Escolha uma das seis seções da Coleção."
+      >
+        <fieldset className="grid grid-cols-2 gap-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <legend className="sr-only">Seções da Coleção</legend>
+          {COLLECTION_SECTIONS.map((section) => {
+            const selected = tab === section.id;
+            return (
+              <label
+                key={section.id}
+                className={
+                  "flex min-h-16 cursor-pointer items-center gap-2 rounded-xl border px-2 py-3 text-sm leading-snug focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-amber-400 " +
+                  (selected
+                    ? "border-amber-500 bg-amber-500/15 font-semibold text-amber-100"
+                    : "border-border bg-surface text-muted")
+                }
+              >
+                <input
+                  type="radio"
+                  name="collection-section"
+                  value={section.id}
+                  checked={selected}
+                  onClick={() => {
+                    if (selected) closeSections();
+                  }}
+                  onChange={() => selectSection(section.id)}
+                  className="size-4 shrink-0 accent-amber-500"
+                />
+                <span className="min-w-0 break-words">{section.label}</span>
+              </label>
+            );
+          })}
+        </fieldset>
+      </Sheet>
 
       {/* Inspeção detalhada */}
       <Sheet
@@ -551,10 +794,22 @@ export function CollectionScreen({
         }}
         eyebrow="Inspeção"
         title={inspected?.design.name || ""}
-        description={inspected ? `${inspected.rarity || "Comum"} · Qualidade ${inspected.quality} · ${gradeFor(inspected.quality)}` : undefined}
+        description={
+          inspected
+            ? `${inspected.rarity || "Comum"} · Qualidade ${inspected.quality} · ${gradeFor(inspected.quality)}`
+            : undefined
+        }
       >
         {inspected ? (
           <div className="space-y-3">
+            {notice ? (
+              <p
+                role="status"
+                className="rounded-lg border border-emerald-700/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-200"
+              >
+                {notice}
+              </p>
+            ) : null}
             <div className="h-52 rounded-xl border border-border bg-[radial-gradient(ellipse_at_50%_45%,#242a33,#0d1015)]">
               <WeaponPreview sword={inspected} />
             </div>
@@ -605,10 +860,19 @@ export function CollectionScreen({
                 {(["guard", "wrap", "pommel", "rune"] as const).map((category) => {
                   const installed = inspected.installedComponents?.[category];
                   return (
-                    <div key={category} className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-2.5 py-2">
+                    <div
+                      key={category}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-2.5 py-2"
+                    >
                       <div className="min-w-0">
                         <p className="text-[0.58rem] uppercase tracking-wider text-muted">
-                          {category === "guard" ? "Guarda" : category === "wrap" ? "Cabo" : category === "pommel" ? "Pomo" : "Runa"}
+                          {category === "guard"
+                            ? "Guarda"
+                            : category === "wrap"
+                              ? "Cabo"
+                              : category === "pommel"
+                                ? "Pomo"
+                                : "Runa"}
                         </p>
                         <p className="truncate text-[0.7rem] text-[#e8dcc4]">
                           {installed ? installed.name : "Peça de forja padrão"}
@@ -618,6 +882,15 @@ export function CollectionScreen({
                         size="sm"
                         variant="secondary"
                         className="shrink-0 text-[0.65rem]"
+                        aria-label={`${installed ? "Trocar" : "Instalar"} ${
+                          category === "guard"
+                            ? "guarda"
+                            : category === "wrap"
+                              ? "cabo"
+                              : category === "pommel"
+                                ? "pomo"
+                                : "runa"
+                        }`}
                         disabled={inspected.broken}
                         onClick={() => openComponentPicker(category)}
                       >
@@ -634,8 +907,15 @@ export function CollectionScreen({
                   </p>
                   {components.filter((c) => c.category === pickerCategory).length === 0 ? (
                     <div className="mt-1.5">
-                      <p className="text-[0.68rem] text-muted">Nenhuma peça solta desta categoria no inventário.</p>
-                      <Button size="sm" variant="secondary" className="mt-2 w-full text-xs" onClick={onGoShop}>
+                      <p className="text-[0.68rem] text-muted">
+                        Nenhuma peça solta desta categoria no inventário.
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="mt-2 w-full text-xs"
+                        onClick={onGoShop}
+                      >
                         Comprar na Loja
                       </Button>
                     </div>
@@ -647,12 +927,15 @@ export function CollectionScreen({
                           <li key={item.id}>
                             <button
                               type="button"
+                              aria-label={`Instalar ${item.name} em ${inspected.design.name}`}
                               onClick={() => installComponent(inspected.id, item.id)}
                               className="flex w-full items-center justify-between gap-2 rounded border border-border bg-black/25 px-2 py-1.5 text-left text-[0.68rem] hover:border-amber-600/70"
                             >
                               <span className="min-w-0">
                                 <span className="block truncate text-[#e8dcc4]">{item.name}</span>
-                                <span className="block text-[0.6rem] text-muted">{item.rarity}</span>
+                                <span className="block text-[0.6rem] text-muted">
+                                  {item.rarity}
+                                </span>
                               </span>
                               <ArrowRight size={14} className="shrink-0 text-amber-300" />
                             </button>
@@ -669,7 +952,9 @@ export function CollectionScreen({
                 <h3 className="flex items-center gap-1.5 font-display text-[0.62rem] uppercase tracking-[0.18em] text-violet-300">
                   <Sparkles size={12} /> Histórico de fusão
                 </h3>
-                <p className="mt-1 text-[0.68rem] text-[#e2d2b4]">{inspected.fusionHistory.coreName}</p>
+                <p className="mt-1 text-[0.68rem] text-[#e2d2b4]">
+                  {inspected.fusionHistory.coreName}
+                </p>
                 <p className="text-[0.62rem] text-muted">
                   {inspected.fusionHistory.parentIds.length} doadoras ·{" "}
                   {new Date(inspected.fusionHistory.date).toLocaleDateString("pt-BR")}
@@ -682,10 +967,15 @@ export function CollectionScreen({
 
             {inspected.perks && inspected.perks.length > 0 ? (
               <section>
-                <h3 className="mb-1 font-display text-[0.62rem] uppercase tracking-[0.18em] text-muted">Propriedades</h3>
+                <h3 className="mb-1 font-display text-[0.62rem] uppercase tracking-[0.18em] text-muted">
+                  Propriedades
+                </h3>
                 <ul className="flex flex-wrap gap-1">
                   {inspected.perks.map((perk) => (
-                    <li key={perk} className="rounded border border-border bg-black/25 px-1.5 py-0.5 text-[0.62rem] text-[#d8c8ab]">
+                    <li
+                      key={perk}
+                      className="rounded border border-border bg-black/25 px-1.5 py-0.5 text-[0.62rem] text-[#d8c8ab]"
+                    >
                       {perk}
                     </li>
                   ))}
@@ -701,10 +991,15 @@ export function CollectionScreen({
             {upgradeQuote && !inspected.broken ? (
               <div className="rounded-lg border border-amber-700/40 bg-amber-950/20 p-2.5 text-xs text-[#d8c8ab]">
                 <p className="font-semibold text-amber-200">
-                  {upgradeQuote.maxed ? "Refino máximo atingido (3/3)" : `Próximo refino: ${upgradeQuote.goldCost} ouro${upgradeQuote.rubyCost ? ` + ${upgradeQuote.rubyCost} rubi` : ""}`}
+                  {upgradeQuote.maxed
+                    ? "Refino máximo atingido (3/3)"
+                    : `Próximo refino: ${upgradeQuote.goldCost} ouro${upgradeQuote.rubyCost ? ` + ${upgradeQuote.rubyCost} rubi` : ""}`}
                 </p>
                 {!upgradeQuote.maxed ? (
-                  <p className="mt-1">Efeito: {signed(upgradeQuote.damageDelta)} ATK · {signed(upgradeQuote.durabilityDelta)} DUR</p>
+                  <p className="mt-1">
+                    Efeito: {signed(upgradeQuote.damageDelta)} ATK ·{" "}
+                    {signed(upgradeQuote.durabilityDelta)} DUR
+                  </p>
                 ) : null}
               </div>
             ) : null}
@@ -715,7 +1010,10 @@ export function CollectionScreen({
                 className="text-xs"
                 onClick={() => {
                   const ok = onToggleFavorite(inspected.id);
-                  if (ok) setNotice(inspected.favorite ? "Proteção removida." : "Espada protegida contra fusão.");
+                  if (ok)
+                    setNotice(
+                      inspected.favorite ? "Proteção removida." : "Espada protegida contra fusão.",
+                    );
                 }}
               >
                 <ShieldCheck size={14} /> {inspected.favorite ? "Desproteger" : "Proteger"}
@@ -751,7 +1049,8 @@ export function CollectionScreen({
         description="Só lâminas íntegras aceitam montagem. A troca devolve a peça anterior ao inventário."
       >
         <ul className="space-y-1.5">
-          {swords.filter((s) => !s.isTraining && !s.broken && s.structuralState !== "broken").length === 0 ? (
+          {swords.filter((s) => !s.isTraining && !s.broken && s.structuralState !== "broken")
+            .length === 0 ? (
             <li className="rounded-lg border border-dashed border-border p-3 text-xs text-muted">
               Nenhuma lâmina íntegra disponível.
             </li>
@@ -770,8 +1069,12 @@ export function CollectionScreen({
                     className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-xs hover:border-amber-600/70"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate font-display font-bold text-amber-50">{sword.design.name}</span>
-                      <span className="block text-[0.62rem] text-muted">{sword.rarity} · Q{sword.quality}</span>
+                      <span className="line-clamp-2 block font-display font-bold break-words text-amber-50">
+                        {sword.design.name}
+                      </span>
+                      <span className="block text-[0.62rem] text-muted">
+                        {sword.rarity} · Q{sword.quality}
+                      </span>
                     </span>
                     <ArrowRight size={15} className="shrink-0 text-amber-300" />
                   </button>

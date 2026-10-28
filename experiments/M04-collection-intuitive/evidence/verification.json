@@ -1,0 +1,121 @@
+{
+  "mission": "M04-collection-intuitive",
+  "date": "2026-10-27",
+  "branch": "antigravity/collection-intuitive-v1",
+  "base": "0806758bea1d011eb0a859745760183a5499d55d",
+  "worktree": "C:\\Users\\phped\\Projetos\\FioForja\\worktree-collection-intuitive-v1",
+  "selectedAlternative": "B",
+  "runtimeFilesChanged": [
+    "src/game/screens/CollectionScreen.tsx",
+    "src/game/collectionSections.ts"
+  ],
+  "testFiles": [
+    "src/game/collectionSections.test.ts"
+  ],
+  "alternatives": {
+    "baseline": {
+      "permanentNavigationHeightPx": 40,
+      "horizontalOverflowPx": {
+        "360x800": 141,
+        "392x819": 109
+      },
+      "sectionsFullyVisible": {
+        "360x800": 4,
+        "392x819": 4
+      },
+      "sectionsHidden": {
+        "360x800": [
+          "Núcleos",
+          "Comparar"
+        ],
+        "392x819": [
+          "Comparar"
+        ]
+      },
+      "swordCardsFullyVisible": 4
+    },
+    "A": {
+      "layout": "grade 3x2 de seis seções",
+      "permanentNavigationHeightPx": 118,
+      "tapTarget": "108x56 px em 360; 119x56 px em 392",
+      "tapsToAnySection": 1,
+      "swordCardsFullyVisible": 4,
+      "thirdCardRowVisiblePx": 38
+    },
+    "B": {
+      "layout": "botão de seção ativa + painel único com seis opções",
+      "permanentNavigationHeightPx": 56,
+      "selectorTarget": "336x56 px em 360; 368x56 px em 392",
+      "panelOptionTarget": "160x64 px em 360; 176x64 px em 392",
+      "tapsToAnySection": 2,
+      "panelHeightPx": 339,
+      "allSixOptionsVisible": true,
+      "swordCardsFullyVisible": 4,
+      "thirdCardRowVisiblePx": 68
+    }
+  },
+  "browser": {
+    "engine": "Playwright 1.62 + Microsoft Edge 156.0.4314.50",
+    "deviceScaleFactor": 1,
+    "viewports": [
+      "360x800",
+      "392x819"
+    ],
+    "fixture": "save sintético; nenhum dado do proprietário",
+    "checks": 70,
+    "pass": 70,
+    "fail": 0,
+    "detailFile": "evidence/checks.json"
+  },
+  "keyResults": {
+    "sixSectionsReachable": true,
+    "activeSectionIdentified": true,
+    "backClosesSectionPanel": true,
+    "escapeClosesSectionPanel": true,
+    "inspectionOpenClose": true,
+    "favoritePersist": true,
+    "installGuard": "DEF 148 -> 156; persiste após reload",
+    "refine": "ATK 312 -> 320; DUR 98 -> 100; persiste após reload",
+    "filterEmptyDistinct": true,
+    "emptyCollectionDistinct": true,
+    "longNamesTwoLines": true,
+    "horizontalOverflowAllSectionsPx": 0,
+    "classicRenderer": true,
+    "weaponDnaRenderer": true,
+    "largeCollection": "14 armas; última alcançável por rolagem; sem overflow horizontal"
+  },
+  "tests": {
+    "discovered": 499,
+    "pass": 492,
+    "skip": 7,
+    "fail": 0,
+    "newTests": 4,
+    "note": "203 testes de scripts + 296 de src/game|src/lib; os 7 SKIP são herdados."
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 40,
+    "changedFilesWarnings": 0
+  },
+  "android": {
+    "apkInstalled": false,
+    "physicalTest": "NOT_PERFORMED"
+  },
+  "git": {
+    "merged": false,
+    "pushed": false,
+    "mainChanged": false
+  },
+  "build": "PASS (npm run build:dev)",
+  "sharedFiles": [
+    {
+      "path": "package.json",
+      "reason": "incluir src/game/collectionSections.test.ts na lista do npm test"
+    },
+    {
+      "path": "docs/specs/collection.md",
+      "reason": "nota da missão na especificação da Coleção"
+    }
+  ]
+}

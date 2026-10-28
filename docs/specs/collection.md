@@ -1,5 +1,7 @@
 # Coleção real — Arsenal, inspeção e montagem
 
+**M04 — Coleção intuitiva (27/10/2026):** na branch `antigravity/collection-intuitive-v1`, base `0806758`, a faixa horizontal de seções foi substituída por um seletor visível com painel único das seis seções. No save de teste, o Arsenal mantém quatro cartões inteiros, nomes em duas linhas e um estado de filtro vazio distinto da coleção vazia. Verificação de navegador 70/70 PASS em 360×800 e 392×819; testes, typecheck e lint aprovados; teste físico no Poco pendente. [Relatório, alternativas e limites](../../experiments/M04-collection-intuitive/README.md).
+
 **Estado:** `[AGENT-IMPLEMENTED]` `[VERIFIED]` no envelope funcional da [revisão Codex 08](../../.project-intelligence/experiments/CODEX08-review.md), base `78945e0` + working tree revisado: testes, navegador e instalação/troca/inspeção no AVD do APK 0.2.2. No Poco, a prova se limita a reinstalação/restauração/navegação com baseline preservado. Candidata à avaliação humana.
 **Fonte de dados:** `save.gallery`, `save.inventory` (componentes, runas, núcleos), `catalog.ts` e `blueprints.ts`.
 

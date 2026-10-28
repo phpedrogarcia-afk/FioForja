@@ -1,0 +1,654 @@
+{
+  "mission": "M04-collection-intuitive",
+  "phase": "baseline",
+  "date": "2026-10-28T00:17:18.181Z",
+  "sizes": {
+    "360x800": {
+      "size": "360x800",
+      "checks": {
+        "sectionsVisibleWithoutScroll": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "sectionsPartiallyVisible": [],
+        "sectionsHidden": [
+          "Núcleos",
+          "Comparar"
+        ],
+        "tablistOverflowPx": 141
+      },
+      "baseline": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentWidth": 360,
+        "horizontalOverflow": 0,
+        "bodyHorizontalOverflow": 0,
+        "headerHeight": 37,
+        "tablist": {
+          "left": 0,
+          "width": 360,
+          "scrollWidth": 501,
+          "overflow": 141,
+          "height": 40,
+          "scrollLeft": 0
+        },
+        "tabs": [
+          {
+            "label": "Arsenal",
+            "left": 12,
+            "right": 83.8,
+            "width": 71.8,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "left": 89.8,
+            "right": 184.1,
+            "width": 94.3,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Peças",
+            "left": 190.1,
+            "right": 249.3,
+            "width": 59.2,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Runas",
+            "left": 255.3,
+            "right": 318.2,
+            "width": 62.9,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "left": 324.2,
+            "right": 397,
+            "width": 72.8,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          },
+          {
+            "label": "Comparar",
+            "left": 403,
+            "right": 488.7,
+            "width": 85.7,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          }
+        ],
+        "fullyVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "centerVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "cardCount": 6,
+        "fullyVisibleCards": 4,
+        "cards": [
+          {
+            "top": 230,
+            "bottom": 413,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Juramento das Cinzas de Valdoria"
+          },
+          {
+            "top": 230,
+            "bottom": 413,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Cimitarra de Damasco"
+          },
+          {
+            "top": 423,
+            "bottom": 605,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Lâmina do Primeiro Inverno"
+          },
+          {
+            "top": 423,
+            "bottom": 605,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Véu de Ferro"
+          },
+          {
+            "top": 615,
+            "bottom": 798,
+            "height": 183,
+            "fullyVisible": false,
+            "title": "Lua Silenciosa"
+          },
+          {
+            "top": 615,
+            "bottom": 798,
+            "height": 183,
+            "fullyVisible": false,
+            "title": "Fragmento da Bigorna"
+          }
+        ],
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalColeçãoA arma é a heroína. Cada peça conta a história da forja.ArsenalCompêndioPeçasRunasNúcleosComparar6 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaLendáriaJuramento das Cinzas de ValdoriaQ97 · Obra-prima⚔ 312 · 🛡 148 · 🌀 162 · 🔨 98LendáriaCimitarra de DamascoQ94 · Magistral⚔ 288 · 🛡 138 · 🌀 96 · 🔨 94RaraLâmina do Primeiro InvernoQ82 · Excelente⚔ 210 · 🛡 150 · 🌀 90 · 🔨 88ComumVéu de FerroQ61 · Boa⚔ 120 · 🛡 140 · 🌀 70 · 🔨 75ÉpicaLua SilenciosaQ90 · Magistral⚔ 232 · 🛡 104 · 🌀 182 · 🔨 90ComumFragmentosFragmento da BigornaQ18 · Defeituosa⚔ 45 · 🛡 30 · 🌀 20 · 🔨 15Lâmina de Teste1. ProjetoGuarda da Fronteira▾2. Metal · consome 1 unidadeFerro · 8 em estoque▾Pronto ",
+        "activeElement": "Coleção",
+        "verticalScroll": {
+          "clientHeight": 800,
+          "scrollHeight": 800,
+          "overflow": 0
+        }
+      },
+      "longName": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "width": 145,
+        "height": 16,
+        "lineHeight": "16px",
+        "clipped": true,
+        "truncateClass": "truncate font-display text-xs font-bold text-amber-50",
+        "visibleText": "Juramento das Cinzas de Valdoria"
+      },
+      "filterEmpty": {
+        "text": "0 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ],
+        "cardCount": 0
+      },
+      "inspection": {
+        "open": true,
+        "title": "Juramento das Cinzas de Valdoria",
+        "titleClipped": false,
+        "description": "Inspeção",
+        "hasPreview": true,
+        "previewSize": {
+          "width": 326,
+          "height": 206
+        },
+        "dialogHeight": 720,
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar"
+      },
+      "inspectionClosed": true,
+      "tab_Peças": {
+        "selected": "Peças",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Runas": {
+        "selected": "Runas",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Núcleos": {
+        "selected": "Núcleos",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Comparar": {
+        "selected": "Comparar",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "empty": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentWidth": 360,
+        "horizontalOverflow": 0,
+        "bodyHorizontalOverflow": 0,
+        "headerHeight": 37,
+        "tablist": {
+          "left": 0,
+          "width": 360,
+          "scrollWidth": 501,
+          "overflow": 141,
+          "height": 40,
+          "scrollLeft": 0
+        },
+        "tabs": [
+          {
+            "label": "Arsenal",
+            "left": 12,
+            "right": 83.8,
+            "width": 71.8,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "left": 89.8,
+            "right": 184.1,
+            "width": 94.3,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Peças",
+            "left": 190.1,
+            "right": 249.3,
+            "width": 59.2,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Runas",
+            "left": 255.3,
+            "right": 318.2,
+            "width": 62.9,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "left": 324.2,
+            "right": 397,
+            "width": 72.8,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          },
+          {
+            "label": "Comparar",
+            "left": 403,
+            "right": 488.7,
+            "width": 85.7,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          }
+        ],
+        "fullyVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "centerVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "cardCount": 0,
+        "fullyVisibleCards": 1,
+        "cards": [
+          {
+            "top": 325,
+            "bottom": 365,
+            "height": 40,
+            "fullyVisible": true,
+            "title": ""
+          }
+        ],
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Sua primeira lâmina espera.Prepare o ferro, aprenda na bigorna e comece o Arsenal.NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 0Forjadas0Melhor Q0Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalColeçãoA arma é a heroína. Cada peça conta a história da forja.ArsenalCompêndioPeçasRunasNúcleosComparar0 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forjar a primeiraLâmina de Teste1. ProjetoGuarda da Fronteira▾2. Metal · consome 1 unidadeFerro · 8 em estoque▾Pronto para forjar.Personalizar espadaAjustes opcionais. O metal é mantido ao trocar de família.Nome da lâminaFamília CanônicaFerro do FerreiroAs primeiras armas da oficina — robustas, simples e leais.Aço do ReinoArmas profissionais para nobres, guardas e cavaleiros.DamascoA própria arte da dobradura cria a beleza ondulada do metal.OrientalPrecisão cirúrgica, geometria esguia e curvatura milimétrica.ÉlficaArma nascida de escultura e harmonia natural — antiga, leve e afiada.RúnicaConstruída para abrigar inscrições profundas de poder primordial.MeteóricaForjada a partir de uma rocha estelar tombada dos céus.ImperialA dignidade máxima da nobreza — poder, ouro e simetria absoluta.Antiga / RelíquiaArmas que desafiam as eras, criadas com segredos perdidos.Perfil da lâminaEspada curtaÁgil e equilibradaEspada longaO clássico europeuClaymoreLarga, de duas mãosAlfangeGume largo de corteSabreCurva e velozKatanaCurvatura elegante e corte devastadorLâmina FoliarCurvas orgânicas e ponta esguiaLâmina AncestralGeometria milenar imponenteCaboCouro RústicoCouro TrançadoLinho MedievalMadeira NobreOsso / MarfimFio DouradoCordão OrientalMadeira ÉlficaCouro de DragãoGuardaCruz ClássicaCurvadaAsasAnel / CestoDisco Oriental (Tsuba)Folha ÉlficaImperial DouradaRúnica AusteraPomoDiscoEsferaLoboCruz / LosangoCrescente OrientalGema ÉlficaCoroa ImperialNó RúnicoComprimentoInscriçãoGravar em runasTreino sem custo · ferro comum1 × Lingote de Ferro BatidoComeçar a fabricarBazar da oficinaLojaTudo o que entra aqui tem uso real na forja ou no Crisol.Categorias🧱 Metais e materiais🧱ComumLingote de Ferro Forjado🪙 50Possui: 8🪙IncomumBarra de Aço Nobre do Reino🪙 140Possui: 4🌊RaraTarugo Dobrado de Damasco🪙 350 · 💎 1Possui: 2⬛ÉpicaBloco de Aço Negro Forjado🪙 450 · 💎 1Possui: 0✨LendáriaLingote de Prata Élfica Sagrada🪙 850 · 💎 3Possui: 0☄️RelíquiaFragmento de Meteorito Celestial🪙 1400 · 💎 5Possui: 1CraftO CrisolQuatro armas. Uma nova oportunidade.EspadasComponentesDoadoras · 0/4Mesma raridade, qualidades livres01Selecionar espada02Selecionar espada03Selecionar espada04Selecionar espadaPossíveis núcleosCatalisador (2)Escolha quatro doadoras da mesma raridade para ver as chances reais.Sem catalisador. Chances provisórias, calculadas pelo motor.Selecione quatro espadas para conferir o custo.Revisar fusão (0/4) As quatro serão consumidas. O resultado é um núcleo para a bigorna.Núcleos no inventário · 1Núcleo de Asterion — Memória de MetalForjar",
+        "activeElement": "Coleção",
+        "verticalScroll": {
+          "clientHeight": 800,
+          "scrollHeight": 800,
+          "overflow": 0
+        }
+      },
+      "large": {
+        "cardCount": 14,
+        "fullyVisibleCards": 4,
+        "verticalScroll": {
+          "clientHeight": 800,
+          "scrollHeight": 800,
+          "overflow": 0
+        },
+        "horizontalOverflow": 0
+      }
+    },
+    "392x819": {
+      "size": "392x819",
+      "checks": {
+        "sectionsVisibleWithoutScroll": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "sectionsPartiallyVisible": [
+          "Núcleos"
+        ],
+        "sectionsHidden": [
+          "Comparar"
+        ],
+        "tablistOverflowPx": 109
+      },
+      "baseline": {
+        "viewport": {
+          "width": 392,
+          "height": 819
+        },
+        "documentWidth": 392,
+        "horizontalOverflow": 0,
+        "bodyHorizontalOverflow": 0,
+        "headerHeight": 37,
+        "tablist": {
+          "left": 0,
+          "width": 392,
+          "scrollWidth": 501,
+          "overflow": 109,
+          "height": 40,
+          "scrollLeft": 0
+        },
+        "tabs": [
+          {
+            "label": "Arsenal",
+            "left": 12,
+            "right": 83.8,
+            "width": 71.8,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "left": 89.8,
+            "right": 184.1,
+            "width": 94.3,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Peças",
+            "left": 190.1,
+            "right": 249.3,
+            "width": 59.2,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Runas",
+            "left": 255.3,
+            "right": 318.2,
+            "width": 62.9,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "left": 324.2,
+            "right": 397,
+            "width": 72.8,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": true
+          },
+          {
+            "label": "Comparar",
+            "left": 403,
+            "right": 488.7,
+            "width": 85.7,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          }
+        ],
+        "fullyVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "centerVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas",
+          "Núcleos"
+        ],
+        "cardCount": 6,
+        "fullyVisibleCards": 4,
+        "cards": [
+          {
+            "top": 230,
+            "bottom": 413,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Juramento das Cinzas de Valdoria"
+          },
+          {
+            "top": 230,
+            "bottom": 413,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Cimitarra de Damasco"
+          },
+          {
+            "top": 423,
+            "bottom": 605,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Lâmina do Primeiro Inverno"
+          },
+          {
+            "top": 423,
+            "bottom": 605,
+            "height": 183,
+            "fullyVisible": true,
+            "title": "Véu de Ferro"
+          },
+          {
+            "top": 615,
+            "bottom": 798,
+            "height": 183,
+            "fullyVisible": false,
+            "title": "Lua Silenciosa"
+          },
+          {
+            "top": 615,
+            "bottom": 798,
+            "height": 183,
+            "fullyVisible": false,
+            "title": "Fragmento da Bigorna"
+          }
+        ],
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalColeçãoA arma é a heroína. Cada peça conta a história da forja.ArsenalCompêndioPeçasRunasNúcleosComparar6 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaLendáriaJuramento das Cinzas de ValdoriaQ97 · Obra-prima⚔ 312 · 🛡 148 · 🌀 162 · 🔨 98LendáriaCimitarra de DamascoQ94 · Magistral⚔ 288 · 🛡 138 · 🌀 96 · 🔨 94RaraLâmina do Primeiro InvernoQ82 · Excelente⚔ 210 · 🛡 150 · 🌀 90 · 🔨 88ComumVéu de FerroQ61 · Boa⚔ 120 · 🛡 140 · 🌀 70 · 🔨 75ÉpicaLua SilenciosaQ90 · Magistral⚔ 232 · 🛡 104 · 🌀 182 · 🔨 90ComumFragmentosFragmento da BigornaQ18 · Defeituosa⚔ 45 · 🛡 30 · 🌀 20 · 🔨 15Lâmina de Teste1. ProjetoGuarda da Fronteira▾2. Metal · consome 1 unidadeFerro · 8 em estoque▾Pronto ",
+        "activeElement": "Coleção",
+        "verticalScroll": {
+          "clientHeight": 819,
+          "scrollHeight": 819,
+          "overflow": 0
+        }
+      },
+      "longName": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "width": 161,
+        "height": 16,
+        "lineHeight": "16px",
+        "clipped": true,
+        "truncateClass": "truncate font-display text-xs font-bold text-amber-50",
+        "visibleText": "Juramento das Cinzas de Valdoria"
+      },
+      "filterEmpty": {
+        "text": "0 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ],
+        "cardCount": 0
+      },
+      "inspection": {
+        "open": true,
+        "title": "Juramento das Cinzas de Valdoria",
+        "titleClipped": false,
+        "description": "Inspeção",
+        "hasPreview": true,
+        "previewSize": {
+          "width": 358,
+          "height": 206
+        },
+        "dialogHeight": 737,
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar"
+      },
+      "inspectionClosed": true,
+      "tab_Peças": {
+        "selected": "Peças",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Runas": {
+        "selected": "Runas",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Núcleos": {
+        "selected": "Núcleos",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "tab_Comparar": {
+        "selected": "Comparar",
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Lendária · Qualidade 97Juramento das Cinzas de ValdoriaArsenal NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 6Forjadas97Melhor Q1Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalCo",
+        "documentOverflow": 0
+      },
+      "empty": {
+        "viewport": {
+          "width": 392,
+          "height": 819
+        },
+        "documentWidth": 392,
+        "horizontalOverflow": 0,
+        "bodyHorizontalOverflow": 0,
+        "headerHeight": 37,
+        "tablist": {
+          "left": 0,
+          "width": 392,
+          "scrollWidth": 501,
+          "overflow": 109,
+          "height": 40,
+          "scrollLeft": 0
+        },
+        "tabs": [
+          {
+            "label": "Arsenal",
+            "left": 12,
+            "right": 83.8,
+            "width": 71.8,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "left": 89.8,
+            "right": 184.1,
+            "width": 94.3,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Peças",
+            "left": 190.1,
+            "right": 249.3,
+            "width": 59.2,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Runas",
+            "left": 255.3,
+            "right": 318.2,
+            "width": 62.9,
+            "height": 36,
+            "fullyVisible": true,
+            "centerVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "left": 324.2,
+            "right": 397,
+            "width": 72.8,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": true
+          },
+          {
+            "label": "Comparar",
+            "left": 403,
+            "right": 488.7,
+            "width": 85.7,
+            "height": 36,
+            "fullyVisible": false,
+            "centerVisible": false
+          }
+        ],
+        "fullyVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas"
+        ],
+        "centerVisibleTabs": [
+          "Arsenal",
+          "Compêndio",
+          "Peças",
+          "Runas",
+          "Núcleos"
+        ],
+        "cardCount": 0,
+        "fullyVisibleCards": 1,
+        "cards": [
+          {
+            "top": 325,
+            "bottom": 365,
+            "height": 40,
+            "fullyVisible": true,
+            "title": ""
+          }
+        ],
+        "text": "Sua oficinaO troféu nascenas suas mãos.The weapon is the hero.Sua primeira lâmina espera.Prepare o ferro, aprenda na bigorna e comece o Arsenal.NÚCLEO AGUARDANDOForje Núcleo de AsterionO Crisol já fez a parte dele. A espada só nasce com o seu martelo.Preparar na bigorna 0Forjadas0Melhor Q0Obras-primasNo almoxarifadoIr à Loja🧱 8 ferro⚙️ 4 aço🔮 2 catalisador(es)🧩 12 fragmento(s)⚒️ 2 peça(s)ForjarProjeto e bigornaCrisol4 doadoras → núcleoLojaMetais e peçasEncomendas3 em abertoAtivar somVisual: ClássicoO ArsenalColeçãoA arma é a heroína. Cada peça conta a história da forja.ArsenalCompêndioPeçasRunasNúcleosComparar0 arma(s) no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forjar a primeiraLâmina de Teste1. ProjetoGuarda da Fronteira▾2. Metal · consome 1 unidadeFerro · 8 em estoque▾Pronto para forjar.Personalizar espadaAjustes opcionais. O metal é mantido ao trocar de família.Nome da lâminaFamília CanônicaFerro do FerreiroAs primeiras armas da oficina — robustas, simples e leais.Aço do ReinoArmas profissionais para nobres, guardas e cavaleiros.DamascoA própria arte da dobradura cria a beleza ondulada do metal.OrientalPrecisão cirúrgica, geometria esguia e curvatura milimétrica.ÉlficaArma nascida de escultura e harmonia natural — antiga, leve e afiada.RúnicaConstruída para abrigar inscrições profundas de poder primordial.MeteóricaForjada a partir de uma rocha estelar tombada dos céus.ImperialA dignidade máxima da nobreza — poder, ouro e simetria absoluta.Antiga / RelíquiaArmas que desafiam as eras, criadas com segredos perdidos.Perfil da lâminaEspada curtaÁgil e equilibradaEspada longaO clássico europeuClaymoreLarga, de duas mãosAlfangeGume largo de corteSabreCurva e velozKatanaCurvatura elegante e corte devastadorLâmina FoliarCurvas orgânicas e ponta esguiaLâmina AncestralGeometria milenar imponenteCaboCouro RústicoCouro TrançadoLinho MedievalMadeira NobreOsso / MarfimFio DouradoCordão OrientalMadeira ÉlficaCouro de DragãoGuardaCruz ClássicaCurvadaAsasAnel / CestoDisco Oriental (Tsuba)Folha ÉlficaImperial DouradaRúnica AusteraPomoDiscoEsferaLoboCruz / LosangoCrescente OrientalGema ÉlficaCoroa ImperialNó RúnicoComprimentoInscriçãoGravar em runasTreino sem custo · ferro comum1 × Lingote de Ferro BatidoComeçar a fabricarBazar da oficinaLojaTudo o que entra aqui tem uso real na forja ou no Crisol.Categorias🧱 Metais e materiais🧱ComumLingote de Ferro Forjado🪙 50Possui: 8🪙IncomumBarra de Aço Nobre do Reino🪙 140Possui: 4🌊RaraTarugo Dobrado de Damasco🪙 350 · 💎 1Possui: 2⬛ÉpicaBloco de Aço Negro Forjado🪙 450 · 💎 1Possui: 0✨LendáriaLingote de Prata Élfica Sagrada🪙 850 · 💎 3Possui: 0☄️RelíquiaFragmento de Meteorito Celestial🪙 1400 · 💎 5Possui: 1CraftO CrisolQuatro armas. Uma nova oportunidade.EspadasComponentesDoadoras · 0/4Mesma raridade, qualidades livres01Selecionar espada02Selecionar espada03Selecionar espada04Selecionar espadaPossíveis núcleosCatalisador (2)Escolha quatro doadoras da mesma raridade para ver as chances reais.Sem catalisador. Chances provisórias, calculadas pelo motor.Selecione quatro espadas para conferir o custo.Revisar fusão (0/4) As quatro serão consumidas. O resultado é um núcleo para a bigorna.Núcleos no inventário · 1Núcleo de Asterion — Memória de MetalForjar",
+        "activeElement": "Coleção",
+        "verticalScroll": {
+          "clientHeight": 819,
+          "scrollHeight": 819,
+          "overflow": 0
+        }
+      },
+      "large": {
+        "cardCount": 14,
+        "fullyVisibleCards": 4,
+        "verticalScroll": {
+          "clientHeight": 819,
+          "scrollHeight": 819,
+          "overflow": 0
+        },
+        "horizontalOverflow": 0
+      }
+    }
+  },
+  "notes": [
+    "Métricas de cartões usam a área rolável da Coleção (topo 37 px, base viewport-69 px), não a viewport inteira.",
+    "Abas de outras telas ocultas foram removidas das contagens; apenas a faixa da Coleção é considerada."
+  ]
+}

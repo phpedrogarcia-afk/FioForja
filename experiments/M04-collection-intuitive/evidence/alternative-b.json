@@ -1,0 +1,261 @@
+{
+  "mission": "M04-collection-intuitive",
+  "phase": "alternative-B",
+  "date": "2026-10-28T00:23:25.703Z",
+  "sizes": {
+    "360x800": {
+      "size": "360x800",
+      "arsenal": {
+        "scroller": {
+          "top": 37,
+          "bottom": 731,
+          "height": 694
+        },
+        "cards": [
+          {
+            "title": "Juramento das Cinzas de Valdoria",
+            "top": 246,
+            "bottom": 445,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Cimitarra de Damasco",
+            "top": 246,
+            "bottom": 445,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lâmina do Primeiro Inverno",
+            "top": 455,
+            "bottom": 653,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Véu de Ferro",
+            "top": 455,
+            "bottom": 653,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lua Silenciosa",
+            "top": 663,
+            "bottom": 862,
+            "fullyVisible": false,
+            "nameVisible": false
+          },
+          {
+            "title": "Fragmento da Bigorna",
+            "top": 663,
+            "bottom": 862,
+            "fullyVisible": false,
+            "nameVisible": false
+          }
+        ],
+        "fullyVisibleCards": 4,
+        "namesVisibleCards": 4
+      },
+      "documentOverflow": 0,
+      "navigation": {
+        "kind": "selector",
+        "label": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "text": "SEÇÃO Arsenal",
+        "height": 56,
+        "expandedBefore": "false",
+        "tapsToSection": 2,
+        "expandedOpen": "true"
+      },
+      "panel": {
+        "open": true,
+        "top": 461,
+        "height": 339,
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true,
+        "selected": "Arsenal"
+      },
+      "back": {
+        "panelOpen": false,
+        "collectionVisible": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "runasReached": {
+        "sectionVisible": true,
+        "selectorText": "SEÇÃO Runas",
+        "panelOpen": false
+      }
+    },
+    "392x819": {
+      "size": "392x819",
+      "arsenal": {
+        "scroller": {
+          "top": 37,
+          "bottom": 750,
+          "height": 713
+        },
+        "cards": [
+          {
+            "title": "Juramento das Cinzas de Valdoria",
+            "top": 246,
+            "bottom": 445,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Cimitarra de Damasco",
+            "top": 246,
+            "bottom": 445,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lâmina do Primeiro Inverno",
+            "top": 455,
+            "bottom": 653,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Véu de Ferro",
+            "top": 455,
+            "bottom": 653,
+            "fullyVisible": true,
+            "nameVisible": true
+          },
+          {
+            "title": "Lua Silenciosa",
+            "top": 663,
+            "bottom": 846,
+            "fullyVisible": false,
+            "nameVisible": false
+          },
+          {
+            "title": "Fragmento da Bigorna",
+            "top": 663,
+            "bottom": 846,
+            "fullyVisible": false,
+            "nameVisible": false
+          }
+        ],
+        "fullyVisibleCards": 4,
+        "namesVisibleCards": 4
+      },
+      "documentOverflow": 0,
+      "navigation": {
+        "kind": "selector",
+        "label": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "text": "SEÇÃO Arsenal",
+        "height": 56,
+        "expandedBefore": "false",
+        "tapsToSection": 2,
+        "expandedOpen": "true"
+      },
+      "panel": {
+        "open": true,
+        "top": 480,
+        "height": 339,
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true,
+        "selected": "Arsenal"
+      },
+      "back": {
+        "panelOpen": false,
+        "collectionVisible": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "runasReached": {
+        "sectionVisible": true,
+        "selectorText": "SEÇÃO Runas",
+        "panelOpen": false
+      }
+    }
+  }
+}

@@ -1,0 +1,1624 @@
+{
+  "mission": "M04-collection-intuitive",
+  "date": "2026-10-28T00:38:10.054Z",
+  "checks": [
+    {
+      "name": "360x800: seletor visível com a seção ativa",
+      "pass": true,
+      "detail": {
+        "count": 1,
+        "text": "SEÇÃO Arsenal",
+        "ariaLabel": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "expanded": "false",
+        "box": {
+          "width": 336,
+          "height": 56
+        },
+        "visible": true
+      }
+    },
+    {
+      "name": "360x800: alvo do seletor >= 56 px",
+      "pass": true,
+      "detail": {
+        "width": 336,
+        "height": 56
+      }
+    },
+    {
+      "name": "360x800: faixa horizontal removida",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "360x800: Arsenal com 6 armas e 4 cartões inteiros",
+      "pass": true,
+      "detail": {
+        "count": 6,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco",
+          "Lâmina do Primeiro Inverno",
+          "Véu de Ferro",
+          "Lua Silenciosa",
+          "Fragmento da Bigorna"
+        ]
+      }
+    },
+    {
+      "name": "360x800: resumo do Arsenal correto",
+      "pass": true,
+      "detail": "6 armas no Arsenal"
+    },
+    {
+      "name": "360x800: sem rolagem horizontal no Arsenal",
+      "pass": true,
+      "detail": {
+        "doc": 0,
+        "section": 0
+      }
+    },
+    {
+      "name": "360x800: nome longo legível em duas linhas",
+      "pass": true,
+      "detail": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "clientHeight": 32,
+        "scrollHeight": 32,
+        "clientWidth": 145,
+        "scrollWidth": 145,
+        "title": "Juramento das Cinzas de Valdoria"
+      }
+    },
+    {
+      "name": "360x800: seis seções no painel, todas visíveis",
+      "pass": true,
+      "detail": {
+        "title": "Seções da Coleção",
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true
+      }
+    },
+    {
+      "name": "360x800: áreas de toque do painel >= 56 px",
+      "pass": true,
+      "detail": [
+        {
+          "label": "Arsenal",
+          "checked": true,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Compêndio",
+          "checked": false,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Peças",
+          "checked": false,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Runas",
+          "checked": false,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Núcleos",
+          "checked": false,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Comparar",
+          "checked": false,
+          "width": 160,
+          "height": 64,
+          "fullyVisible": true
+        }
+      ]
+    },
+    {
+      "name": "360x800: Escape fecha o seletor e devolve o foco",
+      "pass": true,
+      "detail": {
+        "closed": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      }
+    },
+    {
+      "name": "360x800: Voltar fecha o seletor sem sair da Coleção",
+      "pass": true,
+      "detail": {
+        "closed": true,
+        "collection": 1,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      }
+    },
+    {
+      "name": "360x800: Runas alcançada em dois toques e identificada",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Runas",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ᚠ\nFehu — Runa da Brasa\n\nFogo · Rara\n\nO aço perde calor mais lentamente na bigorna.\n\nPeças soltas: 0\n\nᚢ\nUruz — Runa da Força Bruta\n\nTerra · Incomum\n\nAumenta o impacto e a deformação plástica dos golpes.\n\nPeças soltas: 0\n\nᚦ\nThurisaz — Runa do Trovão\n\nFogo · Épica\n\nDispara centelhas que aumentam a precisão do sweet spot.\n\nPeças soltas: 0\n\nᚨ\nAnsuz — Runa dos Reis\n\nÉlfica · Lendária\n\nConcede elegância soberana e alinhamento do gume.\n\nPeças soltas: 0\n\nᛁ\nIsa — Runa do Gelo Estático\n\nGelo · Rara\n\nEstabiliza o banho de têmpera impedindo empenamentos.\n\nPeças soltas: 0\n\nᛊ\nSowilo — Runa do Raio Solar\n\nVento · Lendária\n\nInfunde a lâmina com velocidade e corte sem atrito.\n\nPeças soltas: 0\n\nᛏ\nTiwaz — Runa da Vitória\n\nAntiga · Relíquia\n\nIntegridade inquebrável mesmo sob golpes extremos.\n\nPeças soltas: 0\n\nINSTALAR UMA RUNA NUMA ESPADA"
+      }
+    },
+    {
+      "name": "360x800: Núcleos alcançado e com núcleo real",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Núcleos",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ÉPICA\nNúcleo de Asterion — Memória de Metal\n+8% Q\n\nAfinidade ofensiva predominante\n\nATK\n\n+18\n\nDEF\n\n+6\n\nAGI\n\n+9\n\nDUR\n\n+4\n\nLuz Azul Celeste · Dureza Astral · Origem: 4 doadoras consumidas.\n\nAinda precisa ser forjado na bigorna.\n\nPREPARAR NA FORJA"
+      }
+    },
+    {
+      "name": "360x800: Comparar alcançado",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Comparar",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        }
+      }
+    },
+    {
+      "name": "360x800: comparação calcula diferenças por atributo",
+      "pass": true,
+      "detail": {
+        "rows": [
+          [
+            "atk",
+            "312",
+            "210",
+            "-102"
+          ],
+          [
+            "def",
+            "148",
+            "150",
+            "+2"
+          ],
+          [
+            "agi",
+            "162",
+            "90",
+            "-72"
+          ],
+          [
+            "dur",
+            "98",
+            "88",
+            "-10"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "360x800: Peças lista componentes soltos",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Peças",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "GUARDAS · 1\n🪽\n\nGuarda de Asas de Valdoria\n\nRara · DEFENSE +8 · AGILITY +4\n\nINSTALAR\nCABOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nPOMOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nRUNAS · 1\nᚠ\n\nPedra Rúnica Fehu\n\nRara · DAMAGE +6\n\nINSTALAR\nCOMPRAR PEÇAS NA LOJA"
+      }
+    },
+    {
+      "name": "360x800: Compêndio acessível com os oito projetos",
+      "pass": true,
+      "detail": {
+        "section": 1,
+        "articles": 8
+      }
+    },
+    {
+      "name": "360x800: filtro sem resultado não finge coleção vazia",
+      "pass": true,
+      "detail": {
+        "text": "0 de 6 armas · RelíquiaTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma arma com raridade Relíquia.Você tem 6 armas no Arsenal, mas nenhuma corresponde a este filtro.Mostrar todas as armas",
+        "forjar": false,
+        "summary": "0 de 6 armas · Relíquia"
+      }
+    },
+    {
+      "name": "360x800: ação limpa o filtro e restaura as armas",
+      "pass": true,
+      "detail": {
+        "value": "Todas",
+        "cards": {
+          "count": 6,
+          "fullyVisible": 4,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco",
+            "Lâmina do Primeiro Inverno",
+            "Véu de Ferro",
+            "Lua Silenciosa",
+            "Fragmento da Bigorna"
+          ]
+        }
+      }
+    },
+    {
+      "name": "360x800: filtro com resultado mantém total e nomes",
+      "pass": true,
+      "detail": {
+        "cards": {
+          "count": 2,
+          "fullyVisible": 2,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco"
+          ]
+        },
+        "summary": "2 de 6 armas · Lendária"
+      }
+    },
+    {
+      "name": "360x800: inspeção mostra imagem, nome e atributos reais",
+      "pass": true,
+      "detail": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      }
+    },
+    {
+      "name": "360x800: Escape fecha a inspeção",
+      "pass": true,
+      "detail": {
+        "closed": true
+      }
+    },
+    {
+      "name": "360x800: Proteger confirma dentro da inspeção",
+      "pass": true,
+      "detail": "Espada protegida contra fusão."
+    },
+    {
+      "name": "360x800: cartão protegido identificado",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "360x800: proteção persiste após recarregar",
+      "pass": true,
+      "detail": {
+        "icon": 1,
+        "buttons": "riedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar"
+      }
+    },
+    {
+      "name": "360x800: seleção de peça disponível para a guarda",
+      "pass": true,
+      "detail": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPo"
+    },
+    {
+      "name": "360x800: instalar guarda recalcula atributos e confirma",
+      "pass": true,
+      "detail": {
+        "before": "148",
+        "after": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": "Peça instalada e atributos recalculados."
+      }
+    },
+    {
+      "name": "360x800: montagem persiste após recarregar",
+      "pass": true,
+      "detail": {
+        "before": "148",
+        "after": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        }
+      }
+    },
+    {
+      "name": "360x800: refino recalcula ATK/DUR e confirma",
+      "pass": true,
+      "detail": {
+        "before": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "after": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Lâmina refinada na bancada."
+      }
+    },
+    {
+      "name": "360x800: Desproteger confirma",
+      "pass": true,
+      "detail": "Proteção removida."
+    },
+    {
+      "name": "360x800: desfavoritar e refino persistem após recarregar",
+      "pass": true,
+      "detail": {
+        "icons": 0,
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        }
+      }
+    },
+    {
+      "name": "360x800: coleção vazia pede a primeira forja",
+      "pass": true,
+      "detail": {
+        "text": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ]
+      }
+    },
+    {
+      "name": "360x800: coleção vazia com filtro continua sendo coleção vazia",
+      "pass": true,
+      "detail": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira"
+    },
+    {
+      "name": "360x800: coleção maior rola até a última arma sem overflow horizontal",
+      "pass": true,
+      "detail": {
+        "lastVisible": true,
+        "lastTitle": "Véu de Ferro 14",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "360x800: Coleção abre no renderer DNA",
+      "pass": true,
+      "detail": {
+        "control": "SeçãoArsenal",
+        "canvases": 6,
+        "overflow": 0
+      }
+    },
+    {
+      "name": "392x819: seletor visível com a seção ativa",
+      "pass": true,
+      "detail": {
+        "count": 1,
+        "text": "SEÇÃO Arsenal",
+        "ariaLabel": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "expanded": "false",
+        "box": {
+          "width": 368,
+          "height": 56
+        },
+        "visible": true
+      }
+    },
+    {
+      "name": "392x819: alvo do seletor >= 56 px",
+      "pass": true,
+      "detail": {
+        "width": 368,
+        "height": 56
+      }
+    },
+    {
+      "name": "392x819: faixa horizontal removida",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "392x819: Arsenal com 6 armas e 4 cartões inteiros",
+      "pass": true,
+      "detail": {
+        "count": 6,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco",
+          "Lâmina do Primeiro Inverno",
+          "Véu de Ferro",
+          "Lua Silenciosa",
+          "Fragmento da Bigorna"
+        ]
+      }
+    },
+    {
+      "name": "392x819: resumo do Arsenal correto",
+      "pass": true,
+      "detail": "6 armas no Arsenal"
+    },
+    {
+      "name": "392x819: sem rolagem horizontal no Arsenal",
+      "pass": true,
+      "detail": {
+        "doc": 0,
+        "section": 0
+      }
+    },
+    {
+      "name": "392x819: nome longo legível em duas linhas",
+      "pass": true,
+      "detail": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "clientHeight": 32,
+        "scrollHeight": 32,
+        "clientWidth": 161,
+        "scrollWidth": 161,
+        "title": "Juramento das Cinzas de Valdoria"
+      }
+    },
+    {
+      "name": "392x819: seis seções no painel, todas visíveis",
+      "pass": true,
+      "detail": {
+        "title": "Seções da Coleção",
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true
+      }
+    },
+    {
+      "name": "392x819: áreas de toque do painel >= 56 px",
+      "pass": true,
+      "detail": [
+        {
+          "label": "Arsenal",
+          "checked": true,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Compêndio",
+          "checked": false,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Peças",
+          "checked": false,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Runas",
+          "checked": false,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Núcleos",
+          "checked": false,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        },
+        {
+          "label": "Comparar",
+          "checked": false,
+          "width": 176,
+          "height": 64,
+          "fullyVisible": true
+        }
+      ]
+    },
+    {
+      "name": "392x819: Escape fecha o seletor e devolve o foco",
+      "pass": true,
+      "detail": {
+        "closed": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      }
+    },
+    {
+      "name": "392x819: Voltar fecha o seletor sem sair da Coleção",
+      "pass": true,
+      "detail": {
+        "closed": true,
+        "collection": 1,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      }
+    },
+    {
+      "name": "392x819: Runas alcançada em dois toques e identificada",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Runas",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ᚠ\nFehu — Runa da Brasa\n\nFogo · Rara\n\nO aço perde calor mais lentamente na bigorna.\n\nPeças soltas: 0\n\nᚢ\nUruz — Runa da Força Bruta\n\nTerra · Incomum\n\nAumenta o impacto e a deformação plástica dos golpes.\n\nPeças soltas: 0\n\nᚦ\nThurisaz — Runa do Trovão\n\nFogo · Épica\n\nDispara centelhas que aumentam a precisão do sweet spot.\n\nPeças soltas: 0\n\nᚨ\nAnsuz — Runa dos Reis\n\nÉlfica · Lendária\n\nConcede elegância soberana e alinhamento do gume.\n\nPeças soltas: 0\n\nᛁ\nIsa — Runa do Gelo Estático\n\nGelo · Rara\n\nEstabiliza o banho de têmpera impedindo empenamentos.\n\nPeças soltas: 0\n\nᛊ\nSowilo — Runa do Raio Solar\n\nVento · Lendária\n\nInfunde a lâmina com velocidade e corte sem atrito.\n\nPeças soltas: 0\n\nᛏ\nTiwaz — Runa da Vitória\n\nAntiga · Relíquia\n\nIntegridade inquebrável mesmo sob golpes extremos.\n\nPeças soltas: 0\n\nINSTALAR UMA RUNA NUMA ESPADA"
+      }
+    },
+    {
+      "name": "392x819: Núcleos alcançado e com núcleo real",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Núcleos",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ÉPICA\nNúcleo de Asterion — Memória de Metal\n+8% Q\n\nAfinidade ofensiva predominante\n\nATK\n\n+18\n\nDEF\n\n+6\n\nAGI\n\n+9\n\nDUR\n\n+4\n\nLuz Azul Celeste · Dureza Astral · Origem: 4 doadoras consumidas.\n\nAinda precisa ser forjado na bigorna.\n\nPREPARAR NA FORJA"
+      }
+    },
+    {
+      "name": "392x819: Comparar alcançado",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Comparar",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        }
+      }
+    },
+    {
+      "name": "392x819: comparação calcula diferenças por atributo",
+      "pass": true,
+      "detail": {
+        "rows": [
+          [
+            "atk",
+            "312",
+            "210",
+            "-102"
+          ],
+          [
+            "def",
+            "148",
+            "150",
+            "+2"
+          ],
+          [
+            "agi",
+            "162",
+            "90",
+            "-72"
+          ],
+          [
+            "dur",
+            "98",
+            "88",
+            "-10"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "392x819: Peças lista componentes soltos",
+      "pass": true,
+      "detail": {
+        "selector": "SEÇÃO Peças",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "GUARDAS · 1\n🪽\n\nGuarda de Asas de Valdoria\n\nRara · DEFENSE +8 · AGILITY +4\n\nINSTALAR\nCABOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nPOMOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nRUNAS · 1\nᚠ\n\nPedra Rúnica Fehu\n\nRara · DAMAGE +6\n\nINSTALAR\nCOMPRAR PEÇAS NA LOJA"
+      }
+    },
+    {
+      "name": "392x819: Compêndio acessível com os oito projetos",
+      "pass": true,
+      "detail": {
+        "section": 1,
+        "articles": 8
+      }
+    },
+    {
+      "name": "392x819: filtro sem resultado não finge coleção vazia",
+      "pass": true,
+      "detail": {
+        "text": "0 de 6 armas · RelíquiaTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma arma com raridade Relíquia.Você tem 6 armas no Arsenal, mas nenhuma corresponde a este filtro.Mostrar todas as armas",
+        "forjar": false,
+        "summary": "0 de 6 armas · Relíquia"
+      }
+    },
+    {
+      "name": "392x819: ação limpa o filtro e restaura as armas",
+      "pass": true,
+      "detail": {
+        "value": "Todas",
+        "cards": {
+          "count": 6,
+          "fullyVisible": 4,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco",
+            "Lâmina do Primeiro Inverno",
+            "Véu de Ferro",
+            "Lua Silenciosa",
+            "Fragmento da Bigorna"
+          ]
+        }
+      }
+    },
+    {
+      "name": "392x819: filtro com resultado mantém total e nomes",
+      "pass": true,
+      "detail": {
+        "cards": {
+          "count": 2,
+          "fullyVisible": 2,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco"
+          ]
+        },
+        "summary": "2 de 6 armas · Lendária"
+      }
+    },
+    {
+      "name": "392x819: inspeção mostra imagem, nome e atributos reais",
+      "pass": true,
+      "detail": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      }
+    },
+    {
+      "name": "392x819: Escape fecha a inspeção",
+      "pass": true,
+      "detail": {
+        "closed": true
+      }
+    },
+    {
+      "name": "392x819: Proteger confirma dentro da inspeção",
+      "pass": true,
+      "detail": "Espada protegida contra fusão."
+    },
+    {
+      "name": "392x819: cartão protegido identificado",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "392x819: proteção persiste após recarregar",
+      "pass": true,
+      "detail": {
+        "icon": 1,
+        "buttons": "riedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar"
+      }
+    },
+    {
+      "name": "392x819: seleção de peça disponível para a guarda",
+      "pass": true,
+      "detail": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPo"
+    },
+    {
+      "name": "392x819: instalar guarda recalcula atributos e confirma",
+      "pass": true,
+      "detail": {
+        "before": "148",
+        "after": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": "Peça instalada e atributos recalculados."
+      }
+    },
+    {
+      "name": "392x819: montagem persiste após recarregar",
+      "pass": true,
+      "detail": {
+        "before": "148",
+        "after": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        }
+      }
+    },
+    {
+      "name": "392x819: refino recalcula ATK/DUR e confirma",
+      "pass": true,
+      "detail": {
+        "before": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "after": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Lâmina refinada na bancada."
+      }
+    },
+    {
+      "name": "392x819: Desproteger confirma",
+      "pass": true,
+      "detail": "Proteção removida."
+    },
+    {
+      "name": "392x819: desfavoritar e refino persistem após recarregar",
+      "pass": true,
+      "detail": {
+        "icons": 0,
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        }
+      }
+    },
+    {
+      "name": "392x819: coleção vazia pede a primeira forja",
+      "pass": true,
+      "detail": {
+        "text": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ]
+      }
+    },
+    {
+      "name": "392x819: coleção vazia com filtro continua sendo coleção vazia",
+      "pass": true,
+      "detail": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira"
+    },
+    {
+      "name": "392x819: coleção maior rola até a última arma sem overflow horizontal",
+      "pass": true,
+      "detail": {
+        "lastVisible": true,
+        "lastTitle": "Véu de Ferro 14",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "392x819: Coleção abre no renderer DNA",
+      "pass": true,
+      "detail": {
+        "control": "SeçãoArsenal",
+        "canvases": 6,
+        "overflow": 0
+      }
+    }
+  ],
+  "sizes": {
+    "360x800": {
+      "size": "360x800",
+      "selector": {
+        "count": 1,
+        "text": "SEÇÃO Arsenal",
+        "ariaLabel": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "expanded": "false",
+        "box": {
+          "width": 336,
+          "height": 56
+        },
+        "visible": true
+      },
+      "arsenal": {
+        "count": 6,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco",
+          "Lâmina do Primeiro Inverno",
+          "Véu de Ferro",
+          "Lua Silenciosa",
+          "Fragmento da Bigorna"
+        ]
+      },
+      "countLabel": "6 armas no Arsenal",
+      "overflow": {
+        "doc": 0,
+        "section": 0
+      },
+      "longName": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "clientHeight": 32,
+        "scrollHeight": 32,
+        "clientWidth": 145,
+        "scrollWidth": 145,
+        "title": "Juramento das Cinzas de Valdoria"
+      },
+      "panel": {
+        "title": "Seções da Coleção",
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 160,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true
+      },
+      "escape": {
+        "closed": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "back": {
+        "closed": true,
+        "collection": 1,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "runas": {
+        "selector": "SEÇÃO Runas",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ᚠ\nFehu — Runa da Brasa\n\nFogo · Rara\n\nO aço perde calor mais lentamente na bigorna.\n\nPeças soltas: 0\n\nᚢ\nUruz — Runa da Força Bruta\n\nTerra · Incomum\n\nAumenta o impacto e a deformação plástica dos golpes.\n\nPeças soltas: 0\n\nᚦ\nThurisaz — Runa do Trovão\n\nFogo · Épica\n\nDispara centelhas que aumentam a precisão do sweet spot.\n\nPeças soltas: 0\n\nᚨ\nAnsuz — Runa dos Reis\n\nÉlfica · Lendária\n\nConcede elegância soberana e alinhamento do gume.\n\nPeças soltas: 0\n\nᛁ\nIsa — Runa do Gelo Estático\n\nGelo · Rara\n\nEstabiliza o banho de têmpera impedindo empenamentos.\n\nPeças soltas: 0\n\nᛊ\nSowilo — Runa do Raio Solar\n\nVento · Lendária\n\nInfunde a lâmina com velocidade e corte sem atrito.\n\nPeças soltas: 0\n\nᛏ\nTiwaz — Runa da Vitória\n\nAntiga · Relíquia\n\nIntegridade inquebrável mesmo sob golpes extremos.\n\nPeças soltas: 0\n\nINSTALAR UMA RUNA NUMA ESPADA"
+      },
+      "nucleos": {
+        "selector": "SEÇÃO Núcleos",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ÉPICA\nNúcleo de Asterion — Memória de Metal\n+8% Q\n\nAfinidade ofensiva predominante\n\nATK\n\n+18\n\nDEF\n\n+6\n\nAGI\n\n+9\n\nDUR\n\n+4\n\nLuz Azul Celeste · Dureza Astral · Origem: 4 doadoras consumidas.\n\nAinda precisa ser forjado na bigorna.\n\nPREPARAR NA FORJA"
+      },
+      "comparar": {
+        "selector": "SEÇÃO Comparar",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        }
+      },
+      "comparison": {
+        "rows": [
+          [
+            "atk",
+            "312",
+            "210",
+            "-102"
+          ],
+          [
+            "def",
+            "148",
+            "150",
+            "+2"
+          ],
+          [
+            "agi",
+            "162",
+            "90",
+            "-72"
+          ],
+          [
+            "dur",
+            "98",
+            "88",
+            "-10"
+          ]
+        ]
+      },
+      "pecas": {
+        "selector": "SEÇÃO Peças",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "GUARDAS · 1\n🪽\n\nGuarda de Asas de Valdoria\n\nRara · DEFENSE +8 · AGILITY +4\n\nINSTALAR\nCABOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nPOMOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nRUNAS · 1\nᚠ\n\nPedra Rúnica Fehu\n\nRara · DAMAGE +6\n\nINSTALAR\nCOMPRAR PEÇAS NA LOJA"
+      },
+      "compendio": {
+        "selector": "SEÇÃO Compêndio",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "articles": 8,
+        "text": "Guarda da Fronteira (Medieval Comum)\n\nFerro · Espada longa\n\nPRONTA\n\nProjeto inicial de oficina — sempre disponível.\n\n🧱 Lingote de Ferro Batido: 8 em estoque\n\nCimitarra de Damasco\n\nDamasco · Alfange\n\nFABRICADA\n\nRequer: Concluir 3 forjas na oficina (ou receita no Bazar).\n\n🌊 Tarugo Dobrado de Damasco: 2 em estoque\n\nLua Silenciosa (Katana)\n\nAço Negro · Katana\n\nFABRICADA\n\nRequer: Forjar 1 Obra-prima (Rank S) ou 5 armas.\n\n⬛ Aço Negro dos Abismos: 0 em estoque\n\nFolha de Aereth (Élfica)\n\nPrata Élfica · Lâmina Foliar\n\nBLOQUEADA\n\nRequer: Concluir 7 forjas na oficina (ou segredo élfico no Bazar).\n\n🪙 Lingote de Prata Élfica: 0 em estoque\n\nQueda de Asterion (Meteórica)\n\nMeteorito · Sabre\n\nDOMINADA\n\nRequer: 2 Obras-primas (Rank S) ou 1 Lendária forjada + posse de metal meteórico.\n\n✨ Fragmento de Minério Estelar: 1 em estoque\n\nJuramento de Ferro (Rúnica)\n\nFerro · Claymore\n\nPRONTA\n\nRequer: Concluir 4 forjas na oficina.\n\n🧱 Lingote de Ferro Batido: 8 em estoque\n\nSol Imperial\n\nAço Nobre · Espada longa\n\nBLOQUEADA\n\nRequer: Acumular 2.500 moedas de ouro em valor de armas forjadas.\n\n🪙 Lingote de Aço Forjado: 4 em estoque\n\nCinzas Ancestrais (Relíquia)\n\nLiga Ancestral · Lâmina Ancestral\n\nFALTA METAL\n\nRequer: Alcançar maestria lendária (1+ Lendária) e posse de Liga Primordial.\n\n🏺 Estilhaço de Liga Primordial: 0 em estoque"
+      },
+      "filterEmpty": {
+        "text": "0 de 6 armas · RelíquiaTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma arma com raridade Relíquia.Você tem 6 armas no Arsenal, mas nenhuma corresponde a este filtro.Mostrar todas as armas",
+        "forjar": false,
+        "summary": "0 de 6 armas · Relíquia"
+      },
+      "filterCleared": {
+        "value": "Todas",
+        "cards": {
+          "count": 6,
+          "fullyVisible": 4,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco",
+            "Lâmina do Primeiro Inverno",
+            "Véu de Ferro",
+            "Lua Silenciosa",
+            "Fragmento da Bigorna"
+          ]
+        }
+      },
+      "filterResults": {
+        "cards": {
+          "count": 2,
+          "fullyVisible": 2,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco"
+          ]
+        },
+        "summary": "2 de 6 armas · Lendária"
+      },
+      "inspection": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "inspectionEscape": {
+        "closed": true
+      },
+      "favorite": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaEspada protegida contra fusão.P.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": "Espada protegida contra fusão."
+      },
+      "protectedIcon": 1,
+      "protectedIconPersisted": 1,
+      "favoritePersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "installPicker": {
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPeças disponíveisGuarda de Asas de ValdoriaRaraPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar"
+      },
+      "installed": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaPeça instalada e atributos recalculados.P.ATK312DEF156AGI166DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": "Peça instalada e atributos recalculados."
+      },
+      "installedPersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF156AGI166DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "refined": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaLâmina refinada na bancada.P.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Lâmina refinada na bancada."
+      },
+      "unfavorite": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaProteção removida.P.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Proteção removida."
+      },
+      "unfavoritePersisted": {
+        "icons": 0
+      },
+      "finalPersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": null
+      },
+      "empty": {
+        "text": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ]
+      },
+      "emptyFiltered": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+      "large": {
+        "count": 14,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco 2",
+          "Lâmina do Primeiro Inverno 3",
+          "Véu de Ferro 4",
+          "Lua Silenciosa 5",
+          "Juramento das Cinzas de Valdoria 6",
+          "Cimitarra de Damasco 7",
+          "Lâmina do Primeiro Inverno 8",
+          "Véu de Ferro 9",
+          "Lua Silenciosa 10",
+          "Juramento das Cinzas de Valdoria 11",
+          "Cimitarra de Damasco 12",
+          "Lâmina do Primeiro Inverno 13",
+          "Véu de Ferro 14"
+        ]
+      },
+      "largeBottom": {
+        "lastVisible": true,
+        "lastTitle": "Véu de Ferro 14",
+        "overflow": 0
+      },
+      "dna": {
+        "control": "SeçãoArsenal",
+        "canvases": 6,
+        "overflow": 0
+      }
+    },
+    "392x819": {
+      "size": "392x819",
+      "selector": {
+        "count": 1,
+        "text": "SEÇÃO Arsenal",
+        "ariaLabel": "Seção da Coleção: Arsenal. Abrir as seis seções",
+        "expanded": "false",
+        "box": {
+          "width": 368,
+          "height": 56
+        },
+        "visible": true
+      },
+      "arsenal": {
+        "count": 6,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco",
+          "Lâmina do Primeiro Inverno",
+          "Véu de Ferro",
+          "Lua Silenciosa",
+          "Fragmento da Bigorna"
+        ]
+      },
+      "countLabel": "6 armas no Arsenal",
+      "overflow": {
+        "doc": 0,
+        "section": 0
+      },
+      "longName": {
+        "text": "Juramento das Cinzas de Valdoria",
+        "clientHeight": 32,
+        "scrollHeight": 32,
+        "clientWidth": 161,
+        "scrollWidth": 161,
+        "title": "Juramento das Cinzas de Valdoria"
+      },
+      "panel": {
+        "title": "Seções da Coleção",
+        "options": [
+          {
+            "label": "Arsenal",
+            "checked": true,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Compêndio",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Peças",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Runas",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Núcleos",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          },
+          {
+            "label": "Comparar",
+            "checked": false,
+            "width": 176,
+            "height": 64,
+            "fullyVisible": true
+          }
+        ],
+        "allVisible": true
+      },
+      "escape": {
+        "closed": true,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "back": {
+        "closed": true,
+        "collection": 1,
+        "focused": "Seção da Coleção: Arsenal. Abrir as seis seções"
+      },
+      "runas": {
+        "selector": "SEÇÃO Runas",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ᚠ\nFehu — Runa da Brasa\n\nFogo · Rara\n\nO aço perde calor mais lentamente na bigorna.\n\nPeças soltas: 0\n\nᚢ\nUruz — Runa da Força Bruta\n\nTerra · Incomum\n\nAumenta o impacto e a deformação plástica dos golpes.\n\nPeças soltas: 0\n\nᚦ\nThurisaz — Runa do Trovão\n\nFogo · Épica\n\nDispara centelhas que aumentam a precisão do sweet spot.\n\nPeças soltas: 0\n\nᚨ\nAnsuz — Runa dos Reis\n\nÉlfica · Lendária\n\nConcede elegância soberana e alinhamento do gume.\n\nPeças soltas: 0\n\nᛁ\nIsa — Runa do Gelo Estático\n\nGelo · Rara\n\nEstabiliza o banho de têmpera impedindo empenamentos.\n\nPeças soltas: 0\n\nᛊ\nSowilo — Runa do Raio Solar\n\nVento · Lendária\n\nInfunde a lâmina com velocidade e corte sem atrito.\n\nPeças soltas: 0\n\nᛏ\nTiwaz — Runa da Vitória\n\nAntiga · Relíquia\n\nIntegridade inquebrável mesmo sob golpes extremos.\n\nPeças soltas: 0\n\nINSTALAR UMA RUNA NUMA ESPADA"
+      },
+      "nucleos": {
+        "selector": "SEÇÃO Núcleos",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "ÉPICA\nNúcleo de Asterion — Memória de Metal\n+8% Q\n\nAfinidade ofensiva predominante\n\nATK\n\n+18\n\nDEF\n\n+6\n\nAGI\n\n+9\n\nDUR\n\n+4\n\nLuz Azul Celeste · Dureza Astral · Origem: 4 doadoras consumidas.\n\nAinda precisa ser forjado na bigorna.\n\nPREPARAR NA FORJA"
+      },
+      "comparar": {
+        "selector": "SEÇÃO Comparar",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        }
+      },
+      "comparison": {
+        "rows": [
+          [
+            "atk",
+            "312",
+            "210",
+            "-102"
+          ],
+          [
+            "def",
+            "148",
+            "150",
+            "+2"
+          ],
+          [
+            "agi",
+            "162",
+            "90",
+            "-72"
+          ],
+          [
+            "dur",
+            "98",
+            "88",
+            "-10"
+          ]
+        ]
+      },
+      "pecas": {
+        "selector": "SEÇÃO Peças",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "text": "GUARDAS · 1\n🪽\n\nGuarda de Asas de Valdoria\n\nRara · DEFENSE +8 · AGILITY +4\n\nINSTALAR\nCABOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nPOMOS · 0\n\nNenhuma peça solta. Compre na Loja ou funda quatro no Craft.\n\nRUNAS · 1\nᚠ\n\nPedra Rúnica Fehu\n\nRara · DAMAGE +6\n\nINSTALAR\nCOMPRAR PEÇAS NA LOJA"
+      },
+      "compendio": {
+        "selector": "SEÇÃO Compêndio",
+        "section": 1,
+        "panelOpen": 0,
+        "overflow": {
+          "doc": 0,
+          "section": 0
+        },
+        "articles": 8,
+        "text": "Guarda da Fronteira (Medieval Comum)\n\nFerro · Espada longa\n\nPRONTA\n\nProjeto inicial de oficina — sempre disponível.\n\n🧱 Lingote de Ferro Batido: 8 em estoque\n\nCimitarra de Damasco\n\nDamasco · Alfange\n\nFABRICADA\n\nRequer: Concluir 3 forjas na oficina (ou receita no Bazar).\n\n🌊 Tarugo Dobrado de Damasco: 2 em estoque\n\nLua Silenciosa (Katana)\n\nAço Negro · Katana\n\nFABRICADA\n\nRequer: Forjar 1 Obra-prima (Rank S) ou 5 armas.\n\n⬛ Aço Negro dos Abismos: 0 em estoque\n\nFolha de Aereth (Élfica)\n\nPrata Élfica · Lâmina Foliar\n\nBLOQUEADA\n\nRequer: Concluir 7 forjas na oficina (ou segredo élfico no Bazar).\n\n🪙 Lingote de Prata Élfica: 0 em estoque\n\nQueda de Asterion (Meteórica)\n\nMeteorito · Sabre\n\nDOMINADA\n\nRequer: 2 Obras-primas (Rank S) ou 1 Lendária forjada + posse de metal meteórico.\n\n✨ Fragmento de Minério Estelar: 1 em estoque\n\nJuramento de Ferro (Rúnica)\n\nFerro · Claymore\n\nPRONTA\n\nRequer: Concluir 4 forjas na oficina.\n\n🧱 Lingote de Ferro Batido: 8 em estoque\n\nSol Imperial\n\nAço Nobre · Espada longa\n\nBLOQUEADA\n\nRequer: Acumular 2.500 moedas de ouro em valor de armas forjadas.\n\n🪙 Lingote de Aço Forjado: 4 em estoque\n\nCinzas Ancestrais (Relíquia)\n\nLiga Ancestral · Lâmina Ancestral\n\nFALTA METAL\n\nRequer: Alcançar maestria lendária (1+ Lendária) e posse de Liga Primordial.\n\n🏺 Estilhaço de Liga Primordial: 0 em estoque"
+      },
+      "filterEmpty": {
+        "text": "0 de 6 armas · RelíquiaTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma arma com raridade Relíquia.Você tem 6 armas no Arsenal, mas nenhuma corresponde a este filtro.Mostrar todas as armas",
+        "forjar": false,
+        "summary": "0 de 6 armas · Relíquia"
+      },
+      "filterCleared": {
+        "value": "Todas",
+        "cards": {
+          "count": 6,
+          "fullyVisible": 4,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco",
+            "Lâmina do Primeiro Inverno",
+            "Véu de Ferro",
+            "Lua Silenciosa",
+            "Fragmento da Bigorna"
+          ]
+        }
+      },
+      "filterResults": {
+        "cards": {
+          "count": 2,
+          "fullyVisible": 2,
+          "titles": [
+            "Juramento das Cinzas de Valdoria",
+            "Cimitarra de Damasco"
+          ]
+        },
+        "summary": "2 de 6 armas · Lendária"
+      },
+      "inspection": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "inspectionEscape": {
+        "closed": true
+      },
+      "favorite": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaEspada protegida contra fusão.P.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": "Espada protegida contra fusão."
+      },
+      "protectedIcon": 1,
+      "protectedIconPersisted": 1,
+      "favoritePersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "148",
+          "AGI": "162",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "installPicker": {
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF148AGI162DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaPeça de forja padrãoInstalarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPeças disponíveisGuarda de Asas de ValdoriaRaraPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar"
+      },
+      "installed": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaPeça instalada e atributos recalculados.P.ATK312DEF156AGI166DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": "Peça instalada e atributos recalculados."
+      },
+      "installedPersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK312DEF156AGI166DUR98Estado: estávelDurabilidade: 98%FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 60 ouroEfeito: +8 ATK · +2 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "312",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "98"
+        },
+        "notice": null
+      },
+      "refined": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaLâmina refinada na bancada.P.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Desproteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Lâmina refinada na bancada."
+      },
+      "unfavorite": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaProteção removida.P.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": "Proteção removida."
+      },
+      "unfavoritePersisted": {
+        "icons": 0
+      },
+      "finalPersisted": {
+        "title": "Juramento das Cinzas de Valdoria",
+        "text": "InspeçãoJuramento das Cinzas de ValdoriaLendária · Qualidade 97 · Obra-primaP.ATK320DEF156AGI166DUR100Estado: estávelDurabilidade: 100%Refinos: 1/3FamíliaMeteóricaPerfilSabreMaterialMeteoritoGuardaAsasCaboFio DouradoPomoEsfera“JURAMENTO” MontagemGuardaGuarda de Asas de ValdoriaTrocarCaboPeça de forja padrãoInstalarPomoPeça de forja padrãoInstalarRunaPeça de forja padrãoInstalarPropriedadesAlinhamento Perfeito: Centro de massa idealOrigem: forjada em 09/10/2025 · run run_s1.Próximo refino: 120 ouro + 1 rubiEfeito: +8 ATK · +0 DUR Proteger Refinar",
+        "stats": {
+          "P.ATK": "320",
+          "DEF": "156",
+          "AGI": "166",
+          "DUR": "100"
+        },
+        "notice": null
+      },
+      "empty": {
+        "text": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+        "buttons": [
+          "Forjar a primeira"
+        ]
+      },
+      "emptyFiltered": "0 armas no ArsenalTodasComumIncomumRaraÉpicaLendáriaRelíquiaNenhuma lâmina aqui ainda.Forje a primeira espada para começar o Arsenal.Forjar a primeira",
+      "large": {
+        "count": 14,
+        "fullyVisible": 4,
+        "titles": [
+          "Juramento das Cinzas de Valdoria",
+          "Cimitarra de Damasco 2",
+          "Lâmina do Primeiro Inverno 3",
+          "Véu de Ferro 4",
+          "Lua Silenciosa 5",
+          "Juramento das Cinzas de Valdoria 6",
+          "Cimitarra de Damasco 7",
+          "Lâmina do Primeiro Inverno 8",
+          "Véu de Ferro 9",
+          "Lua Silenciosa 10",
+          "Juramento das Cinzas de Valdoria 11",
+          "Cimitarra de Damasco 12",
+          "Lâmina do Primeiro Inverno 13",
+          "Véu de Ferro 14"
+        ]
+      },
+      "largeBottom": {
+        "lastVisible": true,
+        "lastTitle": "Véu de Ferro 14",
+        "overflow": 0
+      },
+      "dna": {
+        "control": "SeçãoArsenal",
+        "canvases": 6,
+        "overflow": 0
+      }
+    }
+  },
+  "failures": [],
+  "pass": true
+}
