@@ -1,0 +1,46 @@
+{
+  "metric360": {
+    "canvas": {
+      "bottom": 328,
+      "height": 282,
+      "left": 17,
+      "right": 343,
+      "top": 46,
+      "width": 326,
+      "x": 17,
+      "y": 46
+    },
+    "renderer": "legacy",
+    "scroll": {
+      "content": 289,
+      "height": 289,
+      "overflow": 0
+    },
+    "viewport": [
+      360,
+      800
+    ]
+  },
+  "metric392": {
+    "canvas": {
+      "bottom": 335.59375,
+      "height": 289.59375,
+      "left": 17,
+      "right": 375,
+      "top": 46,
+      "width": 358,
+      "x": 17,
+      "y": 46
+    },
+    "renderer": "legacy",
+    "scroll": {
+      "content": 300,
+      "height": 300,
+      "overflow": 0
+    },
+    "viewport": [
+      392,
+      819
+    ]
+  }
+}

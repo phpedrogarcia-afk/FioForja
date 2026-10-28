@@ -1,0 +1,114 @@
+{
+  "before360Closed": {
+    "canvas": {
+      "height": 282,
+      "width": 326
+    },
+    "contentHeight": 289,
+    "controlHeight": 289,
+    "overflow": 0,
+    "viewport": [
+      360,
+      800
+    ],
+    "visibleLeafCharacters": 264
+  },
+  "before360Open": {
+    "canvas": {
+      "height": 282,
+      "width": 326
+    },
+    "contentHeight": 632,
+    "controlHeight": 289,
+    "overflow": 343,
+    "viewport": [
+      360,
+      800
+    ],
+    "visibleLeafCharacters": 305
+  },
+  "before392Open": {
+    "canvas": {
+      "height": 290,
+      "width": 358
+    },
+    "contentHeight": 632,
+    "controlHeight": 300,
+    "overflow": 332,
+    "viewport": [
+      392,
+      819
+    ],
+    "visibleLeafCharacters": 305
+  },
+  "before392Closed": {
+    "canvas": {
+      "height": 290,
+      "width": 358
+    },
+    "contentHeight": 300,
+    "controlHeight": 300,
+    "overflow": 0,
+    "viewport": [
+      392,
+      819
+    ],
+    "visibleLeafCharacters": 264
+  },
+  "after360Closed": {
+    "canvas": {
+      "height": 282,
+      "width": 326
+    },
+    "contentHeight": 289,
+    "controlHeight": 289,
+    "overflow": 0,
+    "viewport": [
+      360,
+      800
+    ],
+    "visibleLeafCharacters": 264
+  },
+  "after360Open": {
+    "canvas": {
+      "height": 282,
+      "width": 326
+    },
+    "contentHeight": 1100,
+    "controlHeight": 289,
+    "overflow": 811,
+    "viewport": [
+      360,
+      800
+    ],
+    "visibleLeafCharacters": 234
+  },
+  "after392Open": {
+    "canvas": {
+      "height": 290,
+      "width": 358
+    },
+    "contentHeight": 1080,
+    "controlHeight": 300,
+    "overflow": 780,
+    "viewport": [
+      392,
+      819
+    ],
+    "visibleLeafCharacters": 235
+  },
+  "after392Closed": {
+    "canvas": {
+      "height": 290,
+      "width": 358
+    },
+    "contentHeight": 300,
+    "controlHeight": 300,
+    "overflow": 0,
+    "viewport": [
+      392,
+      819
+    ],
+    "visibleLeafCharacters": 264
+  }
+}

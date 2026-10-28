@@ -85,7 +85,12 @@ export type StructuralState = "stable" | "deformed" | "damaged" | "cracked" | "b
 export type RarityGrade = "Comum" | "Incomum" | "Rara" | "Épica" | "Lendária" | "Relíquia";
 export type CombatRole = "Ofensiva" | "Defensiva" | "Ágil" | "Equilibrada" | "Excepcional";
 
+export type DesignCustomizationField = "name" | "profile" | "wrap" | "guard" | "pommel" | "length" | "inscription" | "runes" | "runeSymbol" | "runeKey";
+
 export interface SwordDesign {
+  /** Identidade e preferências explícitas são opcionais em saves antigos. */
+  id?: string;
+  customizedFields?: DesignCustomizationField[];
   name: string;
   family?: FamilyId;
   profile: ProfileId;

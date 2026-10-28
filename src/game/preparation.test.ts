@@ -5,6 +5,7 @@ import { defaultSaveData, loadSave, writeSave } from "./save.ts";
 import {
   getDesignBlueprint,
   getPreparationBlocker,
+  selectPreparationFamily,
   selectPreparationProject,
 } from "./preparation.ts";
 import { executeStartForgeTransaction } from "./transactions.ts";
@@ -32,7 +33,11 @@ describe("M03A — preparação pelo motor canônico", () => {
       s.career,
       s.gallery,
     );
-    assert.deepEqual(next, { ...CANONICAL_PRESETS[1].design, steel: "steel" });
+    assert.deepEqual(next, {
+      ...CANONICAL_PRESETS[1].design,
+      id: CANONICAL_PRESETS[1].id,
+      steel: "steel",
+    });
     assert.equal(getPreparationBlocker(next!, s.inventory, s.career, s.gallery), null);
   });
 
@@ -138,7 +143,8 @@ describe("M03A — preparação pelo motor canônico", () => {
       [],
     );
     assert.ok(next, "Projeto inicial deve ser selecionável antes da segunda escolha de metal");
-    assert.equal(next.name, CANONICAL_PRESETS[0].design.name);
+    assert.equal(next.id, CANONICAL_PRESETS[0].id);
+    assert.equal(next.name, "Herança", "nome personalizado deve ser preservado");
     assert.equal(next.steel, "meteor", "Não substituir silenciosamente o material");
     assert.equal(getPreparationBlocker(next, s.inventory, s.career, [])?.code, "METALLURGY_LOCKED");
     assert.equal(executeStartForgeTransaction(s, next).code, "METALLURGY_LOCKED");
@@ -148,7 +154,82 @@ describe("M03A — preparação pelo motor canônico", () => {
     );
   });
 
-  it("preserva ajustes avançados no lastDesign v5 sem alterar schema nem consumir inventário", () => {
+  it("mantém o desbloqueio da família/perfil canônicos após personalizar um projeto com ID", () => {
+    const save = structuredClone(defaultSaveData);
+    const initial = selectPreparationProject(
+      CANONICAL_PRESETS[0],
+      { ...CANONICAL_PRESETS[0].design, steel: "iron" },
+      save.inventory,
+      save.career,
+      [],
+    );
+    assert.ok(initial);
+    const changed = selectPreparationFamily("damascus", { ...initial, name: "Fio único" });
+    assert.equal(changed.id, CANONICAL_PRESETS[0].id);
+    assert.equal(changed.profile, CANONICAL_PRESETS[1].design.profile);
+    assert.equal(
+      getPreparationBlocker(changed, save.inventory, save.career, [])?.code,
+      "BLUEPRINT_LOCKED",
+    );
+    assert.equal(executeStartForgeTransaction(save, changed).code, "BLUEPRINT_LOCKED");
+    save.career.totalForged = 3;
+    assert.equal(getPreparationBlocker(changed, save.inventory, save.career, []), null);
+  });
+
+  it("preserva após reabertura uma escolha manual que é igual ao padrão do projeto anterior", () => {
+    const s = structuredClone(defaultSaveData);
+    s.career.totalForged = 3;
+    s.lastDesign = {
+      ...CANONICAL_PRESETS[0].design,
+      id: CANONICAL_PRESETS[0].id,
+      steel: "steel",
+      customizedFields: ["guard"],
+    };
+    assert.equal(writeSave(s).ok, true);
+    const restored = loadSave();
+    const next = selectPreparationProject(
+      CANONICAL_PRESETS[1],
+      restored.lastDesign,
+      restored.inventory,
+      restored.career,
+      [],
+    );
+    assert.equal(next?.guard, "cross");
+    assert.equal(next?.wrap, CANONICAL_PRESETS[1].design.wrap);
+  });
+
+  it("persiste a identidade selecionada e usa o gate correto mesmo com nome de outro projeto", () => {
+    const unlocked = structuredClone(defaultSaveData);
+    unlocked.career.totalForged = 3;
+    const customized = {
+      ...CANONICAL_PRESETS[0].design,
+      name: CANONICAL_PRESETS[2].design.name,
+      profile: "saber" as const,
+      steel: "steel" as const,
+    };
+    const result = selectPreparationProject(
+      CANONICAL_PRESETS[1],
+      customized,
+      unlocked.inventory,
+      unlocked.career,
+      [],
+    );
+    assert.ok(result);
+    assert.equal(result.name, customized.name);
+    assert.equal(result.id, CANONICAL_PRESETS[1].id);
+    unlocked.lastDesign = result;
+    assert.equal(writeSave(unlocked).ok, true);
+    const restored = loadSave();
+    assert.equal(restored.lastDesign.id, CANONICAL_PRESETS[1].id);
+    assert.equal(executeStartForgeTransaction(restored, restored.lastDesign).success, true);
+    const locked = structuredClone(defaultSaveData);
+    assert.equal(
+      executeStartForgeTransaction(locked, restored.lastDesign).code,
+      "BLUEPRINT_LOCKED",
+    );
+  });
+
+  it("preserva ajustes de um save legado v5 sem consumir inventário", () => {
     const s = structuredClone(defaultSaveData);
     s.lastDesign = {
       ...DEFAULT_DESIGN,

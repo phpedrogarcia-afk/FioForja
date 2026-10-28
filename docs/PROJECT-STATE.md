@@ -1,5 +1,13 @@
 # Estado do projeto — integração e APK Android experimental
 
+## M03A — Da escolha à bigorna — 27/10/2026
+
+- Branch `codex/forge-preparation-m03a`, base `2ac3cf5` (M03A anterior, M02B incluída). [Evidências e comparação](../experiments/M03A-choice-to-anvil/README.md); [contrato](specs/preparation.md). A frente Antigravity em `67ab141` é separada e não foi integrada.
+- Seleção visual por miniaturas, bloqueados sob demanda, ajustes manuais preservados e núcleo com raridade/origem. Campos opcionais `id`/`customizedFields` no design v5 preservam identidade e intenção; projetos identificados simultaneamente por ID e família/perfil precisam cumprir ambos os gates. Economia, limites de metal e transações de consumo preservados.
+- 190 testes afetados e 6 de Android/assets PASS; typecheck PASS; lint 0 erros/38 avisos herdados. Clássico e DNA observados em 360/392; 32 combinações geométricas sem extrapolação, sem afirmar cobertura de todos os pixels. Aprovação humana e desempenho sustentado pendentes.
+- APK 0.2.7/código 9 instalado por cima no Poco; certificado igual e dez arquivos de Local Storage idênticos antes/depois da instalação, antes de abrir. Prévia e lista visual observadas com dados existentes; nenhuma compra/forja com estoque do proprietário. Backup privado e versões 0.2.5/0.2.6 preservados. Em emulador isolado sem rede, abertura, compra no save de teste e entrada no aquecimento foram observadas; ciclo completo offline não foi testado.
+- Nenhuma modificação em câmera, martelo, simulação, Loja, Coleção ou Craft. Sem merge/push.
+
 ## M03A — Preparação intuitiva — 26/10/2026
 
 **Atualização física posterior — 27/10/2026:** Poco atualizado de 0.2.3/código 5 para 0.2.5/código 7 por instalação sobreposta; certificado igual e nove arquivos de Local Storage idênticos antes/depois da instalação, antes da abertura. Backup privado dos dados e APK anteriores preservado. Jogo abriu com dados existentes; preparação e listas de projeto/metal foram observadas no aparelho com a espada inteira visível. Avaliação humana, forja com estoque do proprietário, áudio e offline continuam pendentes. Este registro supera apenas a pendência de instalação e observação física indicada no item histórico abaixo. [Detalhes](../experiments/M03A-intuitive-preparation/README.md#atualização-posterior-no-poco--27102026).

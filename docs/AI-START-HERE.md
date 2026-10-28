@@ -2,6 +2,8 @@
 
 Leia este mapa antes de propor ou implementar mudanças. Ele organiza a direção de produto aprovada, as evidências verificadas do código e as regras inegociáveis.
 
+**M03A — Da escolha à bigorna, 27/10/2026:** [preparação visual refinada](specs/preparation.md) na branch `codex/forge-preparation-m03a`, base `2ac3cf5`. APK 0.2.7/código 9 instalado no Poco, com backup e observação física; aceitação humana pendente. [Comparação, testes e limites](../experiments/M03A-choice-to-anvil/README.md). Não integra a frente Antigravity nem a main.
+
 **M03A — 26/10/2026:** [preparação intuitiva](specs/preparation.md) implementada em branch isolada sobre M02B: projeto/metal, prévia fora da rolagem e personalização opcional. [Comparação e limites](../experiments/M03A-intuitive-preparation/README.md). APK 0.2.5/código 7; verificação técnica aprovada, instalação e observação física posteriores no Poco registradas; avaliação humana pendente. Sem integração à main.
 
 **Decisão humana de 24/10/2026 — Codex e Antigravity:** [FIOFORJA-MOBILE-UX-001](DECISIONS.md#fioforja-mobile-ux-001) aprova cinco seções com barra inferior fixa e fabricação imersiva sem barra. A [Operação Codex 07](DECISIONS.md#fioforja-mobile-core-001--cinco-seções-conectadas-ao-jogo-real-user-approved-agent-implemented-verified) integrou o layout ao jogo real na branch `codex/mobile-core-integration-v1`: Loja, Arsenal, Craft e Forja compartilham um único save e passam pelas transações canônicas. O [protótipo navegável](../experiments/mobile-ux-v1/README.md) continua preservado como referência visual; a avaliação humana do candidato integrado 0.2.2 permanece pendente, com navegação básica física já observada no envelope da revisão abaixo.

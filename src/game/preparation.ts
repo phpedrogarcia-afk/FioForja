@@ -1,4 +1,4 @@
-import { CANONICAL_PRESETS, type CanonicalPreset } from "./catalog.ts";
+import { CANONICAL_PRESETS, DEFAULT_DESIGN, FAMILIES, type CanonicalPreset } from "./catalog.ts";
 import { evaluateBlueprintStatus } from "./blueprints.ts";
 import type {
   SwordDesign,
@@ -7,17 +7,64 @@ import type {
   CareerStats,
   FinishedSword,
   FusionCore,
+  FamilyId,
+  DesignCustomizationField,
 } from "./types.ts";
 
 /** Mesma identificação utilizada pela transação, inclusive designs renomeados. */
 export function getDesignBlueprint(design: SwordDesign) {
+  const byId = design.id && CANONICAL_PRESETS.find((p) => p.id === design.id);
+  if (byId) return byId;
   return CANONICAL_PRESETS.find(
     (p) =>
-      p.id === (design as SwordDesign & { id?: string }).id ||
       p.name === design.name ||
       p.design.name === design.name ||
       (p.family === design.family && p.design.profile === design.profile),
   );
+}
+
+export type AdjustableField = DesignCustomizationField;
+const adjustable: AdjustableField[] = [
+  "name",
+  "profile",
+  "wrap",
+  "guard",
+  "pommel",
+  "length",
+  "inscription",
+  "runes",
+  "runeSymbol",
+  "runeKey",
+];
+
+/** Inferência para saves antigos, que não registravam quais campos foram editados. */
+function previousDefaults(current: SwordDesign): SwordDesign {
+  const preset =
+    (current.id && CANONICAL_PRESETS.find((p) => p.id === current.id)) ||
+    CANONICAL_PRESETS.find((p) => p.family === current.family) ||
+    getDesignBlueprint(current);
+  return preset?.design || DEFAULT_DESIGN;
+}
+
+function retainEdits(
+  next: SwordDesign,
+  current: SwordDesign,
+  touched: ReadonlySet<AdjustableField>,
+): SwordDesign {
+  const previous = previousDefaults(current);
+  const retained = new Set<AdjustableField>(
+    Array.isArray(current.customizedFields)
+      ? current.customizedFields.filter((field) => adjustable.includes(field))
+      : [],
+  );
+  for (const field of adjustable) {
+    if (touched.has(field) || retained.has(field) || current[field] !== previous[field]) {
+      Object.assign(next, { [field]: current[field] });
+      retained.add(field);
+    }
+  }
+  if (retained.size) next.customizedFields = [...retained];
+  return next;
 }
 
 /** Gates existentes, compartilhados pela tela e pela transação. Não consome recursos. */
@@ -103,11 +150,22 @@ export function getPreparationBlocker(
 ): { code: string; error: string } | null {
   // Validate blueprint lock
   const matchedPreset = getDesignBlueprint(design);
-  if (matchedPreset) {
-    const status = evaluateBlueprintStatus(matchedPreset, inventory, career, gallery, activeCore);
+  // Uma identidade explícita não pode esconder outro projeto canônico que a
+  // família e o perfil personalizados também identificam. Saves sem ID seguem
+  // o matching histórico; nomes editados não definem um segundo projeto.
+  const profileMatch =
+    design.id && matchedPreset?.id === design.id
+      ? CANONICAL_PRESETS.find(
+          (p) => p.family === design.family && p.design.profile === design.profile,
+        )
+      : undefined;
+  const matches = [matchedPreset, profileMatch].filter((p, i, all) => p && all.indexOf(p) === i);
+  for (const preset of matches) {
+    if (!preset) continue;
+    const status = evaluateBlueprintStatus(preset, inventory, career, gallery, activeCore);
     if (!status.unlocked || status.state === "locked") {
       return {
-        error: `Projeto "${matchedPreset.name}" bloqueado. ${status.requirementText}`,
+        error: `Projeto "${preset.name}" bloqueado. ${status.requirementText}`,
         code: "BLUEPRINT_LOCKED",
       };
     }
@@ -124,11 +182,32 @@ export function selectPreparationProject(
   career: CareerStats,
   gallery: FinishedSword[],
   activeCore?: FusionCore | null,
+  touched: ReadonlySet<AdjustableField> = new Set(),
 ): SwordDesign | null {
   if (activeCore || !evaluateBlueprintStatus(preset, inventory, career, gallery).unlocked)
     return null;
   // A escolha de projeto precede a de metal. Se o metal perder autorização
   // (ex.: Liberar núcleo), a tela deve permitir trocar o projeto e então
   // corrigir o metal, mantendo o bloqueio canônico da fabricação.
-  return { ...preset.design, steel: current.steel };
+  return retainEdits({ ...preset.design, id: preset.id, steel: current.steel }, current, touched);
+}
+
+export function selectPreparationFamily(
+  family: FamilyId,
+  current: SwordDesign,
+  touched: ReadonlySet<AdjustableField> = new Set(),
+): SwordDesign {
+  const defaults = FAMILIES[family];
+  return retainEdits(
+    {
+      ...current,
+      family,
+      profile: defaults.defaultProfile,
+      wrap: defaults.defaultWrap,
+      guard: defaults.defaultGuard,
+      pommel: defaults.defaultPommel,
+    },
+    current,
+    touched,
+  );
 }

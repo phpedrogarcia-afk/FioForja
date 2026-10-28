@@ -2,6 +2,12 @@
 
 Este documento é a fonte de autoridade para decisões arquiteturais, de produto e regras econômicas do projeto FioForja.
 
+## M03A — Da escolha à bigorna (27/10/2026)
+
+**FIOFORJA-PREPARATION-002** `[USER-AUTHORIZED]` `[AGENT-IMPLEMENTED]` `[TECHNICALLY-VERIFIED]`: preservar o caminho projeto → metal → forjar e a personalização opcional. Projetos disponíveis usam miniaturas do renderer atual; bloqueados e seus requisitos aparecem sob demanda. A prévia principal continua visível. Padrões não editados seguem o projeto/família, enquanto escolhas explícitas válidas e metal permanecem. Núcleo exibe raridade e origem e exige forja. IDs e preferências opcionais são retrocompatíveis com o save v5; dois gates canônicos identificados por ID e família/perfil são verificados. [Provas e limites](../experiments/M03A-choice-to-anvil/README.md). Avaliação humana permanece pendente; sem autorização para integrar à main.
+
+**FIOFORJA-GAMEPLAY-CLARITY** `[PROPOSED]`: o material de análise recomenda que cena, controles e consequências ensinem o jogador, com textos/números como apoio. É direção proposta para planejamento posterior; não autoriza tutorial, efeitos ou alterações na bigorna nesta missão.
+
 ## M03A — Preparação intuitiva (26/10/2026)
 
 **FIOFORJA-PREPARATION-001** `[USER-AUTHORIZED]` `[AGENT-IMPLEMENTED]` `[TECHNICALLY-VERIFIED]`: caminho principal com projeto, metal e começar; personalização detalhada opcional; prévia completa permanente. Reduzir complexidade visível, preservando profundidade e transações. Listas inline evitam sobrepor a arma; projeto/família mantêm o metal escolhido. Draft usa `lastDesign` existente. Núcleos continuam pré-formas com identidade bloqueada e forja manual. [Contrato, evidência e limites](specs/preparation.md). Candidata à avaliação visual humana, sem aprovação de integração à main.

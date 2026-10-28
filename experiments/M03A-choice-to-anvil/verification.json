@@ -1,0 +1,77 @@
+{
+  "mission": "M03A-choice-to-anvil",
+  "base": "2ac3cf58686f71f14510b82bb2ec2a096f5b1912",
+  "branch": "codex/forge-preparation-m03a",
+  "sourceGitBlobs": {
+    "src/game/blueprints.ts": "e03536b7f15693d2c81e112152b7342b67a6dcc5",
+    "src/game/preparation.ts": "6772b32e8dee3716e66b4e6b3eafecbc5552044f",
+    "src/game/screens/DesignScreen.tsx": "07a77d7ea535cb31296b6927aeff4084446aff82",
+    "src/game/transactions.ts": "6897b1e937a665e6870a9014afaa644ab18a012b",
+    "src/game/types.ts": "23d50a9f44c8b72984f8f96ff860ebd2d58292c1",
+    "package.json": "d15289122c296f42a6571a302208fdda7cf08eaf",
+    "package-lock.json": "87cde8a6033eaddbfee07769cab1542688f63853",
+    "android/app/build.gradle": "be92ea2e1e26ba719aba25a6d125df793c56b74f"
+  },
+  "tests": {
+    "affectedPass": 190,
+    "androidAssetsPass": 6,
+    "fail": 0,
+    "dnaGeometryCasesWithinOneTest": 32
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 38
+  },
+  "apk": {
+    "version": "0.2.7",
+    "code": 9,
+    "bytes": 12130249,
+    "sha256": "d47dcf2cce21551867afc724c6f21360690e1fb2c101033e4ece01224d45d20b",
+    "copies": [
+      {
+        "path": "APK/FioForja-teste.apk",
+        "sha256": "d47dcf2cce21551867afc724c6f21360690e1fb2c101033e4ece01224d45d20b"
+      },
+      {
+        "path": "C:/Users/phped/Documents/FioForja/APK/FioForja-teste.apk",
+        "sha256": "d47dcf2cce21551867afc724c6f21360690e1fb2c101033e4ece01224d45d20b"
+      },
+      {
+        "path": "C:/Users/phped/Projetos/FioForja/FioForja/APK/FioForja-teste.apk",
+        "sha256": "d47dcf2cce21551867afc724c6f21360690e1fb2c101033e4ece01224d45d20b"
+      }
+    ],
+    "sourceDirtyAtBuild": true,
+    "certificateSha256": "29896d7ad281e0f642a44d513b2b277a3e1723de2df0d796ea0eff1a8af195bc",
+    "localAssets": 11,
+    "fixturePackaged": false
+  },
+  "physical": {
+    "pocoInstall": "PASS",
+    "from": "0.2.6",
+    "to": "0.2.7",
+    "storageFiles": 10,
+    "storageIdenticalBeforeLaunch": true,
+    "signatureMatched": true,
+    "screenAndProjectImages": "OBSERVED",
+    "humanAcceptance": "PENDING",
+    "purchasesOrForgeOnPhone": "NOT_PERFORMED"
+  },
+  "offline": {
+    "scope": "AVD_READ_ONLY_NO_DEFAULT_NETWORK",
+    "coldStart": "PASS",
+    "syntheticPurchase": "PASS",
+    "preparation": "PASS",
+    "heatingEntry": "PASS",
+    "fullCycle": "NOT_TESTED",
+    "firstEmulatorExited": true,
+    "broadcastDenied": true
+  },
+  "baselineScope": "M03A-0.2.5",
+  "humanVisualApproval": "PENDING",
+  "gateChange": "ID_AND_FAMILY_PROFILE_BOTH_CHECKED_FOR_NEW_IDENTIFIED_DESIGNS",
+  "legacyGateMatching": "UNCHANGED",
+  "push": false,
+  "mainChanged": false
+}

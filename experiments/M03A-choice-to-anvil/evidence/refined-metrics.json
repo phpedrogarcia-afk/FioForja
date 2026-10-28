@@ -1,0 +1,30 @@
+{
+  "refined360": {
+    "canvas": {
+      "height": 282,
+      "width": 326
+    },
+    "contentHeight": 465,
+    "controlHeight": 289,
+    "overflow": 176,
+    "viewport": [
+      360,
+      800
+    ],
+    "visibleLeafCharacters": 213
+  },
+  "refined392": {
+    "canvas": {
+      "height": 290,
+      "width": 358
+    },
+    "contentHeight": 465,
+    "controlHeight": 300,
+    "overflow": 165,
+    "viewport": [
+      392,
+      819
+    ],
+    "visibleLeafCharacters": 213
+  }
+}

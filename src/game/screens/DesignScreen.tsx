@@ -24,7 +24,9 @@ import {
   getDesignBlueprint,
   getMetallurgyBlocker,
   getPreparationBlocker,
+  selectPreparationFamily,
   selectPreparationProject,
+  type AdjustableField,
 } from "../preparation";
 
 interface Props {
@@ -66,6 +68,13 @@ export function DesignScreen({
   onResumeAttempt,
   onRecycleScrap,
 }: Props) {
+  const touched = new Set<AdjustableField>(
+    Array.isArray(design.customizedFields) ? design.customizedFields : [],
+  );
+  const changeCustom = (field: AdjustableField, next: SwordDesign) => {
+    touched.add(field);
+    onChange({ ...next, customizedFields: [...touched] });
+  };
   const reqMat = getRequiredMaterialForSteel(design.steel);
   const currentStock = getMaterialStock(inventory.materials, reqMat.key);
   const blocker = getPreparationBlocker(design, inventory, career, gallery, activeCore);
@@ -121,7 +130,12 @@ export function DesignScreen({
             <div className="flex items-center justify-between gap-2 rounded-lg border border-purple-700/50 bg-purple-950/20 p-2 text-xs text-purple-200">
               <div>
                 <p className="font-display font-bold">
-                  Núcleo de fusão · +{activeCore.bonusQuality}% qualidade
+                  Núcleo {activeCore.rarity} · +{activeCore.bonusQuality}% qualidade
+                </p>
+                <p>
+                  {activeCore.consumedSwordIds?.length
+                    ? `Origem: ${activeCore.consumedSwordIds.length} espadas`
+                    : "Origem não informada"}
                 </p>
               </div>
               {onCancelCore && (
@@ -153,8 +167,11 @@ export function DesignScreen({
             options={CANONICAL_PRESETS.map((p) => ({
               id: p.id,
               label: p.design.name,
+              design: p.design,
               disabled: !evaluateBlueprintStatus(p, inventory, career, gallery, activeCore)
                 .unlocked,
+              requirement: evaluateBlueprintStatus(p, inventory, career, gallery, activeCore)
+                .requirementText,
             }))}
             onChange={(id) => {
               const preset = CANONICAL_PRESETS.find((p) => p.id === id);
@@ -166,6 +183,7 @@ export function DesignScreen({
                 career,
                 gallery,
                 activeCore,
+                touched,
               );
               if (next) onChange(next);
             }}
@@ -232,7 +250,7 @@ export function DesignScreen({
                 className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
                 maxLength={28}
                 value={design.name}
-                onChange={(e) => onChange({ ...design, name: e.target.value })}
+                onChange={(e) => changeCustom("name", { ...design, name: e.target.value })}
                 placeholder="Ex.: Juramento"
               />
             </label>
@@ -254,16 +272,7 @@ export function DesignScreen({
                 }))}
                 value={design.family || "royal"}
                 onChange={(id) => {
-                  const fam = FAMILIES[id as FamilyId];
-                  onChange({
-                    ...design,
-                    family: id as FamilyId,
-                    profile: fam.defaultProfile,
-                    steel: design.steel,
-                    wrap: fam.defaultWrap,
-                    guard: fam.defaultGuard,
-                    pommel: fam.defaultPommel,
-                  });
+                  onChange(selectPreparationFamily(id as FamilyId, design, touched));
                 }}
               />
             </Section>
@@ -277,7 +286,7 @@ export function DesignScreen({
                   hint: v.blurb,
                 }))}
                 value={design.profile}
-                onChange={(id) => onChange({ ...design, profile: id as ProfileId })}
+                onChange={(id) => changeCustom("profile", { ...design, profile: id as ProfileId })}
               />
             </Section>
 
@@ -285,7 +294,7 @@ export function DesignScreen({
               <ChipRow
                 options={Object.entries(WRAPS).map(([id, v]) => ({ id, label: v.name }))}
                 value={design.wrap}
-                onChange={(id) => onChange({ ...design, wrap: id as WrapId })}
+                onChange={(id) => changeCustom("wrap", { ...design, wrap: id as WrapId })}
               />
             </Section>
 
@@ -293,7 +302,7 @@ export function DesignScreen({
               <ChipRow
                 options={Object.entries(GUARDS).map(([id, v]) => ({ id, label: v.name }))}
                 value={design.guard}
-                onChange={(id) => onChange({ ...design, guard: id as GuardId })}
+                onChange={(id) => changeCustom("guard", { ...design, guard: id as GuardId })}
               />
             </Section>
 
@@ -301,7 +310,7 @@ export function DesignScreen({
               <ChipRow
                 options={Object.entries(POMMELS).map(([id, v]) => ({ id, label: v.name }))}
                 value={design.pommel}
-                onChange={(id) => onChange({ ...design, pommel: id as PommelId })}
+                onChange={(id) => changeCustom("pommel", { ...design, pommel: id as PommelId })}
               />
             </Section>
 
@@ -312,7 +321,9 @@ export function DesignScreen({
                 max={1.2}
                 step={0.01}
                 value={design.length}
-                onChange={(e) => onChange({ ...design, length: Number(e.target.value) })}
+                onChange={(e) =>
+                  changeCustom("length", { ...design, length: Number(e.target.value) })
+                }
                 className="mt-2 w-full accent-ember"
                 aria-label="Comprimento da lâmina"
               />
@@ -323,14 +334,16 @@ export function DesignScreen({
                 className="mt-2 h-11 w-full rounded-md border border-border bg-elevated px-3 font-body text-base text-fg placeholder:text-subtle"
                 maxLength={24}
                 value={design.inscription}
-                onChange={(e) => onChange({ ...design, inscription: e.target.value })}
+                onChange={(e) =>
+                  changeCustom("inscription", { ...design, inscription: e.target.value })
+                }
                 placeholder="Palavra na lâmina"
               />
               <label className="mt-3 flex min-h-11 items-center gap-3 text-sm text-muted">
                 <input
                   type="checkbox"
                   checked={design.runes}
-                  onChange={(e) => onChange({ ...design, runes: e.target.checked })}
+                  onChange={(e) => changeCustom("runes", { ...design, runes: e.target.checked })}
                   className="size-4 accent-ember"
                 />
                 Gravar em runas
@@ -429,7 +442,13 @@ function PreparationChoice({
   label: string;
   value: string;
   selectedLabel: string;
-  options: { id: string; label: string; disabled: boolean }[];
+  options: {
+    id: string;
+    label: string;
+    disabled: boolean;
+    design?: SwordDesign;
+    requirement?: string;
+  }[];
   disabled: boolean;
   onChange: (id: string) => void;
 }) {
@@ -438,6 +457,57 @@ function PreparationChoice({
   const groupId = label.startsWith("1")
     ? "preparation-project-options"
     : "preparation-metal-options";
+  const visualProjects = options.some((option) => option.design);
+  const available = visualProjects ? options.filter((option) => !option.disabled) : options;
+  const locked = visualProjects ? options.filter((option) => option.disabled) : [];
+  const renderOption = (option: (typeof options)[number]) => (
+    <div key={option.id}>
+      <label
+        className={cn(
+          "flex min-h-12 cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm",
+          option.design && "flex-col items-stretch",
+          option.disabled ? "cursor-not-allowed text-muted" : "text-fg",
+          option.id === value && "bg-elevated text-amber-200",
+        )}
+      >
+        {option.design && (
+          <span className="mx-auto block h-24 w-28" aria-hidden="true">
+            <WeaponPreview sword={{ design: option.design, quality: 92 }} padded={false} />
+          </span>
+        )}
+        <span className="flex items-center gap-2">
+          <input
+            className="size-4 shrink-0 accent-ember"
+            type="radio"
+            name={groupId}
+            value={option.id}
+            checked={value === option.id}
+            disabled={option.disabled}
+            onChange={() => {
+              onChange(option.id);
+              setOpen(false);
+              trigger.current?.focus();
+            }}
+          />
+          <span>
+            {option.label}
+            {option.disabled ? " · Bloqueado" : ""}
+          </span>
+        </span>
+      </label>
+      {option.design && option.disabled && option.requirement && (
+        <details className="px-2 pb-2 text-xs text-muted">
+          <summary
+            aria-label={`Ver requisito de ${option.label}`}
+            className="cursor-pointer py-2 text-amber-300"
+          >
+            Ver requisito
+          </summary>
+          <p>{option.requirement}</p>
+        </details>
+      )}
+    </div>
+  );
   return (
     <div>
       <button
@@ -457,36 +527,23 @@ function PreparationChoice({
         </span>
       </button>
       {open && !disabled && (
-        <fieldset id={groupId} className="mt-1 rounded-lg border border-border bg-surface p-1">
+        <fieldset
+          id={groupId}
+          className={cn(
+            "mt-1 rounded-lg border border-border bg-surface p-1",
+            visualProjects && "grid grid-cols-2 gap-1",
+          )}
+        >
           <legend className="sr-only">{label}</legend>
-          {options.map((option) => (
-            <label
-              key={option.id}
-              className={cn(
-                "flex min-h-12 cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm",
-                option.disabled ? "cursor-not-allowed text-muted" : "text-fg",
-                option.id === value && "bg-elevated text-amber-200",
-              )}
-            >
-              <input
-                className="size-4 shrink-0 accent-ember"
-                type="radio"
-                name={groupId}
-                value={option.id}
-                checked={value === option.id}
-                disabled={option.disabled}
-                onChange={() => {
-                  onChange(option.id);
-                  setOpen(false);
-                  trigger.current?.focus();
-                }}
-              />
-              <span>
-                {option.label}
-                {option.disabled ? " · Bloqueado" : ""}
-              </span>
-            </label>
-          ))}
+          {available.map(renderOption)}
+          {locked.length > 0 && (
+            <details className="col-span-2 border-t border-border px-2 py-1">
+              <summary className="min-h-11 cursor-pointer py-3 text-xs text-amber-300">
+                Ver {locked.length} projetos bloqueados
+              </summary>
+              <div className="grid grid-cols-2 gap-1">{locked.map(renderOption)}</div>
+            </details>
+          )}
         </fieldset>
       )}
     </div>

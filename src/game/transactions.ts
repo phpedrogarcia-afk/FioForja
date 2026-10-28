@@ -32,7 +32,7 @@ import {
   getRequiredMaterialForSteel,
   recycleScrapToIron,
 } from "./materials.ts";
-import { getPreparationBlocker } from "./preparation.ts";
+import { getDesignBlueprint, getPreparationBlocker } from "./preparation.ts";
 import { findShopArticle } from "./shop.ts";
 import { isSwordEligibleForCommission } from "./commissions.ts";
 
@@ -589,13 +589,7 @@ export function executeFinishSwordTransaction(
   const nextBlueprints = [...(nextInventory.unlockedBlueprints || ["guarda_medieval"])];
   const nextMastered = [...(nextInventory.masteredBlueprints || [])];
   if (!isTraining) {
-    const matchedPreset = CANONICAL_PRESETS.find(
-      (p) =>
-        p.id === (design as any).id ||
-        p.name === design.name ||
-        p.design.name === design.name ||
-        (p.family === design.family && p.design.profile === design.profile),
-    );
+    const matchedPreset = getDesignBlueprint(design);
     if (matchedPreset) {
       if (sword.quality >= 95 && !nextMastered.includes(matchedPreset.id)) {
         nextMastered.push(matchedPreset.id);

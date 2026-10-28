@@ -30,9 +30,12 @@ export function evaluateBlueprintStatus(
   const hasMaterial = stock >= 1;
 
   // Check if crafted or mastered in gallery
-  const matches = (gallery || []).filter(
-    (s) => s.design.name === preset.name || (s.design.family === preset.family && s.design.profile === preset.design.profile),
-  );
+  const matches = (gallery || []).filter((s) => {
+    // O ID explícito sobrevive à customização; saves antigos seguem a regra histórica.
+    const selectedId = s.design.id;
+    if (selectedId && CANONICAL_PRESETS.some((p) => p.id === selectedId)) return selectedId === preset.id;
+    return s.design.name === preset.name || (s.design.family === preset.family && s.design.profile === preset.design.profile);
+  });
   const isCrafted = matches.length > 0;
   const isMastered =
     inventory?.masteredBlueprints?.includes(preset.id) ||
